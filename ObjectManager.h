@@ -72,7 +72,7 @@ public:
     // オブジェクト作成ヘルパー関数
     // rotationY: Y軸回転角度（単位：0～360度、デフォルト0度）
     void CreateHouse(const DirectX::XMFLOAT3& position, float scale, float maxElectricity, 
-                     MODEL* model = nullptr, float rotationY = 0.0f);
+                     MODEL* model = nullptr, float rotationY = 0.0f, bool repaired = false);
     void CreatePole(const DirectX::XMFLOAT3& position, float height, float radius, int& poleID, 
                     MODEL* model = nullptr, float rotationY = 0.0f);
     void CreateItemGenerator(const DirectX::XMFLOAT3& position, float spawnRadius, float spawnInterval, 

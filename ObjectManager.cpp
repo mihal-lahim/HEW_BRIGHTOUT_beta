@@ -149,7 +149,7 @@ bool ObjectManager::IsDebugAABBEnabled() const
 // オブジェクト作成ヘルパー関数の実装
 //============================================================================
 
-void ObjectManager::CreateHouse(const DirectX::XMFLOAT3& position, float scale, float maxElectricity, struct MODEL* model, float rotationY)
+void ObjectManager::CreateHouse(const DirectX::XMFLOAT3& position, float scale, float maxElectricity, struct MODEL* model, float rotationY, bool repaired)
 {
     if (!model) return;
     
@@ -159,6 +159,7 @@ void ObjectManager::CreateHouse(const DirectX::XMFLOAT3& position, float scale, 
     auto house = std::make_unique<House>(position, model, maxElectricity);
     house->SetScale(scale);
     house->SetRotation({ 0.0f, rotationRad, 0.0f });
+    house->SetRepaired(repaired);
     AddGameObject(std::move(house));
 }
 

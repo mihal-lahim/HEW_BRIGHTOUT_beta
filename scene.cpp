@@ -3,7 +3,7 @@
 #include "game.h"
 #include "result.h"
 
-static Scene g_Scene = SCENE_GAME;// デバッグの時はこのシーンをゲームにしておく
+static Scene g_Scene = SCENE_TITLE;// デバッグの時はこのシーンをゲームにしておく
 static Scene g_SceneNext = g_Scene;
 
 // 関数ポインタの型定義

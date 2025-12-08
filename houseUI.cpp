@@ -104,3 +104,6 @@ void HouseUI::BuildHouseDisplayText(std::string& outText)
 
     outText = ss.str();
 }
+
+
+

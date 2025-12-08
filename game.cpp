@@ -38,12 +38,12 @@
 #include "houseUI.h"
 #include "scene.h"
 #include "UI_Timer.h"
+#include "UI_HouseCount.h"
 #include "Enemy.h"
 #include <array>
 #include <string>
 #include <cstdio>
 using namespace DirectX;
-
 
 static CameraManager g_camMgr;
 static DebugCamera g_debugCamera({ 0.0f,1.0f,-5.0f }, { 0.0f,0.0f,0.0f });
@@ -83,6 +83,9 @@ static ButtonHintUI* g_buttonHintUI = nullptr;
 
 // タイマーUI
 static UI_Timer* g_uiTimer = nullptr;
+
+// ハウスカウントUI
+static UI_HouseCount* g_uiHouseCount = nullptr;
 
 void Game_SetPlayerCount(int count)
 {
@@ -203,10 +206,10 @@ void Game_Initialize()
 
 	
 	// 第1区画の家：4つ
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-22.0f, 0.0f, -10.0f), 5.0f, 100.0f, g_houseModel, 180.0f);
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-10.0f, 0.0f, -22.0f), 5.0f, 100.0f, g_houseModel, 90.0f);
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-22.0f, 0.0f, -22.0f), 5.0f, 100.0f, g_houseModel, 135.0f);
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-10.0f, 0.0f, -10.0f), 5.0f, 100.0f, g_houseModel, 270.0f);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-22.0f, 0.0f, -10.0f), 5.0f, 100.0f, g_houseModel, 180.0f,true);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-10.0f, 0.0f, -22.0f), 5.0f, 100.0f, g_houseModel, 90.0f,true);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-22.0f, 0.0f, -22.0f), 5.0f, 100.0f, g_houseModel, 135.0f, true);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-10.0f, 0.0f, -10.0f), 5.0f, 100.0f, g_houseModel, 270.0f, true);
 
 	// ========================================
 	// 第2区画：右上 (NE: Northeast)
@@ -229,10 +232,10 @@ void Game_Initialize()
 	g_ObjectManager.ConnectPolesByID(5, 9);
 
 	// 第2区画の家：4つ
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(22.0f, 0.0f, -10.0f), 5.0f, 100.0f, g_houseModel, 0.0f);
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(10.0f, 0.0f, -22.0f), 5.0f, 100.0f, g_houseModel, 270.0f);
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(22.0f, 0.0f, -22.0f), 5.0f, 100.0f, g_houseModel, 225.0f);
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(10.0f, 0.0f, -10.0f), 5.0f, 100.0f, g_houseModel, 90.0f);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(22.0f, 0.0f, -10.0f), 5.0f, 100.0f, g_houseModel, 0.0f,true);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(10.0f, 0.0f, -22.0f), 5.0f, 100.0f, g_houseModel, 270.0f, true);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(22.0f, 0.0f, -22.0f), 5.0f, 100.0f, g_houseModel, 225.0f, true);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(10.0f, 0.0f, -10.0f), 5.0f, 100.0f, g_houseModel, 90.0f, true);
 
 	// ========================================
 	// 第3区画：左下 (SW: Southwest)
@@ -255,9 +258,9 @@ void Game_Initialize()
 	g_ObjectManager.ConnectPolesByID(10, 14);
 	
 	// 第3区画の家：3つ（電柱沿いに配置）
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-22.0f, 0.0f, 10.0f), 5.0f, 100.0f, g_houseModel, 180.0f);
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-10.0f, 0.0f, 22.0f), 5.0f, 100.0f, g_houseModel, 90.0f);
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-22.0f, 0.0f, 22.0f), 5.0f, 100.0f, g_houseModel, 45.0f);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-22.0f, 0.0f, 10.0f), 5.0f, 100.0f, g_houseModel, 180.0f, false);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-10.0f, 0.0f, 22.0f), 5.0f, 100.0f, g_houseModel, 90.0f, true);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(-22.0f, 0.0f, 22.0f), 5.0f, 100.0f, g_houseModel, 45.0f, true);
 
 	// ========================================
 	// 第4区画：右下 (SE: Southeast)
@@ -280,9 +283,9 @@ void Game_Initialize()
 	g_ObjectManager.ConnectPolesByID(15, 19);
 	
 	// 第4区画の家：3つ（電柱沿いに配置）
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(22.0f, 0.0f, 10.0f), 5.0f, 100.0f, g_houseModel, 0.0f);
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(10.0f, 0.0f, 22.0f), 5.0f, 100.0f, g_houseModel, 270.0f);
-	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(22.0f, 0.0f, 22.0f), 5.0f, 100.0f, g_houseModel, 315.0f);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(22.0f, 0.0f, 10.0f), 5.0f, 100.0f, g_houseModel, 0.0f, true);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(10.0f, 0.0f, 22.0f), 5.0f, 100.0f, g_houseModel, 270.0f, true);
+	g_ObjectManager.CreateHouse(DirectX::XMFLOAT3(22.0f, 0.0f, 22.0f), 5.0f, 100.0f, g_houseModel, 315.0f, true);
 
 	// ========================================
 	// 区画間の接続（外側の電柱同士を接続）
@@ -372,12 +375,38 @@ void Game_Initialize()
 	g_houseUI = new HouseUI(Direct3D_GetDevice(), Direct3D_GetContext(), Direct3D_GetBackBufferWidth(), Direct3D_GetBackBufferHeight());
 	g_houseUI->Initialize(1000.0f, 100.0f, 18.0f);
 
+
+	g_uiHouseCount = new UI_HouseCount(Direct3D_GetDevice(), Direct3D_GetContext(), Direct3D_GetBackBufferWidth(), Direct3D_GetBackBufferHeight());
+	g_uiHouseCount->Initialize(40, 40, 28);
+
+	{
+		std::vector<House*> houses;
+		const auto& allObjects = g_ObjectManager.GetGameObjects();
+		for (const auto& obj : allObjects) {
+			if (obj->GetTag() == GameObjectTag::HOUSE) {
+				// obj は shared_ptr<GameObject> などのはずなので static_cast で House* に変換
+				houses.push_back(static_cast<House*>(obj.get()));
+			}
+		}
+
+		g_uiHouseCount->SetHouses(houses);
+	}
+
+
 	// UI タイマーの初期化
 	g_uiTimer = new UI_Timer();
-	g_uiTimer->SetPosition( 20.0f, 50.0f );
+	g_uiTimer->SetTime(600.0f);
+	g_uiTimer->SetPosition( 500.0f, 50.0f );
 	g_uiTimer->SetSize({ 150.0f, 30.0f });
+
+	//// UI タイマー背景の設定
+	//g_uiTimer->SetFramePosition(480.0f, 0.0f);
+	//g_uiTimer->SetFrameSize(512.0f, 510.0f);
+
 	g_uiTimer->Initialize();
 	UIManager::Add(g_uiTimer);
+
+
 
 	// UI 用のグローバルプレイヤーポインタを設定
 	g_player = g_players[0];
@@ -454,6 +483,12 @@ void Game_Finalize()
 	if (g_buttonHintUI) {
 		delete g_buttonHintUI;
 		g_buttonHintUI = nullptr;
+	}
+
+	// UI タイマーの終了処理
+	if (g_uiTimer) {
+		delete g_uiTimer;
+		g_uiTimer = nullptr;
 	}
 
 	// プレイヤーはObjectManagerが管理しているため、ポインタをリセットのみ
@@ -819,7 +854,16 @@ void Game_Draw()
 
 		Light_SetAmbient({ 0.1f,0.1f,0.1f,1.0f });
 		g_MapInstance.Draw();
+
+		for (auto& obj : g_ObjectManager.GetGameObjects()) {
+			if (obj->GetTag() == GameObjectTag::HOUSE) {
+				House* house = static_cast<House*>(obj.get());
+				house->SetPlayer(g_players[0]);  // 1Pをセット
+			}
+		}
+
 		g_ObjectManager.Draw(); // g_MapInstance.Draw() の後に追加
+
 
 		// アイテムジェネレーターを描画
 		if (g_itemGenerator) {
@@ -885,6 +929,11 @@ void Game_Draw()
 		// HouseUI を描画
 		if (g_houseUI) {
 			g_houseUI->Draw();
+		}
+
+		// UI_HouseCount を描画
+		if (g_uiHouseCount) {
+			g_uiHouseCount->Draw();
 		}
 
 		return;

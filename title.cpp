@@ -36,7 +36,7 @@ static Controller* g_Controller = nullptr;
 void Title_Initialize()
 {
 
-	g_TexTitId = Texture_Load(L"texture/game_haikei.png");
+	g_TexTitId = Texture_Load(L"texture/title_kari.png");
 	g_TexPushAnyKeyId = Texture_Load(L"texture/plzA.png");
 	g_AccumulatedTime = 0.0f;
 	g_State = TITLE_STATE_FADE_IN;

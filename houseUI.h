@@ -1,5 +1,5 @@
-/////////////////////////
-// ‰Æó‹µUI
+ï»¿/////////////////////////
+// å®¶çŠ¶æ³UI
 // Author : hiroshi kasiwagi
 // Date :2025/12/05
 ///////////////////////////
@@ -14,8 +14,8 @@
 class House; // forward declaration
 
 /**
- * @brief ‰Æ‚Ìó‹µ‚ğ•\¦‚·‚éUI
- * ƒfƒoƒbƒOƒeƒLƒXƒg‚ğg—p‚µ‚Ä‰æ–Ê‚É‰Æ‚Ìî•ñ‚ğ•\¦
+ * @brief å®¶ã®çŠ¶æ³ã‚’è¡¨ç¤ºã™ã‚‹UI
+ * ãƒ‡ãƒãƒƒã‚°ãƒ†ã‚­ã‚¹ãƒˆã‚’ä½¿ç”¨ã—ã¦ç”»é¢ã«å®¶ã®æƒ…å ±ã‚’è¡¨ç¤º
  */
 class HouseUI
 {
@@ -23,22 +23,22 @@ public:
     HouseUI(ID3D11Device* device, ID3D11DeviceContext* context, UINT screenWidth, UINT screenHeight);
     ~HouseUI();
 
-    // UI‰Šú‰»
+    // UIåˆæœŸåŒ–
     void Initialize(float posX = 20.0f, float posY = 100.0f, float fontSize = 20.0f);
 
-    // ‰ÆƒŠƒXƒg‚ğİ’è
+    // å®¶ãƒªã‚¹ãƒˆã‚’è¨­å®š
     void SetHouses(const std::vector<class House*>& houses) { m_houses = houses; }
 
-    // –ˆƒtƒŒ[ƒ€XV
+    // æ¯ãƒ•ãƒ¬ãƒ¼ãƒ æ›´æ–°
     void Update(double elapsedTime);
 
-    // UI•`‰æ
+    // UIæç”»
     void Draw();
 
-    // •\¦ˆÊ’uİ’è
+    // è¡¨ç¤ºä½ç½®è¨­å®š
     void SetPosition(float x, float y) { m_posX = x; m_posY = y; }
 
-    // ƒtƒHƒ“ƒgƒTƒCƒYİ’è
+    // ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºè¨­å®š
     void SetFontSize(float size) { m_fontSize = size; }
 
 private:
@@ -54,12 +54,14 @@ private:
     UINT m_screenWidth = 0;
     UINT m_screenHeight = 0;
 
-    // XVƒ^ƒCƒ}[i0.5•b‚²‚Æ‚É•\¦XVj
+    // æ›´æ–°ã‚¿ã‚¤ãƒãƒ¼ï¼ˆ0.5ç§’ã”ã¨ã«è¡¨ç¤ºæ›´æ–°ï¼‰
     float m_updateTimer = 0.0f;
     static constexpr float UPDATE_INTERVAL = 0.5f;
 
-    // ƒeƒLƒXƒg¶¬ƒwƒ‹ƒp[
+    // ãƒ†ã‚­ã‚¹ãƒˆç”Ÿæˆãƒ˜ãƒ«ãƒ‘ãƒ¼
     void BuildHouseDisplayText(std::string& outText);
+
 };
 
 #endif // !HOUSE_UI_H
+

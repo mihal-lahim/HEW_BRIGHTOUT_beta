@@ -53,6 +53,11 @@ public:
      */
     void SetDigitHeight(float digitHeight);
 
+
+    // ★追加：背景の位置とサイズ
+    void SetFramePosition(float x, float y);
+    void SetFrameSize(float w, float h);
+
 private:
     float remainingTime_;    // 残り時間（秒）
     float totalTime_;        // 開始時の設定時間
@@ -60,4 +65,10 @@ private:
     float posX_;             // 表示X座標
     float posY_;             // 表示Y座標
     float digitHeight_;      // 数字1文字の高さ
+
+    int frameTexture_;
+    float frameX_;
+    float frameY_;
+    float frameWidth_;
+    float frameHeight_;
 };
