@@ -81,6 +81,12 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
+for %%F in ("$(TargetDir)*.cso") do (
+    copy /Y "%%~fF" "$(ProjectDir)"
+)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -97,6 +103,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
+for %%F in ("$(TargetDir)*.cso") do (
+    copy /Y "%%~fF" "$(ProjectDir)"
+)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -113,7 +125,10 @@
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /D /Y $(TargetDir)*.cso $(ProjectDir)</Command>
+      <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
+for %%F in ("$(TargetDir)*.cso") do (
+    copy /Y "%%~fF" "$(ProjectDir)"
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,7 +150,10 @@
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /D /Y $(TargetDir)*.cso $(ProjectDir)</Command>
+      <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
+for %%F in ("$(TargetDir)*.cso") do (
+    copy /Y "%%~fF" "$(ProjectDir)"
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -143,6 +161,7 @@
     <ClCompile Include="button_hint_ui.cpp" />
     <ClCompile Include="camera_manager.cpp" />
     <ClCompile Include="ChargingSpot.cpp" />
+    <ClCompile Include="checkmark.cpp" />
     <ClCompile Include="collision.cpp" />
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="cube.cpp" />
@@ -187,6 +206,7 @@
     <ClCompile Include="top_down_camera.cpp" />
     <ClCompile Include="UI_Charge.cpp" />
     <ClCompile Include="UI_house.cpp" />
+    <ClCompile Include="UI_HouseCount.cpp" />
     <ClCompile Include="UI_Timer.cpp" />
     <ClCompile Include="WICTextureLoader11.cpp" />
   </ItemGroup>
@@ -197,6 +217,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="camera_manager.h" />
     <ClInclude Include="ChargingSpot.h" />
+    <ClInclude Include="checkmark.h" />
     <ClInclude Include="collision.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="cube.h" />
@@ -242,6 +263,7 @@
     <ClInclude Include="UI.h" />
     <ClInclude Include="UI_Charge.h" />
     <ClInclude Include="UI_house.h" />
+    <ClInclude Include="UI_HouseCount.h" />
     <ClInclude Include="UI_Timer.h" />
     <ClInclude Include="WICTextureLoader11.h" />
   </ItemGroup>

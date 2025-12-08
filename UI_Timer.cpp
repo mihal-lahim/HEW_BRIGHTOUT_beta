@@ -86,20 +86,26 @@ namespace {
 
 UI_Timer::UI_Timer()
     : remainingTime_(0.0f),
-      totalTime_(0.0f),
-      numberTexture_(-1),
-      posX_(1920.0f / 2.0f - 80.0f),  // 画面中央
-      posY_(50.0f),
-      digitHeight_(60.0f)
+    totalTime_(0.0f),
+    numberTexture_(-1),
+    posX_(1920.0f / 2.0f - 80.0f),
+    posY_(50.0f),
+    digitHeight_(60.0f),
+    frameTexture_(-1),
+    frameX_(0.0f),
+    frameY_(0.0f),
+    frameWidth_(180.0f),
+    frameHeight_(60.0f)
 {
 }
 
 void UI_Timer::Initialize()
 {
-    // 数字テクスチャを読み込み
-    if (numberTexture_ < 0) {
+    if (numberTexture_ < 0)
         numberTexture_ = Texture_Load(L"texture/brightout_number_k.png");
-    }
+
+    if (frameTexture_ < 0)
+        frameTexture_ = Texture_Load(L"texture/BRIGHTOUT_UI_TAIMA-kl.png");
 }
 
 void UI_Timer::Update(double elapsedTime)
@@ -115,35 +121,98 @@ void UI_Timer::Update(double elapsedTime)
 
 void UI_Timer::Draw() const
 {
-    //if (numberTexture_ < 0) return;
+    if (numberTexture_ < 0) return;
 
-    //// 残り時間を秒単位で整数化
-    //int totalSeconds = static_cast<int>(std::ceil(remainingTime_));
-    //
-    //// 分と秒に分割
-    //int minutes = totalSeconds / 60;
-    //int seconds = totalSeconds % 60;
-    //
-    //// 分を描画
-    //DrawNumber(numberTexture_, minutes, posX_, posY_, digitHeight_);
-    //
-    //// コロンの位置を計算
-    //float colonX = posX_ + digitHeight_ * 0.7f * 2 + 5.0f;  // 2桁の数字分 + 少し余白
-    //
-    //// コロン「:」を描画
-    //DrawColon(numberTexture_, colonX, posY_, digitHeight_);
-    //
-    //// 秒を描画する位置を計算
-    //float secondsX = colonX + digitHeight_ * 0.7f + 5.0f;
-    //
-    //// 秒の十の位を描画
-    //int secondsTens = seconds / 10;
-    //DrawNumber(numberTexture_, secondsTens, secondsX, posY_, digitHeight_);
-    //
-    //// 秒の一の位を描画
-    //int secondsOnes = seconds % 10;
-    //float secondsOnesX = secondsX + digitHeight_ * 0.7f;
-    //DrawNumber(numberTexture_, secondsOnes, secondsOnesX, posY_, digitHeight_);
+
+    //フレーム背景(未実装)
+   /* if (frameTexture_ >= 0)
+    {
+        Sprite_Draw(
+            frameTexture_,
+            frameX_, frameY_,
+            frameWidth_, frameHeight_,
+            0, 0, 1024, 1024
+        );
+    }*/
+
+
+    // 残り時間（切り上げ）
+    int totalSeconds = static_cast<int>(std::ceil(remainingTime_));
+
+    // 分：秒に分割
+    int minutes = totalSeconds / 60;
+    int seconds = totalSeconds % 60;
+
+    // 元画像の仕様
+    const int totalTiles = 10;               // 1..9,0 の10タイル
+    const int textureWidth = 3702;           // 画像幅（px）
+    const int textureHeight = 349;           // 画像高さ（px）
+    const int srcW = textureWidth / totalTiles;
+    const int srcH = textureHeight;
+    const int srcY = 0;
+
+    // 描画サイズ（縦は digitHeight_、横はアスペクト比維持）
+    float digitH = digitHeight_;
+    float digitW = digitH * (static_cast<float>(srcW) / static_cast<float>(srcH));
+
+    // 開始 X（中央に寄せたいなら posX_ を調整済み）
+    float x = posX_;
+
+    // 内部：1桁を描くラムダ（0..9 の数値を1桁で描画）
+    auto drawSingleDigit = [&](int num, float& drawX) {
+        int digit = num;
+        // テクスチャは "1 2 3 4 5 6 7 8 9 0" の順と仮定
+        int texIndex = (digit == 0) ? 9 : (digit - 1);
+        int texX = texIndex * srcW;
+        Sprite_Draw(numberTexture_, drawX, posY_, digitW, digitH,
+            texX, srcY, srcW, srcH);
+        drawX += digitW;
+        };
+
+    // 分（2桁で描画）
+    drawSingleDigit((minutes / 10) % 10, x);
+    drawSingleDigit(minutes % 10, x);
+
+    // コロンを自前で描画（点を2つ縦に並べる）
+    // 方法: 元テクスチャの中から小領域を切り出して点として使う（透明背景なら点だけが描画される）
+    auto drawColonDots = [&](float centerX, float centerY, float overallH) {
+        // 点サイズ（全体高さに対する比率で可変）
+        float dotW = overallH * 0.12f;   // 点の横幅
+        float dotH = overallH * 0.12f;   // 点の縦幅
+        float gap = overallH * 0.12f;   // 上下の点の間隔
+
+        // 切り出す元画像の src 範囲（数字のどれかの中央付近を借用）
+        // ここでは '0'（テクスチャインデックス9）の中央部分を使う
+        int sourceTexIndex = 9;
+        int dotSrcW = srcW / 8;   // 小さい切り出し幅
+        int dotSrcH = srcH / 8;   // 小さい切り出し高さ
+        int dotSrcX = sourceTexIndex * srcW + (srcW - dotSrcW) / 2;
+        int dotSrcY = srcY + (srcH - dotSrcH) / 2;
+
+        // 上の点
+        float yTop = centerY - (gap * 0.5f) - (dotH * 0.5f);
+        Sprite_Draw(numberTexture_, centerX - dotW * 0.5f, yTop, dotW, dotH,
+            dotSrcX, dotSrcY, dotSrcW, dotSrcH);
+
+        // 下の点
+        float yBot = centerY + (gap * 0.5f) - (dotH * 0.5f);
+        Sprite_Draw(numberTexture_, centerX - dotW * 0.5f, yBot, dotW, dotH,
+            dotSrcX, dotSrcY, dotSrcW, dotSrcH);
+        };
+
+    // コロンの中心位置（現在の x が分の描画終了位置）
+    float colonCenterX = x + digitW * 0.2f; // 少し間を空ける
+    float colonCenterY = posY_ + digitH * 0.5f;
+
+    // コロンを描く（dotサイズは digitH を基準）
+    drawColonDots(colonCenterX, colonCenterY, digitH);
+
+    // コロン分の横空け（見た目調整）
+    x = colonCenterX + digitW * 0.6f;
+
+    // 秒（2桁）
+    drawSingleDigit((seconds / 10) % 10, x);
+    drawSingleDigit(seconds % 10, x);
 }
 
 void UI_Timer::SetTime(float timeSeconds)
@@ -161,4 +230,16 @@ void UI_Timer::SetPosition(float x, float y)
 void UI_Timer::SetDigitHeight(float digitHeight)
 {
     digitHeight_ = std::max(1.0f, digitHeight);
+}
+
+void UI_Timer::SetFramePosition(float x, float y)
+{
+    frameX_ = x;
+    frameY_ = y;
+}
+
+void UI_Timer::SetFrameSize(float w, float h)
+{
+    frameWidth_ = w;
+    frameHeight_ = h;
 }

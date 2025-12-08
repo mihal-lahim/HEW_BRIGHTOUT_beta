@@ -26,7 +26,7 @@ static ResultState g_State = RESULT_STATE_FADE_IN;
 
 void Result_Initialize()
 {
-	g_TexTitId = Texture_Load(L"texture/game_haikei.png");
+	g_TexTitId = Texture_Load(L"texture/result_kari.png");
 	g_TexPushAnyKeyId = Texture_Load(L"texture/plzA.png");
 	g_AccumulatedTime = 0.0f;
 	g_State = RESULT_STATE_FADE_IN;
