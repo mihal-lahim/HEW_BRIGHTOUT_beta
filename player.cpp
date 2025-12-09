@@ -550,9 +550,6 @@ void Player::TransferElectricityToHouse(House* house, double elapsedSec)
 	if (health_ < transferAmount) {
 		transferAmount = static_cast<float>(health_);
 	}
-
-	
-
 	// ハウスに電気を供給（体力をそのまま電気に変換）
 	house->ReceiveElectricity(transferAmount);
 	

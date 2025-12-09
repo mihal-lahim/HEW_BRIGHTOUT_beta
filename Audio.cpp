@@ -30,14 +30,6 @@ void UninitAudio()
 	g_Xaudio->Release();
 }
 
-
-
-
-
-
-
-
-
 struct AUDIO
 {
 	IXAudio2SourceVoice* SourceVoice{};
@@ -67,9 +59,6 @@ int LoadAudio(const char* FileName)
 
 	if (index == -1)
 		return -1;
-
-
-
 
 	// サウンドデータ読込
 	WAVEFORMATEX wfx = { 0 };
@@ -133,9 +122,6 @@ int LoadAudio(const char* FileName)
 	return index;
 }
 
-
-
-
 void UnloadAudio(int Index)
 {
 	g_Audio[Index].SourceVoice->Stop();
@@ -144,10 +130,6 @@ void UnloadAudio(int Index)
 	delete[] g_Audio[Index].SoundData;
 	g_Audio[Index].SoundData = nullptr;
 }
-
-
-
-
 
 void PlayAudio(int Index, bool Loop)
 {

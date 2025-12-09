@@ -12,26 +12,42 @@ typedef void (*FuncDouble)(double);
 
 static FuncVoid g_Initialize[]{
 	Title_Initialize,
+	//Tutorial_Initialize, 
 	Game_Initialize,
-	Result_Initialize
+	//FirstResult_Initialize,
+	//SecondResult_Initialize,
+	Result_Initialize,
+	//NameInput_Initialize
 };
 
 static FuncVoid g_Finalize[]{
 	Title_Finalize,
+	//Tutorial_Finalize, 
 	Game_Finalize,
-	Result_Finalize
+	//FirstResult_Finalize,
+	//SecondResult_Finalize,
+	Result_Finalize,
+	//NameInput_Finalize
 };
 
 static FuncDouble g_Update[]{
 	Title_Update,
+	//Tutorial_Update, 
 	Game_Update,
-	Result_Update
+	//FirstResult_Update,
+	//SecondResult_Update,
+	Result_Update,
+	//NameInput_Update
 };
 
 static FuncVoid g_Draw[]{
 	Title_Draw,
+	//Tutorial_Draw, 
 	Game_Draw,
-	Result_Draw
+	//FirstResult_Draw,
+	//SecondResult_Draw,
+	Result_Draw,
+	//NameInput_Draw
 };
 
 

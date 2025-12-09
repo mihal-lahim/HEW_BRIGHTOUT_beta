@@ -3,6 +3,7 @@
 #include "sprite.h"
 #include "texture.h"
 #include <cmath>
+#include "game_score.h"
 
 // コンストラクタ
 UI_HouseCount::UI_HouseCount(ID3D11Device* device, ID3D11DeviceContext* context,
@@ -110,7 +111,11 @@ void UI_HouseCount::Draw()
     {
         if (!house) continue;
         total++;
-        if (house->IsRepaired()) repaired++;
+        if (house->IsRepaired())
+        {
+            repaired++;
+			Score_AddScore(100); // 復旧済みの家1軒ごとにスコアを100点追加
+        }
     }
 
     float x = m_posX; // 描画開始X
