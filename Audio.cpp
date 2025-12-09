@@ -1,3 +1,8 @@
+/////////////////////////////////////////////////
+//  オーディオ処理	 
+// Author: Namisyo
+//////////////////////
+
 #include <xaudio2.h>
 #include <assert.h>
 #include "audio.h"
