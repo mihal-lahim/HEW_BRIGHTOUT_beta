@@ -683,6 +683,7 @@ void Game_Update(double elapsed_time)
 		// すべての家が復旧されたらリザルトシーンに遷移
 		if (total_house_count > 0 && repaired_count == total_house_count) {
 			Scene_SetNextScene(SCENE_RESULT);
+			//Scene_SetNextScene(SCENE_FIRST_RESULT);
 		}
 	}
 

@@ -72,6 +72,9 @@ void Result_Update(double elapsed_time)
 		{
 			//ゲームシーンへ移行
 			Scene_SetNextScene(SCENE_GAME);
+
+			//名前入力
+			//Scene_SetNextScene(SCENE_NAME_INPUT);
 		}
 		break;
 	}

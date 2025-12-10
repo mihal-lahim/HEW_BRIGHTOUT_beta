@@ -2,6 +2,8 @@
 #include "title.h"
 #include "game.h"
 #include "result.h"
+#include "tutorial.h"
+#include "name_input.h"
 
 static Scene g_Scene = SCENE_TITLE;// デバッグの時はこのシーンをゲームにしておく
 static Scene g_SceneNext = g_Scene;
@@ -12,42 +14,44 @@ typedef void (*FuncDouble)(double);
 
 static FuncVoid g_Initialize[]{
 	Title_Initialize,
-	//Tutorial_Initialize, 
-	Game_Initialize,
+	Tutorial_Initialize, 
+	Game_Initialize,   //1ステージ目
 	//FirstResult_Initialize,
+	//Round2_Initialize,  //2ステージ目
 	//SecondResult_Initialize,
+	//Round3_Initialize,  //3ステージ目
 	Result_Initialize,
-	//NameInput_Initialize
+	NameInput_Initialize
 };
 
 static FuncVoid g_Finalize[]{
 	Title_Finalize,
-	//Tutorial_Finalize, 
+	Tutorial_Finalize, 
 	Game_Finalize,
 	//FirstResult_Finalize,
 	//SecondResult_Finalize,
 	Result_Finalize,
-	//NameInput_Finalize
+	NameInput_Finalize
 };
 
 static FuncDouble g_Update[]{
 	Title_Update,
-	//Tutorial_Update, 
+	Tutorial_Update, 
 	Game_Update,
 	//FirstResult_Update,
 	//SecondResult_Update,
 	Result_Update,
-	//NameInput_Update
+	NameInput_Update
 };
 
 static FuncVoid g_Draw[]{
 	Title_Draw,
-	//Tutorial_Draw, 
+	Tutorial_Draw, 
 	Game_Draw,
 	//FirstResult_Draw,
 	//SecondResult_Draw,
 	Result_Draw,
-	//NameInput_Draw
+	NameInput_Draw
 };
 
 

@@ -26,6 +26,10 @@ void Sprite_Draw(int texid, float x, float y, float w,float h, int tx, int ty, i
 void Sprite_Draw(int texid, float x, float y, float w, float h, int tx, int ty, int tw, int th, float angle, DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f });
 //void Sprite_Draw(int texid, float x, float y, float w, float h, int tx, int ty, int tw, int th, float bairitu, DirectX::XMFLOAT4 color = { 1.0f, 1.0f, 1.0f, 1.0f });
 
+void Sprite_DrawZ(int texid, float x, float y, float w, float h,
+	int tx, int ty, int tw, int th,
+	float angle, float z, DirectX::XMFLOAT4 color = { 1,1,1,1 });
+
 
 
 #endif // SPRITE_H

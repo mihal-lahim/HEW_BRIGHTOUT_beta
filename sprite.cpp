@@ -298,6 +298,83 @@ void Sprite_Draw(int texid, float x, float y,float zoom,XMFLOAT4 color)
 	g_pContext->Draw(NUM_VERTEX, 0);
 }
 
+void Sprite_DrawZ(
+	int texid,
+	float x, float y,
+	float w, float h,
+	int tx, int ty, int tw, int th,
+	float angle, float z,
+	XMFLOAT4 color)
+{
+	if (texid < 0) return; // 無効なら抜ける
+
+	Shader_Begin();
+
+	D3D11_MAPPED_SUBRESOURCE msr;
+	g_pContext->Map(g_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
+	Vertex* v = (Vertex*)msr.pData;
+
+	// ローカル座標（左上が原点）
+	v[0].position = { 0.0f, 0.0f, 0.0f };
+	v[1].position = { w,    0.0f, 0.0f };
+	v[2].position = { 0.0f, h,    0.0f };
+	v[3].position = { w,    h,    0.0f };
+
+	// 色
+	v[0].color = color; v[1].color = color; v[2].color = color; v[3].color = color;
+
+	// UV 計算
+	float tsw = (float)Texture_GetWidth(texid);
+	float tsh = (float)Texture_GetHeight(texid);
+	if (tsw <= 0.0f || tsh <= 0.0f) {
+		// 安全対策：Unmapして抜ける
+		g_pContext->Unmap(g_pVertexBuffer, 0);
+		return;
+	}
+	float u0 = tx / tsw;
+	float v0 = ty / tsh;
+	float u1 = (tx + tw) / tsw;
+	float v1 = (ty + th) / tsh;
+
+	v[0].texcoord = { u0, v0 };
+	v[1].texcoord = { u1, v0 };
+	v[2].texcoord = { u0, v1 };
+	v[3].texcoord = { u1, v1 };
+
+	g_pContext->Unmap(g_pVertexBuffer, 0);
+
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	g_pContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
+
+	// ワールド行列（回転を先に、平行移動を後にする）
+	XMMATRIX rot = XMMatrixIdentity();
+	if (angle != 0.0f) {
+		rot = XMMatrixRotationZ(angle);
+	}
+	XMMATRIX trans = XMMatrixTranslation(x, y, z);
+	Shader_SetWorldMatrix(rot * trans);
+
+	// プロジェクション：UI用に near=0, far=1 にする（深度精度を安定）
+	const float SCREEN_W = (float)Direct3D_GetBackBufferWidth();
+	const float SCREEN_H = (float)Direct3D_GetBackBufferHeight();
+	Shader_SetProjectionMatrix(
+		XMMatrixOrthographicOffCenterLH(
+			0.0f, SCREEN_W,
+			SCREEN_H, 0.0f,
+			0.0f, 1.0f
+		)
+	);
+
+	Shader_SetColor(color);
+
+	g_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	Texture_SetTexture(texid);
+
+	g_pContext->Draw(NUM_VERTEX, 0);
+}
+
 
 
 //void Sprite_Draw(int texid, float x, float y, float w, float h, int tx, int ty, int tw, int th,float bairitu, DirectX::XMFLOAT4 color)

@@ -19,10 +19,10 @@ enum Scene
     SCENE_TITLE,
     SCENE_TUTORIAL,
     SCENE_GAME,
-    SCENE_FIRST_RESULT,    // 第1ラウンドの小リザルト
-    SCENE_ROUND2,
-    SCENE_SECOND_RESULT,    // 第2ラウンドの小リザルト
-    SCENE_ROUND3,
+    //SCENE_FIRST_RESULT,    // 第1ラウンドの小リザルト
+    //SCENE_ROUND2,
+   // SCENE_SECOND_RESULT,    // 第2ラウンドの小リザルト
+   // SCENE_ROUND3,
     SCENE_RESULT, // 最終リザルト
     SCENE_NAME_INPUT,
     SCENE_MAX

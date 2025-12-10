@@ -48,7 +48,7 @@ void Title_Initialize()
 
 void Title_Finalize()
 {
-	Fade_Start(2.0f, false);
+	Fade_Start(2.0f, true);
 	delete g_Controller;
 	g_Controller = nullptr;
 }
@@ -92,8 +92,7 @@ void Title_Update(double elapsed_time)
 	case TITLE_STATE_FADE_OUT:
 		if (Fade_GetState() == FADE_STATE_FADE_OUT_FINISHED)
 		{
-			//ゲームシーンへ移行
-			Scene_SetNextScene(SCENE_GAME);
+			Scene_SetNextScene(SCENE_NAME_INPUT);
 		}
 		break;
 	}
