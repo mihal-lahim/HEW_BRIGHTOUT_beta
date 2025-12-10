@@ -28,7 +28,7 @@ void Tutorial_Update(double elapsed_time)
 {
 	if (KeyLogger_IsTrigger(KK_ENTER))
 	{
-		Scene_SetNextScene(SCENE_GAME);
+		Scene_SetNextScene(SCENE_NAME_INPUT);
 	}
 }
 
