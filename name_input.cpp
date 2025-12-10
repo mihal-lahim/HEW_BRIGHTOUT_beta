@@ -312,8 +312,8 @@ void NameInput_Draw()
         float cellH = drawH / 5.0f;
 
         // -------- ‘I‘ð•¶Žš‚Ì•`‰æ --------
-        float selStartX = kbX;
-        float selY = kbY - cellH - 20.0f;
+        float selStartX = kbX + 250.0f;
+        float selY = kbY - cellH - 50.0f;
 
         int idx = 0;
         for (auto& k : g_SelectedKeys)
