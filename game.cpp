@@ -30,7 +30,6 @@
 #include "PowerLine.h"
 #include "Pole.h"
 #include "ItemGeneratorObject.h"
-#include "DebugAABB.h"
 #include "house.h"
 #include "button_hint_ui.h"
 #include "ChargingSpot.h"
@@ -157,8 +156,7 @@ void Game_Initialize()
 	Light_Initialize();
 	Fade_Start(1.0f, true);
 
-	// デバッグAABB描画の初期化
-	DebugAABB::Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
+
 	g_pKirby = ModelLoad("model/aruhula_aitemu_toreru_ba.fbx", 0.1f, false);
 	g_test = ModelLoad("model/test.fbx", 0.1f, false);
 	g_ball = ModelLoad("model/ball.fbx", 0.1f, false);
@@ -451,8 +449,6 @@ void Game_Finalize()
 	g_MapInstance.Finalize();
 	g_ObjectManager.Finalize();
 
-	// デバッグAABB描画の終了処理
-	DebugAABB::Finalize();
 
 	if (g_uiCharge) {
 		UIManager::Remove(g_uiCharge);
@@ -549,7 +545,6 @@ void Game_Update(double elapsed_time)
 	}
 
 	Fade_Update(elapsed_time);
-	Grid_Update(elapsed_time);
 
 	// ObjectManager を更新（すべてのゲームオブジェクト、敵を含む）
 	g_ObjectManager.Update(elapsed_time);

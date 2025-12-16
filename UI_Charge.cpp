@@ -16,43 +16,43 @@ extern Player* g_player; // defined in game.cpp
 
 static int g_NumberTex = -1;
 
-// helper to draw an integer using the project's digit sprite sheet
-static void DrawNumber(int texId, int number, float x, float y, float h)
-{
-	if (texId < 0) return;
-	// digit sizing
-	float digitH = h;
-	float digitW = digitH * 0.7f; // adjust to fit
-
-	// source tile height in sprite (approx)
-	int srcH = (int)digitH;
-	int srcW = (int)digitW;
-	int srcY = 100; // as used elsewhere in project
-
-	if (number == 0) {
-		int d = 0;
-		int srcX = d * srcW;
-		Sprite_Draw(texId, x, y, digitW, digitH, srcX, srcY, srcW, srcH);
-		return;
-	}
-
-	char buf[16];
-	int len = 0;
-	int n = number;
-	while (n > 0 && len < 15) {
-		buf[len++] = '0' + (n % 10);
-		n /= 10;
-	}
-	if (len == 0) return;
-
-	float px = x;
-	for (int i = len - 1; i >= 0; --i) {
-		int d = buf[i] - '0';
-		int srcX = d * srcW;
-		Sprite_Draw(texId, px, y, digitW, digitH, srcX, srcY, srcW, srcH);
-		px += digitW;
-	}
-}
+//// helper to draw an integer using the project's digit sprite sheet
+//static void DrawNumber(int texId, int number, float x, float y, float h)
+//{
+//	if (texId < 0) return;
+//	// digit sizing
+//	float digitH = h;
+//	float digitW = digitH * 0.7f; // adjust to fit
+//
+//	// source tile height in sprite (approx)
+//	int srcH = (int)digitH;
+//	int srcW = (int)digitW;
+//	int srcY = 100; // as used elsewhere in project
+//
+//	if (number == 0) {
+//		int d = 0;
+//		int srcX = d * srcW;
+//		Sprite_Draw(texId, x, y, digitW, digitH, srcX, srcY, srcW, srcH);
+//		return;
+//	}
+//
+//	char buf[16];
+//	int len = 0;
+//	int n = number;
+//	while (n > 0 && len < 15) {
+//		buf[len++] = '0' + (n % 10);
+//		n /= 10;
+//	}
+//	if (len == 0) return;
+//
+//	float px = x;
+//	for (int i = len - 1; i >= 0; --i) {
+//		int d = buf[i] - '0';
+//		int srcX = d * srcW;
+//		Sprite_Draw(texId, px, y, digitW, digitH, srcX, srcY, srcW, srcH);
+//		px += digitW;
+//	}
+//}
 
 void UI_Charge::Initialize()
 {
@@ -62,12 +62,12 @@ void UI_Charge::Initialize()
 	if (g_NumberTex < 0) g_NumberTex = Texture_Load(L"texture/ScoreNumberB.png");
 }
 
-void UI_Charge::Update(double elapsedTime)
+void UI_Charge::Update(double/* elapsedTime*/)
 {
 	if (g_player) {
-		int h = g_player->GetHealth();
-		int mh = g_player->GetMaxHealth();
-		if (mh <= 0) mh = 1;
+		float h = g_player->GetHealth();
+		float mh = g_player->GetMaxHealth();
+		if (mh <= 0) mh = 1.0f;
 		chargeAmount_ = static_cast<float>(h) / static_cast<float>(mh);
 	}
 }

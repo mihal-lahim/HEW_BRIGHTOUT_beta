@@ -17,7 +17,7 @@ PowerLine::PowerLine(const XMFLOAT3& startPos, const XMFLOAT3& endPos, float rad
     m_Position.z = (startPos.z + endPos.z) * 0.5f;
 }
 
-void PowerLine::Update(double elapsedTime)
+void PowerLine::Update(double/* elapsedTime*/)
 {
     // 電線は静的なので特に更新処理はない
     // 必要に応じてエフェクトなどを追加可能

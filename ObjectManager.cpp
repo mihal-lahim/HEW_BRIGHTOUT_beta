@@ -3,7 +3,6 @@
 #include "Pole.h"
 #include "PowerLine.h"
 #include "ItemGeneratorObject.h"
-#include "DebugAABB.h"
 #include "house.h"
 #include "ChargingSpot.h"
 #include "Enemy.h"
@@ -129,7 +128,6 @@ void ObjectManager::DrawDebugAABBs() const
     for (const auto& obj : m_GameObjects) {
         if (obj) {
             AABB aabb = obj->GetAABB();
-            DebugAABB::DrawAABB(aabb, { 0.0f, 1.0f, 0.0f, 1.0f });
         }
     }
 }
@@ -137,7 +135,6 @@ void ObjectManager::DrawDebugAABBs() const
 void ObjectManager::SetDebugAABBEnabled(bool enabled)
 {
     m_debugAABBEnabled = enabled;
-    DebugAABB::SetEnabled(enabled);
 }
 
 bool ObjectManager::IsDebugAABBEnabled() const

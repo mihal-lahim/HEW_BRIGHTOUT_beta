@@ -56,7 +56,7 @@ void UIHouse::Initialize()
     m_updateTimer = 0.0f;
 }
 
-void UIHouse::Update(double elapsedTime)
+void UIHouse::Update(double/* elapsedTime*/)
 {
     //m_updateTimer += elapsedTime;
     //

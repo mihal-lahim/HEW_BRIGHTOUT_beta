@@ -33,8 +33,8 @@ public:
 
 	//ˆø”‚ÌAABB‚Æ©•ª©g‚ÌAABB‚ªd‚È‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ğ’²‚×‚é
 	virtual ~Collision() = default;
-	virtual bool IsOverlap(const AABB& aabb) { return false; }
-	virtual Hit IsHit(const AABB& aabb) { return {}; }
+	virtual bool IsOverlap(const AABB&) { return false; }
+	virtual Hit IsHit(const AABB&) { return {}; }
 };
 
 class AABB : public Collision

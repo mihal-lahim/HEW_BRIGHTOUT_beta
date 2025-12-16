@@ -81,8 +81,8 @@ void Sprite_Draw(int texid, float x, float y, float w,float h, int tx, int ty, i
 	const float SCREEN_WIDTH = (float)Direct3D_GetBackBufferWidth();
 	const float SCREEN_HEIGHT = (float)Direct3D_GetBackBufferHeight();
 
-	constexpr float W = 512.0f;
-	constexpr float H = 512.0f;
+	/*constexpr float W = 512.0f;
+	constexpr float H = 512.0f;*/
 
 	// 画面の左上から右下に向かう線分を描画する
 	v[0].position = { -0.5f, -0.5f, 0.0f };
@@ -111,7 +111,6 @@ void Sprite_Draw(int texid, float x, float y, float w,float h, int tx, int ty, i
 	v[2].texcoord = { u0 , v1 };
 	v[3].texcoord = { u1 , v1 };
 
-	float pay = 3.14;
 	// 頂点バッファのロックを解除
 	g_pContext->Unmap(g_pVertexBuffer, 0);
 

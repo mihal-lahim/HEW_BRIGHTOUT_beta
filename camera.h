@@ -14,7 +14,7 @@ class Camera
 public:
 	virtual ~Camera() = default;
 
-	virtual void Update(double elapsed_time) {};
+	virtual void Update(double) {};
 	virtual void SetMatrix() const = 0;
 };
 

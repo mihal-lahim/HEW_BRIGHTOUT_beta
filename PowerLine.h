@@ -13,7 +13,7 @@ public:
     PowerLine(const XMFLOAT3& startPos, const XMFLOAT3& endPos, float radius = 0.2f);
     virtual ~PowerLine() = default;
 
-    virtual void Update(double elapsedTime) override;  // 更新処理
+    virtual void Update(double/* elapsedTime*/) override;  // 更新処理
     virtual void Draw() const override;                // 描画処理
     virtual AABB GetAABB() const override;            // 衝突判定用AABB
 

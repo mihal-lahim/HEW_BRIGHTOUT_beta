@@ -11,7 +11,7 @@
 
 void NameInput_Initialize();
 void NameInput_Finalize();
-void NameInput_Update(double elapsed_time);
+void NameInput_Update(double);
 void NameInput_Draw();
 
 

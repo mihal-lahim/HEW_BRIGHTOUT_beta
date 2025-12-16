@@ -118,6 +118,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>Assimp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -165,7 +166,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="collision.cpp" />
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="cube.cpp" />
-    <ClCompile Include="DebugAABB.cpp" />
     <ClCompile Include="debug_camera.cpp" />
     <ClCompile Include="debug_ostream.cpp" />
     <ClCompile Include="debug_text.cpp" />
@@ -225,7 +225,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="collision.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="cube.h" />
-    <ClInclude Include="DebugAABB.h" />
     <ClInclude Include="debug_camera.h" />
     <ClInclude Include="debug_console.h" />
     <ClInclude Include="debug_ostream.h" />

@@ -34,7 +34,7 @@ static int g_TexId = -1;// テクスチャのID
 void Effect_Initialize()
 {
 	g_TexId = Texture_Load(L"texture/effect000.jpg");
-	g_EffectCount = 0.0f;
+	g_EffectCount = 0;
 	g_AccumulatedTime = 0.0f;
 }
 
@@ -65,10 +65,10 @@ void Effect_Draw()
 	for (int i = 0; i < g_EffectCount; i++)
 	{
 		double time = g_AccumulatedTime - g_Effects[i].birthTime;
-		float ratio = time / g_Effects[i].lifeTime;
+		float ratio = static_cast<float>(time) / static_cast<float>(g_Effects[i].lifeTime);
 		float alpha = 1.0f - ratio;
 		float size = g_Effects[i].size * (1.0f - ratio);
-		float half = g_Effects[i].size * 0.5;
+		float half = g_Effects[i].size * 0.5f;
 
 		float dx = g_Effects[i].position.x + half - size * 0.5f;
 		float dy = g_Effects[i].position.y + half - size * 0.5f;
@@ -76,7 +76,7 @@ void Effect_Draw()
 		XMFLOAT4 color = g_Effects[i].color;
 		color.w = alpha;
 
-		Sprite_Draw(g_TexId, dx, dy, size, size, 0.0f, 0.0f,
+		Sprite_Draw(g_TexId, dx, dy, size, size, 0, 0,
 			Texture_GetWidth(g_TexId), Texture_GetHeight(g_TexId),
 			color);
 	}

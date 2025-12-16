@@ -182,7 +182,7 @@ public:
 
 private:
     // 衝突解決ヘルパー
-    void ResolveCollisions(DirectX::XMFLOAT3& newPos, double elapsedSec);
+    void ResolveCollisions(DirectX::XMFLOAT3& newPos/*, double elapsedSec*/);
     //AABB取得ヘルパー
     AABB GetAABBAt(const DirectX::XMFLOAT3& pos) const;
 

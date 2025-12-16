@@ -8,7 +8,7 @@
 ==============================================================================*/
 #include "sprite.h"
 #include "sprite_anim.h"
-#include "system_timer.h";
+#include "system_timer.h"
 #include <DirectXMath.h>
 
 void AnimPattern::Draw(float dx, float dy,float dw,float dh,int pattern_num, DirectX::XMFLOAT4 color)

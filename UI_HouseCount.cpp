@@ -38,7 +38,7 @@ void UI_HouseCount::SetHouses(const std::vector<House*>& houses)
 }
 
 // 毎フレーム更新（今回は未使用）
-void UI_HouseCount::Update(double elapsedTime)
+void UI_HouseCount::Update(double/* elapsedTime*/)
 {
 }
 

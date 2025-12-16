@@ -22,7 +22,7 @@ public:
 
  // ライフサイクル
  virtual void Initialize() {}
- virtual void Update(double elapsedTime) {}
+ virtual void Update(double /*elapsedTime*/) {}
  virtual void Draw() const {}
 
  // 表示 / 有効フラグ

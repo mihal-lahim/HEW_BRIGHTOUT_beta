@@ -18,7 +18,7 @@ void First_Result_Finalize()
 {
 }
 
-void First_Result_Update(double elapsed_time)
+void First_Result_Update(double /*elapsed_time*/)
 {
 	if (KeyLogger_IsTrigger(KK_ENTER))
 	{

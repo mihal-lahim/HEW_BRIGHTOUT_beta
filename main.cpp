@@ -4,11 +4,15 @@
 // Date		:2025/10/16
 //
 //=======================================
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include <SDKDDKVer.h>
 #define WIN32_LEAN_AND_MEAN //古いウィンドウズのファイルを使わないように飛ばすため
 #include<Windows.h>
 #include <algorithm>
-#include "system_timer.h";
+#include "system_timer.h"
 #include "direct3d.h"
 #include "shader.h"
 #include "shader3d.h"
@@ -54,9 +58,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 //=======================================
 // メイン
 //=======================================
-int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPSTR lpCmdLine, _In_ int nCmdShow)
+int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstance*/,
+	_In_ LPSTR /*lpCmdLine*/, _In_ int nCmdShow)
 {
+
+	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	(void)CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	//DPIスケーリング
@@ -76,9 +83,11 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 	RegisterClassEx(&wcex);										// Registerは登録という意味 wcexの名前で登録
 
+	constexpr int window_Width = 1920;
+	constexpr int window_Height = 1080;
 
 	//クライアント領域のサイズを持った短形
-	RECT window_rect = { 0,0,1920 * 0.75,1080 * 0.75 };
+	RECT window_rect = { 0,0,window_Width,window_Height };
 
 	//ウィンドウのスタイル
 	DWORD window_style = WS_EX_OVERLAPPEDWINDOW ^ (WS_THICKFRAME | WS_MAXIMIZEBOX);
