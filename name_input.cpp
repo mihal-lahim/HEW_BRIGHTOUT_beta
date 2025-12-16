@@ -6,6 +6,7 @@
 #include "direct3d.h"
 #include "math.h"
 #include "scene.h"
+#include "controller.h"
 #include <windows.h>
 #include <vector>
 
@@ -28,6 +29,8 @@ static bool g_ShowKeyboard = true;
 // カーソル位置
 static int cursorRow = 0;
 static int cursorCol = 0;
+
+static Controller g_Controller(0);
 
 // ひらがなマップ
 static const char* HIRAGANA_MAP[5][10] =
@@ -52,6 +55,8 @@ void NameInput_Initialize()
 
     // NameInput シーンなので常にキーボード表示
     g_ShowKeyboard = true;
+
+    g_Controller.Start();
 }
 
 void NameInput_Finalize()
@@ -60,6 +65,8 @@ void NameInput_Finalize()
 
 void NameInput_Update(double elapsed_time)
 {
+    g_Controller.Update();
+
     if (g_ShowKeyboard)
     {
         // --------- カーソル移動（IJKL） ---------
@@ -68,8 +75,21 @@ void NameInput_Update(double elapsed_time)
         if (KeyLogger_IsTrigger(KK_J)) cursorCol = std::max(0, cursorCol - 1);
         if (KeyLogger_IsTrigger(KK_L)) cursorCol = std::min(9, cursorCol + 1);
 
+        if (g_Controller.WasPressed(Controller::BUTTON_DPAD_UP))
+            cursorRow = std::max(0, cursorRow - 1);
+
+        if (g_Controller.WasPressed(Controller::BUTTON_DPAD_DOWN))
+            cursorRow = std::min(4, cursorRow + 1);
+
+        if (g_Controller.WasPressed(Controller::BUTTON_DPAD_LEFT))
+            cursorCol = std::max(0, cursorCol - 1);
+
+        if (g_Controller.WasPressed(Controller::BUTTON_DPAD_RIGHT))
+            cursorCol = std::min(9, cursorCol + 1);
+
         // --------- Enter：文字追加（最大５文字まで） ---------
-        if (KeyLogger_IsTrigger(KK_SPACE))
+        if (KeyLogger_IsTrigger(KK_SPACE) ||
+            g_Controller.WasPressed(Controller::BUTTON_A))
         {
             if (g_SelectedKeys.size() < 5)
             {
@@ -81,14 +101,16 @@ void NameInput_Update(double elapsed_time)
         }
 
         // --------- Backspace：削除 ---------
-        if (KeyLogger_IsTrigger(KK_BACK))
+        if (KeyLogger_IsTrigger(KK_BACK) ||
+            g_Controller.WasPressed(Controller::BUTTON_B))
         {
             if (!g_SelectedKeys.empty())
                 g_SelectedKeys.pop_back();
         }
     }
 
-    if (KeyLogger_IsTrigger(KK_ENTER))
+    if (KeyLogger_IsTrigger(KK_ENTER) ||
+        g_Controller.WasPressed(Controller::BUTTON_START))
     {
         Scene_SetNextScene(SCENE_GAME);
     }
