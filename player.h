@@ -37,6 +37,9 @@ private:
     //位置と向き
     DirectX::XMFLOAT3 direction_{ 0.0f,0.0f,1.0f };
 
+    // 電線移動用：最後に入力された移動方向
+    DirectX::XMFLOAT3 electricMoveDir_{ 0.0f, 0.0f, 0.0f };
+
     //体力
     float health_ = 100.0f;
     float maxHealth_ = 100.0f;

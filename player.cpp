@@ -93,6 +93,9 @@ void Player::Update(double elapsedSec)
 					ChangeState(State::ELECTRICITY);
 					// 電気状態へのリセット処理
 					ResetToElectricityState();
+
+					//電気化した瞬間は進行方向を初期化
+					electricMoveDir_ = XMFLOAT3(0.0f, 0.0f, 0.0f);
 				}
 			} else {
 				// ELECTRICITY -> HUMAN: 電柱近く必須
@@ -105,6 +108,9 @@ void Player::Update(double elapsedSec)
 					KnockbackFromPole();
 					// 0.5秒間、衝突判定をスキップ
 					skipCollisionTimer_ = SKIP_COLLISION_DURATION;
+
+					//人間に戻る時もリセット
+					electricMoveDir_ = XMFLOAT3(0.0f, 0.0f, 0.0f);
 				}
 			}
 		}
@@ -120,6 +126,18 @@ void Player::Update(double elapsedSec)
 			XMVECTOR camRight = XMVectorSet(cosf(cameraAngle), 0.0f, -sinf(cameraAngle), 0.0f);
 			XMVECTOR moveVec = XMVector3Normalize(XMVectorAdd(XMVectorScale(camRight, stickX), XMVectorScale(camForward, stickY)));
 			XMStoreFloat3(&horizontalMove, moveVec);
+
+			//電気状態なら進行方向を保存
+			if (state == State::ELECTRICITY) {
+				electricMoveDir_ = horizontalMove;
+			}
+		}
+
+		//入力がない場合でも電線上では進み続ける
+		if (state == State::ELECTRICITY) {
+			if (horizontalMove.x == 0.0f && horizontalMove.z == 0.0f) {
+				horizontalMove = electricMoveDir_;
+			}
 		}
 
 		// ダッシュ開始（電気状態のみ）
@@ -157,6 +175,8 @@ void Player::Update(double elapsedSec)
 			isGrounded_ = false;
 			powerLineDamageTimer_ = 0.0f;
 			skipCollisionTimer_ = 0.0f;
+
+			electricMoveDir_ = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		}
 		
 	}
