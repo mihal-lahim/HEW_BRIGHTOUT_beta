@@ -1,3 +1,8 @@
+/////////////////////////////////////////////////
+//  オーディオ処理	 
+// Author: Namisyo
+//////////////////////
+
 #include <xaudio2.h>
 #include <assert.h>
 #include "audio.h"
@@ -24,14 +29,6 @@ void UninitAudio()
 	g_MasteringVoice->DestroyVoice();
 	g_Xaudio->Release();
 }
-
-
-
-
-
-
-
-
 
 struct AUDIO
 {
@@ -62,9 +59,6 @@ int LoadAudio(const char* FileName)
 
 	if (index == -1)
 		return -1;
-
-
-
 
 	// サウンドデータ読込
 	WAVEFORMATEX wfx = { 0 };
@@ -128,9 +122,6 @@ int LoadAudio(const char* FileName)
 	return index;
 }
 
-
-
-
 void UnloadAudio(int Index)
 {
 	g_Audio[Index].SourceVoice->Stop();
@@ -139,10 +130,6 @@ void UnloadAudio(int Index)
 	delete[] g_Audio[Index].SoundData;
 	g_Audio[Index].SoundData = nullptr;
 }
-
-
-
-
 
 void PlayAudio(int Index, bool Loop)
 {
