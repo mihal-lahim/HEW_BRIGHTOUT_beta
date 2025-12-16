@@ -63,7 +63,7 @@ void NameInput_Finalize()
 {
 }
 
-void NameInput_Update(double elapsed_time)
+void NameInput_Update(double)
 {
     g_Controller.Update();
 
@@ -131,8 +131,8 @@ void NameInput_Draw()
         int kbH = Texture_GetHeight(g_TexKeyboardId);
 
         float zoom = 2.0f;
-        float drawW = kbW * zoom;
-        float drawH = kbH * zoom;
+        float drawW = static_cast<float>(kbW) * zoom;
+        float drawH = static_cast<float>(kbH) * zoom;
 
         // キーボード位置（画面下）
         float kbX = (screenW - drawW) * 0.5f;
@@ -159,16 +159,17 @@ void NameInput_Draw()
         int idx = 0;
         for (auto& k : g_SelectedKeys)
         {
-            float srcX = (kbW / 10.0f) * k.col;
-            float srcY = (kbH / 5.0f) * k.row;
+            int srcX = (kbW / 10) * k.col;
+            int srcY = (kbH / 5) * k.row;
 
             Sprite_DrawZ(
                 g_TexKeyboardId,
-                selStartX + idx * (cellW + 4),
+                selStartX + static_cast<float>(idx) * (cellW + 4),
                 selY,
                 cellW, cellH,
-                srcX, srcY, kbW / 10.0f, kbH / 5.0f,
-                0,
+                srcX, srcY, kbW / 10,
+                kbH / 5,
+                0.0f,
                 0.15f,
                 XMFLOAT4(1, 1, 1, 1)
             );

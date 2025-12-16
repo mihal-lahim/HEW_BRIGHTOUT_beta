@@ -22,7 +22,6 @@ static int g_TexId = -1;
 
 void Fade_Initialize()
 {
-	FadeState g_FadeState = FADE_STATE_NONE;
 	g_AccumuLatedTime = 0.0f;
 	g_TexId = Texture_Load(L"texture/siro.png");
 }
@@ -74,8 +73,8 @@ void Fade_Draw()
 	}
 
 	Sprite_Draw(g_TexId, 0.0f, 0.0f,
-		Direct3D_GetBackBufferWidth(),
-		Direct3D_GetBackBufferHeight(),
+		static_cast<float>(Direct3D_GetBackBufferWidth()),
+		static_cast<float>(Direct3D_GetBackBufferHeight()),
 		0, 0, 8, 8,
 		g_FadeColor);
 }

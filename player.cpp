@@ -206,7 +206,7 @@ void Player::Update(double elapsedSec)
 		m_Position.y += desiredMove.y;
 	} else {
 		// HUMAN状態は通常の衝突判定を適用
-		ResolveCollisions(desiredMove, elapsedSec);
+		ResolveCollisions(desiredMove);
 	}
 
 	// 4. 電気状態の場合、電線にスナップさせて落下防止
@@ -221,7 +221,7 @@ void Player::Update(double elapsedSec)
 }
 
 // 衝突解決
-void Player::ResolveCollisions(DirectX::XMFLOAT3& desiredMove, double elapsedSec)
+void Player::ResolveCollisions(DirectX::XMFLOAT3& desiredMove/*, double elapsedSec*/)
 {
     // XZ平面（水平）の移動と衝突判定
     XMFLOAT3 newPos = m_Position;
@@ -350,7 +350,7 @@ void Player::TakeDamage(float amount)
 	health_ -= amount;
 	if (health_ < 0.0f) health_ = 0.0f;
 	
-	const char* stateName = (state == State::ELECTRICITY) ? "ELECTRICITY" : "HUMAN";
+	//const char* stateName = (state == State::ELECTRICITY) ? "ELECTRICITY" : "HUMAN";
 	//DEBUG_LOGF("[TakeDamage] State=%s | Pos=(%.1f, %.1f, %.1f) | HP=%.1f/%.1f | Damage=%.2f", stateName, m_Position.x, m_Position.y, m_Position.z, health_, maxHealth_, amount);
 }
 
@@ -359,7 +359,7 @@ void Player::Heal(float amount)
 	health_ += amount;
 	if (health_ > maxHealth_) health_ = maxHealth_;
 	
-	const char* stateName = (state == State::ELECTRICITY) ? "ELECTRICITY" : "HUMAN";
+	//const char* stateName = (state == State::ELECTRICITY) ? "ELECTRICITY" : "HUMAN";
 	//DEBUG_LOGF("[Heal] State=%s | Pos=(%.1f, %.1f, %.1f) | HP=%.1f/%.1f | Healed=%.2f", stateName, m_Position.x, m_Position.y, m_Position.z, health_, maxHealth_, amount);
 }
 

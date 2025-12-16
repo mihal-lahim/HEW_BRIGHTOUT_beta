@@ -148,7 +148,7 @@ void House::Draw() const
     if (m_isRepaired && m_player)
     {
         static CheckMark check;
-        check.Draw(m_Position, m_scale, m_player->GetPosition());
+        check.Draw(m_Position, m_scale/*, m_player->GetPosition()*/);
     }
 }
 

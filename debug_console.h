@@ -188,7 +188,6 @@ namespace hal
             if (hConsole == INVALID_HANDLE_VALUE) return;
 
             // 現在のコンソール情報を取得
-            CONSOLE_SCREEN_BUFFER_INFO csbi;
             if (!GetConsoleScreenBufferInfo(hConsole, &csbi)) return;
 
             // 実際に使用されている領域を計算

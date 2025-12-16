@@ -102,7 +102,7 @@ MODEL* ModelLoad(const char* FileName, float scale, bool isBlender)
 	}
 
 	//テクスチャ読み込み
-	for (int i = 0; i < model->AiScene->mNumTextures; i++)
+	for (unsigned int i = 0; i < model->AiScene->mNumTextures; i++)
 	{
 		aiTexture* aitexture = model->AiScene->mTextures[i];
 
@@ -147,7 +147,7 @@ void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld)
 	// シェーダーを描画パイプラインに設定
 	Shader3d_Begin();
 
-	for (int i = 0; i < model->AiScene->mNumMeshes; i++)
+	for ( unsigned int i = 0; i < model->AiScene->mNumMeshes; i++)
 	{
 		// 頂点バッファを描画パイプラインに設定
 		UINT stride = sizeof(Vertex3d);

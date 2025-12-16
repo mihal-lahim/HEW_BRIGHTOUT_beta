@@ -104,9 +104,9 @@ void Title_Draw()
 
 	if (g_State != TITLE_STATE_FADE_IN)
 	{
-		float speed = g_State == TITLE_STATE_KEYINPUT_WAIT ? 4 : 16;
+		double speed = g_State == TITLE_STATE_KEYINPUT_WAIT ? 4.0f : 16.0f;
 
-		float alpha = (sin(g_AccumulatedTime * speed) + 1.0) * 0.5;
-		Sprite_Draw(g_TexPushAnyKeyId, 1920 / 2 - Texture_GetWidth(g_TexPushAnyKeyId)/ 2, 500.0f,1.0f, { 1.0f,1.0f,1.0f,alpha });
+		float alpha = (static_cast<float>(sin(g_AccumulatedTime * speed)) + 1.0f) * 0.5f;
+		Sprite_Draw(g_TexPushAnyKeyId, static_cast <float>(1920 / 2 - Texture_GetWidth(g_TexPushAnyKeyId))/ 2.0f, 500.0f,1.0f, { 1.0f,1.0f,1.0f,alpha });
 	}
 }

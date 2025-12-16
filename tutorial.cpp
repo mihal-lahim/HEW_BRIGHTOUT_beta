@@ -30,7 +30,7 @@ void Tutorial_Finalize()
 	g_Controller = nullptr;
 }
 
-void Tutorial_Update(double elapsed_time)
+void Tutorial_Update(double/* elapsed_time*/)
 {
 	g_Controller->Update();
 	if (KeyLogger_IsTrigger(KK_ENTER)|| g_Controller->WasPressed(Controller::BUTTON_A))

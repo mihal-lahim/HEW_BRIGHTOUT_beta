@@ -55,7 +55,7 @@ void ItemGenerator::RegisterItem(Item* item)
     }
 }
 
-void ItemGenerator::GenerateItemsOnPowerLines(const Map& map)
+void ItemGenerator::GenerateItemsOnPowerLines(const Map& /*map*/)
 {
     // “düÀ•W‚ğ‰Šú‰»
     m_powerLinePositions.clear();

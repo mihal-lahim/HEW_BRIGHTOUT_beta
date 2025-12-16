@@ -36,7 +36,7 @@ Hit AABB::IsHit(const AABB& aabb)
 		}
 		else
 		{
-			shallow_axis = depth_z;
+			shallow_axis = 2;
 		}
 	}
 	else
@@ -50,4 +50,8 @@ Hit AABB::IsHit(const AABB& aabb)
 			shallow_axis = 2;
 		}
 	}
+	return Hit(true,
+		shallow_axis == 0 ? DirectX::XMFLOAT3((GetCenter().x < aabb.GetCenter().x) ? -1.0f : 1.0f, 0.0f, 0.0f) :
+		shallow_axis == 1 ? DirectX::XMFLOAT3(0.0f, (GetCenter().y < aabb.GetCenter().y) ? -1.0f : 1.0f, 0.0f) :
+		DirectX::XMFLOAT3(0.0f, 0.0f, (GetCenter().z < aabb.GetCenter().z) ? -1.0f : 1.0f));
 }

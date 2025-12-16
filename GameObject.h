@@ -37,7 +37,7 @@ public:
         : m_Position(pos), m_pModel(model), m_TextureId(textureId), m_Scale(scale) {}
     virtual ~GameObject() = default;
 
-    virtual void Update(double elapsedTime) {}
+    virtual void Update(double) {}
     virtual void Draw() const;
 
     virtual AABB GetAABB() const;

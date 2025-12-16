@@ -99,11 +99,6 @@ void Grid_Finalize()
 	SAFE_RELEASE(g_pVertexBuffer);
 }
 
-void Grid_Update(double elapsed_time)
-{
-
-}
-
 void Grid_Draw()
 {
 	// シェーダーを描画パイプラインに設定
