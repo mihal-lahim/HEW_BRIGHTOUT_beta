@@ -27,16 +27,75 @@ void ObjectManager::Finalize()
 void ObjectManager::Update(double elapsedTime)
 {
     for (const auto& obj : m_GameObjects) {
-        obj->Update(elapsedTime);
+        if(obj->m_IsActive) obj->Update(elapsedTime);
     }
+
+    DestroyGameObjects();
 }
 
 void ObjectManager::Draw() const
 {
     for (const auto& obj : m_GameObjects) {
-        obj->Draw();
+        if(obj->m_IsActive) obj->Draw();
     }
 }
+
+void ObjectManager::AddGameObject(std::unique_ptr<GameObject> obj)
+{
+    if (!obj) return;
+
+    // デバッグログ出力
+    const char* tagName = "Unknown";
+    switch (obj->GetTag()) {
+    case GameObjectTag::POLE: tagName = "Pole"; break;
+    case GameObjectTag::POWER_LINE: tagName = "PowerLine"; break;
+    case GameObjectTag::HOUSE: tagName = "House"; break;
+    case GameObjectTag::ITEM_GENERATOR: tagName = "ItemGenerator"; break;
+    case GameObjectTag::CHARGING_SPOT: tagName = "ChargingSpot"; break;
+    case GameObjectTag::ENEMY: tagName = "Enemy"; break;
+    default: tagName = "Unknown"; break;
+    }
+
+    DEBUG_LOGF("[ObjectManager] Added object: %s (Total: %zu)",
+        tagName, m_GameObjects.size() + 1);
+
+
+    // オブジェクトを型ごとのマップに登録
+    const std::type_index type(typeid(*obj));  // type_index でラップ
+
+    obj->m_ID = m_GameObjectMap[type].size();
+    m_GameObjectMap.at(type).push_back(m_GameObjects.size());
+
+    // オブジェクトをリストに追加
+    m_GameObjects.push_back(std::move(obj));
+}
+
+void ObjectManager::DestroyGameObjects()
+{
+    for (auto& obj : m_GameObjects)
+    {
+        if (obj->CanDestroy())
+        {
+            uint64_t id = obj->m_ID;
+            const std::type_index type(typeid(*obj));  // type_index でラップ
+            auto& erace = m_GameObjectMap.at(type).at(id);
+            auto& last = m_GameObjectMap.at(type).back();
+
+            // 更新用のvectorから削除
+            std::swap(m_GameObjects.at(erace), m_GameObjects.at(last));
+            m_GameObjects.pop_back();
+
+            // 型別マップから削除
+            std::swap(erace, last);
+            m_GameObjectMap.at(type).pop_back();
+
+            // 移動したオブジェクトのIDを更新
+            m_GameObjects.at(last)->m_ID = id;
+        }
+    }
+}
+
+
 
 class Pole* ObjectManager::GetPoleByID(int poleID)
 {
