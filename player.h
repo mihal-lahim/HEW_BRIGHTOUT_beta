@@ -149,7 +149,7 @@ public:
  bool IsCollidingWith(const AABB& other) const { return GetAABB().IsOverlap(other); }
 
  // ジャンプ処理
- void Jump(float jumpForce = 5.0f);
+ void Jump(float jumpForce = 30.0f);
  bool IsGrounded() const { return isGrounded_; }
 
  // 電柱周辺検出（電気状態への変身可能判定）

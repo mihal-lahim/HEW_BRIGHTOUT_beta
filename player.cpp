@@ -46,21 +46,14 @@ Player::Player(MODEL* model, MODEL* electricModel, const XMFLOAT3& pos, const XM
 {
 	health_ = maxHealth_ = 100.0f;	
 	usePlayer = true;
-
-	
 }
 
 // 毎フレーム更新（ダッシュ継続時間の管理、入力処理）
 void Player::Update(double elapsedSec)
 {
-	// 1. ダッシュ時間の更新
-	if (isDashing_) {
-		dashTimeRemaining_ -= static_cast<float>(elapsedSec);
-		if (dashTimeRemaining_ <= 0.0f) {
-			isDashing_ = false;
-			currentSpeed_ = (state == State::ELECTRICITY) ? (baseSpeed_ * electricSpeedmul) : baseSpeed_;
-			dashTimeRemaining_ = 0.0f;
-		}
+	//ジャンプ
+	if (controller_->WasPressed(Controller::BUTTON_A)) {
+		Jump(15);
 	}
 
 	// 衝突判定スキップタイマーの更新
@@ -96,21 +89,22 @@ void Player::Update(double elapsedSec)
 
 					//電気化した瞬間は進行方向を初期化
 					electricMoveDir_ = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
 				}
 			} else {
 				// ELECTRICITY -> HUMAN: 電柱近く必須
 				if (IsNearPole()) {
 					ChangeState(State::HUMAN);
-					if (!isDashing_) {
+					/*if (!isDashing_) {
 					currentSpeed_ = baseSpeed_;
-					}
+					}*/
 					// 電柱から跳ね返す処理
 					KnockbackFromPole();
 					// 0.5秒間、衝突判定をスキップ
 					skipCollisionTimer_ = SKIP_COLLISION_DURATION;
 
 					//人間に戻る時もリセット
-					electricMoveDir_ = XMFLOAT3(0.0f, 0.0f, 0.0f);
+					//electricMoveDir_ = XMFLOAT3(0.0f, 0.0f, 0.0f);
 				}
 			}
 		}
@@ -127,23 +121,27 @@ void Player::Update(double elapsedSec)
 			XMVECTOR moveVec = XMVector3Normalize(XMVectorAdd(XMVectorScale(camRight, stickX), XMVectorScale(camForward, stickY)));
 			XMStoreFloat3(&horizontalMove, moveVec);
 
-			//電気状態なら進行方向を保存
+			////電気状態なら進行方向を保存
+			//if (state == State::ELECTRICITY) {
+			//	electricMoveDir_ = horizontalMove;
+			//}
+
 			if (state == State::ELECTRICITY) {
-				electricMoveDir_ = horizontalMove;
+				if (horizontalMove.x != 0.0f || horizontalMove.z != 0.0f) {
+					electricMoveDir_ = horizontalMove;
+				}
 			}
 		}
 
 		//入力がない場合でも電線上では進み続ける
 		if (state == State::ELECTRICITY) {
-			if (horizontalMove.x == 0.0f && horizontalMove.z == 0.0f) {
-				horizontalMove = electricMoveDir_;
-			}
+			horizontalMove = electricMoveDir_;
 		}
 
-		// ダッシュ開始（電気状態のみ）
-		if (controller_->WasPressed(Controller::BUTTON_A) && state == State::ELECTRICITY && !isDashing_) {
-			StartDash();
-		}
+		//// ダッシュ開始（電気状態のみ）
+		//if (controller_->WasPressed(Controller::BUTTON_A) && state == State::ELECTRICITY && !isDashing_) {
+		//	StartDash();
+		//}
         // デバッグ用ダメージ
 		if (controller_->WasPressed(Controller::BUTTON_RIGHT_SHOULDER)) {
 			TakeDamage(10);
@@ -167,8 +165,8 @@ void Player::Update(double elapsedSec)
 			currentSpeed_ = baseSpeed_;
 			
 			// ダッシュ状態をリセット
-			isDashing_ = false;
-			dashTimeRemaining_ = 0.0f;
+			//isDashing_ = false;
+			//dashTimeRemaining_ = 0.0f;
 			
 			// その他の状態をリセット
 			velocityY_ = 0.0f;
@@ -217,6 +215,14 @@ void Player::Update(double elapsedSec)
 	// 5. 向きの更新
 	if (horizontalMove.x != 0.0f || horizontalMove.z != 0.0f) {
 		direction_ = horizontalMove;
+	}
+
+	//地面に設置したら速度を通常通りに戻す
+	if (state == State::HUMAN) {
+		// 空中 → 地面 に変わった瞬間
+		if (isGrounded_) {
+			currentSpeed_ = baseSpeed_;
+		}
 	}
 }
 
@@ -316,30 +322,10 @@ void Player::Draw() const
 	ModelDraw(drawModel, world);
 }
 
-void Player::StartDash()
-{
-	// 電気状態のみダッシュ可能
-	if (state != State::ELECTRICITY || isDashing_) return;
-	isDashing_ = true;
-	dashTimeRemaining_ = dashDuration_;
-	// 電気状態のダッシュ速度 = 通常電気速度 * dashMultiplier_
-	currentSpeed_ = baseSpeed_ * electricSpeedmul * dashMultiplier_;
-}
-
-void Player::StopDash()
-{
-	if (isDashing_) {
-		isDashing_ = false;
-		dashTimeRemaining_ = 0.0f;
-		//解除後は状態に応じた通常速度
-		currentSpeed_ = (state == State::ELECTRICITY) ? (baseSpeed_ * electricSpeedmul) : baseSpeed_;
-	}
-}
-
 void Player::Jump(float jumpForce)
 {
-	// 地面に接しているい場合のみジャンプ可能
-	if (isGrounded_) {
+	// 地面にいて、Aボタンを押したらジャンプ
+	if (isGrounded_ && controller_->WasPressed(Controller::BUTTON_A) && state == State::HUMAN) {
 		velocityY_ = jumpForce;
 		isGrounded_ = false;
 	}
@@ -527,7 +513,7 @@ void Player::ResetToElectricityState()
 	velocityY_ = 0.0f;
 	isGrounded_ = true;
 	isDashing_ = false;
-	dashTimeRemaining_ = 0.0f;
+	//dashTimeRemaining_ = 0.0f;
 
 	// 電気状態の速度を設定
 	currentSpeed_ = baseSpeed_ * electricSpeedmul;
