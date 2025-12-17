@@ -102,7 +102,7 @@ public:
  void Update(double elapsedSec) override;
 
  // 移動：方向は正規化されていることを想定
- void Move(const DirectX::XMFLOAT3& dir, double elapsedSec);
+ //void Move(const DirectX::XMFLOAT3& dir, double elapsedSec);
 
  // ダッシュ開始/終了
  void StartDash();

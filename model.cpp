@@ -20,7 +20,6 @@ struct Vertex3d
 	XMFLOAT2 texcoord;			// テクスチャ座標
 	UINT  boneIndex[4] = {};	// ボーンインデックス
 	float boneWeight[4] = {};	// ボーンウェイト
-
 };
 
 static int g_WhiteTexId = -1;
