@@ -1,3 +1,9 @@
+/////////////////////////////////
+// model.cpp
+//Author: hiroshi kasiwagi
+//Date:2025/12/17
+/////////////////////////////////
+
 #include "direct3d.h"
 #include "model.h"
 using namespace DirectX;
@@ -8,10 +14,13 @@ using namespace DirectX;
 // 頂点構造体
 struct Vertex3d
 {
-	XMFLOAT3 position; // 頂点座標
-	XMFLOAT3 normal;   // 法線
-	XMFLOAT4 color;    // 色
-	XMFLOAT2 texcoord; // テクスチャ座標
+	XMFLOAT3 position;			// 頂点座標
+	XMFLOAT3 normal;			// 法線
+	XMFLOAT4 color;				// 色
+	XMFLOAT2 texcoord;			// テクスチャ座標
+	UINT  boneIndex[4] = {};	// ボーンインデックス
+	float boneWeight[4] = {};	// ボーンウェイト
+
 };
 
 static int g_WhiteTexId = -1;
