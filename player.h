@@ -14,6 +14,8 @@
 #include "top_down_camera.h"
 #include "collision.h"
 
+#include "PowerLine.h"
+
 struct MODEL; // forward declaration for model pointer
 class Controller; // forward declaration
 class TopDownCamera; // forward declaration
@@ -58,6 +60,9 @@ private:
     float dashDuration_ = 0.6f; // ダッシュ継続時間（秒）
     float dashTimeRemaining_ = 0.0f;
 
+    // 空中ジャンプ関連
+    bool canAirJump_ = false;
+
     //プレイヤーのステート
     enum class State {
         HUMAN,
@@ -90,6 +95,8 @@ private:
 	// 電気供給状態
 	class House* m_supplyingHouse = nullptr;  // 現在供給中のハウス
 	bool m_isSupplying = false;                // 供給中フラグ
+
+    PowerLine* currentPowerLine_ = nullptr;
 
 public:
  Player();
@@ -179,6 +186,7 @@ public:
 
  // 描画処理
  void Draw() const;
+
 
 private:
     // 衝突解決ヘルパー

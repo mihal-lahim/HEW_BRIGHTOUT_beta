@@ -90,6 +90,10 @@ void Player::Update(double elapsedSec)
 					//電気化した瞬間は進行方向を初期化
 					electricMoveDir_ = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
+
+					// ★ 電線に即スナップ
+					SnapToNearestPowerLine();
+
 				}
 			} else {
 				// ELECTRICITY -> HUMAN: 電柱近く必須
@@ -138,10 +142,6 @@ void Player::Update(double elapsedSec)
 			horizontalMove = electricMoveDir_;
 		}
 
-		//// ダッシュ開始（電気状態のみ）
-		//if (controller_->WasPressed(Controller::BUTTON_A) && state == State::ELECTRICITY && !isDashing_) {
-		//	StartDash();
-		//}
         // デバッグ用ダメージ
 		if (controller_->WasPressed(Controller::BUTTON_RIGHT_SHOULDER)) {
 			TakeDamage(10);
@@ -179,10 +179,25 @@ void Player::Update(double elapsedSec)
 		
 	}
 
-	// 2. 重力を適用（毎フレーム速度を加算）
+	//// 2. 重力を適用（毎フレーム速度を加算）
 	if (!isGrounded_) {
 		velocityY_ -= GRAVITY * static_cast<float>(elapsedSec);
 	}
+
+	if (state == State::HUMAN)
+	{
+		if (!isGrounded_)
+		{
+			velocityY_ -= GRAVITY * static_cast<float>(elapsedSec);
+		}
+	}
+	else if (state == State::ELECTRICITY)
+	{
+		// 電気状態では重力無効・地面無視
+		velocityY_ = 0.0f;
+		isGrounded_ = true;
+	}
+
 
 	// 3. 移動と衝突判定
 	XMFLOAT3 desiredMove = {
@@ -224,6 +239,47 @@ void Player::Update(double elapsedSec)
 			currentSpeed_ = baseSpeed_;
 		}
 	}
+
+
+	if (state == State::ELECTRICITY)
+	{
+		// 毎フレーム最寄りの電線を更新
+		SnapToNearestPowerLine();
+		if (!currentPowerLine_) return;
+
+		XMFLOAT3 a = currentPowerLine_->GetStartPosition();
+		XMFLOAT3 b = currentPowerLine_->GetEndPosition();
+
+		XMFLOAT3 dir{
+			b.x - a.x,
+			b.y - a.y,
+			b.z - a.z
+		};
+
+		float len = sqrtf(dir.x * dir.x + dir.z * dir.z);
+		if (len > 0.001f) {
+			dir.x /= len;
+			dir.z /= len;
+		}
+
+		// 入力方向に合わせて向きを反転
+		float dot =
+			dir.x * electricMoveDir_.x +
+			dir.z * electricMoveDir_.z;
+
+		if (dot < 0.0f) {
+			dir.x = -dir.x;
+			dir.z = -dir.z;
+		}
+
+		// 電線方向に進む
+		m_Position.x += dir.x * currentSpeed_ * static_cast<float>(elapsedSec);
+		m_Position.z += dir.z * currentSpeed_ * static_cast<float>(elapsedSec);
+
+		// 最終スナップ（角対策）
+		SnapToNearestPowerLine();
+	}
+
 }
 
 // 衝突解決
@@ -279,6 +335,9 @@ void Player::ResolveCollisions(DirectX::XMFLOAT3& desiredMove/*, double elapsedS
                 m_Position.y = obj->GetAABB().GetMax().y; // オブジェクトの上面にスナップ
                 velocityY_ = 0.0f;
                 isGrounded_ = true;
+
+				// 着地したらリセット
+				canAirJump_ = false;
             } else if (desiredMove.y > 0.0f) { // 上昇時
                 m_Position.y = obj->GetAABB().GetMin().y - aabbHalfSize.y * 2.0f; // オブジェクトの下面にスナップ
                 velocityY_ = 0.0f;
@@ -324,10 +383,20 @@ void Player::Draw() const
 
 void Player::Jump(float jumpForce)
 {
-	// 地面にいて、Aボタンを押したらジャンプ
-	if (isGrounded_ && controller_->WasPressed(Controller::BUTTON_A) && state == State::HUMAN) {
+	// HUMAN状態のみ
+	if (state != State::HUMAN) return;
+
+	// 地上ジャンプ
+	if (isGrounded_ && controller_->WasPressed(Controller::BUTTON_A)) {
 		velocityY_ = jumpForce;
 		isGrounded_ = false;
+		return;
+	}
+
+	// 空中ジャンプ（1回だけ）
+	if (!isGrounded_ && canAirJump_ && controller_->WasPressed(Controller::BUTTON_A)) {
+		velocityY_ = jumpForce;
+		canAirJump_ = false; // ← 使い切り
 	}
 }
 
@@ -405,58 +474,82 @@ bool Player::IsNearPole() const
 	return false;
 }
 
-// 最も近い電線にスナップするメソッド
 void Player::SnapToNearestPowerLine()
 {
+	// 電気状態でなければ何もしない
 	if (state != State::ELECTRICITY) return;
 
+	// ゲーム内の全オブジェクト管理クラス（外部参照）
 	extern ObjectManager g_ObjectManager;
 
+	// 最も近い電線との距離（初期値は最大）
 	float minDistance = FLT_MAX;
-	DirectX::XMFLOAT3 snappedPos = m_Position;
-	bool found = false;
 
-	// すべての電線の中から最も近いポイントを探す
-	const auto& allObjects = g_ObjectManager.GetGameObjects();
-	for (const auto& obj : allObjects) {
-		if (obj->GetTag() == GameObjectTag::POWER_LINE) {
-			PowerLine* line = static_cast<PowerLine*>(obj.get());
-			if (!line) continue;
+	// スナップ後のプレイヤー位置
+	XMFLOAT3 snappedPos = m_Position;
 
-			// 電線上の最も近いポイントを取得
-			DirectX::XMFLOAT3 closestPoint = line->GetClosestPointOnLine(m_Position);
-			
-			float dx = closestPoint.x - m_Position.x;
-			float dy = closestPoint.y - m_Position.y;
-			float dz = closestPoint.z - m_Position.z;
-			
-			// 水平距離と垂直距離を分別
-			float horizontalDist = sqrtf(dx * dx + dz * dz);
-			float verticalDist = fabsf(dy);
-			
-			// 水平距離が範囲内なら、垂直距離に関わらずスナップ対象にする
-			// 水平距離: 2m以内、垂直距離: 5m以内
-			if (horizontalDist <= POWER_LINE_SNAP_DISTANCE && verticalDist <= 5.0f) {
-				// 3次元距離で最も近いものを選ぶ
-				float distance = sqrtf(dx * dx + dy * dy + dz * dz);
-				
-				if (distance < minDistance) {
-					minDistance = distance;
-					snappedPos = closestPoint;
-					found = true;
-				}
+	// 最終的に選ばれた電線
+	PowerLine* nearestLine = nullptr;
+
+	// ============================================
+	// 全ての電線オブジェクトを探索
+	// ============================================
+	for (const auto& obj : g_ObjectManager.GetGameObjects())
+	{
+		// 電線以外は無視
+		if (obj->GetTag() != GameObjectTag::POWER_LINE) continue;
+
+		// 電線オブジェクトにキャスト
+		PowerLine* line = static_cast<PowerLine*>(obj.get());
+		if (!line) continue;
+
+		// プレイヤー位置から電線への最近接点を取得
+		XMFLOAT3 closest = line->GetClosestPointOnLine(m_Position);
+
+		// 最近接点との差分
+		float dx = closest.x - m_Position.x;
+		float dy = closest.y - m_Position.y;
+		float dz = closest.z - m_Position.z;
+
+		// XZ平面上での距離（電線に「乗れる」かの判定）
+		float horizontalDist = sqrtf(dx * dx + dz * dz);
+
+		// 高さ方向の距離（別階層の電線誤検出防止）
+		float verticalDist = fabsf(dy);
+
+		// ============================================
+		// スナップ可能距離内か判定
+		// ============================================
+		if (horizontalDist <= POWER_LINE_SNAP_DISTANCE && verticalDist <= 5.0f)
+		{
+			// 3次元距離で最も近い電線を選択
+			float dist = sqrtf(dx * dx + dy * dy + dz * dz);
+
+			if (dist < minDistance)
+			{
+				// 最短距離を更新
+				minDistance = dist;
+
+				// スナップ位置を更新
+				snappedPos = closest;
+
+				// 最も近い電線として記録
+				nearestLine = line;
 			}
 		}
 	}
 
-	// 最も近い電線にスナップ
-	if (found) {
+	if (nearestLine)
+	{
+		// プレイヤー位置を電線上にスナップ
 		m_Position = snappedPos;
-		isGrounded_ = true;
+		// 現在乗っている電線を更新
+		currentPowerLine_ = nearestLine;
+		// 電線移動中は落下させない
 		velocityY_ = 0.0f;
+		isGrounded_ = true;
 	}
 }
-
 // 電気状態から人間状態に変化する際に電柱から跳ね返す
 void Player::KnockbackFromPole()
 {
@@ -504,6 +597,9 @@ void Player::KnockbackFromPole()
 		velocityY_ = KNOCKBACK_JUMP_FORCE;
 		isGrounded_ = false;
 	}
+
+	// 空中ジャンプを1回だけ許可
+	canAirJump_ = true;
 }
 
 // 電気状態への変化時に各種状態をリセット
@@ -613,3 +709,4 @@ void Player::StopSupplyingElectricity()
 	DEBUG_LOGF("[StopSupply] State=%s | Pos=(%.1f, %.1f, %.1f) | HP=%.1f/%.1f", 
 		stateName, m_Position.x, m_Position.y, m_Position.z, health_, maxHealth_);
 }
+
