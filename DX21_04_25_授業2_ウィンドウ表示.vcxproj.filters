@@ -17,6 +17,18 @@
       <UniqueIdentifier>{297c81cb-dd1e-4d64-88d3-139df9292f17}</UniqueIdentifier>
       <Extensions>hlsl</Extensions>
     </Filter>
+    <Filter Include="ヘッダー ファイル\電柱">
+      <UniqueIdentifier>{5a289fa2-a435-480a-b705-45138b174742}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\電柱">
+      <UniqueIdentifier>{aeb7fedc-9a5c-4d2e-acbd-f4cb2209ad26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\GameObject">
+      <UniqueIdentifier>{8e0ba6a4-d74c-43da-8fac-ceedfabb9a58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\GameObject">
+      <UniqueIdentifier>{ba7c9c71-b845-4562-8fcf-7391108e76c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -121,19 +133,10 @@
     <ClCompile Include="UI_Charge.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="item.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="ItemGenerator.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="PowerLine.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Pole.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="ItemGeneratorObject.cpp">
@@ -155,9 +158,6 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="UI_Timer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Enemy.cpp">
@@ -189,6 +189,21 @@
     </ClCompile>
     <ClCompile Include="scene_title.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="PowerLine.cpp">
+      <Filter>ソース ファイル\電柱</Filter>
+    </ClCompile>
+    <ClCompile Include="Pole.cpp">
+      <Filter>ソース ファイル\電柱</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>ソース ファイル\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>ソース ファイル\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="PoleManager.cpp">
+      <Filter>ソース ファイル\電柱</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -303,19 +318,10 @@
     <ClInclude Include="UI.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="item.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="ItemGenerator.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="PowerLine.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Pole.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="ItemGeneratorObject.h">
@@ -337,9 +343,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="UI_Timer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="enemy.h">
@@ -371,6 +374,21 @@
     </ClInclude>
     <ClInclude Include="scene_title.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerLine.h">
+      <Filter>ヘッダー ファイル\電柱</Filter>
+    </ClInclude>
+    <ClInclude Include="Pole.h">
+      <Filter>ヘッダー ファイル\電柱</Filter>
+    </ClInclude>
+    <ClInclude Include="PoleManager.h">
+      <Filter>ヘッダー ファイル\電柱</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>ヘッダー ファイル\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>ヘッダー ファイル\GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
