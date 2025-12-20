@@ -201,6 +201,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="sceneManager.cpp" />
+    <ClCompile Include="scene_title.cpp" />
     <ClCompile Include="Second_Result.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shader3d.cpp" />
@@ -261,6 +262,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="result.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="sceneManager.h" />
+    <ClInclude Include="scene_title.h" />
     <ClInclude Include="Second_Result.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shader3d.h" />
