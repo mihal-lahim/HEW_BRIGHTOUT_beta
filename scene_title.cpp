@@ -10,7 +10,7 @@
 
 void SceneTitle::Enter()
 {
-	m_object_manager = new ObjectManager();
+	m_object_manager->Initialize();
 }
 
 void SceneTitle::Update(double elapsed_time)

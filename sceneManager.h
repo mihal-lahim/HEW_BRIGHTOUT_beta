@@ -16,6 +16,6 @@ public:
 	void Draw();
 	void Exit();
 
-	void ChangeScene(Scene&);
+	void ChangeScene(Scene& newScene);
 };
 #endif // SCENE_MANAGER_H
