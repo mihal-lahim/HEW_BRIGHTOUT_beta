@@ -16,16 +16,14 @@ class GameObject
 private:
     uint64_t m_ID = 0; // オブジェクトの型ごとの一意なID
     bool m_CanDestroy = false; // オブジェクトが破壊可能かどうか
+	ObjectManager* m_owner = nullptr; // 所有者の ObjectManager へのポインタ
+	bool m_IsActive = true; // オブジェクトがアクティブかどうか
 protected:
     DirectX::XMFLOAT3 m_Position{};
     DirectX::XMFLOAT3 m_Scale{ 1.0f, 1.0f, 1.0f };
     DirectX::XMFLOAT3 m_Rotation{}; // オイラー角
     MODEL* m_pModel = nullptr;
     int m_TextureId = -1; // テクスチャID（モデルがない場合）
-
-    ObjectManager* m_owner = nullptr;
-
-	bool m_IsActive = true; // オブジェクトがアクティブかどうか
 public:
     GameObject(const DirectX::XMFLOAT3& pos, MODEL* model = nullptr, int textureId = -1, const DirectX::XMFLOAT3& scale = { 1.0f, 1.0f, 1.0f })
         : m_Position(pos), m_pModel(model), m_TextureId(textureId), m_Scale(scale) {}
@@ -37,7 +35,7 @@ public:
 	virtual void PreUpdate(double) {}
     virtual void Update(double) {}
 	virtual void PostUpdate(double) {}
-    virtual void Draw() const {}
+	virtual void Draw() const;
 
     virtual AABB GetAABB() const;
 
