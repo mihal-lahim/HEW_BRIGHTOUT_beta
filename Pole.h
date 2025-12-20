@@ -1,48 +1,47 @@
-#pragma once
+
+#ifndef POLE_H
+#define POLE_H
+
 #include <DirectXMath.h>
 #include "GameObject.h"
-#include "collision.h"
+#include <vector>
+#include "PoleManager.h"
 
-using namespace DirectX;
 
-// 電柱クラス：GameObjectを継承
-// ゲームワールドに配置される静的な電柱
 class Pole : public GameObject
 {
+private:
+	// 所有者の PoleManager へのポインタ
+    PoleManager* m_PoleManager = nullptr;
+    // 接続されている電線のリスト
+	std::vector<PowerLineID> m_ConnectedLines;
+    // 電柱の高さ
+    float m_Height;
+	// 電柱の頂点位置
+    DirectX::XMFLOAT3 m_TopPos{};
 public:
     // コンストラクタ
-    Pole(const XMFLOAT3& pos, MODEL* model = nullptr, float height = 4.0f, float radius = 0.2f);
+    Pole(const DirectX::XMFLOAT3& pos, MODEL* model = nullptr, float height = 4.0f);
     virtual ~Pole() = default;
 
-    virtual void Update(double elapsedTime) override;  // 更新処理
-    virtual void Draw() const override;                // 描画処理
-    virtual AABB GetAABB() const override;            // 衝突判定用AABB
+	// 所有者の PoleManager 設定メソッド
+	void SetOwner(PoleManager* manager) { m_PoleManager = manager; }
+	// 接続されている電線の追加メソッド
+	void SetPowerLine(PowerLineID lineID) { m_ConnectedLines.push_back(lineID); }
+	// 電柱の高さ設定メソッド
+	void SetHeight(float height)
+	{ 
+		m_Height = height;
+		m_TopPos = DirectX::XMFLOAT3(m_Position.x, m_Position.y + m_Height, m_Position.z);
+	}
+	// 電柱の頂点位置取得メソッド
+	const DirectX::XMFLOAT3& GetTopPos() const { return m_TopPos; }
+	// 接続されている電線リスト取得メソッド
+	std::vector<PowerLineID> GetLines() const { return m_ConnectedLines; }
 
-    // 電柱のプロパティ取得
-    float GetHeight() const { return m_height; }
-    float GetRadius() const { return m_radius; }
-    
-    // 電柱の頂上位置を取得
-    XMFLOAT3 GetTopPosition() const 
-    { 
-        return { m_Position.x, m_Position.y + m_height, m_Position.z }; 
-    }
-
-    // 点と電柱が衝突しているか判定
-    bool CheckCollisionWithPoint(const XMFLOAT3& point) const;
-
-    // 電柱ID管理
-    void SetPoleID(int id) { m_poleID = id; }
-    int GetPoleID() const { return m_poleID; }
-
-    // モデル設定
-    void SetModel(MODEL* model) { m_pModel = model; }
-    MODEL* GetModel() const { return m_pModel; }
-
-private:
-    float m_height;         // 電柱の高さ
-    float m_radius;         // 電柱の半径
-    float m_rotationSpeed;  // 回転速度（エフェクト用）
-    double m_elapsedTime;   // 経過時間（エフェクト用）
-    int m_poleID = -1;      // 電柱の識別ID
+    virtual void Draw() const override;  // 描画処理
 };
+
+
+
+#endif

@@ -1,15 +1,5 @@
 #include "ObjectManager.h"
-#include "texture.h"
-#include "Pole.h"
-#include "PowerLine.h"
-#include "ItemGeneratorObject.h"
-#include "house.h"
-#include "ChargingSpot.h"
-#include "Enemy.h"
-#include "Player.h"
-#include "debug_console.h"
-#include <algorithm>
-#include <cmath>
+
 
 void ObjectManager::Initialize()
 {
@@ -59,7 +49,7 @@ void ObjectManager::Draw() const
     }
 }
 
-void ObjectManager::AddGameObject(GameObject* obj)
+void ObjectManager::RegisterGameObject(GameObject* obj)
 {
     if (!obj) return;
 
@@ -81,7 +71,7 @@ void ObjectManager::AddPendingGameObjects()
         m_GameObjectMap.at(type).push_back(m_GameObjects.size());
 
         // オブジェクトをリストに追加
-        m_GameObjects.push_back(std::make_unique<GameObject>(obj));
+        m_GameObjects.push_back(std::unique_ptr<GameObject>(obj));
     }
 }
 

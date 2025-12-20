@@ -5,10 +5,8 @@
 #include <unordered_map>
 #include <type_traits>
 #include <memory>
-#include <DirectXMath.h>
 #include <cstdint>
 #include "GameObject.h"
-#include "debug_console.h"
 #include <typeindex>
 
 
@@ -36,9 +34,6 @@ private:
     void PostUpdate(double elapsedTime);
     void Draw() const;
 
-
-    // ゲームオブジェクトを追加するメソッド
-    void AddGameObject(GameObject* obj);
 	// 保留中のゲームオブジェクトを追加するメソッド
 	void AddPendingGameObjects();
 
@@ -99,10 +94,13 @@ public:
     T* Create(Args... args)
     {
         T* obj = new T(args...);
-        AddGameObject(obj);
+        RegisterGameObject(obj);
 		m_PreStarted.push_back(obj);
         return obj;
     }
+
+    // 既存ゲームオブジェクトを登録するメソッド
+    void RegisterGameObject(GameObject* obj);
 };
 
 #endif // OBJECT_MANAGER_H

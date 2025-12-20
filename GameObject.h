@@ -25,7 +25,7 @@ protected:
     MODEL* m_pModel = nullptr;
     int m_TextureId = -1; // テクスチャID（モデルがない場合）
 public:
-    GameObject(const DirectX::XMFLOAT3& pos, MODEL* model = nullptr, int textureId = -1, const DirectX::XMFLOAT3& scale = { 1.0f, 1.0f, 1.0f })
+    GameObject(const DirectX::XMFLOAT3& pos = {}, MODEL* model = nullptr, int textureId = -1, const DirectX::XMFLOAT3& scale = {1.0f, 1.0f, 1.0f})
         : m_Position(pos), m_pModel(model), m_TextureId(textureId), m_Scale(scale) {}
     virtual ~GameObject() = default;
 

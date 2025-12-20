@@ -199,6 +199,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="Pole.cpp" />
+    <ClCompile Include="PoleManager.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="PowerLine.cpp" />
     <ClCompile Include="result.cpp" />
@@ -260,6 +261,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="Pole.h" />
+    <ClInclude Include="PoleManager.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="PowerLine.h" />
     <ClInclude Include="result.h" />
