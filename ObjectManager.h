@@ -16,10 +16,6 @@
 template<typename T>
 concept GameObjectDerived = requires { std::is_base_of<GameObject, T>::value; };
 
-// フォワード宣言
-class Player;
-class Enemy;
-class Controller;
 
 class ObjectManager
 {
@@ -30,7 +26,8 @@ private:
 	std::unordered_map<std::type_index, std::vector<uint64_t>> m_GameObjectMap;
 	// 未Startゲームオブジェクトリスト
     std::vector<GameObject*> m_PreStarted;
-
+	// 追加保留中ゲームオブジェクトリスト
+	std::vector<GameObject*> m_PendingGameObjects;
 
 	// 更新メソッド
     void Start();
@@ -41,7 +38,9 @@ private:
 
 
     // ゲームオブジェクトを追加するメソッド
-    void AddGameObject(std::unique_ptr<GameObject> obj);
+    void AddGameObject(GameObject* obj);
+	// 保留中のゲームオブジェクトを追加するメソッド
+	void AddPendingGameObjects();
 
     // Destroyフラグが立っているオブジェクトを削除するメソッド
     void DestroyGameObjects();
@@ -97,13 +96,12 @@ public:
     // 汎用オブジェクト作成テンプレートメソッド
     // T は GameObject を継承している必要があります(コンパイルエラーになる)
     template<GameObjectDerived T, typename... Args>
-    [[nodiscard]] T* Create(Args... args)
+    T* Create(Args... args)
     {
-        std::unique_ptr<T> obj = std::make_unique<T>(args...);
-        T* ref = obj.get();
-        AddGameObject(std::move(obj));
-		m_PreStarted.push_back(ref);
-        return ref;
+        T* obj = new T(args...);
+        AddGameObject(obj);
+		m_PreStarted.push_back(obj);
+        return obj;
     }
 };
 

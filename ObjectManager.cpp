@@ -49,6 +49,7 @@ void ObjectManager::PostUpdate(double elapsedTime)
         if (obj->m_IsActive) obj->PostUpdate(elapsedTime);
     }
     DestroyGameObjects();
+    AddPendingGameObjects();
 }
 
 void ObjectManager::Draw() const
@@ -58,21 +59,30 @@ void ObjectManager::Draw() const
     }
 }
 
-void ObjectManager::AddGameObject(std::unique_ptr<GameObject> obj)
+void ObjectManager::AddGameObject(GameObject* obj)
 {
     if (!obj) return;
 
 	// オブジェクトのオーナーを設定
 	obj->m_owner = this;
 
-    // オブジェクトを型ごとのマップに登録
-    const std::type_index type(typeid(*obj));  // type_index でラップ
+    // 保留リストに追加
+    m_PendingGameObjects.push_back(std::move(obj));
+}
 
-    obj->m_ID = m_GameObjectMap[type].size();
-    m_GameObjectMap.at(type).push_back(m_GameObjects.size());
+void ObjectManager::AddPendingGameObjects()
+{
+    for (auto* obj : m_PendingGameObjects)
+    {
+        // オブジェクトを型ごとのマップに登録
+        const std::type_index type(typeid(*obj));  // type_index でラップ
 
-    // オブジェクトをリストに追加
-    m_GameObjects.push_back(std::move(obj));
+        obj->m_ID = m_GameObjectMap[type].size();
+        m_GameObjectMap.at(type).push_back(m_GameObjects.size());
+
+        // オブジェクトをリストに追加
+        m_GameObjects.push_back(std::make_unique<GameObject>(obj));
+    }
 }
 
 void ObjectManager::DestroyGameObjects()
