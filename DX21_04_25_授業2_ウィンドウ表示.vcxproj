@@ -191,6 +191,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="map.cpp" />
+    <ClCompile Include="mapcell.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="mouse.cpp" />
     <ClCompile Include="name_input.cpp" />
@@ -252,6 +253,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="key_logger.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="map.h" />
+    <ClInclude Include="mapcell.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="mouse.h" />
     <ClInclude Include="name_input.h" />
