@@ -70,10 +70,10 @@ StickState Controller::GetLeftStick() const
 	float length = sqrtf(lx * lx + ly * ly);
 
 	// デッドゾーン判定と正規化・値のセット
-	state.isOutside = length > (m_LeftStickDeadZone * STICK_DIVIDER);
+	state.isOutside = length > m_LeftStickDeadZone;
 	state.length = state.isOutside ? length * STICK_DIVIDER : 0.0f;
-	state.x = state.isOutside ? lx * STICK_DIVIDER : 0.0f;
-	state.y = state.isOutside ? ly * STICK_DIVIDER : 0.0f;
+	state.x = state.isOutside * STICK_DIVIDER ? lx : 0.0f;
+	state.y = state.isOutside * STICK_DIVIDER ? ly : 0.0f;
 
 	return state;
 }
@@ -84,17 +84,17 @@ StickState Controller::GetRightStick() const
 	StickState state{};
 
 	// 取得と正規化
-	float rx = (float)(m_CurState.Gamepad.sThumbRX * STICK_DIVIDER);
-	float ry = (float)(m_CurState.Gamepad.sThumbRY * STICK_DIVIDER);
+	float rx = (float)(m_CurState.Gamepad.sThumbRX);
+	float ry = (float)(m_CurState.Gamepad.sThumbRY);
 
 	// スティックの倒れ具合を計算
 	float length = sqrtf(rx * rx + ry * ry);
 
 	// デッドゾーン判定と値のセット
 	state.isOutside = length > (m_LeftStickDeadZone * STICK_DIVIDER);
-	state.length = state.isOutside ? length : 0.0f;
-	state.x = state.isOutside ? rx : 0.0f;
-	state.y = state.isOutside ? ry : 0.0f;
+	state.length = state.isOutside ? length * STICK_DIVIDER : 0.0f;
+	state.x = state.isOutside * STICK_DIVIDER ? rx : 0.0f;
+	state.y = state.isOutside * STICK_DIVIDER ? ry : 0.0f;
 
 	return state;
 }
