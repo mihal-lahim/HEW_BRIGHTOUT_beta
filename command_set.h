@@ -6,13 +6,14 @@
 
 #include "command.h"
 #include <unordered_set>
+#include "GameObject.h"
 
 
 // コマンド型の概念
 template<typename C>
 concept CommandType = std::is_base_of_v<Command, C>;
 
-class CommandSet
+class CommandSet : public GameObject
 {
 protected:
 	// 許可されたコマンドIDの集合

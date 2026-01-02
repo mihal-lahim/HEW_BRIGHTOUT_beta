@@ -10,17 +10,12 @@
 
 class DebugCamera : public Camera
 {
-private:
-	DirectX::XMFLOAT3 m_front{};
-	DirectX::XMFLOAT3 m_right{};
-	DirectX::XMFLOAT3 m_up{};
-	DirectX::XMFLOAT3 m_position{};
-	float m_fov{ 1.0f };
 public:
 
-	DebugCamera(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& target);
-	void Update(double elapsed_time)override;//キー入力による更新
-	void SetMatrix() const override;
+	DebugCamera() = default;
+
+	//キー入力による更新
+	void Update(double elapsed_time)override;
 };
 
 #endif // DEBUG_CAMERA_H

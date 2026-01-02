@@ -24,15 +24,15 @@ public:
 	PlayerComSet_Human()
 	{
 		// 移動コマンドを許可
-		AllowCommand<PlayerCommand_WalkX>();
-		AllowCommand<PlayerCommand_WalkZ>();
+		AllowCommand<PlayerCommand_MoveX>();
+		AllowCommand<PlayerCommand_MoveZ>();
 
 		// ジャンプコマンドを許可
 		AllowCommand<PlayerCommand_Jump>();
 		// 変身コマンドを許可
 		AllowCommand<PlayerCommand_Morph>();
 		// 電気ジャンプコマンドを許可
-		AllowCommand<PlayerCommand_ElectricJump>();
+		AllowCommand<PlayerCommand_Jump>();
 	}
 
 	virtual ~PlayerComSet_Human()

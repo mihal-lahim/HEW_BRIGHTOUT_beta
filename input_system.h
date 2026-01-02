@@ -5,14 +5,14 @@
 #include <unordered_map>
 #include "input_device.h"
 #include "command_set.h"
-
+#include "GameObject.h"
 
 // EnumŒ^‚ÌŠT”O
 template <typename E>
 concept EnumType = std::is_enum_v<E>;
 
 
-class InputSystem
+class InputSystem : public GameObject
 {
 private:
 	// “ü—ÍƒfƒoƒCƒX
