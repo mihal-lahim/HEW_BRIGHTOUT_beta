@@ -8,6 +8,7 @@
 
 #include <windows.h>
 #include <Xinput.h>
+#include "input_device.h"
 
 #pragma comment(lib, "Xinput.lib")
 
@@ -23,7 +24,16 @@ enum Button : WORD {
     BUTTON_DPAD_UP    = XINPUT_GAMEPAD_DPAD_UP,
     BUTTON_DPAD_DOWN  = XINPUT_GAMEPAD_DPAD_DOWN,
     BUTTON_DPAD_LEFT  = XINPUT_GAMEPAD_DPAD_LEFT,
-    BUTTON_DPAD_RIGHT = XINPUT_GAMEPAD_DPAD_RIGHT
+    BUTTON_DPAD_RIGHT = XINPUT_GAMEPAD_DPAD_RIGHT,
+
+	TRIGGER_LEFT,
+	TRIGGER_RIGHT,
+	STICK_LEFT_X,
+	STICK_LEFT_Y,
+	STICK_RIGHT_X,
+	STICK_RIGHT_Y,
+    STICK_LEFT_LENGTH,
+	STICK_RIGHT_LENGTH,
 };
 
 struct StickState {
@@ -38,7 +48,7 @@ struct TriggerState {
     bool isDowned; // 閾値を超えたかどうか
 };
 
-class Controller
+class Controller : public InputDevice
 {
 public:
 	// コンストラクタ・デストラクタ
@@ -47,6 +57,9 @@ public:
     
     // 毎フレーム呼ぶ
     void Update();
+
+	// 入力値取得（親クラスからオーバーライド）
+	float GetInputValue(WORD input, InputCondition inputCondition) override;
     
     // ボタン状態
     bool IsDown(Button btn) const;
@@ -65,6 +78,11 @@ public:
 	bool IsConnected() const { return m_IsConnected; }
 
 private:
+	// ヘルパ関数
+	float GetButtonValue(Button btn, InputCondition inputCondition) const;
+	float GetTriggerValue(Button btn, InputCondition inputCondition) const;
+	float GetStickValue(Button btn, InputCondition inputCondition) const;
+
 	// コントローラー番号
     int m_ControllerNumber;
 
@@ -72,8 +90,14 @@ private:
     XINPUT_STATE m_PrevState;
     XINPUT_STATE m_CurState;
 
+	// 前回のスティックとトリガーの状態（デッドゾーン判定後）
+	mutable StickState m_PrevLeftStick = {};
+	mutable StickState m_PrevRightStick = {};
+	mutable TriggerState m_PrevLeftTrigger = {};
+	mutable TriggerState m_PrevRightTrigger = {};
+
 	// 接続状態
-    bool m_IsConnected;
+    bool m_IsConnected = false;
 
 	// スティックのデッドゾーン
 	const float m_LeftStickDeadZone = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;

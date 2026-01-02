@@ -29,14 +29,22 @@ public:
 
 	// 電線の長さ取得メソッド
 	float GetPowerLineLength(PowerLineID id) const;
+	// 電線ID取得メソッド
+	PowerLineID GetPowerLineID(PoleID start, PoleID dest) const;
 	// 電線上の位置取得メソッド 
 	// t: 0.0f ~ 1.0f　の範囲を指定することで、今現在の電線上の位置を取得できる
 	DirectX::XMFLOAT3 GetPositionOnPowerLine(PoleID start, PoleID dest, float t) const;
-
 	// 指定した方向に最も合う、接続されている電柱のIDを取得するメソッド
-	PoleID GetDirectionalPole(PoleID from, const DirectX::XMFLOAT3& direction) const;
+	PoleID GetDirectionalPole(PoleID from, const DirectX::XMVECTOR& direction) const;
 
+	// 電柱取得メソッド
+	Pole* GetPole(PoleID id) const { return m_Poles.at(id); };
+	// 電線取得メソッド
+	PowerLine* GetPowerLine(PowerLineID id) const { return m_PowerLines.at(id); };
+	// 電柱リスト取得メソッド
 	std::vector<Pole*> GetPoles() const { return m_Poles; }
+	// 電線リスト取得メソッド
+	std::vector<PowerLine*> GetPowerLines() const { return m_PowerLines; }
 };
 
 

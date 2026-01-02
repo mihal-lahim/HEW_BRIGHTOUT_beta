@@ -23,60 +23,87 @@
     <Filter Include="ソース ファイル\電柱">
       <UniqueIdentifier>{aeb7fedc-9a5c-4d2e-acbd-f4cb2209ad26}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\GameObject">
+    <Filter Include="ソース ファイル\プレイヤー">
+      <UniqueIdentifier>{fd3203e7-421d-42f1-9cc6-b194f3f530d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\ゲームオブジェクト">
       <UniqueIdentifier>{8e0ba6a4-d74c-43da-8fac-ceedfabb9a58}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\GameObject">
+    <Filter Include="ヘッダー ファイル\ゲームオブジェクト">
       <UniqueIdentifier>{ba7c9c71-b845-4562-8fcf-7391108e76c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\プレイヤー">
+      <UniqueIdentifier>{501e1f77-b1a7-4528-bc7d-9f5a7c0e8cf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\プレイヤー\ステート">
+      <UniqueIdentifier>{e14126e3-412a-4c92-8d18-6dbbdb3b5dc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\プレイヤー\ステート">
+      <UniqueIdentifier>{e2a41019-bdb4-4219-84a2-37a374af6423}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\コンポーネント">
+      <UniqueIdentifier>{5fb83f26-4833-4ad8-af28-a22e1e52c1dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\コンポーネント">
+      <UniqueIdentifier>{b1415811-8c83-4a47-9af3-748cb9a401c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\入力">
+      <UniqueIdentifier>{4d01d11f-4346-4ebe-8c58-ac9e08586c46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\入力">
+      <UniqueIdentifier>{f4b48a2d-6c88-454f-a48b-3dc9c53e3227}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\描画">
+      <UniqueIdentifier>{18a09341-120d-405b-ab8f-d5032e1224c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\描画">
+      <UniqueIdentifier>{b49ab068-b48e-437a-bf8f-292441bab8ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\カメラ">
+      <UniqueIdentifier>{5842a41c-7843-4567-a723-e3c5ad7ff7d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\カメラ">
+      <UniqueIdentifier>{206a1085-6c83-4aee-809a-038857b281ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Direct3D">
+      <UniqueIdentifier>{67962c20-1d20-4e76-9e29-2f2776999a9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\オーディオ">
+      <UniqueIdentifier>{2dc27b41-2303-4fa3-befa-67f0b4314b69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\オーディオ">
+      <UniqueIdentifier>{d3c6db4d-0dbf-4448-af0d-6ba53d100fd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\デバッグ">
+      <UniqueIdentifier>{82ae1953-6a9b-42d1-806d-63709ba9d453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\デバッグ">
+      <UniqueIdentifier>{a9400362-d1ea-4d83-a596-b27313543114}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Direct3D">
+      <UniqueIdentifier>{5ff0dfc9-5ecf-474f-882f-f0a384d51955}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\UI">
+      <UniqueIdentifier>{fc1bdfe7-bb7a-4c2c-bcf3-880c9e8842b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\UI">
+      <UniqueIdentifier>{1029840f-39e6-474c-a7d3-24560aaefc4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\シーン">
+      <UniqueIdentifier>{8fbc3800-6fd6-44c6-835d-d271af847d50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\シーン">
+      <UniqueIdentifier>{a5f15219-e23b-464f-8cb7-62e2a42f35d3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="direct3d.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="debug_ostream.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="polygon.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="shader.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="sprite.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="sprite_anim.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="system_timer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="debug_text.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="WICTextureLoader11.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="texture.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="keyboard.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="mouse.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="key_logger.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="game_score.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="fade.cpp">
@@ -85,52 +112,19 @@
     <ClCompile Include="title.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="scene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="game_effect.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="result.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="cube.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="shader3d.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="grid.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="debug_camera.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="map.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="light.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="model.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="collision.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="controller.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="player.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="camera_manager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="top_down_camera.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="UI_Charge.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="item.cpp">
@@ -145,19 +139,7 @@
     <ClCompile Include="house.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="button_hint_ui.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="game.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="ChargingSpot.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="UI_house.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="UI_Timer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Enemy.cpp">
@@ -166,13 +148,7 @@
     <ClCompile Include="houseUI.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="UI_HouseCount.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="checkmark.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="tutorial.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="First_Result.cpp">
@@ -184,12 +160,6 @@
     <ClCompile Include="name_input.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="sceneManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="scene_title.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="PowerLine.cpp">
       <Filter>ソース ファイル\電柱</Filter>
     </ClCompile>
@@ -197,35 +167,140 @@
       <Filter>ソース ファイル\電柱</Filter>
     </ClCompile>
     <ClCompile Include="ObjectManager.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
+      <Filter>ソース ファイル\ゲームオブジェクト</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
-      <Filter>ソース ファイル\GameObject</Filter>
+      <Filter>ソース ファイル\ゲームオブジェクト</Filter>
     </ClCompile>
     <ClCompile Include="PoleManager.cpp">
       <Filter>ソース ファイル\電柱</Filter>
     </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>ソース ファイル\プレイヤー</Filter>
+    </ClCompile>
+    <ClCompile Include="player_state_human_walk.cpp">
+      <Filter>ソース ファイル\プレイヤー\ステート</Filter>
+    </ClCompile>
+    <ClCompile Include="player_movement.cpp">
+      <Filter>ソース ファイル\プレイヤー</Filter>
+    </ClCompile>
+    <ClCompile Include="health.cpp">
+      <Filter>ソース ファイル\コンポーネント</Filter>
+    </ClCompile>
+    <ClCompile Include="movement.cpp">
+      <Filter>ソース ファイル\コンポーネント</Filter>
+    </ClCompile>
+    <ClCompile Include="player_state.cpp">
+      <Filter>ソース ファイル\プレイヤー\ステート</Filter>
+    </ClCompile>
+    <ClCompile Include="player_state_human_idle.cpp">
+      <Filter>ソース ファイル\プレイヤー\ステート</Filter>
+    </ClCompile>
+    <ClCompile Include="controller.cpp">
+      <Filter>ソース ファイル\入力</Filter>
+    </ClCompile>
+    <ClCompile Include="key_logger.cpp">
+      <Filter>ソース ファイル\入力</Filter>
+    </ClCompile>
+    <ClCompile Include="keyboard.cpp">
+      <Filter>ソース ファイル\入力</Filter>
+    </ClCompile>
+    <ClCompile Include="cube.cpp">
+      <Filter>ソース ファイル\描画</Filter>
+    </ClCompile>
+    <ClCompile Include="model.cpp">
+      <Filter>ソース ファイル\描画</Filter>
+    </ClCompile>
+    <ClCompile Include="mouse.cpp">
+      <Filter>ソース ファイル\入力</Filter>
+    </ClCompile>
+    <ClCompile Include="sprite.cpp">
+      <Filter>ソース ファイル\描画</Filter>
+    </ClCompile>
+    <ClCompile Include="sprite_anim.cpp">
+      <Filter>ソース ファイル\描画</Filter>
+    </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>ソース ファイル\描画</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_manager.cpp">
+      <Filter>ソース ファイル\カメラ</Filter>
+    </ClCompile>
+    <ClCompile Include="debug_camera.cpp">
+      <Filter>ソース ファイル\カメラ</Filter>
+    </ClCompile>
+    <ClCompile Include="top_down_camera.cpp">
+      <Filter>ソース ファイル\カメラ</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio.cpp">
+      <Filter>ソース ファイル\オーディオ</Filter>
+    </ClCompile>
+    <ClCompile Include="polygon.cpp">
+      <Filter>ソース ファイル\描画</Filter>
+    </ClCompile>
+    <ClCompile Include="light.cpp">
+      <Filter>ソース ファイル\描画</Filter>
+    </ClCompile>
+    <ClCompile Include="shader3d.cpp">
+      <Filter>ソース ファイル\Direct3D</Filter>
+    </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>ソース ファイル\Direct3D</Filter>
+    </ClCompile>
+    <ClCompile Include="direct3d.cpp">
+      <Filter>ソース ファイル\Direct3D</Filter>
+    </ClCompile>
+    <ClCompile Include="debug_ostream.cpp">
+      <Filter>ソース ファイル\デバッグ</Filter>
+    </ClCompile>
+    <ClCompile Include="debug_text.cpp">
+      <Filter>ソース ファイル\デバッグ</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_Charge.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_house.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_HouseCount.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_Timer.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="game_score.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="button_hint_ui.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>ソース ファイル\シーン</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_title.cpp">
+      <Filter>ソース ファイル\シーン</Filter>
+    </ClCompile>
+    <ClCompile Include="sceneManager.cpp">
+      <Filter>ソース ファイル\シーン</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>ソース ファイル\シーン</Filter>
+    </ClCompile>
+    <ClCompile Include="tutorial.cpp">
+      <Filter>ソース ファイル\シーン</Filter>
+    </ClCompile>
+    <ClCompile Include="player_state_human.cpp">
+      <Filter>ソース ファイル\プレイヤー\ステート</Filter>
+    </ClCompile>
+    <ClCompile Include="player_state_human_ground.cpp">
+      <Filter>ソース ファイル\プレイヤー\ステート</Filter>
+    </ClCompile>
+    <ClCompile Include="player_state_human_midair.cpp">
+      <Filter>ソース ファイル\プレイヤー\ステート</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="direct3d.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="debug_ostream.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="polygon.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="shader.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="texture.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="sprite.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="sprite_anim.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="system_timer.h">
@@ -237,31 +312,10 @@
     <ClInclude Include="WICTextureLoader11.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="keyboard.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="mouse.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="key_logger.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="game.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Audio.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="game_score.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="fade.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="title.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="scene.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="game_effect.h">
@@ -270,19 +324,7 @@
     <ClInclude Include="result.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="cube.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="shader3d.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="grid.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="camera.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="debug_camera.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="map.h">
@@ -291,31 +333,7 @@
     <ClInclude Include="light.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="model.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="collision.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\controller\cont_12\controller.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="controller.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="player.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="camera_manager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="top_down_camera.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="UI_Charge.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="UI.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="item.h">
@@ -330,19 +348,7 @@
     <ClInclude Include="house.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="button_hint_ui.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="ChargingSpot.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="UI_house.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="debug_console.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="UI_Timer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="enemy.h">
@@ -351,13 +357,7 @@
     <ClInclude Include="houseUI.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="UI_HouseCount.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="checkmark.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="tutorial.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="First_Result.h">
@@ -367,12 +367,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="name_input.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="sceneManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="scene_title.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="PowerLine.h">
@@ -385,10 +379,157 @@
       <Filter>ヘッダー ファイル\電柱</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
+      <Filter>ヘッダー ファイル\ゲームオブジェクト</Filter>
     </ClInclude>
     <ClInclude Include="ObjectManager.h">
-      <Filter>ヘッダー ファイル\GameObject</Filter>
+      <Filter>ヘッダー ファイル\ゲームオブジェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>ヘッダー ファイル\プレイヤー</Filter>
+    </ClInclude>
+    <ClInclude Include="player_state.h">
+      <Filter>ヘッダー ファイル\プレイヤー\ステート</Filter>
+    </ClInclude>
+    <ClInclude Include="player_state_human.h">
+      <Filter>ヘッダー ファイル\プレイヤー\ステート</Filter>
+    </ClInclude>
+    <ClInclude Include="player_state_electric.h">
+      <Filter>ヘッダー ファイル\プレイヤー\ステート</Filter>
+    </ClInclude>
+    <ClInclude Include="player_state_human_idle.h">
+      <Filter>ヘッダー ファイル\プレイヤー\ステート</Filter>
+    </ClInclude>
+    <ClInclude Include="player_movement.h">
+      <Filter>ヘッダー ファイル\プレイヤー</Filter>
+    </ClInclude>
+    <ClInclude Include="player_state_human_midair.h">
+      <Filter>ヘッダー ファイル\プレイヤー\ステート</Filter>
+    </ClInclude>
+    <ClInclude Include="player_state_human_walk.h">
+      <Filter>ヘッダー ファイル\プレイヤー\ステート</Filter>
+    </ClInclude>
+    <ClInclude Include="health.h">
+      <Filter>ヘッダー ファイル\コンポーネント</Filter>
+    </ClInclude>
+    <ClInclude Include="movement.h">
+      <Filter>ヘッダー ファイル\コンポーネント</Filter>
+    </ClInclude>
+    <ClInclude Include="controller.h">
+      <Filter>ヘッダー ファイル\入力</Filter>
+    </ClInclude>
+    <ClInclude Include="input_device.h">
+      <Filter>ヘッダー ファイル\入力</Filter>
+    </ClInclude>
+    <ClInclude Include="input_system.h">
+      <Filter>ヘッダー ファイル\入力</Filter>
+    </ClInclude>
+    <ClInclude Include="key_logger.h">
+      <Filter>ヘッダー ファイル\入力</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboard.h">
+      <Filter>ヘッダー ファイル\入力</Filter>
+    </ClInclude>
+    <ClInclude Include="mouse.h">
+      <Filter>ヘッダー ファイル\入力</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>ヘッダー ファイル\描画</Filter>
+    </ClInclude>
+    <ClInclude Include="cube.h">
+      <Filter>ヘッダー ファイル\描画</Filter>
+    </ClInclude>
+    <ClInclude Include="sprite.h">
+      <Filter>ヘッダー ファイル\描画</Filter>
+    </ClInclude>
+    <ClInclude Include="sprite_anim.h">
+      <Filter>ヘッダー ファイル\描画</Filter>
+    </ClInclude>
+    <ClInclude Include="polygon.h">
+      <Filter>ヘッダー ファイル\描画</Filter>
+    </ClInclude>
+    <ClInclude Include="debug_camera.h">
+      <Filter>ヘッダー ファイル\カメラ</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>ヘッダー ファイル\カメラ</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_manager.h">
+      <Filter>ヘッダー ファイル\カメラ</Filter>
+    </ClInclude>
+    <ClInclude Include="top_down_camera.h">
+      <Filter>ヘッダー ファイル\カメラ</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio.h">
+      <Filter>ヘッダー ファイル\オーディオ</Filter>
+    </ClInclude>
+    <ClInclude Include="debug_console.h">
+      <Filter>ヘッダー ファイル\デバッグ</Filter>
+    </ClInclude>
+    <ClInclude Include="debug_ostream.h">
+      <Filter>ヘッダー ファイル\デバッグ</Filter>
+    </ClInclude>
+    <ClInclude Include="direct3d.h">
+      <Filter>ヘッダー ファイル\Direct3D</Filter>
+    </ClInclude>
+    <ClInclude Include="shader3d.h">
+      <Filter>ヘッダー ファイル\Direct3D</Filter>
+    </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>ヘッダー ファイル\Direct3D</Filter>
+    </ClInclude>
+    <ClInclude Include="UI.h">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_Charge.h">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_house.h">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_HouseCount.h">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_Timer.h">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="game_score.h">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="button_hint_ui.h">
+      <Filter>ヘッダー ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="scene_title.h">
+      <Filter>ヘッダー ファイル\シーン</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>ヘッダー ファイル\シーン</Filter>
+    </ClInclude>
+    <ClInclude Include="sceneManager.h">
+      <Filter>ヘッダー ファイル\シーン</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>ヘッダー ファイル\シーン</Filter>
+    </ClInclude>
+    <ClInclude Include="tutorial.h">
+      <Filter>ヘッダー ファイル\シーン</Filter>
+    </ClInclude>
+    <ClInclude Include="command.h">
+      <Filter>ヘッダー ファイル\入力</Filter>
+    </ClInclude>
+    <ClInclude Include="player_command.h">
+      <Filter>ヘッダー ファイル\プレイヤー</Filter>
+    </ClInclude>
+    <ClInclude Include="command_set.h">
+      <Filter>ヘッダー ファイル\入力</Filter>
+    </ClInclude>
+    <ClInclude Include="player_command_set.h">
+      <Filter>ヘッダー ファイル\プレイヤー</Filter>
+    </ClInclude>
+    <ClInclude Include="player_state_human_ground.h">
+      <Filter>ヘッダー ファイル\プレイヤー\ステート</Filter>
+    </ClInclude>
+    <ClInclude Include="player_states_instances.h">
+      <Filter>ヘッダー ファイル\プレイヤー\ステート</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -19,8 +19,8 @@ PowerLineID PoleManager::RegisterPowerLine(PowerLine* line)
 	// 接続されている電柱にも電線のIDを登録
 	Pole* pole1 = m_Poles.at(line->GetPoles().first);
 	Pole* pole2 = m_Poles.at(line->GetPoles().second);
-	pole1->GetLines().push_back(static_cast<PowerLineID>(m_PowerLines.size() - 1));
-	pole2->GetLines().push_back(static_cast<PowerLineID>(m_PowerLines.size() - 1));
+	pole1->SetPowerLine((PoleID)m_PowerLines.size() - 1);
+	pole2->SetPowerLine((PoleID)m_PowerLines.size() - 1);
 
 	// 電柱の座標を取得
 	XMVECTOR pos1 = XMLoadFloat3(&pole1->GetPosition());
@@ -29,10 +29,30 @@ PowerLineID PoleManager::RegisterPowerLine(PowerLine* line)
 	// 電線の長さを設定
 	line->SetLength(XMVectorGetX(XMVector3Length(pos1 - pos2)));
 
-	return static_cast<PoleID>(m_PowerLines.size() - 1);
+	return (PoleID)(m_PowerLines.size() - 1);
 }
 
 float PoleManager::GetPowerLineLength(PowerLineID id) const { return m_PowerLines.at(id)->GetLength(); }
+
+PowerLineID PoleManager::GetPowerLineID(PoleID start, PoleID dest) const
+{
+	// 指定された2つの電柱を結ぶ電線を検索
+	for (PowerLineID lineID : m_Poles.at(start)->GetLines())
+	{
+		// 電線を取得
+		PowerLine* line = m_PowerLines.at(lineID);
+
+		// 接続されている電柱のIDペアを取得
+		auto [firstPole, secondPole] = line->GetPoles();
+
+		// 電柱の組み合わせが一致するか確認
+		if ((firstPole == start && secondPole == dest) || (firstPole == dest && secondPole == start))
+			return lineID;
+	}
+	
+	// 見つからなかった場合は-1を返す
+	return -1;
+}
 
 DirectX::XMFLOAT3 PoleManager::GetPositionOnPowerLine(PoleID start, PoleID dest, float t) const
 {
@@ -47,10 +67,10 @@ DirectX::XMFLOAT3 PoleManager::GetPositionOnPowerLine(PoleID start, PoleID dest,
 	return result;
 }
 
-PoleID PoleManager::GetDirectionalPole(PoleID from, const DirectX::XMFLOAT3& direction) const
+PoleID PoleManager::GetDirectionalPole(PoleID from, const XMVECTOR& direction) const
 {
 	// 指定された方向ベクトルを正規化
-	XMVECTOR dirVec = XMVector3Normalize(XMLoadFloat3(&direction));
+	XMVECTOR dirVec = XMVector3Normalize(direction);
 	float maxDot = -1.0f;
 	PoleID bestPole = -1;
 

@@ -1,15 +1,12 @@
 #include "player.h"
-#include <algorithm>
 #include <cmath>
 #include <DirectXMath.h>
 #include "model.h"
 #include "controller.h"
 #include "top_down_camera.h"
-#include "map.h"
 #include "ObjectManager.h"
 #include "Pole.h"
 #include "PowerLine.h"
-#include "house.h"
 #include "debug_console.h"
 
 // 入力反転フラグ（必要に応じて調整）
@@ -18,35 +15,7 @@ static constexpr bool INVERT_LS_Y = true; // 前後が反転しているので Y を反転
 
 using namespace DirectX;
 
-// プレイヤークラス実装
-Player::~Player() = default;
 
-Player::Player()
-	: GameObject(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f))
-	, model_(nullptr)
-	, electricModel_(nullptr)
-	, direction_(0.0f, 0.0f, 1.0f)
-	, health_(100.0f)
-	, maxHealth_(100.0f)
-	, usePlayer(true)
-{
-}
-
-Player::Player(const XMFLOAT3& pos)
-	: GameObject(pos)
-{
-}
-
-
-Player::Player(MODEL* model, MODEL* electricModel, const XMFLOAT3& pos, const XMFLOAT3& dir)
-	: GameObject(pos, model)
-	, model_(model)
-	, electricModel_(electricModel)
-	, direction_(dir)
-{
-	health_ = maxHealth_ = 100.0f;	
-	usePlayer = true;
-}
 
 // 毎フレーム更新（ダッシュ継続時間の管理、入力処理）
 void Player::Update(double elapsedSec)
@@ -54,11 +23,6 @@ void Player::Update(double elapsedSec)
 	//ジャンプ
 	if (controller_->WasPressed(Controller::BUTTON_A)) {
 		Jump(15);
-	}
-
-	// 衝突判定スキップタイマーの更新
-	if (skipCollisionTimer_ > 0.0f) {
-		skipCollisionTimer_ -= static_cast<float>(elapsedSec);
 	}
 
 	// カメラを更新（右スティックの入力処理を含む）
@@ -381,42 +345,6 @@ void Player::Draw() const
 	ModelDraw(drawModel, world);
 }
 
-void Player::Jump(float jumpForce)
-{
-	// HUMAN状態のみ
-	if (state != State::HUMAN) return;
-
-	// 地上ジャンプ
-	if (isGrounded_ && controller_->WasPressed(Controller::BUTTON_A)) {
-		velocityY_ = jumpForce;
-		isGrounded_ = false;
-		return;
-	}
-
-	// 空中ジャンプ（1回だけ）
-	if (!isGrounded_ && canAirJump_ && controller_->WasPressed(Controller::BUTTON_A)) {
-		velocityY_ = jumpForce;
-		canAirJump_ = false; // ← 使い切り
-	}
-}
-
-void Player::TakeDamage(float amount)
-{
-	health_ -= amount;
-	if (health_ < 0.0f) health_ = 0.0f;
-	
-	//const char* stateName = (state == State::ELECTRICITY) ? "ELECTRICITY" : "HUMAN";
-	//DEBUG_LOGF("[TakeDamage] State=%s | Pos=(%.1f, %.1f, %.1f) | HP=%.1f/%.1f | Damage=%.2f", stateName, m_Position.x, m_Position.y, m_Position.z, health_, maxHealth_, amount);
-}
-
-void Player::Heal(float amount)
-{
-	health_ += amount;
-	if (health_ > maxHealth_) health_ = maxHealth_;
-	
-	//const char* stateName = (state == State::ELECTRICITY) ? "ELECTRICITY" : "HUMAN";
-	//DEBUG_LOGF("[Heal] State=%s | Pos=(%.1f, %.1f, %.1f) | HP=%.1f/%.1f | Healed=%.2f", stateName, m_Position.x, m_Position.y, m_Position.z, health_, maxHealth_, amount);
-}
 
 void Player::SetController(Controller* controller)
 {
@@ -638,75 +566,3 @@ void Player::ChangeState(Player::State newState)
 			m_Position.x, m_Position.y, m_Position.z, health_, maxHealth_);
 	}
 }
-
-// ハウスへの電気供給（ボタン操作で呼ばれる）
-// プレイヤーが近くにいるハウスに電気を供給する関数
-void Player::TransferElectricityToHouse(House* house, double elapsedSec)
-{
-	if (!house || health_ <= 0) return;
-
-	// 毎秒の固定供給量（ELECTRICITY_TRANSFER_RATE で調整可能）
-	float transferAmount = ELECTRICITY_TRANSFER_RATE * static_cast<float>(elapsedSec);
-	
-	// プレイヤーが持っている体力の方が少ない場合はそれを上限にする
-	if (health_ < transferAmount) {
-		transferAmount = static_cast<float>(health_);
-	}
-	// ハウスに電気を供給（体力をそのまま電気に変換）
-	house->ReceiveElectricity(transferAmount);
-	
-	// プレイヤーの体力から差し引く（電気を消費）
-// 体力を減少させて電気を供給
-	TakeDamage(transferAmount);
-	
-}
-
-// 最も近いハウスを取得
-class House* Player::GetNearestHouse() const
-{
-	extern ObjectManager g_ObjectManager;
-	const auto& allObjects = g_ObjectManager.GetGameObjects();
-	
-	House* nearestHouse = nullptr;
-	float minDistance = FLT_MAX;
-	
-	for (const auto& obj : allObjects) {
-		if (obj->GetTag() == GameObjectTag::HOUSE) {
-			House* house = static_cast<House*>(obj.get());
-			if (!house) continue;
-			
-			float distance = house->GetDistanceToPlayer(m_Position);
-			
-			if (distance < minDistance && distance <= HOUSE_INTERACTION_RADIUS) {
-				minDistance = distance;
-				nearestHouse = house;
-			}
-		}
-	}
-	return nearestHouse;
-}
-
-// 給電開始
-void Player::StartSupplyingElectricity(House* house)
-{
-	if (!house || m_isSupplying) return;
-	m_supplyingHouse = house;
-	m_isSupplying = true;
-
-	const char* stateName = (state == State::ELECTRICITY) ? "ELECTRICITY" : "HUMAN";
-	DEBUG_LOGF("[StartSupply] State=%s | Pos=(%.1f, %.1f, %.1f) | HP=%.1f/%.1f | House=(%.1f, %.1f, %.1f)", 
-		stateName, m_Position.x, m_Position.y, m_Position.z, health_, maxHealth_,
-		house->GetPosition().x, house->GetPosition().y, house->GetPosition().z);
-}
-
-// 給電停止
-void Player::StopSupplyingElectricity()
-{
-	m_isSupplying = false;
-	m_supplyingHouse = nullptr;
-
-	const char* stateName = (state == State::ELECTRICITY) ? "ELECTRICITY" : "HUMAN";
-	DEBUG_LOGF("[StopSupply] State=%s | Pos=(%.1f, %.1f, %.1f) | HP=%.1f/%.1f", 
-		stateName, m_Position.x, m_Position.y, m_Position.z, health_, maxHealth_);
-}
-

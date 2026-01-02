@@ -32,6 +32,8 @@ public:
 	void SetLength(float length) { m_Length = length; }
 	// 長さ取得メソッド
 	float GetLength() const { return m_Length; }
+	// 電線ベクトル取得メソッド
+	DirectX::XMVECTOR GetLineVector() const;
 };
 
 #endif
