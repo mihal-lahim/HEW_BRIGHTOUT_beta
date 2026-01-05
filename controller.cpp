@@ -16,7 +16,7 @@ Controller::Controller(int controllerNumber)
 	  m_IsConnected(false)
 {}
 
-void Controller::Update()
+void Controller::PreUpdate()
 {
 	// ‘O‰ñ‚Ìó‘Ô‚ğ•Û‘¶
 	m_PrevState = m_CurState;

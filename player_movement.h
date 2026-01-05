@@ -34,7 +34,9 @@ struct PlayerMoveCtx
 	// 電線上の位置パラメータ
 	float t = 0.0f;
 	// 電線上移動速度
-	float LineMoveSpeed = 10.0f;
+	float LineMoveSpeed = 0.0f;
+	// 電線上移動速度の最小値
+	float LineMoveSpeedMin = 10.0f;
 
 	// 最後の入力方向
 	DirectX::XMVECTOR LastInputDir{};
@@ -46,7 +48,7 @@ class PlayerMovement : public Movement
 {
 private:
 	// 移動設定値
-	PlayerMoveCtx m_MoveCtx;
+	PlayerMoveCtx m_Ctx;
 
 	// 入力方向を保存
 	DirectX::XMVECTOR SetInputDir(float inputX, float inputZ, const Player* player);
@@ -66,6 +68,8 @@ public:
 	void ApplyGravity(double elapsedTime);
 
 
+	// 電線上に移動する処理
+	void SnapToPowerLine(PowerLineID lineID, const Player& player);
 	// 電線上方向指定処理
 	void Turn(float inputX, float inputZ, const Player* player);
 	// 電線上移動処理
@@ -74,22 +78,17 @@ public:
 	void Eject(float inputX, float inputZ, const Player* player);
 
 	// 移動設定値取得・設定
-	void SetMoveCtx(const PlayerMoveCtx& moveCtx) { m_MoveCtx = moveCtx; }
-	const PlayerMoveCtx& GetMoveCtx() const { return m_MoveCtx; }
-
-	// 速度ベクトルを電線上速度に変換
-	void ConvertVelocityToLineSpeed() { m_MoveCtx.LineMoveSpeed = DirectX::XMVectorGetX(DirectX::XMVector3Length(GetVelocityVecV())); }
-	// 電線上速度を速度ベクトルに変換
-	void ConvertLineSpeedToVelocity();
+	void SetMoveCtx(const PlayerMoveCtx& moveCtx) { m_Ctx = moveCtx; }
+	const PlayerMoveCtx& GetMoveCtx() const { return m_Ctx; }
 
 	// コンストラクタ
 	PlayerMovement(PlayerMoveCtx moveCtx = {})
-		: m_MoveCtx(moveCtx)
+		: m_Ctx(moveCtx)
 	{}
 };
 
 // 入力方向をワールド座標系に変換する関数
-DirectX::XMFLOAT3 ConvertToWorldFromInput(const DirectX::XMFLOAT3 inputDir, const Camera* camera);
+DirectX::XMVECTOR ConvertToWorldFromInput(const DirectX::XMFLOAT3 inputDir, const Camera* camera);
 
 
 #endif

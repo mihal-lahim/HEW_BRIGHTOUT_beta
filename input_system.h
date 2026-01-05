@@ -33,9 +33,6 @@ public:
 	// デバイス設定
 	void SetDevice(InputDevice* inputDevice) { m_InputDevice = inputDevice; }
 
-	// 毎フレーム呼ぶ
-	void Update() { m_InputDevice->Update(); }
-
 	// 入力デバイスの設定
 	void SetInputDevice(InputDevice* inputDevice) { m_InputDevice = inputDevice; }
 

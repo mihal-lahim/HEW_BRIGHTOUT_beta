@@ -1,5 +1,6 @@
 #include "ObjectManager.h"
-
+#include "camera.h"
+#include <map>
 
 void ObjectManager::Initialize()
 {
@@ -42,10 +43,30 @@ void ObjectManager::PostUpdate(double elapsedTime)
     AddPendingGameObjects();
 }
 
+
 void ObjectManager::Draw() const
 {
-    for (const auto& obj : m_GameObjects) {
-        if(obj->m_IsActive) obj->Draw();
+	// カメラを取得
+	auto cameraVec = GetGameObjects<Camera>();
+
+	// カメラを優先度順にマップに格納
+	std::map<int, Camera*> cameraMap;
+
+    for (auto* camera : cameraVec)
+		cameraMap[camera->GetCameraCtx().Priority] = camera;
+
+	// 優先度順に描画
+    for (auto& [priority, camera] : cameraMap)
+    {
+		if (camera->IsActive() == false) continue;
+
+		// カメラ行列を設定
+        camera->SetMatrix();
+
+		// 全オブジェクトを描画
+        for (const auto& obj : m_GameObjects) {
+            if (obj->m_IsActive) obj->Draw();
+        }
     }
 }
 

@@ -9,12 +9,13 @@
 #include <DirectXMath.h>
 #include "GameObject.h"
 #include "input_system.h"
-#include "camera.h"
+#include "tps_camera.h"
 #include "health.h"
 #include "model.h"
 #include "player_movement.h"
 #include "player_state.h"
 #include "PoleManager.h"
+#include "player_morphsystem.h"
 #include "player_command.h"
 #include "player_states_instances.h"
 
@@ -33,44 +34,47 @@ private:
     MODEL* m_ElectricModel = nullptr;
 
     // InputSystem
-	InputSystem m_InputSystem;
+	InputSystem* m_InputSystem = nullptr;
 
     // カメラ
-    Camera* m_Camera;
+    TPSCamera* m_Camera = nullptr;
 
     // 体力
-    Health m_Health;
+    Health* m_Health = nullptr;
 
     // 移動
-	PlayerMovement* m_Movement;
+	PlayerMovement* m_Movement = nullptr;
 
 	// ポールマネージャー
-	PoleManager* m_PoleManager;
+	PoleManager* m_PoleManager = nullptr;
+
+	// 変身システム
+	PlayerMorphSystem* m_MorphSystem = nullptr;
 
 	// 状態管理
-	PlayerStateMachine m_StateMachine;
+	PlayerStateMachine* m_StateMachine = nullptr;
 
     // 地面に接しているかどうか
 	bool m_IsGrounded = false;
 
 public:
     Player();
-    ~Player();
+	~Player() = default;
 
-    Player(MODEL* model, MODEL* electricModel, const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& dir);
-
-    // 毎フレーム更新（経過時間は秒）
+    // 毎フレーム更新
     void Update(double elapsedSec) override;
 
+	// 描画処理
+	void Draw() const override;
 
-    // カメラを生成（target の y 成分を高さと解釈）
-    void CreateCamera(const DirectX::XMFLOAT3& target);
-	const Camera* GetCamera() const { return m_Camera; }
+    // Cameraの設定・取得
+	void SetTPSCamera(TPSCamera* camera) { m_Camera = camera; }
+	TPSCamera* const GetTPSCamera() const { return m_Camera; }
 
 
     // InputSystemの設定・取得
-    void SetInputSystem(InputSystem inputSystem) { m_InputSystem = inputSystem; }
-    const InputSystem& GetInputSystem() const { return m_InputSystem; }
+    void SetInputSystem(InputSystem* inputSystem) { m_InputSystem = inputSystem; }
+    const InputSystem* const GetInputSystem() const { return m_InputSystem; }
 
 	// モデル設定
 	void SetHumanModel(MODEL* humanModel) { m_HumanModel = humanModel; }
@@ -78,8 +82,8 @@ public:
 
     
 	// Healthコンポーネントの設定・取得
-	void SetHealth(Health health) { m_Health = health; }
-	const Health& GetHealth() const { return m_Health; }
+	void SetHealth(Health* health) { m_Health = health; }
+	Health* const GetHealth() const { return m_Health; }
 
 	// Movementコンポーネントの取得・設定
 	void SetMovement(PlayerMovement* movement) { m_Movement = movement; }
@@ -87,12 +91,16 @@ public:
 
 	// PoleManagerの取得・設定
 	void SetPoleManager(PoleManager* poleManager) { m_PoleManager = poleManager; }
-	PoleManager* const GetPoleManager() const { return m_PoleManager; }
+	const PoleManager* const GetPoleManager() const { return m_PoleManager; }
+
+	// MorphSystemの取得・設定
+	void SetMorphSystem(PlayerMorphSystem* morphSystem) { m_MorphSystem = morphSystem; }
+	PlayerMorphSystem* const GetMorphSystem() const { return m_MorphSystem; }
 
 	// 状態管理コンポーネントの取得・設定
-	void SetStateMachine(PlayerStateMachine stateMachine) { m_StateMachine = stateMachine; }
-	const PlayerStateMachine& GetStateMachine() const { return m_StateMachine; }
-    void ChangeState(PlayerState* newState) { m_StateMachine.ChangeState(*this, newState); }
+	void SetStateMachine(PlayerStateMachine* stateMachine) { m_StateMachine = stateMachine; }
+	const PlayerStateMachine* GetStateMachine() const { return m_StateMachine; }
+    void ChangeState(PlayerState* newState) { m_StateMachine->ChangeState(*this, newState); }
 
 	// 地面接地状態の設定・取得
 	void SetGrounded(bool isGrounded) { m_IsGrounded = isGrounded; }
@@ -101,5 +109,6 @@ public:
     // 描画処理
     void Draw() const;
 };
+
 
 #endif

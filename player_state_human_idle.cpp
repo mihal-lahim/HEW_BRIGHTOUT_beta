@@ -14,18 +14,18 @@ void PlayerState_Human_Idle::HandleInput(Player& player)
 void PlayerState_Human_Idle::Update(Player& player, double elapsedTime)
 {
 	// 入力システム取得
-	const InputSystem& inputSystem = player.GetInputSystem();
+	const InputSystem* inputSystem = player.GetInputSystem();
 
 	// 移動コマンドが発行されたら歩行状態へ遷移
-	if (inputSystem.IsIssued<PlayerCommand_MoveX>() 
-		|| inputSystem.IsIssued<PlayerCommand_MoveZ>())
+	if (inputSystem->IsIssued<PlayerCommand_MoveX>() 
+		|| inputSystem->IsIssued<PlayerCommand_MoveZ>())
 	{
 		player.ChangeState(&PlayerStates::HumanWalk);
 		return;
 	}
 
 	// ジャンプコマンドが発行されたら空中状態へ遷移
-	if (inputSystem.GetValue<PlayerCommand_Jump>())
+	if (inputSystem->GetValue<PlayerCommand_Jump>())
 	{
 		player.ChangeState(&PlayerStates::HumanMidAir);
 		return;
@@ -37,9 +37,4 @@ void PlayerState_Human_Idle::Update(Player& player, double elapsedTime)
 void PlayerState_Human_Idle::Draw(const Player& player) const
 {
 	PlayerState_Human::Draw(player);
-}
-
-void PlayerState_Human_Idle::Exit(Player& player)
-{
-	PlayerState_Human::Exit(player);
 }

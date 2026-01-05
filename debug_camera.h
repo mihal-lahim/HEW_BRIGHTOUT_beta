@@ -6,7 +6,6 @@
 #ifndef DEBUG_CAMERA_H
 #define DEBUG_CAMERA_H
 #include "camera.h"
-#include <DirectXMath.h>
 
 class DebugCamera : public Camera
 {

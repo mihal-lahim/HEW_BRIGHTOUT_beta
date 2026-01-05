@@ -13,7 +13,6 @@ public:
 	void HandleInput(Player& player) override;
 	void Update(Player& player, double elapsedTime) override;
 	void Draw(const Player& player) const override;
-	void Exit(Player& player) override;
 };
 
 #endif

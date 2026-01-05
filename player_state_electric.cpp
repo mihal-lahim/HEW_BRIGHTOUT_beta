@@ -10,18 +10,18 @@ void PlayerState_Electric::Enter(Player& player)
 void PlayerState_Electric::HandleInput(Player& player)
 {
 	// 入力システム取得
-	const InputSystem& inputSystem = player.GetInputSystem();
+	const InputSystem* inputSystem = player.GetInputSystem();
 
 	// 移動コンポーネント取得
 	PlayerMovement* movement = player.GetMovement();
 
 	// ジャンプコマンドが発行されたら射出・変身処理
-	if (inputSystem.IsIssued<PlayerCommand_Jump>())
+	if (inputSystem->IsIssued<PlayerCommand_Jump>())
 	{
 		// 電線から射出
 		movement->Eject(
-			inputSystem.GetValue<PlayerCommand_MoveX>(),
-			inputSystem.GetValue<PlayerCommand_MoveZ>(),
+			inputSystem->GetValue<PlayerCommand_MoveX>(),
+			inputSystem->GetValue<PlayerCommand_MoveZ>(),
 			&player);
 
 		// 人間形態へ変身
@@ -30,16 +30,15 @@ void PlayerState_Electric::HandleInput(Player& player)
 	}
 
 	// 移動コマンドが発行されたら方向転換処理
-	if (inputSystem.IsIssued<PlayerCommand_MoveX>()
-		|| inputSystem.IsIssued<PlayerCommand_MoveZ>())
+	if (inputSystem->IsIssued<PlayerCommand_MoveX>()
+		|| inputSystem->IsIssued<PlayerCommand_MoveZ>())
 	{
 		// 電線上方向指定処理
 		movement->Turn(
-			inputSystem.GetValue<PlayerCommand_MoveX>(),
-			inputSystem.GetValue<PlayerCommand_MoveZ>(),
+			inputSystem->GetValue<PlayerCommand_MoveX>(),
+			inputSystem->GetValue<PlayerCommand_MoveZ>(),
 			&player);
 	}
-
 
 	PlayerState::HandleInput(player);
 }
@@ -55,9 +54,4 @@ void PlayerState_Electric::Update(Player& player, double elapsedTime)
 void PlayerState_Electric::Draw(const Player& player) const
 {
 	PlayerState::Draw(player);
-}
-
-void PlayerState_Electric::Exit(Player& player)
-{
-	PlayerState::Exit(player);
 }

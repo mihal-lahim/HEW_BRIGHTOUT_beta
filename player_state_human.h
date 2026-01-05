@@ -11,7 +11,6 @@ public:
 	virtual void HandleInput(Player& player) override;
 	virtual void Update(Player& player, double elapsedTime) override;
 	virtual void Draw(const Player& player) const override;
-	virtual void Exit(Player& player) override;
 };
 
 #endif

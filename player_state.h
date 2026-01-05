@@ -1,6 +1,8 @@
 #ifndef PLAYER_STATE_H
 #define PLAYER_STATE_H
 
+#include "GameObject.h"
+
 class Player;
 
 // 抽象ステート基底クラス
@@ -12,13 +14,11 @@ public:
 	virtual ~PlayerState() = default;
 
 	// ステート切り替え時の初期化処理
-	virtual void Enter(Player&) {}
+	virtual void Enter(Player& player);
 	// ステート中の毎フレーム処理
-	virtual void HandleInput(Player&) {}
-	virtual void Update(Player&, double) {}
-	virtual void Draw(const Player&) const {}
-	// ステート離脱時の処理
-	virtual void Exit(Player&) {}
+	virtual void HandleInput(Player& player);
+	virtual void Update(Player& player, double elapsedTime);
+	virtual void Draw(const Player& player) const;
 
 	// コピーコンストラクタと代入演算子を削除（ステートの複製を防止）
 	PlayerState(const PlayerState&) = delete;
@@ -26,7 +26,7 @@ public:
 };
 
 // ステートマシン管理クラス
-class PlayerStateMachine
+class PlayerStateMachine : public GameObject
 {
 private:
 	// 現在のステート

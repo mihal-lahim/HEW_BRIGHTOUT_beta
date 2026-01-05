@@ -1,33 +1,42 @@
 #include "player_state_human.h"
 #include "player.h"
 
-void PlayerState_Human::Enter(Player&)
+void PlayerState_Human::Enter(Player& player)
 {
+	PlayerState::Enter(player);
 }
 
 void PlayerState_Human::HandleInput(Player& player)
 {
 	// 入力システム取得
-	const InputSystem& inputSystem = player.GetInputSystem();
+	const InputSystem* inputSystem = player.GetInputSystem();
 
 	// 移動コンポーネント取得
 	PlayerMovement* movement = player.GetMovement();
 
 	// 変身処理
-	if (inputSystem.IsCommandIssued<PlayerCommand_Morph>())
-	{}
+	if (inputSystem->IsIssued<PlayerCommand_Morph>() && player.GetMorphSystem()->CanMorph(player))
+	{
+		// 最寄りの電線IDを取得
+		PowerLineID nearestLine = player.GetMorphSystem()->GetNearestPowerLineID(player);
+
+		// 電気形態へ変身
+		movement->SnapToPowerLine(nearestLine, player);
+
+		// ステート変更
+		player.ChangeState(&PlayerStates::Electric);
+		return;
+	}
+
+	PlayerState::HandleInput(player);
 }
 
 void PlayerState_Human::Update(Player& player, double elapsedTime)
 {
-	// 移動コンポーネントの更新処理
-	player.GetMovement()->Update(elapsedTime, &player);
+	PlayerState::Update(player, elapsedTime);
 }
 
-void PlayerState_Human::Draw(const Player&) const
+void PlayerState_Human::Draw(const Player& player) const
 {
-}
-
-void PlayerState_Human::Exit(Player&)
-{
+	PlayerState::Draw(player);
 }

@@ -37,10 +37,11 @@ void Camera::SetMatrix() const
 
 
 	// アスペクト比を計算
-	float aspect = m_AspectRatio == -1.0f ? (float)Direct3D_GetBackBufferWidth() / (float)Direct3D_GetBackBufferHeight() : m_AspectRatio;
+	float aspect = m_Ctx.ViewportWidth == -1.0f || m_Ctx.ViewportHeight == -1.0f
+		? (float)Direct3D_GetBackBufferWidth() / (float)Direct3D_GetBackBufferHeight() : m_Ctx.ViewportWidth / m_Ctx.ViewportHeight;
 
 	// プロジェクション行列を作成
-	XMMATRIX proj = XMMatrixPerspectiveFovLH(XMConvertToRadians(m_Fov), aspect, m_Near, m_Far);
+	XMMATRIX proj = XMMatrixPerspectiveFovLH(XMConvertToRadians(m_Ctx.Fov), aspect, m_Ctx.Near, m_Ctx.Far);
 
 	// シェーダにプロジェクション行列を設定
 	Shader3d_SetProjectionMatrix(proj);

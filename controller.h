@@ -56,10 +56,10 @@ public:
 	~Controller() = default;
     
     // 毎フレーム呼ぶ
-    void Update();
+    void PreUpdate();
 
 	// 入力値取得（親クラスからオーバーライド）
-	float GetInputValue(WORD input, InputCondition inputCondition) override;
+	float GetInputValue(InputKey input, InputCondition inputCondition) override;
     
     // ボタン状態
     bool IsDown(Button btn) const;

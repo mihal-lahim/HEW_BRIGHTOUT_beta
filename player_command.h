@@ -18,5 +18,10 @@ class PlayerCommand_Jump : public Command {};
 // プレイヤー変身コマンド
 class PlayerCommand_Morph : public Command {};
 
+// カメラX軸移動コマンド
+class PlayerCommand_CameraMoveX : public Command {};
+
+// カメラY軸移動コマンド
+class PlayerCommand_CameraMoveY : public Command {};
 
 #endif

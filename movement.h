@@ -4,11 +4,10 @@
 #define MOVEMENT_H
 
 #include <DirectXMath.h>
+#include "GameObject.h"
 
-class GameObject;
 
-
-class Movement
+class Movement : GameObject
 {
 private:
 	// 移動ベクトル(毎フレームリセット)
@@ -35,8 +34,11 @@ public:
 	void SetVelocityVec(DirectX::XMVECTOR velocityVec) { DirectX::XMStoreFloat3(&m_VelocityVec, velocityVec); }
 	DirectX::XMVECTOR GetVelocityVecV() const { return DirectX::XMLoadFloat3(&m_VelocityVec); }
 
+	// 移動ベクトルの方向にオブジェクトを回転させる
+	void RotateByMoveVec(GameObject* owner);
+
 	// 更新処理
-	virtual void Update(double elapsedTime, GameObject* owner);
+	virtual void PostUpdate(double elapsedTime, GameObject* owner);
 };
 
 #endif

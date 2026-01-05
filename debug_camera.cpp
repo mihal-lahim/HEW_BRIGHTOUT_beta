@@ -23,15 +23,15 @@ void DebugCamera::Update(double elapsed_time)
 
 	//ズームアウト
 	if (KeyLogger_IsPressed(KK_K))
-		m_Fov += 0.1f;
+		m_Ctx.Fov += 0.1f;
 
 	//ズームイン
 	if (KeyLogger_IsPressed(KK_L))
 	{
-		m_Fov -= 0.1f;
+		m_Ctx.Fov -= 0.1f;
 
-		if (m_Fov <= 0)
-			m_Fov = 0.1f;
+		if (m_Ctx.Fov <= 0)
+			m_Ctx.Fov = 0.1f;
 	}
 
 	//右回転

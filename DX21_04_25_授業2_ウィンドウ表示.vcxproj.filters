@@ -124,9 +124,6 @@
     <ClCompile Include="map.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="collision.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="item.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -229,7 +226,7 @@
     <ClCompile Include="debug_camera.cpp">
       <Filter>ソース ファイル\カメラ</Filter>
     </ClCompile>
-    <ClCompile Include="top_down_camera.cpp">
+    <ClCompile Include="tps_camera.cpp">
       <Filter>ソース ファイル\カメラ</Filter>
     </ClCompile>
     <ClCompile Include="Audio.cpp">
@@ -298,6 +295,18 @@
     <ClCompile Include="player_state_human_midair.cpp">
       <Filter>ソース ファイル\プレイヤー\ステート</Filter>
     </ClCompile>
+    <ClCompile Include="player_state_electric.cpp">
+      <Filter>ソース ファイル\プレイヤー\ステート</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>ソース ファイル\カメラ</Filter>
+    </ClCompile>
+    <ClCompile Include="player_morphsystem.cpp">
+      <Filter>ソース ファイル\プレイヤー</Filter>
+    </ClCompile>
+    <ClCompile Include="collision.cpp">
+      <Filter>ソース ファイル\コンポーネント</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="texture.h">
@@ -331,9 +340,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="light.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="collision.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="item.h">
@@ -456,7 +462,7 @@
     <ClInclude Include="camera_manager.h">
       <Filter>ヘッダー ファイル\カメラ</Filter>
     </ClInclude>
-    <ClInclude Include="top_down_camera.h">
+    <ClInclude Include="tps_camera.h">
       <Filter>ヘッダー ファイル\カメラ</Filter>
     </ClInclude>
     <ClInclude Include="Audio.h">
@@ -530,6 +536,12 @@
     </ClInclude>
     <ClInclude Include="player_states_instances.h">
       <Filter>ヘッダー ファイル\プレイヤー\ステート</Filter>
+    </ClInclude>
+    <ClInclude Include="player_morphsystem.h">
+      <Filter>ヘッダー ファイル\プレイヤー</Filter>
+    </ClInclude>
+    <ClInclude Include="collision.h">
+      <Filter>ヘッダー ファイル\コンポーネント</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
