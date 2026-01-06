@@ -16,7 +16,7 @@ class GameObject
 private:
     uint64_t m_ID = 0; // オブジェクトの型ごとの一意なID
     bool m_CanDestroy = false; // オブジェクトが破壊可能かどうか
-	ObjectManager* m_owner = nullptr; // 所有者の ObjectManager へのポインタ
+	ObjectManager* m_Owner = nullptr; // 所有者の ObjectManager へのポインタ
 	bool m_IsActive = true; // オブジェクトがアクティブかどうか
 protected:
     DirectX::XMFLOAT3 m_Position{};
@@ -49,6 +49,12 @@ public:
     void SetRotation(const DirectX::XMFLOAT3& rotation) { m_Rotation = rotation; }
 	void SetScale(const DirectX::XMFLOAT3& scale) { m_Scale = scale; }
 
+	// モデル、テクスチャIDの取得・設定メソッド
+	MODEL* GetModel() const { return m_pModel; }
+	void SetModel(MODEL* model) { m_pModel = model; }
+	int GetTextureId() const { return m_TextureId; }
+	void SetTextureId(int textureId) { m_TextureId = textureId; }
+
 
 	// アクティブフラグの取得・設定メソッド
 	bool IsActive() const { return m_IsActive; }
@@ -56,7 +62,7 @@ public:
 
 
 	// Owner ObjectManager の取得・設定メソッド
-	ObjectManager* GetOwner() const { return m_owner; }
+	ObjectManager* GetOwner() const { return m_Owner; }
 
 
 	// 破壊可能フラグの取得・設定メソッド

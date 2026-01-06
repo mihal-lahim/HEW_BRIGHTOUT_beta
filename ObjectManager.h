@@ -81,7 +81,7 @@ public:
 
 			for (int i = 0; i < m_GameObjectMap.at(typeid(T)).size(); ++i)
             {
-                result.at(i) = static_cast<T*>(m_GameObjects.at(m_GameObjectMap.at(typeid(T)).at(i)));
+                result.at(i) = dynamic_cast<T*>(m_GameObjects.at(m_GameObjectMap.at(typeid(T)).at(i)));
             }
 			return result;
         }
@@ -94,8 +94,8 @@ public:
     T* Create(Args... args)
     {
         T* obj = new T(args...);
-        RegisterGameObject(obj);
-		m_PreStarted.push_back(obj);
+        RegisterGameObject(static_cast<GameObject*>(obj));
+		m_PreStarted.push_back(static_cast<GameObject*>(obj));
         return obj;
     }
 
@@ -103,4 +103,4 @@ public:
     void RegisterGameObject(GameObject* obj);
 };
 
-#endif // OBJECT_MANAGER_H
+#endif

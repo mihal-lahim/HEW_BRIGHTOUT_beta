@@ -11,6 +11,8 @@
 class Pole : public GameObject
 {
 private:
+	// 電柱ID
+	PoleID m_ID = -1;  // 電柱ID
 	// 所有者の PoleManager へのポインタ
     PoleManager* m_PoleManager = nullptr;
     // 接続されている電線のリスト
@@ -23,6 +25,10 @@ public:
     // コンストラクタ
     Pole(const DirectX::XMFLOAT3& pos, MODEL* model = nullptr, float height = 4.0f);
     virtual ~Pole() = default;
+
+	// 電柱ID設定・取得メソッド
+	void SetID(PoleID id) { m_ID = id; }
+	PoleID GetID() const { return m_ID; }
 
 	// 所有者の PoleManager 設定メソッド
 	void SetOwner(PoleManager* manager) { m_PoleManager = manager; }
