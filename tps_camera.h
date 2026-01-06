@@ -19,6 +19,7 @@ class TPSCamera : public Camera
 {
 private:
 	GameObject* m_Target = nullptr; // 注視対象オブジェクト
+
 	TPSCameraCtx m_Ctx; // カメラ設定値
 
 	float Distance = 8.0f;
@@ -26,7 +27,7 @@ private:
 	float m_AngleX = 0.0f; // 水平回転角度
 	float m_AngleY = 0.0f; // 垂直（高さ）調整角度
 
-	DirectX::XMVECTOR m_Dest{}; // 目標位置
+	DirectX::XMFLOAT3 m_Dest = {}; // 目標位置
 
 public:
     TPSCamera(GameObject* target, TPSCameraCtx ctx = {})

@@ -60,6 +60,8 @@ void PlayerState::Update(Player&, double)
 {
 }
 
-void PlayerState::Draw(const Player&) const
+void PlayerState::Draw(const Player& player) const
 {
+	// ƒvƒŒƒCƒ„[•`‰æ
+	player.Draw();
 }

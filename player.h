@@ -58,7 +58,7 @@ private:
 	bool m_IsGrounded = false;
 
 public:
-    Player();
+    Player(InputSystem* inputSystem, PoleManager* poleManager);
 	~Player() = default;
 
     // 毎フレーム更新
@@ -76,9 +76,11 @@ public:
     void SetInputSystem(InputSystem* inputSystem) { m_InputSystem = inputSystem; }
     const InputSystem* const GetInputSystem() const { return m_InputSystem; }
 
-	// モデル設定
+	// モデル設定・取得
 	void SetHumanModel(MODEL* humanModel) { m_HumanModel = humanModel; }
+	MODEL* const GetHumanModel() const { return m_HumanModel; }
     void SetElectricModel(MODEL* electricModel) { m_ElectricModel = electricModel; }
+	MODEL* const GetElectricModel() const { return m_ElectricModel; }
 
     
 	// Healthコンポーネントの設定・取得
@@ -105,9 +107,6 @@ public:
 	// 地面接地状態の設定・取得
 	void SetGrounded(bool isGrounded) { m_IsGrounded = isGrounded; }
 	bool IsGrounded() const { return m_IsGrounded; }
-
-    // 描画処理
-    void Draw() const;
 };
 
 

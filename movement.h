@@ -7,7 +7,7 @@
 #include "GameObject.h"
 
 
-class Movement : GameObject
+class Movement : public GameObject
 {
 private:
 	// 移動ベクトル(毎フレームリセット)

@@ -11,6 +11,8 @@
 class PowerLine : public GameObject
 {
 private:
+	// 電線ID
+	PowerLineID m_ID = -1;
 	// 所有者の PoleManager へのポインタ
 	PoleManager* m_PoleManager = nullptr;
 	// 接続されている電柱のIDペア
@@ -20,6 +22,11 @@ private:
 public:
     PowerLine(PoleID first, PoleID second);
     virtual ~PowerLine() = default;
+
+	// 電線ID設定・取得メソッド
+	void SetID(PowerLineID id) { m_ID = id; }
+	PowerLineID GetID() const { return m_ID; }
+
 	// 描画処理
     virtual void Draw() const override;
 	// 所有者の PoleManager 設定メソッド

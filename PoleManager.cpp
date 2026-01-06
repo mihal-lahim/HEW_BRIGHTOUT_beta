@@ -8,7 +8,15 @@ PoleID PoleManager::RegisterPole(Pole* pole)
 {
 	// 電柱を登録し、そのIDを返す
 	m_Poles.push_back(pole);
-    return static_cast<PoleID>(m_Poles.size() - 1);
+	
+	// PoleManagerを電柱に設定
+	pole->SetOwner(this);
+
+	// 電柱IDを設定
+	PoleID id = (PoleID)(m_Poles.size() - 1);
+	pole->SetID(id);
+
+    return id;
 }
 
 PowerLineID PoleManager::RegisterPowerLine(PowerLine* line)
@@ -29,7 +37,14 @@ PowerLineID PoleManager::RegisterPowerLine(PowerLine* line)
 	// 電線の長さを設定
 	line->SetLength(XMVectorGetX(XMVector3Length(pos1 - pos2)));
 
-	return (PoleID)(m_PowerLines.size() - 1);
+	// PoleManagerを電線に設定
+	line->SetOwner(this);
+
+	// 電線IDを設定
+	PowerLineID id = (PowerLineID)(m_PowerLines.size() - 1);
+	line->SetID(id);
+
+	return id;
 }
 
 float PoleManager::GetPowerLineLength(PowerLineID id) const { return m_PowerLines.at(id)->GetLength(); }

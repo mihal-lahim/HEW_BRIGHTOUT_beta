@@ -55,7 +55,7 @@ public:
 
 	// コマンドが発行されているかどうかを取得
 	template<CommandType COM>
-	bool IsIssued() const { return GetCommandValue<COM>() != 0.0f; }
+	bool IsIssued() const { return GetValue<COM>() != 0.0f; }
 
 	// コマンドが許可されているかどうかを取得
 	template<CommandType COM>
@@ -92,7 +92,7 @@ inline float InputSystem::GetValue() const
 	auto it = m_CommandMap.find(typeIndex);
 
 	// 登録されていてかつ、許可されていれば値を返す
-	if (it != m_CommandMap.end() && IsCommandAllowed<COM>())
+	if (it != m_CommandMap.end() && IsAllowed<COM>())
 		return m_InputDevice->GetInputValue(it->second.first, it->second.second);
 
 

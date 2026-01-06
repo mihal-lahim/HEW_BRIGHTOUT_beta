@@ -40,11 +40,11 @@ void TPSCamera::Rotate(float inputX, float inputY)
 	);
 
 	// 目標位置を計算
-	m_Dest = XMVectorAdd(targetVec, offset);
+	XMStoreFloat3(&m_Dest, XMVectorAdd(targetVec, offset));
 }
 
 void TPSCamera::Update(double)
 {
 	// 位置を更新
-	XMStoreFloat3(&m_Position, m_Dest);
+	m_Position = m_Dest;
 }

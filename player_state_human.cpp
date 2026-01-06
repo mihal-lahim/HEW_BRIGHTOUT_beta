@@ -3,6 +3,9 @@
 
 void PlayerState_Human::Enter(Player& player)
 {
+	// ƒ‚ƒfƒ‹‚ğlŠÔŒ`‘Ô‚Éİ’è
+	player.SetModel(player.GetHumanModel());
+
 	PlayerState::Enter(player);
 }
 

@@ -4,6 +4,18 @@
 
 void PlayerState_Electric::Enter(Player& player)
 {
+	// モデルを電気形態に設定
+	player.SetModel(player.GetElectricModel());
+
+	// 移動コンポーネント取得
+	PlayerMovement* movement = player.GetMovement();
+
+	// 変身コンポーネント取得
+	PlayerMorphSystem* morphSystem = player.GetMorphSystem();
+
+	// 電線上にスナップ
+	movement->SnapToPowerLine(morphSystem->GetNearestPowerLineID(player), player);
+
 	PlayerState::Enter(player);
 }
 

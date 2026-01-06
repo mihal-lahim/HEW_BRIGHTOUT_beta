@@ -3,9 +3,9 @@
 #ifndef HEALTH_H
 #define HEALTH_H
 
+#include "GameObject.h"
 
-
-class Health
+class Health : public GameObject
 {
 private:
 	// Å‘å‘Ì—Í‚ÆŒ»İ‘Ì—Í

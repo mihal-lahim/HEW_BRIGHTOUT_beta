@@ -13,10 +13,12 @@ XMVECTOR PlayerMovement::SetInputDir(float inputX, float inputZ, const Player* p
 	XMFLOAT3 inputVec = { inputX, 0.0f, inputZ };
 
 	// 入力方向をカメラの向きに合わせて変換
-	XMVECTOR convertedVec = ConvertToWorldFromInput(inputVec, player->GetCamera());
+	XMVECTOR convertedVec = ConvertToWorldFromInput(inputVec, player->GetTPSCamera());
 
 	// 最後の入力方向を保存
 	m_Ctx.LastInputDir = convertedVec;
+
+	return convertedVec;
 }
 
 void PlayerMovement::Walk(float inputX, float inputZ, const Player* player)
@@ -123,7 +125,7 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID, const Player& player)
 		if (XMVectorGetX(XMVectorEqual(vec, XMVectorZero())))
 		{
 			// カメラ方向を設定
-			vec = ConvertToWorldFromInput({ 0.0f, 0.0f, 1.0f }, player.GetCamera());
+			vec = ConvertToWorldFromInput({ 0.0f, 0.0f, 1.0f }, player.GetTPSCamera());
 		}
 	}
 
@@ -138,20 +140,41 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID, const Player& player)
 	// 電線IDを設定
 	m_Ctx.LineID = lineID;
 
-	// 電線上の位置パラメータtをリセット
-	m_Ctx.t = 0.0f;
+
+	// 電線ベクトルの半分の長さを取得
+	XMVECTOR halfVec = XMVectorScale(lineVec, 0.5f);
+
+	// 電線の中央位置を取得
+	XMVECTOR lineMidPos = XMLoadFloat3(&powerLine->GetPosition());
+
+	// 開始位置を設定（内積の符号に基づく）
+	XMVECTOR startPos = dot >= 0.0f ? XMVectorSubtract(lineMidPos, halfVec) : XMVectorAdd(lineMidPos, halfVec);
+
+	// プレイヤーの現在位置を取得
+	XMVECTOR playerPos = XMLoadFloat3(&player.GetPosition());
+
+	// 開始位置からプレイヤー位置へのベクトルを取得
+	XMVECTOR toPlayerVec = XMVectorSubtract(playerPos, startPos);
+	
+	// 電線ベクトルの長さを取得
+	float lineLength = powerLine->GetLength();
+
+	// 電線上の位置パラメータtを設定（0.0f ~ 1.0fの範囲にクランプ）
+	m_Ctx.t = std::clamp(XMVectorGetX(XMVector3Dot(toPlayerVec, lineVec)) / lineLength, 0.0f, 1.0f);
+
+
 
 	// 速度ベクトルの長さを取得
-	float length = XMVectorGetX(XMVector3Length(vec));
+	float velocityLength = XMVectorGetX(XMVector3Length(vec));
 
 	// 電線上速度を設定
-	m_Ctx.LineMoveSpeed = length >= m_Ctx.LineMoveSpeedMin ? length : m_Ctx.LineMoveSpeedMin;
+	m_Ctx.LineMoveSpeed = velocityLength >= m_Ctx.LineMoveSpeedMin ? velocityLength : m_Ctx.LineMoveSpeedMin;
 }
 
 void PlayerMovement::Turn(float inputX, float inputZ, const Player* player)
 {
 	// PoleManagerを取得
-	PoleManager* poleManager = player->GetPoleManager();
+	const PoleManager* poleManager = player->GetPoleManager();
 
 	// 現在の電線を取得
 	PowerLine* powerLine = poleManager->GetPowerLine(m_Ctx.LineID);

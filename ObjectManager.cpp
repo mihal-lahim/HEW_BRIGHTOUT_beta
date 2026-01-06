@@ -75,7 +75,7 @@ void ObjectManager::RegisterGameObject(GameObject* obj)
     if (!obj) return;
 
 	// オブジェクトのオーナーを設定
-	obj->m_owner = this;
+	obj->m_Owner = this;
 
     // 保留リストに追加
     m_PendingGameObjects.push_back(std::move(obj));
