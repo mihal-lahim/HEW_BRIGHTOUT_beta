@@ -307,6 +307,9 @@
     <ClCompile Include="collision.cpp">
       <Filter>ソース ファイル\コンポーネント</Filter>
     </ClCompile>
+    <ClCompile Include="mapcell.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="texture.h">
@@ -542,6 +545,9 @@
     </ClInclude>
     <ClInclude Include="collision.h">
       <Filter>ヘッダー ファイル\コンポーネント</Filter>
+    </ClInclude>
+    <ClInclude Include="mapcell.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
