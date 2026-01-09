@@ -216,6 +216,7 @@ for %%F in ("$(TargetDir)*.cso") do (
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\controller\cont_12\controller.h" />
+    <ClInclude Include="animation.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="button_hint_ui.h" />
     <ClInclude Include="camera.h" />

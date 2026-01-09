@@ -20,13 +20,11 @@ static ID3D11Buffer* g_pVSConstantBuffer0 = nullptr;
 static ID3D11Buffer* g_pVSConstantBuffer1 = nullptr;
 static ID3D11Buffer* g_pVSConstantBuffer2 = nullptr;
 static ID3D11Buffer* g_pPSConstantBuffer2 = nullptr;
+static ID3D11Buffer* g_pPSMaterialCB = nullptr;  // オーバーライド用マテリアルCB
 static ID3D11PixelShader* g_pPixelShader = nullptr;
 static ID3D11SamplerState* g_pSamplerState = nullptr;
 
-//static ID3D11Buffer* g_pPSConstantBuffer = nullptr;
-
-
-// 注意！初期化で外部から設定されるもの。Release不要。
+// 注意！テクスチャは外側で設定される。Release不要。
 static ID3D11Device* g_pDevice = nullptr;
 static ID3D11DeviceContext* g_pContext = nullptr;
 
@@ -37,7 +35,7 @@ bool Shader3d_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	// デバイスとデバイスコンテキストのチェック
 	if (!pDevice || !pContext) {
-		hal::dout << "Shader_Initialize() : 与えられたデバイスかコンテキストが不正です" << std::endl;
+		hal::dout << "Shader_Initialize() : 不正なデバイスまたはコンテキストです" << std::endl;
 		return false;
 	}
 
@@ -46,7 +44,7 @@ bool Shader3d_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	g_pContext = pContext;
 
 
-	// 事前コンパイル済み頂点シェーダーの読み込み
+	// ログコンパイル済み頂点シェーダーの読み込み
 	std::ifstream ifs_vs("VertexShader3d.cso", std::ios::binary);
 
 	if (!ifs_vs) {
@@ -55,14 +53,14 @@ bool Shader3d_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	}
 
 	// ファイルサイズを取得
-	ifs_vs.seekg(0, std::ios::end); // ファイルポインタを末尾に移動
+	ifs_vs.seekg(0, std::ios::end); // ファイルポインタを終端に移動
 	std::streamsize filesize = ifs_vs.tellg(); // ファイルポインタの位置を取得（つまりファイルサイズ）
 	ifs_vs.seekg(0, std::ios::beg); // ファイルポインタを先頭に戻す
 
-	// バイナリデータを格納するためのバッファを確保
+	// バイナルデータを格納するためのバッファを確保
 	unsigned char* vsbinary_pointer = new unsigned char[filesize];
 	
-	ifs_vs.read((char*)vsbinary_pointer, filesize); // バイナリデータを読み込む
+	ifs_vs.read((char*)vsbinary_pointer, filesize); // バイナリデータを読み込み
 	ifs_vs.close(); // ファイルを閉じる
 
 	// 頂点シェーダーの作成
@@ -70,7 +68,7 @@ bool Shader3d_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	if (FAILED(hr)) {
 		hal::dout << "Shader3d_Initialize() : 頂点シェーダーの作成に失敗しました" << std::endl;
-		delete[] vsbinary_pointer; // メモリリークしないようにバイナリデータのバッファを解放
+		delete[] vsbinary_pointer; // メモリリークを起こさないようにバイナリデータのバッファを削除
 		return false;
 	}
 
@@ -80,6 +78,8 @@ bool Shader3d_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 		{ "NORMAL"   , 0, DXGI_FORMAT_R32G32B32_FLOAT,     0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR"    , 0, DXGI_FORMAT_R32G32B32A32_FLOAT,  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD" , 0, DXGI_FORMAT_R32G32_FLOAT,        0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "BLENDINDICES" , 0, DXGI_FORMAT_R32G32B32A32_UINT,  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "BLENDWEIGHT" , 0, DXGI_FORMAT_R32G32B32A32_FLOAT,   0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	UINT num_elements = ARRAYSIZE(layout); // 配列の要素数を取得
@@ -87,7 +87,7 @@ bool Shader3d_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	// 頂点レイアウトの作成
 	hr = g_pDevice->CreateInputLayout(layout, num_elements, vsbinary_pointer, filesize, &g_pInputLayout);
 
-	delete[] vsbinary_pointer; // バイナリデータのバッファを解放
+	delete[] vsbinary_pointer; // バイナリデータのバッファを削除
 
 	if (FAILED(hr)) {
 		hal::dout << "Shader3d_Initialize() : 頂点レイアウトの作成に失敗しました" << std::endl;
@@ -103,7 +103,15 @@ bool Shader3d_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	g_pDevice->CreateBuffer(&buffer_desc, nullptr, &g_pVSConstantBuffer1);
 	g_pDevice->CreateBuffer(&buffer_desc, nullptr, &g_pVSConstantBuffer2);
 
-	// 事前コンパイル済みピクセルシェーダーの読み込み
+	// ピクセルシェーダー用定数バッファの作成
+	buffer_desc.ByteWidth = sizeof(XMFLOAT4); // バッファのサイズ
+	g_pDevice->CreateBuffer(&buffer_desc, nullptr, &g_pPSConstantBuffer2);
+
+	// マテリアルオーバーライド定数バッファ
+	buffer_desc.ByteWidth = sizeof(MaterialCB);
+	g_pDevice->CreateBuffer(&buffer_desc, nullptr, &g_pPSMaterialCB);
+
+	// ログコンパイル済みピクセルシェーダーの読み込み
 	std::ifstream ifs_ps("PixelShader3d.cso", std::ios::binary);
 	if (!ifs_ps) {
 		MessageBox(nullptr, "ピクセルシェーダーの読み込みに失敗しました\n\nshader_pixel_2d.cso", "エラー", MB_OK);
@@ -121,7 +129,7 @@ bool Shader3d_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	// ピクセルシェーダーの作成
 	hr = g_pDevice->CreatePixelShader(psbinary_pointer, filesize, nullptr, &g_pPixelShader);
 
-	delete[] psbinary_pointer; // バイナリデータのバッファを解放
+	delete[] psbinary_pointer; // バイナリデータのバッファを削除
 
 	if (FAILED(hr)) {
 		hal::dout << "Shader3d_Initialize() : ピクセルシェーダーの作成に失敗しました" << std::endl;
@@ -134,7 +142,7 @@ bool Shader3d_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	// サンプラーステート設定
 	D3D11_SAMPLER_DESC sampler_desc{};
-	sampler_desc.Filter = D3D11_FILTER_ANISOTROPIC;// 3Dでのテクスチャは一番これがきれい(処理が重い)
+	sampler_desc.Filter = D3D11_FILTER_ANISOTROPIC;// 3Dでのテクスチャは遠い角度のほうが旨い(ソフト重視)
 	//sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;//ドット
 	//sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	//sampler_desc.Filter = D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
@@ -150,7 +158,7 @@ bool Shader3d_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	sampler_desc.BorderColor[3] = 0.0f;
 
 	sampler_desc.MipLODBias = 0;
-	sampler_desc.MaxAnisotropy = 8;// 周りのピクセルを16個使って補完する(2,4,8,16)
+	sampler_desc.MaxAnisotropy = 8;// 最大のピクセル幅は16程度耐えられる(2,4,8,16)
 	sampler_desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	sampler_desc.MinLOD = 0;
 	sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
@@ -168,6 +176,7 @@ void Shader3d_Finalize()
 	SAFE_RELEASE(g_pVSConstantBuffer1);
 	SAFE_RELEASE(g_pVSConstantBuffer2);
 	SAFE_RELEASE(g_pPSConstantBuffer2);
+	SAFE_RELEASE(g_pPSMaterialCB);
 	SAFE_RELEASE(g_pInputLayout);
 	SAFE_RELEASE(g_pVertexShader);
 }
@@ -177,7 +186,7 @@ void Shader3d_SetWorldMatrix(const DirectX::XMMATRIX& matrix)
 	// 定数バッファ格納用行列の構造体を定義
 	XMFLOAT4X4 transpose;
 
-	// 行列を転置して定数バッファ格納用行列に変換
+	// 行列転置してから定数バッファ格納用行列に変換
 	XMStoreFloat4x4(&transpose, XMMatrixTranspose(matrix));
 
 	// 定数バッファに行列をセット
@@ -189,7 +198,7 @@ void Shader3d_SetViewMatrix(const DirectX::XMMATRIX& matrix)
 	// 定数バッファ格納用行列の構造体を定義
 	XMFLOAT4X4 transpose;
 
-	// 行列を転置して定数バッファ格納用行列に変換
+	// 行列転置してから定数バッファ格納用行列に変換
 	XMStoreFloat4x4(&transpose, XMMatrixTranspose(matrix));
 
 	// 定数バッファに行列をセット
@@ -201,7 +210,7 @@ void Shader3d_SetProjectionMatrix(const DirectX::XMMATRIX& matrix)
 	// 定数バッファ格納用行列の構造体を定義
 	XMFLOAT4X4 transpose;
 
-	// 行列を転置して定数バッファ格納用行列に変換
+	// 行列転置してから定数バッファ格納用行列に変換
 	XMStoreFloat4x4(&transpose, XMMatrixTranspose(matrix));
 
 	// 定数バッファに行列をセット
@@ -214,6 +223,12 @@ void Shader3d_SetMaterialDiffuse(const DirectX::XMFLOAT4 color)
 	g_pContext->UpdateSubresource(g_pPSConstantBuffer2, 0, nullptr, &color, 0, 0);
 }
 
+void Shader3d_SetMaterialCB(const MaterialCB& mtlCB)
+{
+	// マテリアルオーバーライド定数バッファ更新
+	g_pContext->UpdateSubresource(g_pPSMaterialCB, 0, nullptr, &mtlCB, 0, 0);
+}
+
 void Shader3d_Begin()
 {
 	// 頂点シェーダーとピクセルシェーダーを描画パイプラインに設定
@@ -223,11 +238,12 @@ void Shader3d_Begin()
 	// 頂点レイアウトを描画パイプラインに設定
 	g_pContext->IASetInputLayout(g_pInputLayout);
 
-	// 定数バッファを描画パイプラインに設定	//b0,b1のスロットに送れる
+	// 定数バッファを描画パイプラインに設定	//b0,b1のスロットに関連
 	g_pContext->VSSetConstantBuffers(0, 1, &g_pVSConstantBuffer0);
 	g_pContext->VSSetConstantBuffers(1, 1, &g_pVSConstantBuffer1);
 	g_pContext->VSSetConstantBuffers(2, 1, &g_pVSConstantBuffer2);
 	g_pContext->PSSetConstantBuffers(2, 1, &g_pPSConstantBuffer2);
+	g_pContext->PSSetConstantBuffers(3, 1, &g_pPSMaterialCB);
 
 	// サンプラーステートをピクセルシェーダーに設定
 	g_pContext->PSSetSamplers(0, 1, &g_pSamplerState);

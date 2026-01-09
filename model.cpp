@@ -1,7 +1,7 @@
 /////////////////////////////////
 // model.cpp
-//Author: hiroshi kasiwagi
-//Date:2025/12/17
+// Author: hiroshi kasiwagi
+// Date:2025/12/17
 /////////////////////////////////
 
 #include "direct3d.h"
@@ -10,6 +10,7 @@ using namespace DirectX;
 #include "DirectXTex.h"
 #include "shader3d.h"
 #include "texture.h"
+#include "animation.h"
 
 // 頂点構造体
 struct Vertex3d
@@ -49,14 +50,14 @@ MODEL* ModelLoad(const char* FileName, float scale, bool isBlender)
 
 				if (isBlender == true)
 				{
-					// ブレンダー用
+					// ブレンダー用座標変換
 					vertex[v].position = XMFLOAT3(mesh->mVertices[v].x, -mesh->mVertices[v].z, mesh->mVertices[v].y);
 					vertex[v].normal = XMFLOAT3(mesh->mNormals[v].x, -mesh->mNormals[v].z, mesh->mNormals[v].y);
 
 				}
 				if (isBlender == false)
 				{
-					// Maya用
+					// Maya用座標変換
 					vertex[v].position = XMFLOAT3(mesh->mVertices[v].x * scale, mesh->mVertices[v].y * scale, mesh->mVertices[v].z * scale);
 					vertex[v].normal = XMFLOAT3(mesh->mNormals[v].x, mesh->mNormals[v].y, mesh->mNormals[v].z);
 				}
@@ -109,7 +110,7 @@ MODEL* ModelLoad(const char* FileName, float scale, bool isBlender)
 		}
 	}
 
-	//テクスチャ読み込み
+	// テクスチャ読み込み
 	for (unsigned int i = 0; i < model->AiScene->mNumTextures; i++)
 	{
 		aiTexture* aitexture = model->AiScene->mTextures[i];
@@ -161,10 +162,10 @@ void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld)
 		UINT stride = sizeof(Vertex3d);
 		UINT offset = 0;
 
-		// プリミティブトポロジ設定
+		// 頂点バッファをセット
 		Direct3D_GetContext()->IASetVertexBuffers(0, 1, &model->VertexBuffer[i], &stride, &offset);
 
-		// 頂点インデックスを描画をパイプラインに設定
+		// 頂点インデックスを描画パイプラインに設定
 		Direct3D_GetContext()->IASetIndexBuffer(model->IndexBuffer[i], DXGI_FORMAT_R32_UINT, 0);
 
 		// ワールド変換行列を計算
@@ -173,7 +174,10 @@ void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld)
 		// プリミティブトポロジ設定
 		Direct3D_GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		//テクスチャの設定
+		// テクスチャとマテリアルの設定
+		MaterialCB materialCB{};
+		materialCB.useOverride = 0;
+		materialCB.hasTex = 0;
 
 		aiString texture;
 		aiMaterial* aimaterial = model->AiScene->mMaterials[model->AiScene->mMeshes[i]->mMaterialIndex];
@@ -183,6 +187,7 @@ void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld)
 		{
 			Direct3D_GetContext()->PSSetShaderResources(0, 1, &model->Texture.at(texture.data));
 			Shader3d_SetMaterialDiffuse({ 1.0f,1.0f,1.0f,1.0f });
+			materialCB.hasTex = 1;
 		}
 		else
 		{
@@ -192,10 +197,36 @@ void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld)
 			Shader3d_SetMaterialDiffuse({ diffuse.r,diffuse.g,diffuse.b,1.0f });
 		}
 
+		// マテリアルCBを更新してセット
+		Shader3d_SetMaterialCB(materialCB);
 
 		// ポリゴン描画命令発行
 		Direct3D_GetContext()->DrawIndexed(model->AiScene->mMeshes[i]->mNumFaces * 3, 0, 0);
 	}
+}
+
+// アニメーション更新関数
+void UpdateAnim(AnimationState& state, float deltaTime)
+{
+    if (!state.clip || !state.play)
+        return;
+
+    // アニメーション時間を進める
+    state.time += deltaTime * state.clip->tps;
+
+    // ループ処理
+    if (state.time >= state.clip->duration)
+    {
+        if (state.loop)
+        {
+            state.time = fmod(state.time, state.clip->duration);
+        }
+        else
+        {
+            state.time = state.clip->duration;
+            state.play = false;
+        }
+    }
 }
 
 

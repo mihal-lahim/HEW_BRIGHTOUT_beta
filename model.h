@@ -1,7 +1,7 @@
 //////////////////////////////////
 // model.h
-//Author: hiroshi kasiwagi
-//Date:2025/12/17
+// 作成者: hirosih kasiwagi
+// 日付: 2025/12/17
 //////////////////////////////////
 #ifndef MODEL_H
 #define MODEL_H
@@ -15,6 +15,7 @@
 #pragma comment (lib, "assimp-vc143-mt.lib")
 #include <vector>
 #include <string>
+#include "animation.h"
 
 struct Bone
 {
@@ -37,13 +38,23 @@ struct MODEL
 
     std::vector<Bone> Bones;
     std::unordered_map<std::string, int> BoneIndexMap;
+
+    // アニメーション対応
+    std::vector<AnimationClip> AnimationClips;
+    AnimationState CurrentAnimationState;
+    std::vector<DirectX::XMMATRIX> BoneMatrices;  // スキニング用ボーンワールド行列
 };
 
 
 
-MODEL* ModelLoad(const char* FileName, float scale = 1.0f,bool isBlender = false);
+// モデル関数
+MODEL* ModelLoad(const char* FileName, float scale = 1.0f, bool isBlender = false);
 void ModelRelease(MODEL* model);
 
 void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld);
+
+// アニメーション関数
+void UpdateAnim(AnimationState& state, float deltaTime);
+
 #endif // MODEL_H
 

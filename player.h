@@ -13,6 +13,7 @@
 #include "controller.h"
 #include "top_down_camera.h"
 #include "collision.h"
+#include "animation.h"
 
 struct MODEL; // forward declaration for model pointer
 class Controller; // forward declaration
@@ -27,6 +28,10 @@ private:
     struct MODEL* model_ = nullptr;
     //電気状態用モデル
     struct MODEL* electricModel_ = nullptr;
+
+    // アニメーション状態管理
+    AnimationState animationState_;
+    int currentAnimationClipIndex_ = -1;  // 現在のアニメーションクリップインデックス
 
     // コントローラ（非所有、外部で作成して渡す）
     Controller* controller_ = nullptr;
@@ -176,6 +181,13 @@ public:
  // 供給開始/停止
  void StartSupplyingElectricity(class House* house);
  void StopSupplyingElectricity();
+
+ // アニメーション関連
+ void SetAnimationClip(int clipIndex);
+ void PlayAnimation();
+ void StopAnimation();
+ bool IsAnimationPlaying() const { return animationState_.play; }
+ void SetAnimationLooping(bool loop) { animationState_.loop = loop; }
 
  // 描画処理
  void Draw() const;

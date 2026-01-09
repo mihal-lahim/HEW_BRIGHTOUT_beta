@@ -11,6 +11,7 @@
 #include "PowerLine.h"
 #include "house.h"
 #include "debug_console.h"
+#include "animation.h"
 
 // 入力反転フラグ（必要に応じて調整）
 static constexpr bool INVERT_LS_X = true; // 左右が反転しているので X を反転
@@ -47,12 +48,20 @@ Player::Player(MODEL* model, MODEL* electricModel, const XMFLOAT3& pos, const XM
 	health_ = maxHealth_ = 100.0f;	
 	usePlayer = true;
 
-	
+	// アニメーション状態の初期化
+	animationState_.clip = nullptr;
+	animationState_.time = 0.0;
+	animationState_.play = false;
+	animationState_.loop = true;
+	currentAnimationClipIndex_ = -1;
 }
 
 // 毎フレーム更新（ダッシュ継続時間の管理、入力処理）
 void Player::Update(double elapsedSec)
 {
+	// アニメーション更新
+	UpdateAnim(animationState_, static_cast<float>(elapsedSec));
+
 	// 1. ダッシュ時間の更新
 	if (isDashing_) {
 		dashTimeRemaining_ -= static_cast<float>(elapsedSec);
@@ -626,4 +635,37 @@ void Player::StopSupplyingElectricity()
 	const char* stateName = (state == State::ELECTRICITY) ? "ELECTRICITY" : "HUMAN";
 	DEBUG_LOGF("[StopSupply] State=%s | Pos=(%.1f, %.1f, %.1f) | HP=%.1f/%.1f", 
 		stateName, m_Position.x, m_Position.y, m_Position.z, health_, maxHealth_);
+}
+
+// アニメーション関連メソッドの実装
+void Player::SetAnimationClip(int clipIndex)
+{
+	// モデルがある場合のみアニメーション設定
+	MODEL* targetModel = (state == State::ELECTRICITY && electricModel_) ? electricModel_ : model_;
+	if (!targetModel) return;
+
+	// クリップインデックスが有効かどうかチェック
+	if (clipIndex < 0 || clipIndex >= static_cast<int>(targetModel->AnimationClips.size())) {
+		animationState_.clip = nullptr;
+		currentAnimationClipIndex_ = -1;
+		return;
+	}
+
+	// アニメーションクリップを設定
+	animationState_.clip = &targetModel->AnimationClips[clipIndex];
+	animationState_.time = 0.0;
+	currentAnimationClipIndex_ = clipIndex;
+}
+
+void Player::PlayAnimation()
+{
+	if (animationState_.clip) {
+		animationState_.play = true;
+	}
+}
+
+void Player::StopAnimation()
+{
+	animationState_.play = false;
+	animationState_.time = 0.0;
 }

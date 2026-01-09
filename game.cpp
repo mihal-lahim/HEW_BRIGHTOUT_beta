@@ -157,13 +157,13 @@ void Game_Initialize()
 	Fade_Start(1.0f, true);
 
 
-	g_pKirby = ModelLoad("model/aruhula_aitemu_toreru_ba.fbx", 0.1f, false);
+	g_pKirby = ModelLoad("model/walk2.fbx", 0.1f, false);
 	g_test = ModelLoad("model/test.fbx", 0.1f, false);
 	g_ball = ModelLoad("model/ball.fbx", 0.1f, false);
 	//g_pall = ModelLoad("model/aruhula_dentryu_tan.fbx", 0.1f, false);
 
 	// ハウスモデルのロード
-	g_houseModel = ModelLoad("model/aruhula_ie.fbx", 0.1f, false);  // ※ ハウスの適切なモデルに置き換え
+	g_houseModel = ModelLoad("model/aruhula_ie.fbx", 0.1f, false);  // ※ ハウスのモデルに置き換え
 	//ジェネレーターモデルのロード
 	g_generatorModel = ModelLoad("model/aruhula_hatuden.fbx", 0.1f, false);
 
