@@ -173,6 +173,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="debug_ostream.cpp" />
     <ClCompile Include="debug_text.cpp" />
     <ClCompile Include="direct3d.cpp" />
+    <ClCompile Include="ElectricRestoreSystem.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="First_Result.cpp" />
@@ -236,6 +237,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="debug_ostream.h" />
     <ClInclude Include="debug_text.h" />
     <ClInclude Include="direct3d.h" />
+    <ClInclude Include="ElectricRestoreSystem.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="First_Result.h" />

@@ -282,6 +282,18 @@ void Player::Update(double elapsedSec)
 
 }
 
+void Player::ConsumeElectricityRate(float rate)
+{
+	if (rate <= 0.0f) return;
+
+	electricityRate_ -= rate;
+
+	if (electricityRate_ < 0.0f)
+	{
+		electricityRate_ = 0.0f;
+	}
+}
+
 // Õ“Ë‰ðŒˆ
 void Player::ResolveCollisions(DirectX::XMFLOAT3& desiredMove/*, double elapsedSec*/)
 {

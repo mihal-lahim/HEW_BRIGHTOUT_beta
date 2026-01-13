@@ -98,6 +98,9 @@ private:
 
     PowerLine* currentPowerLine_ = nullptr;
 
+    // 電気量（0.0f ～ 1.0f）
+    float electricityRate_ = 1.0f; // 100%
+
 public:
  Player();
  ~Player();
@@ -187,6 +190,11 @@ public:
  // 描画処理
  void Draw() const;
 
+ // 電気量取得（0.0f ～ 1.0f）
+ float GetElectricityRate() const { return electricityRate_; }
+
+ // 電気量消費（rate = 0.4f → 40%消費）
+ void ConsumeElectricityRate(float rate);
 
 private:
     // 衝突解決ヘルパー
