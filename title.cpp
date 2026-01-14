@@ -92,7 +92,7 @@ void Title_Update(double elapsed_time)
 	case TITLE_STATE_FADE_OUT:
 		if (Fade_GetState() == FADE_STATE_FADE_OUT_FINISHED)
 		{
-			Scene_SetNextScene(SCENE_TUTORIAL);
+			//Scene_SetNextScene(SCENE_TUTORIAL);
 		}
 		break;
 	}

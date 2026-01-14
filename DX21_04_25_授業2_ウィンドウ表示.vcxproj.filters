@@ -301,6 +301,12 @@
     <ClCompile Include="MeshRanderer.cpp">
       <Filter>ソース ファイル\コンポーネント</Filter>
     </ClCompile>
+    <ClCompile Include="mapcell.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ElectricRestoreSystem.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="texture.h">
@@ -542,6 +548,12 @@
     </ClInclude>
     <ClInclude Include="MeshRenderer.h">
       <Filter>ヘッダー ファイル\コンポーネント</Filter>
+    </ClInclude>
+    <ClInclude Include="mapcell.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="ElectricRestoreSystem.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
