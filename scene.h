@@ -12,8 +12,8 @@
 
 class Scene
 {
-protected:
-	ObjectManager* m_object_manager;
+private:
+	ObjectManager* object_manager;
 
 public:
 	virtual void Enter() = 0;
