@@ -6,15 +6,13 @@ using namespace DirectX;
 
 void Camera::SetMatrix() const
 {
-	// 回転をオイラー角からクォータニオンに変換
-	XMVECTOR rotation = XMQuaternionRotationRollPitchYaw(
-		XMConvertToRadians(m_Rotation.x),
-		XMConvertToRadians(m_Rotation.y),
-		XMConvertToRadians(m_Rotation.z)
-	);
+	// 所有者のゲームオブジェクトを取得
+	GameObject* owner = GetOwner();
 
-	// クォータニオンから回転行列を作成
-	XMMATRIX matRot = XMMatrixRotationQuaternion(rotation);
+	Transform& transform = owner->Transform;
+
+	// 回転行列を作成
+	XMMATRIX matRot = XMMatrixRotationQuaternion(XMLoadFloat4(&transform.Rotation.Quat));
 
 	// 前方向ベクトルを計算
 	XMVECTOR forward = XMVector3TransformNormal(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), matRot);
@@ -23,7 +21,7 @@ void Camera::SetMatrix() const
 	XMVECTOR up = XMVector3TransformNormal(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), matRot);
 
 	// カメラ位置を設定
-	XMVECTOR eye = XMLoadFloat3(&m_Position);
+	XMVECTOR eye = XMLoadFloat3(&transform.Position);
 
 	// 注視点を計算
 	XMVECTOR target = XMVectorAdd(eye, forward);
@@ -37,11 +35,11 @@ void Camera::SetMatrix() const
 
 
 	// アスペクト比を計算
-	float aspect = m_Ctx.ViewportWidth == -1.0f || m_Ctx.ViewportHeight == -1.0f
-		? (float)Direct3D_GetBackBufferWidth() / (float)Direct3D_GetBackBufferHeight() : m_Ctx.ViewportWidth / m_Ctx.ViewportHeight;
+	float aspect = ViewportWidth == -1.0f || ViewportHeight == -1.0f
+		? (float)Direct3D_GetBackBufferWidth() / (float)Direct3D_GetBackBufferHeight() : ViewportWidth / ViewportHeight;
 
 	// プロジェクション行列を作成
-	XMMATRIX proj = XMMatrixPerspectiveFovLH(XMConvertToRadians(m_Ctx.Fov), aspect, m_Ctx.Near, m_Ctx.Far);
+	XMMATRIX proj = XMMatrixPerspectiveFovLH(XMConvertToRadians(Fov), aspect, Near, Far);
 
 	// シェーダにプロジェクション行列を設定
 	Shader3d_SetProjectionMatrix(proj);

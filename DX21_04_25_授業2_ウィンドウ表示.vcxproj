@@ -168,7 +168,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="button_hint_ui.cpp" />
     <ClCompile Include="camera.cpp" />
-    <ClCompile Include="camera_manager.cpp" />
     <ClCompile Include="ChargingSpot.cpp" />
     <ClCompile Include="checkmark.cpp" />
     <ClCompile Include="collision.cpp" />
@@ -202,7 +201,9 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="movement.cpp" />
     <ClCompile Include="name_input.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="PlayerSystem.cpp" />
     <ClCompile Include="player_morphsystem.cpp" />
     <ClCompile Include="player_movement.cpp" />
     <ClCompile Include="player_state.cpp" />
@@ -216,7 +217,9 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="PoleManager.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="PowerLine.cpp" />
+    <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="result.cpp" />
+    <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="sceneManager.cpp" />
     <ClCompile Include="scene_title.cpp" />
@@ -240,12 +243,13 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Audio.h" />
     <ClInclude Include="button_hint_ui.h" />
     <ClInclude Include="camera.h" />
-    <ClInclude Include="camera_manager.h" />
     <ClInclude Include="ChargingSpot.h" />
     <ClInclude Include="checkmark.h" />
+    <ClInclude Include="Collider.h" />
     <ClInclude Include="collision.h" />
     <ClInclude Include="command.h" />
     <ClInclude Include="command_set.h" />
+    <ClInclude Include="Component.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="cube.h" />
     <ClInclude Include="debug_camera.h" />
@@ -278,13 +282,14 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="movement.h" />
     <ClInclude Include="name_input.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="PlayerSystem.h" />
     <ClInclude Include="player_command.h" />
     <ClInclude Include="player_command_set.h" />
     <ClInclude Include="player_morphsystem.h" />
     <ClInclude Include="player_movement.h" />
     <ClInclude Include="player_state.h" />
-    <ClInclude Include="player_states_instances.h" />
     <ClInclude Include="player_state_electric.h" />
     <ClInclude Include="player_state_human_ground.h" />
     <ClInclude Include="player_state_human.h" />
@@ -295,7 +300,9 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="PoleManager.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="PowerLine.h" />
+    <ClInclude Include="Quaternion.h" />
     <ClInclude Include="result.h" />
+    <ClInclude Include="RigidBody.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="sceneManager.h" />
     <ClInclude Include="scene_title.h" />
@@ -308,6 +315,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="tps_camera.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="tutorial.h" />
     <ClInclude Include="UI.h" />
     <ClInclude Include="UI_Charge.h" />

@@ -23,7 +23,7 @@ private:
     DirectX::XMFLOAT3 m_TopPos{};
 public:
     // コンストラクタ
-    Pole(const DirectX::XMFLOAT3& pos, MODEL* model = nullptr, float height = 4.0f);
+    Pole(const DirectX::XMFLOAT3& pos, float height = 4.0f);
     virtual ~Pole() = default;
 
 	// 電柱ID設定・取得メソッド
@@ -38,14 +38,12 @@ public:
 	void SetHeight(float height)
 	{ 
 		m_Height = height;
-		m_TopPos = DirectX::XMFLOAT3(m_Position.x, m_Position.y + m_Height, m_Position.z);
+		m_TopPos = DirectX::XMFLOAT3(Transform.Position.x, Transform.Position.y + m_Height, Transform.Position.z);
 	}
 	// 電柱の頂点位置取得メソッド
 	const DirectX::XMFLOAT3& GetTopPos() const { return m_TopPos; }
 	// 接続されている電線リスト取得メソッド
 	std::vector<PowerLineID> GetLines() const { return m_ConnectedLines; }
-
-    virtual void Draw() const override;  // 描画処理
 };
 
 

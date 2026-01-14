@@ -10,10 +10,16 @@
 using namespace DirectX;
 
 
+void TPSCamera::Start()
+{
+	// カメラコンポーネント取得
+	m_Camera = GetOwner()->GetComponent<Camera>();
+}
+
 void TPSCamera::Rotate(float inputX, float inputY)
 {
 	// 注視対象の位置を取得
-	XMFLOAT3 targetPos = m_Target->GetPosition();
+	XMFLOAT3 targetPos = m_Target->Transform.Position;
 
 	// 高さ調整
 	targetPos.y += m_Ctx.Height;
@@ -46,5 +52,5 @@ void TPSCamera::Rotate(float inputX, float inputY)
 void TPSCamera::Update(double)
 {
 	// 位置を更新
-	m_Position = m_Dest;
+	GetOwner()->Transform.Position = m_Dest;
 }

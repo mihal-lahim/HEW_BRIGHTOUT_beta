@@ -1,37 +1,48 @@
 
 #include "player.h"
-#include "ObjectManager.h"
 
-Player::Player(InputSystem* inputSystem, PoleManager* poleManger)
+#include "player_state_human_idle.h"
+#include "player_state_human_walk.h"
+#include "player_state_human_midair.h"
+#include "player_state_electric.h"
+
+Player::Player()
 {
+	// PlayerSystem設定
+	AddComponent<PlayerSystem>();
+
+	// TPSCamera作成
+	GameObject* cam = GetOwner()->Create<GameObject>();
+	Camera* camcomp = cam->AddComponent<Camera>();
+	cam->AddComponent<TPSCamera>(this);
+
+
+
+	// Controller設定
+	auto* controller = AddComponent<Controller>();
+
 	// InputSystem設定
-	m_InputSystem = inputSystem;
+	AddComponent<InputSystem>(controller);
 
-	// PoleManager設定
-	m_PoleManager = poleManger;
 
-	// TPSCamera作成・設定
-	m_Camera = GetOwner()->Create<TPSCamera>(this);
 
-	// Healthコンポーネント作成・設定
-	m_Health = GetOwner()->Create<Health>(100.0f);
+	// Healthコンポーネント設定
+	AddComponent<Health>(100.0f);
 
-	// PlayerMovementコンポーネント作成・設定
-	m_Movement = GetOwner()->Create<PlayerMovement>();
+	// PlayerMovementコンポーネント設定
+	AddComponent<PlayerMovement>(camcomp);
 
-	// PlayerMorphSystemコンポーネント作成・設定
-	m_MorphSystem = GetOwner()->Create<PlayerMorphSystem>();
+	// PlayerMorphSystemコンポーネント設定
+	AddComponent<PlayerMorphSystem>();
 
-	// PlayerStateMachineコンポーネント作成・設定
-	m_StateMachine = GetOwner()->Create<PlayerStateMachine>(&PlayerStates::HumanIdle);
-}
+	// 各種ステート作成
+	auto* idle = AddComponent<PlayerState_Human_Idle>();
+	AddComponent<PlayerState_Human_Walk>();
+	AddComponent<PlayerState_Human_MidAir>();
+	AddComponent<PlayerState_Electric>();
 
-void Player::Update(double elapsedSec)
-{
-	m_StateMachine->Update(*this, elapsedSec);
-}
+	// PlayerStateMachineコンポーネント設定
+	AddComponent<PlayerStateMachine>(idle);
 
-void Player::Draw() const
-{
-	m_StateMachine->Draw(*this);
+
 }

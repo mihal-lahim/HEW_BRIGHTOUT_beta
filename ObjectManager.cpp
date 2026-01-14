@@ -12,14 +12,6 @@ void ObjectManager::Finalize()
     m_GameObjects.clear();
 }
 
-void ObjectManager::Start()
-{
-    for (auto& obj : m_PreStarted) {
-        obj->Start();
-    }
-	m_PreStarted.clear();
-}
-
 void ObjectManager::PreUpdate(double elapsedTime)
 {
     for (const auto& obj : m_GameObjects) {

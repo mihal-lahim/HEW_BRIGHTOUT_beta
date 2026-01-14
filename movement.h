@@ -5,9 +5,10 @@
 
 #include <DirectXMath.h>
 #include "GameObject.h"
+#include "Component.h"
 
 
-class Movement : public GameObject
+class Movement : public Component
 {
 private:
 	// 移動ベクトル(毎フレームリセット)
@@ -35,10 +36,10 @@ public:
 	DirectX::XMVECTOR GetVelocityVecV() const { return DirectX::XMLoadFloat3(&m_VelocityVec); }
 
 	// 移動ベクトルの方向にオブジェクトを回転させる
-	void RotateByMoveVec(GameObject* owner);
+	void RotateByMoveVec();
 
 	// 更新処理
-	virtual void PostUpdate(double elapsedTime, GameObject* owner);
+	virtual void PostUpdate(double elapsedTime);
 };
 
 #endif

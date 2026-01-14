@@ -1,4 +1,3 @@
-
 #ifndef PLAYER_STATE_HUMAN_GROUND_H
 #define PLAYER_STATE_HUMAN_GROUND_H
 
@@ -9,10 +8,9 @@
 class PlayerState_Human_Ground : public PlayerState_Human
 {
 public:
-	virtual void Enter(Player& player) override;
-	virtual void HandleInput(Player& player) override;
-	virtual void Update(Player& player, double elapsedTime) override;
-	virtual void Draw(const Player& player) const override;
+	virtual void Enter() override;
+	virtual void HandleInput() override;
+	virtual void Update(double elapsedTime) override;
 };
 
 

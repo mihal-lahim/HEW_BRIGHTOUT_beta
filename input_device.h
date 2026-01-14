@@ -4,7 +4,7 @@
 #define INPUT_DEVICE_H
 
 #include <Windows.h>
-#include "GameObject.h"
+#include "Component.h"
 
 // “ü—ÍğŒ—ñ‹“Œ^
 enum class InputCondition
@@ -17,7 +17,7 @@ enum class InputCondition
 
 typedef WORD InputKey;
 
-class InputDevice : public GameObject
+class InputDevice : public Component
 {
 public:
 	InputDevice() = default;

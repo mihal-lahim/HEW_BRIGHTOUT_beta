@@ -22,13 +22,10 @@ private:
     std::vector<std::unique_ptr<GameObject>> m_GameObjects;
 	// 型別ゲームオブジェクトマップ（高速検索用）
 	std::unordered_map<std::type_index, std::vector<uint64_t>> m_GameObjectMap;
-	// 未Startゲームオブジェクトリスト
-    std::vector<GameObject*> m_PreStarted;
 	// 追加保留中ゲームオブジェクトリスト
 	std::vector<GameObject*> m_PendingGameObjects;
 
 	// 更新メソッド
-    void Start();
     void PreUpdate(double elapsedTime);
     void Update(double elapsedTime);
     void PostUpdate(double elapsedTime);
@@ -50,7 +47,6 @@ public:
 	// ゲームループの1サイクルを実行するメソッド
     void Cycle(double elapsedTime)
     {
-        Start();
         PreUpdate(elapsedTime);
         Update(elapsedTime);
         PostUpdate(elapsedTime);

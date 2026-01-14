@@ -9,10 +9,9 @@
 class PlayerState_Human_Idle : public PlayerState_Human_Ground
 {
 public:
-	void Enter(Player& player) override;
-	void HandleInput(Player& player) override;
-	void Update(Player& player, double elapsedTime) override;
-	void Draw(const Player& player) const override;
+	void Enter() override;
+	void HandleInput() override;
+	void Update(double elapsedTime) override;
 };
 
 #endif

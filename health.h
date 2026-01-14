@@ -3,9 +3,10 @@
 #ifndef HEALTH_H
 #define HEALTH_H
 
+#include "Component.h"
 #include "GameObject.h"
 
-class Health : public GameObject
+class Health : public Component
 {
 private:
 	// Å‘å‘Ì—Í‚ÆŒ»İ‘Ì—Í

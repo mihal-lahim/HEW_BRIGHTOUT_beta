@@ -50,40 +50,48 @@ private:
 	// 移動設定値
 	PlayerMoveCtx m_Ctx;
 
+	// カメラ
+	Camera* m_Camera = nullptr;
+
+	// PoleManager
+	PoleManager* m_PoleManager = nullptr;
+
 	// 入力方向を保存
-	DirectX::XMVECTOR SetInputDir(float inputX, float inputZ, const Player* player);
+	DirectX::XMVECTOR SetInputDir(float inputX, float inputZ);
 public:
 
+	void Start() override;
+
 	// 歩行処理
-	void Walk(float inputX, float inputZ, const Player* player);
+	void Walk(float inputX, float inputZ);
 	// 空中移動処理
-	void AirMove(float inputX, float inputZ, const Player* player);
+	void AirMove(float inputX, float inputZ);
 	// ジャンプ呼び出し処理
-	void Jump(float inputX, float inputZ, float force, const Player* player);
+	void Jump(float inputX, float inputZ, float force);
 	// 地上ジャンプ処理
-	void GroundJump(float inputX, float inputZ, const Player* player);
+	void GroundJump(float inputX, float inputZ);
 	// 電気ジャンプ処理
-	void ElectricJump(float inputX, float inputZ, const Player* player);
+	void ElectricJump(float inputX, float inputZ);
 	// 重力適用
 	void ApplyGravity(double elapsedTime);
 
 
 	// 電線上に移動する処理
-	void SnapToPowerLine(PowerLineID lineID, const Player& player);
+	void SnapToPowerLine(PowerLineID lineID);
 	// 電線上方向指定処理
-	void Turn(float inputX, float inputZ, const Player* player);
+	void Turn(float inputX, float inputZ);
 	// 電線上移動処理
-	void Move(const Player* player);
+	void Move();
 	// 電線射出処理
-	void Eject(float inputX, float inputZ, const Player* player);
+	void Eject(float inputX, float inputZ);
 
 	// 移動設定値取得・設定
 	void SetMoveCtx(const PlayerMoveCtx& moveCtx) { m_Ctx = moveCtx; }
 	const PlayerMoveCtx& GetMoveCtx() const { return m_Ctx; }
 
 	// コンストラクタ
-	PlayerMovement(PlayerMoveCtx moveCtx = {})
-		: m_Ctx(moveCtx)
+	PlayerMovement(Camera* camera, PlayerMoveCtx moveCtx = {})
+		: m_Camera(camera), m_Ctx(moveCtx)
 	{}
 };
 

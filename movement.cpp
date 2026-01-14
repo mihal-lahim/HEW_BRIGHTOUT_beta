@@ -3,7 +3,7 @@
 
 using namespace DirectX;
 
-void Movement::RotateByMoveVec(GameObject* owner)
+void Movement::RotateByMoveVec()
 {
 	// 移動ベクトルを取得
 	XMVECTOR vec = XMLoadFloat3(&m_MoveVec);
@@ -12,10 +12,10 @@ void Movement::RotateByMoveVec(GameObject* owner)
 	float yaw = atan2f(-XMVectorGetX(vec), XMVectorGetZ(vec));
 
 	// オーナーの回転を更新
-	owner->SetRotation({ 0.0f, yaw, 0.0f });
+	GetOwner()->SetRotation({0.0f, yaw, 0.0f});
 }
 
-void Movement::PostUpdate(double elapsedTime, GameObject* owner)
+void Movement::PostUpdate(double elapsedTime)
 {
 	// オーナーの位置を取得
 	XMVECTOR pos = XMLoadFloat3(&owner->GetPosition());

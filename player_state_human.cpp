@@ -1,45 +1,47 @@
 #include "player_state_human.h"
+#include "player_state_electric.h"
 #include "player.h"
 
-void PlayerState_Human::Enter(Player& player)
+void PlayerState_Human::Enter()
 {
 	// モデルを人間形態に設定
-	player.SetModel(player.GetHumanModel());
+	// TODO: GetOwner()からモデル設定
 
-	PlayerState::Enter(player);
+	PlayerState::Enter();
 }
 
-void PlayerState_Human::HandleInput(Player& player)
+void PlayerState_Human::HandleInput()
 {
 	// 入力システム取得
-	const InputSystem* inputSystem = player.GetInputSystem();
+	const InputSystem* inputSystem = GetOwner()->GetComponent<InputSystem>();
 
 	// 移動コンポーネント取得
-	PlayerMovement* movement = player.GetMovement();
+	PlayerMovement* movement = GetOwner()->GetComponent<PlayerMovement>();
+
+	// 変身システム取得
+	PlayerMorphSystem* morphSystem = GetOwner()->GetComponent<PlayerMorphSystem>();
+
+	// ステートマシン取得
+	PlayerStateMachine* stateMachine = GetOwner()->GetComponent<PlayerStateMachine>();
 
 	// 変身処理
-	if (inputSystem->IsIssued<PlayerCommand_Morph>() && player.GetMorphSystem()->CanMorph(player))
+	if (inputSystem->IsIssued<PlayerCommand_Morph>() && morphSystem->CanMorph())
 	{
 		// 最寄りの電線IDを取得
-		PowerLineID nearestLine = player.GetMorphSystem()->GetNearestPowerLineID(player);
+		PowerLineID nearestLine = morphSystem->GetNearestPowerLineID();
 
 		// 電気形態へ変身
-		movement->SnapToPowerLine(nearestLine, player);
+		movement->SnapToPowerLine(nearestLine, *static_cast<Player*>(GetOwner()));
 
 		// ステート変更
-		player.ChangeState(&PlayerStates::Electric);
+		stateMachine->ChangeState(GetOwner()->GetComponent<PlayerState_Electric>());
 		return;
 	}
 
-	PlayerState::HandleInput(player);
+	PlayerState::HandleInput();
 }
 
-void PlayerState_Human::Update(Player& player, double elapsedTime)
+void PlayerState_Human::Update(double elapsedTime)
 {
-	PlayerState::Update(player, elapsedTime);
-}
-
-void PlayerState_Human::Draw(const Player& player) const
-{
-	PlayerState::Draw(player);
+	PlayerState::Update(elapsedTime);
 }

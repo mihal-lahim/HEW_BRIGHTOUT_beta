@@ -1,18 +1,18 @@
 #include "player_state_human_midair.h"
 #include "player.h"
 
-void PlayerState_Human_MidAir::Enter(Player& player)
+void PlayerState_Human_MidAir::Enter()
 {
-	PlayerState_Human::Enter(player);
+	PlayerState_Human::Enter();
 }
 
-void PlayerState_Human_MidAir::HandleInput(Player& player)
+void PlayerState_Human_MidAir::HandleInput()
 {
 	// 入力システム取得
-	const InputSystem* inputSystem = player.GetInputSystem();
+	const InputSystem* inputSystem = GetOwner()->GetComponent<InputSystem>();
 
 	// 移動コンポーネント取得
-	PlayerMovement* movement = player.GetMovement();
+	PlayerMovement* movement = GetOwner()->GetComponent<PlayerMovement>();
 
 	// 入力値取得
 	float inputX = inputSystem->GetValue<PlayerCommand_MoveX>();
@@ -20,20 +20,18 @@ void PlayerState_Human_MidAir::HandleInput(Player& player)
 
 	// 電気ジャンプ処理
 	if (inputSystem->IsIssued<PlayerCommand_Jump>())
-		movement->ElectricJump(inputX, inputZ, &player);
+		movement->ElectricJump(inputX, inputZ, static_cast<Player*>(GetOwner()));
 
-	PlayerState_Human::HandleInput(player);
+	PlayerState_Human::HandleInput();
 }
 
-void PlayerState_Human_MidAir::Update(Player& player, double elapsedTime)
+void PlayerState_Human_MidAir::Update(double elapsedTime)
 {
+	// 移動コンポーネント取得
+	PlayerMovement* movement = GetOwner()->GetComponent<PlayerMovement>();
+
 	// 重力適用
-	player.GetMovement()->ApplyGravity(elapsedTime);
+	movement->ApplyGravity(elapsedTime);
 
-	PlayerState_Human::Update(player, elapsedTime);
-}
-
-void PlayerState_Human_MidAir::Draw(const Player& player) const
-{
-	PlayerState_Human::Draw(player);
+	PlayerState_Human::Update(elapsedTime);
 }

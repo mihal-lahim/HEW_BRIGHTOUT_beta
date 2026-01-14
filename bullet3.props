@@ -5,7 +5,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)external\bullet3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\external\bullet3\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)lib\bullet3\BulletCollision\$(Configuration);$(ProjectDir)lib\bullet3\BulletDynamics\$(Configuration);$(ProjectDir)lib\bullet3\LinearMath\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

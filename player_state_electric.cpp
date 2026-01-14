@@ -1,31 +1,34 @@
-
 #include "player_state_electric.h"
+#include "player_state_human_midair.h"
 #include "player.h"
 
-void PlayerState_Electric::Enter(Player& player)
+void PlayerState_Electric::Enter()
 {
 	// モデルを電気形態に設定
-	player.SetModel(player.GetElectricModel());
+	// TODO: GetOwner()からモデル設定
 
 	// 移動コンポーネント取得
-	PlayerMovement* movement = player.GetMovement();
+	PlayerMovement* movement = GetOwner()->GetComponent<PlayerMovement>();
 
 	// 変身コンポーネント取得
-	PlayerMorphSystem* morphSystem = player.GetMorphSystem();
+	PlayerMorphSystem* morphSystem = GetOwner()->GetComponent<PlayerMorphSystem>();
 
 	// 電線上にスナップ
-	movement->SnapToPowerLine(morphSystem->GetNearestPowerLineID(player), player);
+	movement->SnapToPowerLine(morphSystem->GetNearestPowerLineID(), *static_cast<Player*>(GetOwner()));
 
-	PlayerState::Enter(player);
+	PlayerState::Enter();
 }
 
-void PlayerState_Electric::HandleInput(Player& player)
+void PlayerState_Electric::HandleInput()
 {
 	// 入力システム取得
-	const InputSystem* inputSystem = player.GetInputSystem();
+	const InputSystem* inputSystem = GetOwner()->GetComponent<InputSystem>();
 
 	// 移動コンポーネント取得
-	PlayerMovement* movement = player.GetMovement();
+	PlayerMovement* movement = GetOwner()->GetComponent<PlayerMovement>();
+
+	// ステートマシン取得
+	PlayerStateMachine* stateMachine = GetOwner()->GetComponent<PlayerStateMachine>();
 
 	// ジャンプコマンドが発行されたら射出・変身処理
 	if (inputSystem->IsIssued<PlayerCommand_Jump>())
@@ -34,10 +37,10 @@ void PlayerState_Electric::HandleInput(Player& player)
 		movement->Eject(
 			inputSystem->GetValue<PlayerCommand_MoveX>(),
 			inputSystem->GetValue<PlayerCommand_MoveZ>(),
-			&player);
+			static_cast<Player*>(GetOwner()));
 
 		// 人間形態へ変身
-		player.ChangeState(&PlayerStates::HumanMidAir);
+		stateMachine->ChangeState(GetOwner()->GetComponent<PlayerState_Human_MidAir>());
 		return;
 	}
 
@@ -49,21 +52,19 @@ void PlayerState_Electric::HandleInput(Player& player)
 		movement->Turn(
 			inputSystem->GetValue<PlayerCommand_MoveX>(),
 			inputSystem->GetValue<PlayerCommand_MoveZ>(),
-			&player);
+			static_cast<Player*>(GetOwner()));
 	}
 
-	PlayerState::HandleInput(player);
+	PlayerState::HandleInput();
 }
 
-void PlayerState_Electric::Update(Player& player, double elapsedTime)
+void PlayerState_Electric::Update(double elapsedTime)
 {
+	// 移動コンポーネント取得
+	PlayerMovement* movement = GetOwner()->GetComponent<PlayerMovement>();
+
 	// 電線上移動処理
-	player.GetMovement()->Move(&player);
+	movement->Move(static_cast<Player*>(GetOwner()));
 
-	PlayerState::Update(player, elapsedTime);
-}
-
-void PlayerState_Electric::Draw(const Player& player) const
-{
-	PlayerState::Draw(player);
+	PlayerState::Update(elapsedTime);
 }
