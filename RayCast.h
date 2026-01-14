@@ -31,6 +31,9 @@ private:
 
 public:
 
+	// デフォルトコンストラクタ
+	RayCast() = default;
+
 	// コンストラクタ
 	// 引数：始点、終点
 	RayCast(DirectX::XMFLOAT3 from, DirectX::XMFLOAT3 to)
@@ -38,6 +41,10 @@ public:
 	{}
 
 	virtual ~RayCast() = default;
+
+	// 始点・終点設定メソッド
+	void SetFrom(DirectX::XMFLOAT3 from) { m_From = from; }
+	void SetTo(DirectX::XMFLOAT3 to) { m_To = to; }
 
 	// ヒットしたかどうかを取得
 	bool IsHit() const { return m_IsHit; }

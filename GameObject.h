@@ -8,12 +8,12 @@
 #include "Component.h"
 #include <typeindex>
 #include "Transform.h"
+#include "ObjectManager.h"
 
 // Component を継承している型に制約をかけるコンセプト
 template<typename T>
 concept ComponentDerived = requires { std::is_base_of<Component, T>::value; };
 
-class ObjectManager;
 
 // ゲーム内のすべての静的オブジェクトの基底クラス
 class GameObject
@@ -27,7 +27,7 @@ private:
 	// コンポーネントリスト
 	std::vector<std::unique_ptr<Component>> m_Components;
 	// コンポーネントマップ
-	std::unordered_map<std::type_index, uint64_t> m_ComponentMap;
+	std::unordered_map<std::type_index, std::vector<uint64_t>> m_ComponentMap;
 	// 未Startコンポーネントリスト
 	std::vector<Component*> m_PreStarted;
 
@@ -106,14 +106,8 @@ T* GameObject::AddComponent(Args... args)
 	// コンポーネントIDを決定
 	uint64_t componentID = m_Components.size();
 
-	if (m_ComponentMap.find(typeIndex) != m_ComponentMap.end())
-	{
-		// すでに同じ型のコンポーネントが存在する場合は追加せず、nullptrを返す
-		return nullptr;
-	}
-
 	// コンポーネントマップに登録
-	m_ComponentMap[typeIndex] = componentID;
+	m_ComponentMap[typeIndex].push_back(componentID);
 	// コンポーネントの所有者を設定
 	newComponent->m_Owner = this;
 	// コンポーネントIDを設定
@@ -122,6 +116,10 @@ T* GameObject::AddComponent(Args... args)
 	m_Components.push_back(std::move(newComponent));
 	// コンポーネントのStartを保留リストに追加
 	m_PreStarted.push_back(m_Components.back().get());
+
+	// オーナーのObjectManagerにコンポーネントを登録
+	m_Owner->RegisterComponent(m_Components.back().get());
+
 	// 追加したコンポーネントを返す
 	return static_cast<T*>(m_Components.back().get());
 }

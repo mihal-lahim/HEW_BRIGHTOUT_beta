@@ -1,5 +1,8 @@
 #include "ObjectManager.h"
 #include "camera.h"
+#include "MeshRenderer.h"
+#include "Collider.h"
+#include "RigidBody.h"
 #include <map>
 
 void ObjectManager::Initialize()
@@ -10,6 +13,27 @@ void ObjectManager::Initialize()
 void ObjectManager::Finalize()
 {
     m_GameObjects.clear();
+}
+
+void ObjectManager::PhysicsUpdate(double elapsedTime)
+{
+    // シミュレーションを進める
+    m_PhysicsSystem.PhysicsUpdate(elapsedTime);
+
+    // 衝突を更新
+    m_PhysicsSystem.UpdateCollisions();
+
+    // RigidBodyを取得
+    auto rigidbodies = GetComponents<RigidBody>();
+
+    // 剛体を更新
+    m_PhysicsSystem.UpdateRigidBody(rigidbodies);
+
+    // レイを取得
+    auto raycasts = GetGameObjects<RayCast>();
+
+    // レイを取得
+    m_PhysicsSystem.UpdateRayCasts(raycasts);
 }
 
 void ObjectManager::PreUpdate(double elapsedTime)
@@ -39,25 +63,32 @@ void ObjectManager::PostUpdate(double elapsedTime)
 void ObjectManager::Draw() const
 {
 	// カメラを取得
-	auto cameraVec = GetGameObjects<Camera>();
+	auto cameraVec = GetComponents<Camera>();
 
 	// カメラを優先度順にマップに格納
-	std::map<int, Camera*> cameraMap;
-
+	std::map<int, std::vector<Camera*>> cameraMap;
     for (auto* camera : cameraVec)
-		cameraMap[camera->GetCameraCtx().Priority] = camera;
+		cameraMap[camera->Priority].push_back(camera);
+
+	auto meshrenderers = GetComponents<MeshRenderer>();
 
 	// 優先度順に描画
-    for (auto& [priority, camera] : cameraMap)
+    for (auto& [priority, cameras] : cameraMap)
     {
-		if (camera->IsActive() == false) continue;
+		// 同一優先度のカメラごとに描画
+        for (auto* camera : cameras)
+        {
+            if (camera->IsActive() == false) continue;
 
-		// カメラ行列を設定
-        camera->SetMatrix();
+            // カメラ行列を設定
+            camera->SetMatrix();
 
-		// 全オブジェクトを描画
-        for (const auto& obj : m_GameObjects) {
-            if (obj->m_IsActive) obj->Draw();
+			// メッシュレンダラーを描画
+            for (auto* meshrenderer : meshrenderers)
+            {
+                if (meshrenderer->IsActive())
+                    meshrenderer->Render();
+			}
         }
     }
 }
@@ -71,6 +102,21 @@ void ObjectManager::RegisterGameObject(GameObject* obj)
 
     // 保留リストに追加
     m_PendingGameObjects.push_back(std::move(obj));
+}
+
+void ObjectManager::RegisterComponent(Component* component)
+{
+    if (!component) return;
+
+    // type_index でラップ
+    const std::type_index type(typeid(*component));
+	m_ComponentMap[type].push_back(component);
+
+    // ColliderかRigidBodyの場合はPhysicsSystemに登録
+    if (type == typeid(Collider))
+        m_PhysicsSystem.RegisterColliders(static_cast<Collider*>(component));
+    else if (type == typeid(RigidBody))
+        m_PhysicsSystem.RegisterRigidBodies(static_cast<RigidBody*>(component));
 }
 
 void ObjectManager::AddPendingGameObjects()

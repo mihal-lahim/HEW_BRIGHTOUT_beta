@@ -25,10 +25,11 @@ void MeshRenderer::Render()
 		// モデルが設定されていない場合、テクスチャインデックスが有効ならCubeを描画
 		if (m_TextureIndex >= 0)
 		{
-
+			Cube_Draw(m_TextureIndex, mtxWorld);
 		}
 		else
 		{
-			Cube_Draw(mtxWorld);
+			Cube_Draw(-1, mtxWorld);
 		}
+	}
 }

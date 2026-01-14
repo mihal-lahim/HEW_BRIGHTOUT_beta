@@ -10,61 +10,67 @@ Quaternion::Quaternion()
 
 }
 
-Quaternion& Quaternion::Identity()
+Quaternion Quaternion::Identity()
 {
-	// 単位クオータニオンを設定
+	// 単位クオータニオンを作成
+	Quaternion result;
 	XMVECTOR quatVec = XMQuaternionIdentity();
-	XMStoreFloat4(&Quat, quatVec);
+	XMStoreFloat4(&result.Quat, quatVec);
 
-	return *this;
+	return result;
 }
 
-Quaternion& Quaternion::SetEulerX(float angle)
+Quaternion Quaternion::SetEulerX(float angle)
 {
 	// X軸回転用クオータニオンを作成
+	Quaternion result;
 	XMVECTOR quatVec = XMQuaternionRotationRollPitchYaw(angle, 0.0f, 0.0f);
-	XMStoreFloat4(&Quat, quatVec);
+	XMStoreFloat4(&result.Quat, quatVec);
 
-	return *this;
+	return result;
 }
 
-Quaternion& Quaternion::SetEulerY(float angle)
+Quaternion Quaternion::SetEulerY(float angle)
 {
 	// Y軸回転用クオータニオンを作成
+	Quaternion result;
 	XMVECTOR quatVec = XMQuaternionRotationRollPitchYaw(0.0f, angle, 0.0f);
-	XMStoreFloat4(&Quat, quatVec);
+	XMStoreFloat4(&result.Quat, quatVec);
 
-	return *this;
+	return result;
 }
 
-Quaternion& Quaternion::SetEulerZ(float angle)
+Quaternion Quaternion::SetEulerZ(float angle)
 {
 	// Z軸回転用クオータニオンを作成
+	Quaternion result;
 	XMVECTOR quatVec = XMQuaternionRotationRollPitchYaw(0.0f, 0.0f, angle);
-	XMStoreFloat4(&Quat, quatVec);
+	XMStoreFloat4(&result.Quat, quatVec);
 
-	return *this;
+	return result;
 }
 
-Quaternion& Quaternion::SetAngleAxis(float angle, const DirectX::XMVECTOR& axis)
+Quaternion Quaternion::SetAngleAxis(float angle, const DirectX::XMVECTOR& axis)
 {
 	// 任意軸回転用クオータニオンを作成
+	Quaternion result;
 	XMVECTOR quatVec = XMQuaternionRotationAxis(axis, angle);
-	XMStoreFloat4(&Quat, quatVec);
+	XMStoreFloat4(&result.Quat, quatVec);
 
-	return *this;
+	return result;
 }
 
-Quaternion& Quaternion::SetRollPitchYaw(float roll, float pitch, float yaw)
+Quaternion Quaternion::SetRollPitchYaw(float roll, float pitch, float yaw)
 {
 	// Roll-Pitch-Yaw回転用クオータニオンを作成
-	XMVECTOR quatVec = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
-	XMStoreFloat4(&Quat, quatVec);
+	Quaternion result;
+	XMVECTOR quatVec = XMQuaternionRotationRollPitchYaw(roll, pitch, yaw);
+	XMStoreFloat4(&result.Quat, quatVec);
 
-	return *this;
+	return result;
 }
 
-const Quaternion& Quaternion::operator*(const Quaternion& other) const
+Quaternion Quaternion::operator*(const Quaternion& other) const
 {
 	// クオータニオンの乗算
 	Quaternion result;
@@ -76,4 +82,15 @@ const Quaternion& Quaternion::operator*(const Quaternion& other) const
 	XMStoreFloat4(&result.Quat, quatResult);
 
 	return result;
+}
+
+Quaternion& Quaternion::operator*=(const Quaternion& other)
+{
+	// クオータニオンの乗算代入
+	XMVECTOR quatA = XMLoadFloat4(&Quat);
+	XMVECTOR quatB = XMLoadFloat4(&other.Quat);
+	XMVECTOR quatResult = XMQuaternionMultiply(quatA, quatB);
+	XMStoreFloat4(&Quat, quatResult);
+
+	return *this;
 }

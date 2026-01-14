@@ -8,9 +8,9 @@
 class PlayerState_Human_Ground : public PlayerState_Human
 {
 public:
-	virtual void Enter() override;
-	virtual void HandleInput() override;
-	virtual void Update(double elapsedTime) override;
+	virtual void Enter(PlayerSystem& playerSystem) override;
+	virtual void HandleInput(PlayerSystem& playerSystem) override;
+	virtual void Update(double elapsedTime, PlayerSystem& playerSystem) override;
 };
 
 

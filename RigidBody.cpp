@@ -57,3 +57,23 @@ void RigidBody::SetGravity(DirectX::XMFLOAT3 gravity)
 	if(m_RigidBody)
 	m_RigidBody->setGravity(btGravity);
 }
+
+void RigidBody::SetDeActivate()
+{
+	m_IsDeActivated = true;
+	m_PhysicsSystem->UnregisterRigidBody(this);
+}
+
+void RigidBody::ReturnActivate(const Transform& returnTransform)
+{
+	m_IsDeActivated = false;
+	m_PhysicsSystem->RegisterRigidBodies(this);
+	// 位置を設定
+	btTransform transform;
+	transform.setOrigin(ToBulletPosition(returnTransform.Position));
+	// 回転を設定
+	transform.setRotation(ToBulletRotation(returnTransform.Rotation));
+
+	// 剛体のワールド変換を更新
+	m_RigidBody->setWorldTransform(transform);
+}

@@ -2,39 +2,34 @@
 #include "player_state_human_walk.h"
 #include "player_state_human_midair.h"
 #include "player.h"
+#include "PlayerSystem.h"
 
-void PlayerState_Human_Idle::Enter()
+void PlayerState_Human_Idle::Enter(PlayerSystem& playerSystem)
 {
-	PlayerState_Human::Enter();
+	PlayerState_Human::Enter(playerSystem);
 }
 
-void PlayerState_Human_Idle::HandleInput()
-{
-	PlayerState_Human::HandleInput();
-}
-
-void PlayerState_Human_Idle::Update(double elapsedTime)
+void PlayerState_Human_Idle::HandleInput(PlayerSystem& playerSystem)
 {
 	// 入力システム取得
-	const InputSystem* inputSystem = GetOwner()->GetComponent<InputSystem>();
+	const InputSystem* inputSystem = playerSystem.m_InputSystem;
 
 	// ステートマシン取得
-	PlayerStateMachine* stateMachine = GetOwner()->GetComponent<PlayerStateMachine>();
+	PlayerStateMachine* stateMachine = playerSystem.m_StateMachine;
 
 	// 移動コマンドが発行されたら歩行状態へ遷移
-	if (inputSystem->IsIssued<PlayerCommand_MoveX>() 
+	if (inputSystem->IsIssued<PlayerCommand_MoveX>()
 		|| inputSystem->IsIssued<PlayerCommand_MoveZ>())
 	{
-		stateMachine->ChangeState(GetOwner()->GetComponent<PlayerState_Human_Walk>());
+		stateMachine->ChangeState(PlayerStates::HumanWalk, playerSystem);
 		return;
 	}
 
-	// ジャンプコマンドが発行されたら空中状態へ遷移
-	if (inputSystem->GetValue<PlayerCommand_Jump>())
-	{
-		stateMachine->ChangeState(GetOwner()->GetComponent<PlayerState_Human_MidAir>());
-		return;
-	}
+	PlayerState_Human::HandleInput(playerSystem);
+}
 
-	PlayerState_Human::Update(elapsedTime);
+void PlayerState_Human_Idle::Update(double elapsedTime, PlayerSystem& playerSystem)
+{
+
+	PlayerState_Human::Update(elapsedTime, playerSystem);
 }

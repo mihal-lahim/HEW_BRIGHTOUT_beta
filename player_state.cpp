@@ -1,8 +1,9 @@
 #include "player_state.h"
 #include "player.h"
 #include "tps_camera.h"
+#include "PlayerSystem.h"
 
-void PlayerStateMachine::ChangeState(PlayerState* newState)
+void PlayerStateMachine::ChangeState(PlayerState* newState, PlayerSystem& playerSystem)
 {
 	// 現在のステートから抜ける処理
 	m_CurrentState = newState;
@@ -10,44 +11,40 @@ void PlayerStateMachine::ChangeState(PlayerState* newState)
 	if (m_CurrentState)
 	{
 		// 新しいステートに入る処理
-		m_CurrentState->Enter();
+		m_CurrentState->Enter(playerSystem);
 	}
 }
 
-void PlayerStateMachine::Update(double elapsedTime)
+void PlayerStateMachine::Update(double elapsedTime, PlayerSystem& playerSystem)
 {
 	if (m_CurrentState)
 	{
 		// 現在のステートの入力処理
-		m_CurrentState->HandleInput();
+		m_CurrentState->HandleInput(playerSystem);
 		// 現在のステートの更新処理
-		m_CurrentState->Update(elapsedTime);
+		m_CurrentState->Update(elapsedTime, playerSystem);
 	}
 }
 
 
 
-void PlayerState::Enter()
+void PlayerState::Enter(PlayerSystem&)
 {}
 
-void PlayerState::HandleInput()
+void PlayerState::HandleInput(PlayerSystem& playerSystem)
 {
 	// 入力システム取得
-	const InputSystem* inputSystem = GetOwner()->GetComponent<InputSystem>();
+	const InputSystem* inputSystem = playerSystem.m_InputSystem;
 
-	// カメラ取得
-	TPSCamera* camera = GetOwner()->GetComponent<TPSCamera>();
+	float inputX = inputSystem->GetValue<PlayerCommand_CameraMoveX>();
+	float inputY = inputSystem->GetValue<PlayerCommand_CameraMoveY>();
 
 	// カメラ回転処理
-	if (inputSystem->IsIssued<PlayerCommand_CameraMoveX>()
-		|| inputSystem->IsIssued<PlayerCommand_CameraMoveY>())
-	{
-		camera->Rotate(
-			inputSystem->GetValue<PlayerCommand_CameraMoveX>(),
-			inputSystem->GetValue<PlayerCommand_CameraMoveY>());
-	}
+	if (inputX != 0.0f || inputY != 0.0f)
+		playerSystem.m_Camera->Rotate(inputX, inputY);
 }
 
-void PlayerState::Update(double)
+void PlayerState::Update(double, PlayerSystem&)
 {
 }
+

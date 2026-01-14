@@ -7,9 +7,9 @@
 class PlayerState_Human_Walk : public PlayerState_Human_Ground
 {
 public:
-	void Enter() override;
-	void HandleInput() override;
-	void Update(double elapsedTime) override;
+	void Enter(PlayerSystem& playerSystem) override;
+	void HandleInput(PlayerSystem& playerSystem) override;
+	void Update(double elapsedTime, PlayerSystem& playerSystem) override;
 };
 
 #endif

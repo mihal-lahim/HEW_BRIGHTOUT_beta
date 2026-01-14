@@ -6,6 +6,7 @@
 #include <DirectXMath.h>
 #include <memory>
 #include "Component.h"
+#include "PhysicsSystem.h"
 #include "Quaternion.h"
 
 // コライダーの種類

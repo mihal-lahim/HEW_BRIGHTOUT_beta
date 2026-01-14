@@ -12,7 +12,7 @@
 
 #pragma comment(lib, "Xinput.lib")
 
-enum Button : WORD {
+enum XBOXButton : WORD {
     BUTTON_A          = XINPUT_GAMEPAD_A,
     BUTTON_B          = XINPUT_GAMEPAD_B,
     BUTTON_X          = XINPUT_GAMEPAD_X,
@@ -62,9 +62,9 @@ public:
 	float GetInputValue(InputKey input, InputCondition inputCondition) override;
     
     // ボタン状態
-    bool IsDown(Button btn) const;
-    bool IsPressed(Button btn) const;
-    bool IsReleased(Button btn) const;
+    bool IsDown(XBOXButton btn) const;
+    bool IsPressed(XBOXButton btn) const;
+    bool IsReleased(XBOXButton btn) const;
     
     // スティック (-1.0f ~ 1.0f)
     StickState GetLeftStick() const;
@@ -79,9 +79,9 @@ public:
 
 private:
 	// ヘルパ関数
-	float GetButtonValue(Button btn, InputCondition inputCondition) const;
-	float GetTriggerValue(Button btn, InputCondition inputCondition) const;
-	float GetStickValue(Button btn, InputCondition inputCondition) const;
+	float GetButtonValue(XBOXButton btn, InputCondition inputCondition) const;
+	float GetTriggerValue(XBOXButton btn, InputCondition inputCondition) const;
+	float GetStickValue(XBOXButton btn, InputCondition inputCondition) const;
 
 	// コントローラー番号
     int m_ControllerNumber;

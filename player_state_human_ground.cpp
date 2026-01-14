@@ -1,42 +1,46 @@
 #include "player_state_human_ground.h"
 #include "player.h"
+#include "PlayerSystem.h"
 
 using namespace DirectX;
 
-void PlayerState_Human_Ground::Enter()
+void PlayerState_Human_Ground::Enter(PlayerSystem& playerSystem)
 {
-	// 移動コンポーネント取得
-	PlayerMovement* movement = GetOwner()->GetComponent<PlayerMovement>();
-
-	// 地上状態に入る際に速度ベクトルをリセット
-	movement->SetVelocityVec(DirectX::XMVectorZero());
-
-	PlayerState_Human::Enter();
+	PlayerState_Human::Enter(playerSystem);
 }
 
-void PlayerState_Human_Ground::HandleInput()
+void PlayerState_Human_Ground::HandleInput(PlayerSystem& playerSystem)
 {
 	// 入力システム取得
-	const InputSystem* inputSystem = GetOwner()->GetComponent<InputSystem>();
+	const InputSystem* inputSystem = playerSystem.m_InputSystem;
+
+	// ステートマシン取得
+	PlayerStateMachine* stateMachine = playerSystem.m_StateMachine;
 
 	// 移動コンポーネント取得
-	PlayerMovement* movement = GetOwner()->GetComponent<PlayerMovement>();
+	PlayerMovement* movement = playerSystem.m_Movement;
 
-	// 入力値取得
-	float inputX = inputSystem->GetValue<PlayerCommand_MoveX>();
-	float inputZ = inputSystem->GetValue<PlayerCommand_MoveZ>();
-
-	// 歩行処理
-	movement->Walk(inputX, inputZ, static_cast<Player*>(GetOwner()));
-
-	// 通常ジャンプ処理
+	// ジャンプ処理
 	if (inputSystem->IsIssued<PlayerCommand_Jump>())
-		movement->GroundJump(inputX, inputZ, static_cast<Player*>(GetOwner()));
+	{
+		// 入力値取得
+		float inputX = inputSystem->GetValue<PlayerCommand_MoveX>();
+		float inputZ = inputSystem->GetValue<PlayerCommand_MoveZ>();
 
-	PlayerState_Human::HandleInput();
+		movement->GroundJump(inputX, inputZ);
+	}
+
+
+	PlayerState_Human::HandleInput(playerSystem);
 }
 
-void PlayerState_Human_Ground::Update(double elapsedTime)
+void PlayerState_Human_Ground::Update(double elapsedTime, PlayerSystem& playerSystem)
 {
-	PlayerState_Human::Update(elapsedTime);
+	// 移動コンポーネント取得
+	PlayerMovement* movement = playerSystem.m_Movement;
+
+	// 速度リセット
+	movement->ResetVelocity();
+
+	PlayerState_Human::Update(elapsedTime, playerSystem);
 }

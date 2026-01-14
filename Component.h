@@ -26,6 +26,7 @@ public:
 
 	// アクティブフラグの取得・設定メソッド
 	void SetActive(bool isActive) { m_IsActive = isActive; }
+	bool IsActive() const { return m_IsActive; }
 
 	virtual void Start() {};
 	virtual void PreUpdate(double) {};

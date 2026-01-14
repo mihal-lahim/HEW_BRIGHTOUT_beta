@@ -1,7 +1,12 @@
 #include "movement.h"
 
-
 using namespace DirectX;
+
+void Movement::Start()
+{
+	// RigidBodyコンポーネントを取得
+	m_RigidBody = GetOwner()->GetComponent<RigidBody>();
+}
 
 void Movement::RotateByMoveVec()
 {
@@ -12,24 +17,52 @@ void Movement::RotateByMoveVec()
 	float yaw = atan2f(-XMVectorGetX(vec), XMVectorGetZ(vec));
 
 	// オーナーの回転を更新
-	GetOwner()->SetRotation({0.0f, yaw, 0.0f});
+	Quaternion rot{};
+	GetOwner()->Transform.Rotation *= rot.SetEulerY(yaw);
 }
 
 void Movement::PostUpdate(double elapsedTime)
 {
-	// オーナーの位置を取得
-	XMVECTOR pos = XMLoadFloat3(&owner->GetPosition());
+	// RigidBodyがアクティブな場合
+	if (!m_RigidBody->GetDeActivateFlag())
+	{
+		// 現在の速度を取得
+		XMVECTOR current = XMLoadFloat3(&m_RigidBody->GetVelocity());
+		// 移動ベクトルをXMVECTORに変換
+		XMVECTOR moveVec = XMLoadFloat3(&m_MoveVec);
 
-	// 移動ベクトルと速度ベクトルを加算して新しい位置を計算
-	XMVECTOR moveVec = XMLoadFloat3(&m_MoveVec) + XMLoadFloat3(&m_VelocityVec);
-	moveVec = XMVectorScale(moveVec, static_cast<float>(elapsedTime));
-	pos = XMVectorAdd(pos, moveVec);
+		// 新しい速度を計算
+		XMVECTOR newVelocity = XMVectorAdd(current, moveVec);
 
-	// オーナーの位置を更新
-	XMFLOAT3 newPos{};
-	XMStoreFloat3(&newPos, pos);
-	owner->SetPosition(newPos);
+		XMFLOAT3 velocity{};
+		// 新しい速度をXMFLOAT3に変換して保存
+		XMStoreFloat3(&velocity, newVelocity);
 
-	// 移動ベクトルをリセット
-	m_MoveVec = { 0.0f, 0.0f, 0.0f };
+		//移動ベクトルをRididBodyに設定
+		m_RigidBody->SetVelocity(velocity);
+
+		// 力量ベクトルRigidBodyに適用
+		m_RigidBody->AddForce(m_ForceVec);
+
+
+		// 力量ベクトルと移動ベクトルをリセット
+		m_MoveVec = { 0.0f, 0.0f, 0.0f };
+		m_ForceVec = { 0.0f, 0.0f, 0.0f };
+	}
+	// RigidBodyがアクティブでない場合
+	else
+	{
+		// オーナーのTransformを直接更新
+		Transform& transform = GetOwner()->Transform;
+
+		// 位置ベクトルと移動ベクトルをXMVECTORに変換
+		XMVECTOR position = XMLoadFloat3(&transform.Position);
+		XMVECTOR moveVec = XMLoadFloat3(&m_MoveVec);
+
+		// 位置を更新
+		position = XMVectorAdd(position, XMVectorScale(moveVec, static_cast<float>(elapsedTime)));
+
+		// 更新した位置をTransformに保存
+		XMStoreFloat3(&transform.Position, position);
+	}
 }

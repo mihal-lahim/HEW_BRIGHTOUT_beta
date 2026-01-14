@@ -2,23 +2,24 @@
 #define PLAYER_STATE_H
 
 #include "GameObject.h"
-#include "Component.h"
+
 
 class Player;
+class PlayerSystem;
 
 // 抽象ステート基底クラス
-class PlayerState : public Component
+class PlayerState
 {
 public:
 	// デフォルトコンストラクタとデストラクタ
-	PlayerState() { SetActive(false); };
+	PlayerState() = default;
 	virtual ~PlayerState() = default;
 
 	// ステート切り替え時の初期化処理
-	virtual void Enter();
+	virtual void Enter(PlayerSystem& playerSystem);
 	// ステート中の毎フレーム処理
-	virtual void HandleInput();
-	virtual void Update(double elapsedTime);
+	virtual void HandleInput(PlayerSystem& playerSystem);
+	virtual void Update(double elapsedTime, PlayerSystem& playerSystem);
 };
 
 // ステートマシン管理クラス
@@ -35,10 +36,10 @@ public:
 	~PlayerStateMachine() = default;
 
 	// ステート変更
-	void ChangeState(PlayerState* newState);
+	void ChangeState(PlayerState* newState, PlayerSystem& playerSystem);
 
 	// 現在フレーム更新
-	void Update(double elapsedTime);
+	void Update(double elapsedTime, PlayerSystem& playerSystem);
 };
 
 

@@ -8,6 +8,8 @@
 #include <vector>
 #include <DirectXMath.h>
 #include "Component.h"
+#include "PhysicsSystem.h"
+#include "Transform.h"
 
 class Collider;
 class PhysicsSystem;
@@ -38,6 +40,9 @@ private:
 
 	// トリガー
 	bool m_IsTrigger = false;
+
+	// 一時的に非アクティブ化されているかどうか
+	bool m_IsDeActivated = false;
 public:
 
 	// コンストラクタ
@@ -59,6 +64,16 @@ public:
 
 	// 重力を設定するメソッド
 	void SetGravity(DirectX::XMFLOAT3 gravity);
+
+
+	// 一時的に非アクティブ化するメソッド
+	void SetDeActivate();
+
+	// 再アクティブ化するメソッド
+	void ReturnActivate(const Transform& returnTransform);
+
+	// 非アクティブ化フラグ取得メソッド
+	bool GetDeActivateFlag() { return m_IsDeActivated; }
 
 	friend PhysicsSystem;
 };

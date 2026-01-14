@@ -18,6 +18,8 @@
 #include "player_movement.h"
 #include "player_morphsystem.h"
 #include "player_command.h"
+#include "PlayerSystem.h"
+#include "MeshRenderer.h"
 
 
 class Player : public GameObject

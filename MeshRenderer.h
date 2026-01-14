@@ -1,10 +1,10 @@
 
-#ifndef MESHRANDERER_H
-#define MESHRANDERER_H
+#ifndef MESHRENDERER_H
+#define MESHRENDERER_H
 
 #include "Component.h"
 
-class MODEL;
+struct MODEL;
 
 class MeshRenderer : public Component
 {

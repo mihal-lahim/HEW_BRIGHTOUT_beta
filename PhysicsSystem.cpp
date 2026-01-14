@@ -275,8 +275,8 @@ void PhysicsSystem::UpdateRayCasts(std::vector<RayCast*>& raycasts)
 		// レイキャストの実行
 		btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
 
-		// レイがヒットしたか
-		if (rayCallback.hasHit())
+		// レイがヒットしつつ、Triggerを無視する設定
+		if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))
 		{
 			// ヒット情報をRayCastに設定
 			raycast->m_IsHit = true;

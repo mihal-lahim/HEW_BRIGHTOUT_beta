@@ -3,6 +3,8 @@
 #include "PowerLine.h"
 #include <algorithm>
 #include "Camera.h"
+#include "ObjectManager.h"
+#include "RayCast.h"
 
 using namespace DirectX;
 
@@ -25,6 +27,32 @@ void PlayerMovement::Start()
 {
 	// PoleManager取得
 	m_PoleManager = GetOwner()->GetOwner()->GetGameObject<PoleManager>();
+
+	// 地面判定用レイキャストを作成
+	m_GroundRay = GetOwner()->GetOwner()->Create<RayCast>();
+
+	// レイキャストの更新
+	UpdateRayCast();
+}
+
+bool PlayerMovement::IsOnGround() const
+{
+	return m_GroundRay->IsHit();
+}
+
+void PlayerMovement::UpdateRayCast()
+{
+	// レイの始点を設定
+	XMFLOAT3 from = GetOwner()->Transform.Position;
+	from.y -= m_Ctx.GroundDetectOffset;
+
+	// レイの終点を設定
+	XMFLOAT3 to = from;
+	to.y -= m_Ctx.RayLength;
+
+	// レイキャストの始点・終点を設定
+	m_GroundRay->SetFrom(from);
+	m_GroundRay->SetTo(to);
 }
 
 void PlayerMovement::Walk(float inputX, float inputZ)
@@ -40,26 +68,10 @@ void PlayerMovement::Walk(float inputX, float inputZ)
 		vec = XMVectorScale(XMVector3Normalize(vec), m_Ctx.WalkSpeed);
 
 		// 現在の移動方向と新しい移動ベクトルを加算して設定
-		SetMoveVec(vec + GetMoveVecV());
+		SetMoveVecV(XMVectorAdd(vec, GetMoveVecV()));
 	}
 }
 
-void PlayerMovement::AirMove(float inputX, float inputZ)
-{
-	// 入力方向ベクトルを作成
-	XMVECTOR vec = SetInputDir(inputX, inputZ);
-
-	// 移動方向がゼロベクトルでなければ移動ベクトルを更新
-	if (XMVectorGetX(vec) != 0.0f || XMVectorGetZ(vec) != 0.0f)
-	{
-		// Y成分を0にする
-		vec = XMVectorSetY(vec, 0.0f);
-		vec = XMVectorScale(XMVector3Normalize(vec), m_Ctx.WalkSpeed);
-
-		// 現在の移動方向と新しい移動ベクトルを加算して設定
-		SetMoveVec(vec + GetMoveVecV());
-	}
-}
 
 void PlayerMovement::Jump(float inputX, float inputZ, float force)
 {
@@ -78,11 +90,14 @@ void PlayerMovement::Jump(float inputX, float inputZ, float force)
 	// XZ成分の速度ベクトルをスケーリング
 	xzVel = XMVectorScale(xzVel, factor);
 
-	// ジャンプベクトルを計算
-	XMVECTOR jumpVel = XMVectorSetY(XMVectorZero(), XMVectorGetY(GetVelocityVecV()) + force);
-
 	// 速度ベクトルを更新
-	SetVelocityVec(XMVectorAdd(xzVel, jumpVel));
+	SetMoveVecV(xzVel);
+
+	// ジャンプベクトルを計算
+	XMVECTOR jumpVel = XMVectorSetY(XMVectorZero(), force);
+
+	// 力量ベクトルを更新
+	SetForceVecV(XMVectorAdd(jumpVel, GetForceVecV()));
 }
 
 void PlayerMovement::GroundJump(float inputX, float inputZ)
@@ -95,19 +110,6 @@ void PlayerMovement::ElectricJump(float inputX, float inputZ)
 {
 	// ジャンプ処理を呼び出し
 	Jump(inputX, inputZ, m_Ctx.ElectricJumpForce);
-}
-
-void PlayerMovement::ApplyGravity(double elapsedTime)
-{
-	// 速度ベクトルを取得
-	XMVECTOR vec = GetVelocityVecV();
-
-	// Y成分に重力加速度を設定して加算
-	XMVECTOR gravity = XMVectorZero();
-	vec = XMVectorAdd(vec, XMVectorSetY(gravity, m_Ctx.Gravity * static_cast<float>(elapsedTime)));
-
-	// 移動ベクトルを更新
-	SetVelocityVec(vec);
 }
 
 void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
@@ -205,7 +207,7 @@ void PlayerMovement::Turn(float inputX, float inputZ)
 	}
 }
 
-void PlayerMovement::Move()
+void PlayerMovement::LineMove()
 {
 	// 次の電柱に到達したか判定
 	if (m_Ctx.t >= 1.0f)
@@ -224,15 +226,24 @@ void PlayerMovement::Move()
 	float lineLength = m_PoleManager->GetPowerLineLength(m_Ctx.LineID);
 	m_Ctx.t += (m_Ctx.LineMoveSpeed / lineLength);
 
-	// 電線上の位置を取得してプレイヤーの位置を更新
+	// 電線上の位置を取得
 	XMFLOAT3 newPos = m_PoleManager->GetPositionOnPowerLine(m_Ctx.StartPole, m_Ctx.DestPole, m_Ctx.t);
-	SetMoveVec(newPos);
+
+	GetOwner()->Transform.Position = newPos;
 }
 
 void PlayerMovement::Eject(float inputX, float inputZ)
 {
 	// 電線上からの射出処理
 	ElectricJump(inputX, inputZ);
+}
+
+void PlayerMovement::PostUpdate(double elapsedTime)
+{
+	// レイキャストの更新
+	UpdateRayCast();
+	// 基底クラスの更新処理を呼び出し
+	Movement::PostUpdate(elapsedTime);
 }
 
 

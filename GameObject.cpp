@@ -4,21 +4,6 @@
 
 using namespace DirectX;
 
-void GameObject::Draw() const
-{
-    XMMATRIX scale = XMMatrixScaling(m_Scale.x, m_Scale.y, m_Scale.z);
-    XMMATRIX rot = XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
-    XMMATRIX trans = XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
-    XMMATRIX world = scale * rot * trans;
-
-    if (m_pModel) {
-        ModelDraw(m_pModel, world);
-    }
-    else if (m_TextureId != -1) {
-        // モデルがない場合はテクスチャ付きのキューブを描画
-        Cube_Draw(m_TextureId, world);
-    }
-}
 
 void GameObject::DestroyComponents()
 {

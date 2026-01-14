@@ -1,10 +1,17 @@
 
 #include "player.h"
+#include "MeshRenderer.h"
+#include "Collider.h"
+#include "RigidBody.h"
+#include "player_command_set.h"
+#include "model.h"
 
 #include "player_state_human_idle.h"
 #include "player_state_human_walk.h"
 #include "player_state_human_midair.h"
 #include "player_state_electric.h"
+
+using namespace DirectX;
 
 Player::Player()
 {
@@ -21,8 +28,11 @@ Player::Player()
 	// Controller設定
 	auto* controller = AddComponent<Controller>();
 
+	// プレイヤー用コマンドセット作成
+	auto* commandSet = AddComponent<PlayerCommandSet>();
+
 	// InputSystem設定
-	AddComponent<InputSystem>(controller);
+	AddComponent<InputSystem>(controller, commandSet);
 
 
 
@@ -35,14 +45,18 @@ Player::Player()
 	// PlayerMorphSystemコンポーネント設定
 	AddComponent<PlayerMorphSystem>();
 
-	// 各種ステート作成
-	auto* idle = AddComponent<PlayerState_Human_Idle>();
-	AddComponent<PlayerState_Human_Walk>();
-	AddComponent<PlayerState_Human_MidAir>();
-	AddComponent<PlayerState_Electric>();
 
 	// PlayerStateMachineコンポーネント設定
-	AddComponent<PlayerStateMachine>(idle);
+	AddComponent<PlayerStateMachine>(PlayerStates::HumanIdle);
+
+	// コライダー設定
+	auto* collider = AddComponent<Collider>(ColliderType::CAPSULE, XMFLOAT3{ 0.5f, 1.0f, 0.0f });
+
+	// RigidBody設定
+	auto* rigidbody = AddComponent<RigidBody>(1.0f, XMFLOAT3{ 1.0f, 0.0f, 1.0f });
+	rigidbody->AddCollider(collider);
 
 
+	// MeshRenderer設定
+	AddComponent<MeshRenderer>();
 }

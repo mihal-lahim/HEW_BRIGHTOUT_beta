@@ -7,9 +7,9 @@
 class PlayerState_Human : public PlayerState
 {
 public:
-	virtual void Enter() override;
-	virtual void HandleInput() override;
-	virtual void Update(double elapsedTime) override;
+	virtual void Enter(PlayerSystem& playerSystem) override;
+	virtual void HandleInput(PlayerSystem& playerSystem) override;
+	virtual void Update(double elapsedTime, PlayerSystem& playerSystem) override;
 };
 
 #endif

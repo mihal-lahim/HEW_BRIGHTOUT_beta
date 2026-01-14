@@ -31,11 +31,11 @@ PowerLineID PoleManager::RegisterPowerLine(PowerLine* line)
 	pole2->SetPowerLine((PoleID)m_PowerLines.size() - 1);
 
 	// 電柱の座標を取得
-	XMVECTOR pos1 = XMLoadFloat3(&pole1->GetPosition());
-	XMVECTOR pos2 = XMLoadFloat3(&pole2->GetPosition());
+	XMVECTOR pos1 = XMLoadFloat3(&pole1->Transform.Position);
+	XMVECTOR pos2 = XMLoadFloat3(&pole2->Transform.Position);
 
 	// 電線の長さを設定
-	line->SetLength(XMVectorGetX(XMVector3Length(pos1 - pos2)));
+	line->SetLength(XMVectorGetX(XMVector3Length(XMVectorSubtract(pos1, pos2))));
 
 	// PoleManagerを電線に設定
 	line->SetOwner(this);
@@ -99,7 +99,7 @@ PoleID PoleManager::GetDirectionalPole(PoleID from, const XMVECTOR& direction) c
 		// 方向ベクトルとの内積を計算
 		XMVECTOR destPos = XMLoadFloat3(&m_Poles.at(destID)->GetTopPos());
 		XMVECTOR fromPos = XMLoadFloat3(&m_Poles.at(from)->GetTopPos());
-		XMVECTOR toOtherVec = XMVector3Normalize(destPos - fromPos);
+		XMVECTOR toOtherVec = XMVector3Normalize(XMVectorSubtract(destPos, fromPos));
 		float dot = XMVectorGetX(XMVector3Dot(dirVec, toOtherVec));
 
 		// 最大の内積を持つ電柱を記録
