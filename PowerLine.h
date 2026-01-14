@@ -27,8 +27,6 @@ public:
 	void SetID(PowerLineID id) { m_ID = id; }
 	PowerLineID GetID() const { return m_ID; }
 
-	// 描画処理
-    virtual void Draw() const override;
 	// 所有者の PoleManager 設定メソッド
 	void SetOwner(PoleManager* manager) { m_PoleManager = manager; }
 	// 接続されている電柱IDペア取得メソッド

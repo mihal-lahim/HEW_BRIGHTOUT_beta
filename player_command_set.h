@@ -5,37 +5,34 @@
 
 #include "command_set.h"
 #include "player_command.h"
+#include "controller.h"
 
-// プレイヤー用コマンドセット基底クラス
-class PlayerComSet : public CommandSet
+// プレイヤー用コマンドセット
+class PlayerCommandSet : public CommandSet
 {
 public:
-	PlayerComSet()
-	{}
-
-	virtual ~PlayerComSet()
-	{}
-};
-
-// 人間形態のコマンドセット
-class PlayerComSet_Human : public PlayerComSet
-{
-public:
-	PlayerComSet_Human()
+	PlayerCommandSet()
 	{
-		// 移動コマンドを許可
-		AllowCommand<PlayerCommand_MoveX>();
-		AllowCommand<PlayerCommand_MoveZ>();
+		// 移動コマンドを登録
+		RegisterCommand<XBOXButton, PlayerCommand_MoveX>(STICK_LEFT_X, InputCondition::PERFOMED);
+		RegisterCommand<XBOXButton, PlayerCommand_MoveZ>(STICK_LEFT_Y, InputCondition::PERFOMED);
 
-		// ジャンプコマンドを許可
-		AllowCommand<PlayerCommand_Jump>();
+		// カメラ移動コマンドを登録
+		RegisterCommand<XBOXButton, PlayerCommand_CameraMoveX>(STICK_RIGHT_X, InputCondition::PERFOMED);
+		RegisterCommand<XBOXButton, PlayerCommand_CameraMoveY>(STICK_RIGHT_Y, InputCondition::PERFOMED);
+
+		// ジャンプコマンドを設定
+		RegisterCommand<XBOXButton, PlayerCommand_Jump>(BUTTON_A, InputCondition::STARTED);
 		// 変身コマンドを許可
-		AllowCommand<PlayerCommand_Morph>();
-		// 電気ジャンプコマンドを許可
-		AllowCommand<PlayerCommand_Jump>();
+		RegisterCommand<XBOXButton, PlayerCommand_Morph>(BUTTON_X, InputCondition::STARTED);
+
+		// ADSコマンドを登録
+		RegisterCommand<XBOXButton, playerCommand_ADS>(TRIGGER_LEFT, InputCondition::PERFOMED);
+		// 射撃コマンドを登録
+		RegisterCommand<XBOXButton, PlayerCommand_Fire>(TRIGGER_RIGHT, InputCondition::STARTED);
 	}
 
-	virtual ~PlayerComSet_Human()
+	virtual ~PlayerCommandSet()
 	{}
 };
 

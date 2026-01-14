@@ -59,12 +59,6 @@
     <Filter Include="ヘッダー ファイル\描画">
       <UniqueIdentifier>{b49ab068-b48e-437a-bf8f-292441bab8ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\カメラ">
-      <UniqueIdentifier>{5842a41c-7843-4567-a723-e3c5ad7ff7d8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\カメラ">
-      <UniqueIdentifier>{206a1085-6c83-4aee-809a-038857b281ca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\Direct3D">
       <UniqueIdentifier>{67962c20-1d20-4e76-9e29-2f2776999a9d}</UniqueIdentifier>
     </Filter>
@@ -95,6 +89,12 @@
     <Filter Include="ヘッダー ファイル\シーン">
       <UniqueIdentifier>{a5f15219-e23b-464f-8cb7-62e2a42f35d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Physics">
+      <UniqueIdentifier>{f9aea0b4-d74c-4b78-8ccf-48884fe753af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Physics">
+      <UniqueIdentifier>{1f986eb8-a036-42c7-923c-8f35cb374d29}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -122,24 +122,6 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="map.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="item.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="ItemGenerator.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="ItemGeneratorObject.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="house.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="ChargingSpot.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Enemy.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="houseUI.cpp">
@@ -220,15 +202,6 @@
     <ClCompile Include="texture.cpp">
       <Filter>ソース ファイル\描画</Filter>
     </ClCompile>
-    <ClCompile Include="camera_manager.cpp">
-      <Filter>ソース ファイル\カメラ</Filter>
-    </ClCompile>
-    <ClCompile Include="debug_camera.cpp">
-      <Filter>ソース ファイル\カメラ</Filter>
-    </ClCompile>
-    <ClCompile Include="tps_camera.cpp">
-      <Filter>ソース ファイル\カメラ</Filter>
-    </ClCompile>
     <ClCompile Include="Audio.cpp">
       <Filter>ソース ファイル\オーディオ</Filter>
     </ClCompile>
@@ -298,13 +271,34 @@
     <ClCompile Include="player_state_electric.cpp">
       <Filter>ソース ファイル\プレイヤー\ステート</Filter>
     </ClCompile>
-    <ClCompile Include="camera.cpp">
-      <Filter>ソース ファイル\カメラ</Filter>
-    </ClCompile>
     <ClCompile Include="player_morphsystem.cpp">
       <Filter>ソース ファイル\プレイヤー</Filter>
     </ClCompile>
     <ClCompile Include="collision.cpp">
+      <Filter>ソース ファイル\コンポーネント</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem.cpp">
+      <Filter>ソース ファイル\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerSystem.cpp">
+      <Filter>ソース ファイル\プレイヤー</Filter>
+    </ClCompile>
+    <ClCompile Include="Quaternion.cpp">
+      <Filter>ソース ファイル\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>ソース ファイル\コンポーネント</Filter>
+    </ClCompile>
+    <ClCompile Include="tps_camera.cpp">
+      <Filter>ソース ファイル\コンポーネント</Filter>
+    </ClCompile>
+    <ClCompile Include="debug_camera.cpp">
+      <Filter>ソース ファイル\デバッグ</Filter>
+    </ClCompile>
+    <ClCompile Include="RigidBody.cpp">
+      <Filter>ソース ファイル\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshRanderer.cpp">
       <Filter>ソース ファイル\コンポーネント</Filter>
     </ClCompile>
   </ItemGroup>
@@ -340,24 +334,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="light.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="item.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="ItemGenerator.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="ItemGeneratorObject.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="house.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="ChargingSpot.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="enemy.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="houseUI.h">
@@ -453,18 +429,6 @@
     <ClInclude Include="polygon.h">
       <Filter>ヘッダー ファイル\描画</Filter>
     </ClInclude>
-    <ClInclude Include="debug_camera.h">
-      <Filter>ヘッダー ファイル\カメラ</Filter>
-    </ClInclude>
-    <ClInclude Include="camera.h">
-      <Filter>ヘッダー ファイル\カメラ</Filter>
-    </ClInclude>
-    <ClInclude Include="camera_manager.h">
-      <Filter>ヘッダー ファイル\カメラ</Filter>
-    </ClInclude>
-    <ClInclude Include="tps_camera.h">
-      <Filter>ヘッダー ファイル\カメラ</Filter>
-    </ClInclude>
     <ClInclude Include="Audio.h">
       <Filter>ヘッダー ファイル\オーディオ</Filter>
     </ClInclude>
@@ -534,13 +498,49 @@
     <ClInclude Include="player_state_human_ground.h">
       <Filter>ヘッダー ファイル\プレイヤー\ステート</Filter>
     </ClInclude>
-    <ClInclude Include="player_states_instances.h">
-      <Filter>ヘッダー ファイル\プレイヤー\ステート</Filter>
-    </ClInclude>
     <ClInclude Include="player_morphsystem.h">
       <Filter>ヘッダー ファイル\プレイヤー</Filter>
     </ClInclude>
     <ClInclude Include="collision.h">
+      <Filter>ヘッダー ファイル\コンポーネント</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBody.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>ヘッダー ファイル\コンポーネント</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerSystem.h">
+      <Filter>ヘッダー ファイル\プレイヤー</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>ヘッダー ファイル\コンポーネント</Filter>
+    </ClInclude>
+    <ClInclude Include="Quaternion.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>ヘッダー ファイル\コンポーネント</Filter>
+    </ClInclude>
+    <ClInclude Include="tps_camera.h">
+      <Filter>ヘッダー ファイル\コンポーネント</Filter>
+    </ClInclude>
+    <ClInclude Include="debug_camera.h">
+      <Filter>ヘッダー ファイル\デバッグ</Filter>
+    </ClInclude>
+    <ClInclude Include="RayCast.h">
+      <Filter>ヘッダー ファイル\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>ヘッダー ファイル\描画</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshRenderer.h">
       <Filter>ヘッダー ファイル\コンポーネント</Filter>
     </ClInclude>
   </ItemGroup>

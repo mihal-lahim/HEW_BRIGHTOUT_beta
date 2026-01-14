@@ -1,6 +1,7 @@
 #ifndef TPS_CAMERA_H
 #define TPS_CAMERA_H
-#include "camera.h"
+
+#include "Component.h"
 #include <DirectXMath.h>
 
 // TPSカメラ設定構造体
@@ -15,9 +16,14 @@ struct TPSCameraCtx
 	float MaxDistance = 15.0f; // プレイヤーとの最大距離
 };
 
-class TPSCamera : public Camera
+class Camera;
+
+class TPSCamera : public Component
 {
 private:
+	
+	Camera* m_Camera = nullptr; // カメラコンポーネント
+
 	GameObject* m_Target = nullptr; // 注視対象オブジェクト
 
 	TPSCameraCtx m_Ctx; // カメラ設定値
@@ -33,6 +39,8 @@ public:
     TPSCamera(GameObject* target, TPSCameraCtx ctx = {})
 		: m_Target(target), m_Ctx(ctx)
 	{}
+
+	void Start() override;
 
 	// カメラ回転処理
 	void Rotate(float inputX, float inputY);

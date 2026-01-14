@@ -47,21 +47,21 @@ void Controller::PreUpdate()
 
 float Controller::GetInputValue(InputKey input, InputCondition inputCondition)
 {
-	Button btn = static_cast<Button>(input);
+	XBOXButton btn = static_cast<XBOXButton>(input);
 	
 	// アナログ入力の判定
 	switch (btn)
 	{
-	case Button::TRIGGER_LEFT:
-	case Button::TRIGGER_RIGHT:
+	case XBOXButton::TRIGGER_LEFT:
+	case XBOXButton::TRIGGER_RIGHT:
 		return GetTriggerValue(btn, inputCondition);
 
-	case Button::STICK_LEFT_X:
-	case Button::STICK_LEFT_Y:
-	case Button::STICK_LEFT_LENGTH:
-	case Button::STICK_RIGHT_X:
-	case Button::STICK_RIGHT_Y:
-	case Button::STICK_RIGHT_LENGTH:
+	case XBOXButton::STICK_LEFT_X:
+	case XBOXButton::STICK_LEFT_Y:
+	case XBOXButton::STICK_LEFT_LENGTH:
+	case XBOXButton::STICK_RIGHT_X:
+	case XBOXButton::STICK_RIGHT_Y:
+	case XBOXButton::STICK_RIGHT_LENGTH:
 		return GetStickValue(btn, inputCondition);
 
 	default:
@@ -71,17 +71,17 @@ float Controller::GetInputValue(InputKey input, InputCondition inputCondition)
 }
 
 
-bool Controller::IsDown(Button btn) const
+bool Controller::IsDown(XBOXButton btn) const
 {
 	return (btn & m_CurState.Gamepad.wButtons) && !(btn & m_PrevState.Gamepad.wButtons);
 }
 
-bool Controller::IsPressed(Button btn) const
+bool Controller::IsPressed(XBOXButton btn) const
 {
 	return (btn & m_CurState.Gamepad.wButtons) && (btn & m_PrevState.Gamepad.wButtons);
 }
 
-bool Controller::IsReleased(Button btn) const
+bool Controller::IsReleased(XBOXButton btn) const
 {
 	return !(btn & m_CurState.Gamepad.wButtons) && (btn & m_PrevState.Gamepad.wButtons);
 }
@@ -168,7 +168,7 @@ TriggerState Controller::GetRightTrigger() const
 	return state;
 }
 
-float Controller::GetButtonValue(Button btn, InputCondition inputCondition) const
+float Controller::GetButtonValue(XBOXButton btn, InputCondition inputCondition) const
 {
 	bool isCurrentPressed = (btn & m_CurState.Gamepad.wButtons) != 0;
 	bool isPrevPressed = (btn & m_PrevState.Gamepad.wButtons) != 0;
@@ -190,11 +190,11 @@ float Controller::GetButtonValue(Button btn, InputCondition inputCondition) cons
 	}
 }
 
-float Controller::GetTriggerValue(Button btn, InputCondition inputCondition) const
+float Controller::GetTriggerValue(XBOXButton btn, InputCondition inputCondition) const
 {
 	TriggerState current{}, prev{};
 	
-	if (btn == Button::TRIGGER_LEFT)
+	if (btn == XBOXButton::TRIGGER_LEFT)
 	{
 		current = GetLeftTrigger();
 		prev = m_PrevLeftTrigger;
@@ -225,7 +225,7 @@ float Controller::GetTriggerValue(Button btn, InputCondition inputCondition) con
 	}
 }
 
-float Controller::GetStickValue(Button btn, InputCondition inputCondition) const
+float Controller::GetStickValue(XBOXButton btn, InputCondition inputCondition) const
 {
 	StickState currentLeft = GetLeftStick();
 	StickState currentRight = GetRightStick();
@@ -236,37 +236,37 @@ float Controller::GetStickValue(Button btn, InputCondition inputCondition) const
 	// ボタンに応じて現在値と前回値を取得
 	switch (btn)
 	{
-	case Button::STICK_LEFT_X:
+	case XBOXButton::STICK_LEFT_X:
 		current = currentLeft;
 		prev = m_PrevLeftStick;
 		value = current.x;
 		break;
 
-	case Button::STICK_LEFT_Y:
+	case XBOXButton::STICK_LEFT_Y:
 		current = currentLeft;
 		prev = m_PrevLeftStick;
 		value = current.y;
 		break;
 
-	case Button::STICK_LEFT_LENGTH:
+	case XBOXButton::STICK_LEFT_LENGTH:
 		current = currentLeft;
 		prev = m_PrevLeftStick;
 		value = current.length;
 		break;
 
-	case Button::STICK_RIGHT_X:
+	case XBOXButton::STICK_RIGHT_X:
 		current = currentRight;
 		prev = m_PrevRightStick;
 		value = current.x;
 		break;
 
-	case Button::STICK_RIGHT_Y:
+	case XBOXButton::STICK_RIGHT_Y:
 		current = currentRight;
 		prev = m_PrevRightStick;
 		value = current.y;
 		break;
 
-	case Button::STICK_RIGHT_LENGTH:
+	case XBOXButton::STICK_RIGHT_LENGTH:
 		current = currentRight;
 		prev = m_PrevRightStick;
 		value = current.length;

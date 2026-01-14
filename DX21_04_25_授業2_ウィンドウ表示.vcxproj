@@ -65,9 +65,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="bullet3.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project=".props\bullet3.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -166,8 +168,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="button_hint_ui.cpp" />
     <ClCompile Include="camera.cpp" />
-    <ClCompile Include="camera_manager.cpp" />
-    <ClCompile Include="ChargingSpot.cpp" />
     <ClCompile Include="checkmark.cpp" />
     <ClCompile Include="collision.cpp" />
     <ClCompile Include="controller.cpp" />
@@ -176,7 +176,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="debug_ostream.cpp" />
     <ClCompile Include="debug_text.cpp" />
     <ClCompile Include="direct3d.cpp" />
-    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="First_Result.cpp" />
     <ClCompile Include="game.cpp" />
@@ -185,22 +184,21 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="game_score.cpp" />
     <ClCompile Include="grid.cpp" />
     <ClCompile Include="health.cpp" />
-    <ClCompile Include="house.cpp" />
     <ClCompile Include="houseUI.cpp" />
-    <ClCompile Include="item.cpp" />
-    <ClCompile Include="ItemGenerator.cpp" />
-    <ClCompile Include="ItemGeneratorObject.cpp" />
     <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="key_logger.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="map.cpp" />
+    <ClCompile Include="MeshRanderer.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="mouse.cpp" />
     <ClCompile Include="movement.cpp" />
     <ClCompile Include="name_input.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="PlayerSystem.cpp" />
     <ClCompile Include="player_morphsystem.cpp" />
     <ClCompile Include="player_movement.cpp" />
     <ClCompile Include="player_state.cpp" />
@@ -214,7 +212,9 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="PoleManager.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="PowerLine.cpp" />
+    <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="result.cpp" />
+    <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="sceneManager.cpp" />
     <ClCompile Include="scene_title.cpp" />
@@ -238,12 +238,12 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Audio.h" />
     <ClInclude Include="button_hint_ui.h" />
     <ClInclude Include="camera.h" />
-    <ClInclude Include="camera_manager.h" />
-    <ClInclude Include="ChargingSpot.h" />
     <ClInclude Include="checkmark.h" />
+    <ClInclude Include="Collider.h" />
     <ClInclude Include="collision.h" />
     <ClInclude Include="command.h" />
     <ClInclude Include="command_set.h" />
+    <ClInclude Include="Component.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="cube.h" />
     <ClInclude Include="debug_camera.h" />
@@ -251,7 +251,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="debug_ostream.h" />
     <ClInclude Include="debug_text.h" />
     <ClInclude Include="direct3d.h" />
-    <ClInclude Include="enemy.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="First_Result.h" />
     <ClInclude Include="game.h" />
@@ -260,29 +259,28 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="game_score.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="health.h" />
-    <ClInclude Include="house.h" />
     <ClInclude Include="houseUI.h" />
     <ClInclude Include="input_system.h" />
     <ClInclude Include="input_device.h" />
-    <ClInclude Include="item.h" />
-    <ClInclude Include="ItemGenerator.h" />
-    <ClInclude Include="ItemGeneratorObject.h" />
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="key_logger.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="map.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="mouse.h" />
     <ClInclude Include="movement.h" />
     <ClInclude Include="name_input.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="PlayerSystem.h" />
     <ClInclude Include="player_command.h" />
     <ClInclude Include="player_command_set.h" />
     <ClInclude Include="player_morphsystem.h" />
     <ClInclude Include="player_movement.h" />
     <ClInclude Include="player_state.h" />
-    <ClInclude Include="player_states_instances.h" />
     <ClInclude Include="player_state_electric.h" />
     <ClInclude Include="player_state_human_ground.h" />
     <ClInclude Include="player_state_human.h" />
@@ -293,7 +291,10 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="PoleManager.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="PowerLine.h" />
+    <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="RayCast.h" />
     <ClInclude Include="result.h" />
+    <ClInclude Include="RigidBody.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="sceneManager.h" />
     <ClInclude Include="scene_title.h" />
@@ -306,6 +307,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="tps_camera.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="tutorial.h" />
     <ClInclude Include="UI.h" />
     <ClInclude Include="UI_Charge.h" />

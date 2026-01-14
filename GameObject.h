@@ -1,13 +1,18 @@
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 
-#include <DirectXMath.h>
-#include "collision.h"
 #include <cstdint>
-#include <string>
+#include <memory>
+#include <vector>
+#include <unordered_map>
+#include "Component.h"
+#include <typeindex>
+#include "Transform.h"
+#include "ObjectManager.h"
 
-struct MODEL; // モデル構造体の前方宣言
-class ObjectManager;
+// Component を継承している型に制約をかけるコンセプト
+template<typename T>
+concept ComponentDerived = requires { std::is_base_of<Component, T>::value; };
 
 
 // ゲーム内のすべての静的オブジェクトの基底クラス
@@ -18,42 +23,30 @@ private:
     bool m_CanDestroy = false; // オブジェクトが破壊可能かどうか
 	ObjectManager* m_Owner = nullptr; // 所有者の ObjectManager へのポインタ
 	bool m_IsActive = true; // オブジェクトがアクティブかどうか
-protected:
-    DirectX::XMFLOAT3 m_Position{};
-    DirectX::XMFLOAT3 m_Scale{ 1.0f, 1.0f, 1.0f };
-    DirectX::XMFLOAT3 m_Rotation{}; // オイラー角
-    MODEL* m_pModel = nullptr;
-    int m_TextureId = -1; // テクスチャID（モデルがない場合）
+
+	// コンポーネントリスト
+	std::vector<std::unique_ptr<Component>> m_Components;
+	// コンポーネントマップ
+	std::unordered_map<std::type_index, std::vector<uint64_t>> m_ComponentMap;
+	// 未Startコンポーネントリスト
+	std::vector<Component*> m_PreStarted;
+
+	// コンポーネント破棄メソッド
+	void DestroyComponents();
 public:
-    GameObject(const DirectX::XMFLOAT3& pos = {}, MODEL* model = nullptr, int textureId = -1, const DirectX::XMFLOAT3& scale = {1.0f, 1.0f, 1.0f})
-        : m_Position(pos), m_pModel(model), m_TextureId(textureId), m_Scale(scale) {}
+
+	// 位置・回転・スケール情報
+	Transform Transform;
+
+
+	GameObject() = default;
     virtual ~GameObject() = default;
 
 
-	// 各種更新メソッド　overrideして使用
-    virtual void Start() {}
-	virtual void PreUpdate(double) {}
-    virtual void Update(double) {}
-	virtual void PostUpdate(double) {}
-	virtual void Draw() const;
-
-    virtual AABB GetAABB() const;
-
-	// 位置、回転、スケールの取得・設定メソッド
-    const DirectX::XMFLOAT3& GetPosition() const { return m_Position; }
-    const DirectX::XMFLOAT3& GetRotation() const { return m_Rotation; }
-	const DirectX::XMFLOAT3& GetScale() const { return m_Scale; }
-
-	// 位置、回転、スケールの設定メソッド
-	void SetPosition(const DirectX::XMFLOAT3& position) { m_Position = position; }
-    void SetRotation(const DirectX::XMFLOAT3& rotation) { m_Rotation = rotation; }
-	void SetScale(const DirectX::XMFLOAT3& scale) { m_Scale = scale; }
-
-	// モデル、テクスチャIDの取得・設定メソッド
-	MODEL* GetModel() const { return m_pModel; }
-	void SetModel(MODEL* model) { m_pModel = model; }
-	int GetTextureId() const { return m_TextureId; }
-	void SetTextureId(int textureId) { m_TextureId = textureId; }
+	// 各種更新メソッド
+	void PreUpdate(double);
+	void Update(double);
+	void PostUpdate(double);
 
 
 	// アクティブフラグの取得・設定メソッド
@@ -61,7 +54,7 @@ public:
 	void SetActive(bool isActive) { m_IsActive = isActive; }
 
 
-	// Owner ObjectManager の取得・設定メソッド
+	// Owner ObjectManager の取得メソッド
 	ObjectManager* GetOwner() const { return m_Owner; }
 
 
@@ -70,7 +63,65 @@ public:
 	void Destroy() { m_CanDestroy = true; }
 
 
+	template<ComponentDerived T>
+	T* GetComponent() const;
+
+	template<ComponentDerived T, typename... Args>
+	T* AddComponent(Args... args);
+
 	friend class ObjectManager; // ObjectManager クラスをフレンドに指定
 };
 
-#endif // GAME_OBJECT_H
+
+
+
+template<ComponentDerived T>
+T* GameObject::GetComponent() const
+{
+	// 型情報を取得
+	std::type_index typeIndex = std::type_index(typeid(T));
+
+	// コンポーネントマップからコンポーネントのIDを取得
+	auto it = m_ComponentMap.find(typeIndex);
+
+	if (it != m_ComponentMap.end())
+	{
+		uint64_t componentID = it->second;
+		// コンポーネントリストからコンポーネントを取得して返す
+		return static_cast<T*>(m_Components.at(componentID).get());
+	}
+	else
+		// コンポーネントが見つからなかった場合は nullptr を返す
+		return nullptr;
+}
+
+
+template<ComponentDerived T, typename... Args>
+T* GameObject::AddComponent(Args... args)
+{
+	// 新しいコンポーネントを作成
+	std::unique_ptr<T> newComponent = std::make_unique<T>(args...);
+	// コンポーネントの型情報を取得
+	std::type_index typeIndex = std::type_index(typeid(T));
+	// コンポーネントIDを決定
+	uint64_t componentID = m_Components.size();
+
+	// コンポーネントマップに登録
+	m_ComponentMap[typeIndex].push_back(componentID);
+	// コンポーネントの所有者を設定
+	newComponent->m_Owner = this;
+	// コンポーネントIDを設定
+	newComponent->m_ID = componentID;
+	// コンポーネントリストに追加
+	m_Components.push_back(std::move(newComponent));
+	// コンポーネントのStartを保留リストに追加
+	m_PreStarted.push_back(m_Components.back().get());
+
+	// オーナーのObjectManagerにコンポーネントを登録
+	m_Owner->RegisterComponent(m_Components.back().get());
+
+	// 追加したコンポーネントを返す
+	return static_cast<T*>(m_Components.back().get());
+}
+
+#endif

@@ -1,37 +1,47 @@
-
+#include "player_state_human_walk.h"
+#include "player_state_human_idle.h"
 #include "player.h"
 #include "player_command.h"
 #include "player_state.h"
+#include "PlayerSystem.h"
 
 using namespace DirectX;
 
-void PlayerState_Human_Walk::Enter(Player& player)
+void PlayerState_Human_Walk::Enter(PlayerSystem& playerSystem)
 {
-	PlayerState_Human_Ground::Enter(player);
+	PlayerState_Human_Ground::Enter(playerSystem);
 }
 
-void PlayerState_Human_Walk::HandleInput(Player& player)
+void PlayerState_Human_Walk::HandleInput(PlayerSystem& playerSystem)
 {
 	// 入力システム取得
-	const InputSystem* inputSystem = player.GetInputSystem();
+	const InputSystem* inputSystem = playerSystem.m_InputSystem;
+
+	// ステートマシン取得
+	PlayerStateMachine* stateMachine = playerSystem.m_StateMachine;
+
+	// 移動コンポーネント取得
+	PlayerMovement* movement = playerSystem.m_Movement;
+
+	// 入力値取得
+	float inputX = inputSystem->GetValue<PlayerCommand_MoveX>();
+	float inputZ = inputSystem->GetValue<PlayerCommand_MoveZ>();
+
+	// 歩行処理
+	movement->Walk(inputX, inputZ);
 
 	// 歩行入力がなくなったらアイドル状態へ遷移
-	if(inputSystem->IsIssued<PlayerCommand_MoveX>() == 0.0f &&
-		inputSystem->IsIssued<PlayerCommand_MoveZ>() == 0.0f)
+	if(inputX == 0.0f &&
+		inputZ == 0.0f)
 	{
-		player.ChangeState(&PlayerStates::HumanIdle);
+		stateMachine->ChangeState(PlayerStates::HumanIdle, playerSystem);
 		return;
 	}
 
-	PlayerState_Human::HandleInput(player);
+	PlayerState_Human::HandleInput(playerSystem);
 }
 
-void PlayerState_Human_Walk::Update(Player& player, double elapsedTime)
+void PlayerState_Human_Walk::Update(double elapsedTime, PlayerSystem& playerSystem)
 {
-	PlayerState_Human_Ground::Update(player, elapsedTime);
-}
-
-void PlayerState_Human_Walk::Draw(const Player& player) const
-{
-	PlayerState_Human_Ground::Draw(player);
+	PlayerState_Human_Ground::Update(elapsedTime, playerSystem);
 }

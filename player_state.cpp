@@ -1,67 +1,50 @@
 #include "player_state.h"
 #include "player.h"
+#include "tps_camera.h"
+#include "PlayerSystem.h"
 
-void PlayerStateMachine::ChangeState(Player& player, PlayerState* newState)
+void PlayerStateMachine::ChangeState(PlayerState* newState, PlayerSystem& playerSystem)
 {
 	// 現在のステートから抜ける処理
 	m_CurrentState = newState;
+
 	if (m_CurrentState)
 	{
 		// 新しいステートに入る処理
-		m_CurrentState->Enter(player);
+		m_CurrentState->Enter(playerSystem);
 	}
 }
 
-void PlayerStateMachine::Update(Player& player, double elapsedTime)
+void PlayerStateMachine::Update(double elapsedTime, PlayerSystem& playerSystem)
 {
 	if (m_CurrentState)
 	{
 		// 現在のステートの入力処理
-		m_CurrentState->HandleInput(player);
+		m_CurrentState->HandleInput(playerSystem);
 		// 現在のステートの更新処理
-		m_CurrentState->Update(player, elapsedTime);
-	}
-}
-
-void PlayerStateMachine::Draw(const Player& player) const
-{
-	if (m_CurrentState)
-	{
-		// 現在のステートの描画処理
-		m_CurrentState->Draw(player);
+		m_CurrentState->Update(elapsedTime, playerSystem);
 	}
 }
 
 
 
-void PlayerState::Enter(Player&)
-{
-}
+void PlayerState::Enter(PlayerSystem&)
+{}
 
-void PlayerState::HandleInput(Player& player)
+void PlayerState::HandleInput(PlayerSystem& playerSystem)
 {
 	// 入力システム取得
-	const InputSystem* inputSystem = player.GetInputSystem();
+	const InputSystem* inputSystem = playerSystem.m_InputSystem;
 
-	// カメラ取得
-	TPSCamera* camera = player.GetTPSCamera();
+	float inputX = inputSystem->GetValue<PlayerCommand_CameraMoveX>();
+	float inputY = inputSystem->GetValue<PlayerCommand_CameraMoveY>();
 
 	// カメラ回転処理
-	if (inputSystem->IsIssued<PlayerCommand_CameraMoveX>()
-		|| inputSystem->IsIssued<PlayerCommand_CameraMoveY>())
-	{
-		camera->Rotate(
-			inputSystem->GetValue<PlayerCommand_CameraMoveX>(),
-			inputSystem->GetValue<PlayerCommand_CameraMoveY>());
-	}
+	if (inputX != 0.0f || inputY != 0.0f)
+		playerSystem.m_Camera->Rotate(inputX, inputY);
 }
 
-void PlayerState::Update(Player&, double)
+void PlayerState::Update(double, PlayerSystem&)
 {
 }
 
-void PlayerState::Draw(const Player& player) const
-{
-	// プレイヤー描画
-	player.Draw();
-}
