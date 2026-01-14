@@ -5,28 +5,30 @@
 ////////////////////////////////////
 #include "sceneManager.h"
 
-void SceneManager::Enter(Scene&)
+
+
+void SceneManager::Enter()
 {
 	// シーンのEnter処理
 	if (m_scene) {
 		m_scene->Enter();
 	}
 }
-void SceneManager::Update(Scene&)
+void SceneManager::Update(double elapsed_time)
 {
 	// シーンのUpdate処理
 	if (m_scene) {
-		m_scene->Update();
+		m_scene->Update(elapsed_time);
 	}
 }
-void SceneManager::Draw(Scene&)
+void SceneManager::Draw()
 {
 	// シーンのDraw処理
 	if (m_scene) {
 		m_scene->Draw();
 	}
 }
-void SceneManager::Exit(Scene&)
+void SceneManager::Exit()
 {
 	// シーンのExit処理
 	if (m_scene) {
@@ -35,6 +37,10 @@ void SceneManager::Exit(Scene&)
 }
 void SceneManager::ChangeScene(Scene& newScene)
 {
+	// 同じシーンなら何もしない
+	if (m_scene == &newScene)
+		return;
+
 	// 現在のシーンのExit処理
 	if (m_scene) {
 		m_scene->Exit();

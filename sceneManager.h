@@ -11,11 +11,11 @@ class SceneManager
 private:
 	Scene* m_scene = nullptr;
 public:
-	void Enter(Scene&);
-	void Update(Scene&);
-	void Draw(Scene&);
-	void Exit(Scene&);
+	void Enter();
+	void Update(double);
+	void Draw();
+	void Exit();
 
-	void ChangeScene(Scene&);
+	void ChangeScene(Scene& newScene);
 };
 #endif // SCENE_MANAGER_H
