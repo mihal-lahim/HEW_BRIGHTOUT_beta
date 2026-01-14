@@ -1,3 +1,5 @@
+//復旧システム
+
 #include "ElectricRestoreSystem.h"
 #include "Player.h"
 
@@ -12,16 +14,16 @@ ElectricRestoreSystem::ElectricRestoreSystem(
 
 void ElectricRestoreSystem::Interact(Player* player)
 {
-	// 既に復旧中なら何もしない
+	//すでに復旧中の場合何もしない
 	if (m_IsRestoring) return;
 
-	// 電気量が足りない
+	// 電気量が足りない場合何もしない
 	if (player->GetElectricityRate() < START_COST_RATE)
 	{
 		return;
 	}
 
-	// 一気に40%支払う
+	// 40%支払う
 	player->ConsumeElectricityRate(START_COST_RATE);
 
 	// 復旧開始
@@ -44,8 +46,6 @@ void ElectricRestoreSystem::TakeDamage(float damage)
 void ElectricRestoreSystem::Update(double elapsedTime)
 {
 	if (!m_IsRestoring) return;
-
-	
 }
 
 void ElectricRestoreSystem::Draw() const

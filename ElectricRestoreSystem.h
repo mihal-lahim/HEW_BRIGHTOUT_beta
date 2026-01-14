@@ -9,23 +9,22 @@ class Player;
 class ElectricRestoreSystem : public GameObject
 {
 public:
-	// 定数
+
+	//インタラクトしたときに減るプレイヤーの電気量
 	static constexpr float START_COST_RATE = 0.4f; // 40%
 
 private:
 	bool  m_IsRestoring = false; // 復旧中か
 	float m_Durability = 100.0f; // 耐久値
-	float m_MaxDurability = 100.0f;
+	float m_MaxDurability = 100.0f; //最大耐久値
 
 public:
-	ElectricRestoreSystem(
-		const DirectX::XMFLOAT3& pos,
-		float durability = 100.0f);
+	ElectricRestoreSystem(const DirectX::XMFLOAT3& pos,float durability = 100.0f);
 
-	// インタラクト（プレイヤーから呼ぶ）
+	// インタラクト
 	void Interact(Player* player);
 
-	// ダメージを受ける
+	// ダメージ
 	void TakeDamage(float damage);
 
 	// 状態取得
