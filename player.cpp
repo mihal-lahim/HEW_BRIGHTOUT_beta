@@ -51,6 +51,28 @@ void Player::Update(double elapsedSec)
 			isDashing_ = false;
 			currentSpeed_ = (state == State::ELECTRICITY) ? (baseSpeed_ * electricSpeedmul) : baseSpeed_;
 			dashTimeRemaining_ = 0.0f;
+<<<<<<< HEAD
+=======
+		}
+	}
+
+	// Õ“Ë”»’èƒXƒLƒbƒvƒ^ƒCƒ}[‚ÌXV
+	if (skipCollisionTimer_ > 0.0f) {
+		skipCollisionTimer_ -= static_cast<float>(elapsedSec);
+	}
+
+	// ƒJƒƒ‰‚ðXVi‰EƒXƒeƒBƒbƒN‚Ì“ü—Íˆ—‚ðŠÜ‚Þj
+	if (camera_) {
+		camera_->Update(elapsedSec);
+	}
+
+	// “düƒ_ƒ[ƒWˆ—F“d‹Có‘Ô‚ÌŠÔA’èŠú“I‚Éƒ_ƒ[ƒW‚ðŽó‚¯‚é
+	if (state == State::ELECTRICITY) {
+		powerLineDamageTimer_ -= static_cast<float>(elapsedSec);
+		if (powerLineDamageTimer_ <= 0.0f) {
+			TakeDamage(POWERLINE_DAMAGE_AMOUNT);
+			powerLineDamageTimer_ = POWERLINE_DAMAGE_INTERVAL; // ƒ^ƒCƒ}[‚ðƒŠƒZƒbƒg
+>>>>>>> parent of 4f2a780 (inertiaã¨å°„å‡ºã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã®è¿½åŠ (å®Œäº†))
 		}
 	}
 >>>>>>> parent of 4f2a780 (inertiaã¨å°„å‡ºã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã®è¿½åŠ (å®Œäº†))
@@ -100,6 +122,7 @@ void Player::Update(double elapsedSec)
 	AddComponent<PlayerStateMachine>(PlayerStates::HumanIdle);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	// ƒRƒ‰ƒCƒ_[Ý’è
 	auto* collider = AddComponent<Collider>(ColliderType::CAPSULE, XMFLOAT3{ 0.5f, 1.0f, 0.0f });
 
@@ -112,6 +135,8 @@ void Player::Update(double elapsedSec)
 	AddComponent<MeshRenderer>();
 }
 =======
+=======
+>>>>>>> parent of 4f2a780 (inertiaã¨å°„å‡ºã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã®è¿½åŠ (å®Œäº†))
 			//“d‹Có‘Ô‚È‚çis•ûŒü‚ð•Û‘¶
 			if (state == State::ELECTRICITY) {
 				electricMoveDir_ = horizontalMove;
