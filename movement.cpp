@@ -1,11 +1,11 @@
-#include "movement.h"
+#include "Movement.h"
 
 using namespace DirectX;
 
 void Movement::Start()
 {
 	// RigidBodyコンポーネントを取得
-	m_RigidBody = GetOwner()->GetComponent<RigidBody>();
+	m_RigidBody = gameObject()->GetComponent<RigidBody>();
 }
 
 void Movement::RotateByMoveVec()
@@ -18,7 +18,7 @@ void Movement::RotateByMoveVec()
 
 	// オーナーの回転を更新
 	Quaternion rot{};
-	GetOwner()->Transform.Rotation *= rot.SetEulerY(yaw);
+	gameObject()->Transform.Rotation *= rot.SetEulerY(yaw);
 }
 
 void Movement::PostUpdate(double elapsedTime)
@@ -53,7 +53,7 @@ void Movement::PostUpdate(double elapsedTime)
 	else
 	{
 		// オーナーのTransformを直接更新
-		Transform& transform = GetOwner()->Transform;
+		Transform& transform = gameObject()->Transform;
 
 		// 位置ベクトルと移動ベクトルをXMVECTORに変換
 		XMVECTOR position = XMLoadFloat3(&transform.Position);

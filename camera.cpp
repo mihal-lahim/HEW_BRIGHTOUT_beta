@@ -1,13 +1,14 @@
 #include "camera.h"
 #include "direct3d.h"
 #include "shader3d.h"
+#include "GameObject.h"
 
 using namespace DirectX;
 
 void Camera::SetMatrix() const
 {
 	// 所有者のゲームオブジェクトを取得
-	GameObject* owner = GetOwner();
+	GameObject* owner = gameObject();
 
 	Transform& transform = owner->Transform;
 

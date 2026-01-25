@@ -19,7 +19,7 @@ public:
 	virtual ~Component() = default;
 
 	// 所有しているゲームオブジェクトの取得メソッド
-	GameObject* const GameObject() const { return m_GameObject; }
+	GameObject* const gameObject() const { return m_GameObject; }
 
 	// オブジェクトのアクティブ状態を取得するメソッド
 	bool IsActive() const override;

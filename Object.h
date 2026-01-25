@@ -5,7 +5,6 @@
 #include <typeindex>
 #include <cstdint>
 #include <type_traits>
-#include "GameManager.h"
 
 class ObjectManager;
 
@@ -13,7 +12,7 @@ using ObjectID = uint32_t;
 
 class Object
 {
-private:
+protected:
 	// オブジェクトの所有者オブジェクトマネージャー
 	ObjectManager* m_ObjectManager = nullptr;
 
@@ -56,7 +55,7 @@ public:
 
 	// オブジェクトの型を比較するテンプレートメソッド
 	template<typename T>
-	void CompareType() { return typeid(this*) == typeid(T); }
+	bool CompareType() { return typeid(this*) == typeid(T); }
 
 
 

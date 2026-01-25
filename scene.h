@@ -11,6 +11,7 @@
 
 #include "ObjectManager.h"
 #include "PhysicsSystem.h"
+#include "RenderSystem.h"
 
 class Scene
 {
@@ -20,6 +21,9 @@ protected:
 
 	// 物理演算システム
 	PhysicsSystem m_PhysicsSystem{};
+
+	// レンダリングシステム
+	RenderSystem m_RenderSystem{};
 
 public:
 	virtual void Enter() = 0;
@@ -33,6 +37,8 @@ public:
 	// 物理演算システム取得メソッド
 	PhysicsSystem& GetPhysicsSystem() { return m_PhysicsSystem; }
 
+	// レンダリングシステム取得メソッド
+	RenderSystem& GetRenderSystem() { return m_RenderSystem; }
 };
 
 #endif

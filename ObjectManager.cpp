@@ -194,47 +194,75 @@ void ObjectManager::AddPendingComponents()
 
 void ObjectManager::DestroyGameObjects()
 {
-    for (auto& obj : m_GameObjects)
-        if (obj->CanDestroy())
-			DestroyComponentByID(obj->m_ID);
+	// 後ろから削除して安全に処理
+	for (int i = m_GameObjects.size() - 1; i >= 0; i--)
+	{
+		if (m_GameObjects.at(i)->CanDestroy())
+			DestroyGameObjectByID(m_GameObjects.at(i)->m_ID);
+	}
 }
 
 
 void ObjectManager::DestroyComponents()
 {
-    for (auto& comp : m_Components)
-        if (comp->CanDestroy())
-			DestroyComponentByID(comp->m_ID);
+	// 後ろから削除して安全に処理
+	for (int i = m_Components.size() - 1; i >= 0; i--)
+	{
+		if (m_Components.at(i)->CanDestroy())
+			DestroyComponentByID(m_Components.at(i)->m_ID);
+	}
 }
 
 
 void ObjectManager::DestroyGameObjectByID(ObjectID id)
 {
-	// 所持しているコンポーネントをすべて破棄
-	for (auto* comp : m_ComponentMap.at(id))
+	// コピーを作成してから削除
+	auto compList = m_ComponentMap.at(id);
+	for (auto* comp : compList)
 		DestroyComponentByID(comp->m_ID);
 
-	// GameObjectリストとコンポーネントマップで対象IDと最後尾を入れ替え
 	std::swap(m_GameObjects.at(id), m_GameObjects.back());
 	std::swap(m_ComponentMap.at(id), m_ComponentMap.back());
 
-	// 最後尾を削除
 	m_GameObjects.pop_back();
 	m_ComponentMap.pop_back();
 
-	// 入れ替えたGameObjectのIDを更新
+
 	m_GameObjects.at(id)->m_ID = id;
 }
 
 
 void ObjectManager::DestroyComponentByID(ObjectID id)
 {
+	// m_ComponentMapから該当コンポーネントを削除
+	DestroyComponentMap(id);
+
 	// Componentリストで対象IDと最後尾を入れ替え
 	std::swap(m_Components.at(id), m_Components.back());
 
 	// 最後尾を削除
 	m_Components.pop_back();
 
-	// 入れ替えたComponentのIDを更新
-	m_Components.at(id)->m_ID = id;
+	// 入れ替えたComponentのIDを更新（リストが空でない場合のみ）
+	if (id < m_Components.size())
+		m_Components.at(id)->m_ID = id;
+}
+
+
+void ObjectManager::DestroyComponentMap(ObjectID componentID)
+{
+	// 削除対象のコンポーネントを取得
+	Component* targetComp = m_Components.at(componentID).get();
+	ObjectID gameObjectID = targetComp->GameObject()->m_ID;
+
+	// m_ComponentMapから該当コンポーネントを削除
+	auto& compList = m_ComponentMap.at(gameObjectID);
+
+	// イテレータを取得して削除
+	auto it = std::find(compList.begin(), compList.end(), targetComp);
+
+	if (it == compList.end()) return;
+
+	std::swap(*it, compList.back());
+	compList.pop_back();
 }

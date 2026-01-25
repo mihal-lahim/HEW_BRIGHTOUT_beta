@@ -9,11 +9,13 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "GameObject.h"
+
 #include "Component.h"
+#include "GameManager.h"
+#include "GameObject.h"
 
 
-class Camera : public Component
+class Camera : public GameObject
 {
 public:
 
@@ -29,8 +31,8 @@ public:
 
 
 
-	Camera() = default;
-	virtual ~Camera() = default;
+	Camera() { GetRenderSystem().RegisterCamera(this); }
+	virtual ~Camera() { GetRenderSystem().UnregisterCamera(this); }
 
 	// 行列を定数バッファに設定するメソッド
 	void SetMatrix() const;

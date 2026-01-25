@@ -3,6 +3,7 @@
 #define MESHRENDERER_H
 
 #include "Component.h"
+#include "GameManager.h"
 
 struct MODEL;
 
@@ -15,6 +16,9 @@ private:
 	// テクスチャインデックス（MODELがnullptrの場合、Cubeに貼るテクスチャのインデックス）
 	int m_TextureIndex = -1;
 public:
+
+	MeshRenderer() { GetRenderSystem().RegisterMeshRenderer(this); }
+	virtual ~MeshRenderer() { GetRenderSystem().UnregisterMeshRenderer(this); }
 
 	// MODELポインタ設定
 	void SetModel(MODEL* model) { m_Model = model; }

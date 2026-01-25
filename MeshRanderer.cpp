@@ -1,4 +1,4 @@
-#include "MeshRanderer.h"
+#include "MeshRenderer.h"
 #include "model.h"
 #include "GameObject.h"
 #include "cube.h"
@@ -6,7 +6,7 @@
 void MeshRenderer::Render()
 {
 	// トランスフォーム取得
-	Transform* tf = &GetOwner()->Transform;
+	Transform* tf = &GameObject()->Transform;
 
 	// ワールド行列計算
 	DirectX::XMMATRIX mtxWorld =

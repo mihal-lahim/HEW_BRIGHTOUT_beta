@@ -7,7 +7,6 @@
 #define GAME_MANAGER_H
 
 #include "Scene.h"
-#include "GameObject.h"
 #include <memory>
 #include <stack>
 
@@ -46,17 +45,21 @@ void PopScene();
 PhysicsSystem& GetPhysicsSystem() { return CurrentScene->GetPhysicsSystem(); }
 // オブジェクト管理システム取得メソッド
 ObjectManager& GetObjectManager() { return CurrentScene->GetObjectManager(); }
+// レンダリングシステム取得メソッド
+RenderSystem& GetRenderSystem() { return CurrentScene->GetRenderSystem(); }
 
 
 
 #include "ObjectManager.h"
+#include "GameObject.h"
+
 
 // 汎用オブジェクト作成テンプレートメソッド
 template<GameObjectDerived T, typename... Args>
 T* CreateGameObject(Args... args)
 {
 	T* obj = new T(std::forward<Args>(args)...);
-	m_ObjectManager.RegisterGameObject(obj);
+	CurrentScene->GetObjectManager().RegisterGameObject(obj);
 	return obj;
 }
 

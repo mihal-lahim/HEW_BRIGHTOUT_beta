@@ -52,6 +52,9 @@ private:
 	// ObjectID指定でComponentを削除するメソッド
     void DestroyComponentByID(ObjectID id);
 
+	// ComponentMapから指定されたComponentIDを削除するメソッド
+	void DestroyComponentMap(ObjectID componentID);
+
 public:
     ObjectManager() = default;
     ~ObjectManager() = default;
@@ -98,7 +101,7 @@ public:
 
 
 template<GameObjectDerived T>
-inline T* ObjectManager::GetGameObject() const
+T* ObjectManager::GetGameObject() const
 {
     // 型情報を取得
     std::type_info type = typeid(T);
@@ -115,7 +118,7 @@ inline T* ObjectManager::GetGameObject() const
 }
 
 template<GameObjectDerived T>
-inline std::vector<T*> ObjectManager::GetGameObjects() const
+std::vector<T*> ObjectManager::GetGameObjects() const
 {
     // 型情報を取得
     std::type_info type = typeid(T);
@@ -136,7 +139,7 @@ inline std::vector<T*> ObjectManager::GetGameObjects() const
 }
 
 template<ComponentDerived T>
-inline T* ObjectManager::GetComponent(const GameObject& obj) const
+T* ObjectManager::GetComponent(const GameObject& obj) const
 {
 	// 取得対象のゲームオブジェクトのIDを取得
 	ObjectID objID = obj.m_ID;
@@ -157,7 +160,7 @@ inline T* ObjectManager::GetComponent(const GameObject& obj) const
 }
 
 template<ComponentDerived T>
-inline std::vector<T*> ObjectManager::GetComponents(const GameObject& obj) const
+std::vector<T*> ObjectManager::GetComponents(const GameObject& obj) const
 {
     // 取得対象のゲームオブジェクトのIDを取得
     ObjectID objID = obj.m_ID;

@@ -1,4 +1,4 @@
-#include "tps_camera.h"
+#include "TPSCamera.h"
 #include "player.h"
 #include "shader3d.h"
 #include <DirectXMath.h>
@@ -6,15 +6,10 @@
 #include "debug_ostream.h"
 #include <cmath>
 #include <algorithm>
+#include "GameObject.h"
 
 using namespace DirectX;
 
-
-void TPSCamera::Start()
-{
-	// カメラコンポーネント取得
-	m_Camera = GetOwner()->GetComponent<Camera>();
-}
 
 void TPSCamera::Rotate(float inputX, float inputY)
 {
@@ -52,5 +47,5 @@ void TPSCamera::Rotate(float inputX, float inputY)
 void TPSCamera::Update(double)
 {
 	// 位置を更新
-	GetOwner()->Transform.Position = m_Dest;
+	gameObject()->Transform.Position = m_Dest;
 }
