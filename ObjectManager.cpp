@@ -1,4 +1,5 @@
 #include "ObjectManager.h"
+#include "GameObject.h"
 #include "camera.h"
 #include "MeshRenderer.h"
 #include "Collider.h"
@@ -8,55 +9,79 @@
 void ObjectManager::Initialize()
 {
     m_GameObjects.clear();
+	m_Components.clear();
+	m_ComponentMap.clear();
+	m_PendingGameObjects.clear();
+	m_PendingComponents.clear();
 }
 
 void ObjectManager::Finalize()
 {
     m_GameObjects.clear();
+	m_Components.clear();
+	m_ComponentMap.clear();
+	m_PendingGameObjects.clear();
+	m_PendingComponents.clear();
 }
 
-void ObjectManager::PhysicsUpdate(double elapsedTime)
+
+void ObjectManager::Start()
 {
-    // シミュレーションを進める
-    m_PhysicsSystem.PhysicsUpdate(elapsedTime);
+	for (auto& obj : m_GameObjects) 
+	{
+		if (obj->m_IsActive && !obj->m_HasStarted)
+		{
+			obj->Start();
+			obj->m_HasStarted = true;
+		}
+	}
 
-    // 衝突を更新
-    m_PhysicsSystem.UpdateCollisions();
-
-    // RigidBodyを取得
-    auto rigidbodies = GetComponents<RigidBody>();
-
-    // 剛体を更新
-    m_PhysicsSystem.UpdateRigidBody(rigidbodies);
-
-    // レイを取得
-    auto raycasts = GetGameObjects<RayCast>();
-
-    // レイを取得
-    m_PhysicsSystem.UpdateRayCasts(raycasts);
+	for (auto& comp : m_Components) 
+	{
+		if (comp->m_IsActive && !comp->m_HasStarted)
+		{
+			comp->Start();
+			comp->m_HasStarted = true;
+		}
+	}
 }
 
-void ObjectManager::PreUpdate(double elapsedTime)
+void ObjectManager::PreUpdate()
 {
-    for (const auto& obj : m_GameObjects) {
-        if (obj->m_IsActive) obj->PreUpdate(elapsedTime);
-    }
+	for (auto& obj : m_GameObjects) {
+		if(obj->m_IsActive) obj->PreUpdate();
+	}
+
+	for (auto& comp : m_Components) {
+		if(comp->m_IsActive) comp->PreUpdate();
+	}
 }
 
-void ObjectManager::Update(double elapsedTime)
+void ObjectManager::Update()
 {
-    for (const auto& obj : m_GameObjects) {
-        if(obj->m_IsActive) obj->Update(elapsedTime);
-    }
+	for (auto& obj : m_GameObjects) {
+		if (obj->m_IsActive) obj->Update();
+	}
+
+	for (auto& comp : m_Components) {
+		if (comp->m_IsActive) comp->Update();
+	}
 }
 
-void ObjectManager::PostUpdate(double elapsedTime)
+void ObjectManager::PostUpdate()
 {
-    for (const auto& obj : m_GameObjects) {
-        if (obj->m_IsActive) obj->PostUpdate(elapsedTime);
-    }
+	for (auto& obj : m_GameObjects) {
+		if (obj->m_IsActive) obj->PostUpdate();
+	}
+
+	for (auto& comp : m_Components) {
+		if (comp->m_IsActive) comp->PostUpdate();
+	}
+
     DestroyGameObjects();
+    DestroyComponents();
     AddPendingGameObjects();
+    AddPendingComponents();
 }
 
 
@@ -93,68 +118,123 @@ void ObjectManager::Draw() const
     }
 }
 
+
 void ObjectManager::RegisterGameObject(GameObject* obj)
 {
-    if (!obj) return;
+	if (!obj) return;
 
 	// オブジェクトのオーナーを設定
-	obj->m_Owner = this;
+	obj->m_ObjectManager = this;
 
-    // 保留リストに追加
-    m_PendingGameObjects.push_back(std::move(obj));
+	// 保留リストに追加
+	m_PendingGameObjects.push_back(obj);
 }
 
-void ObjectManager::RegisterComponent(Component* component)
+
+void ObjectManager::RegisterComponent(Component* comp)
 {
-    if (!component) return;
+	if (!comp) return;
 
-    // type_index でラップ
-    const std::type_index type(typeid(*component));
-	m_ComponentMap[type].push_back(component);
+	// コンポーネントのオーナーを設定
+	comp->m_ObjectManager = this;
 
-    // ColliderかRigidBodyの場合はPhysicsSystemに登録
-    if (type == typeid(Collider))
-        m_PhysicsSystem.RegisterColliders(static_cast<Collider*>(component));
-    else if (type == typeid(RigidBody))
-        m_PhysicsSystem.RegisterRigidBodies(static_cast<RigidBody*>(component));
+	// 保留リストに追加
+	m_PendingComponents.push_back(comp);
 }
+
 
 void ObjectManager::AddPendingGameObjects()
 {
+	// 保留中のゲームオブジェクトをメインリストに追加
     for (auto* obj : m_PendingGameObjects)
     {
-        // オブジェクトを型ごとのマップに登録
-        const std::type_index type(typeid(*obj));  // type_index でラップ
+		// オブジェクトのオーナーを設定
+		obj->m_ObjectManager = this;
 
-        obj->m_ID = m_GameObjectMap[type].size();
-        m_GameObjectMap.at(type).push_back(m_GameObjects.size());
+		// IDを設定
+		obj->m_ID = m_GameObjects.size();
 
-        // オブジェクトをリストに追加
+
+		// Componentマップ用の空セットを追加
+        m_ComponentMap.push_back({});
+
         m_GameObjects.push_back(std::unique_ptr<GameObject>(obj));
+
+		// Awakeを呼び出し
+		obj->Awake();
     }
+
+	m_PendingGameObjects.clear();
 }
+
+
+void ObjectManager::AddPendingComponents()
+{
+	// 保留中のコンポーネントをメインリストに追加
+    for (auto* comp : m_PendingComponents)
+    {
+		// コンポーネントのオーナーを設定
+		comp->m_ObjectManager = this;
+
+		// IDを設定
+		comp->m_ID = m_Components.size();
+
+		// GameObjectごとのコンポーネントマップに登録
+		m_ComponentMap.at(comp->GameObject()->m_ID).push_back(comp);
+
+        m_Components.push_back(std::unique_ptr<Component>(comp));
+
+		// Awakeを呼び出し
+		comp->Awake();
+    }
+
+	m_PendingComponents.clear();
+}
+
 
 void ObjectManager::DestroyGameObjects()
 {
     for (auto& obj : m_GameObjects)
-    {
         if (obj->CanDestroy())
-        {
-            uint64_t id = obj->m_ID;
-            const std::type_index type(typeid(*obj));  // type_index でラップ
-            auto& erace = m_GameObjectMap.at(type).at(id);
-            auto& last = m_GameObjectMap.at(type).back();
+			DestroyComponentByID(obj->m_ID);
+}
 
-            // 更新用のvectorから削除
-            std::swap(m_GameObjects.at(erace), m_GameObjects.at(last));
-            m_GameObjects.pop_back();
 
-            // 型別マップから削除
-            std::swap(erace, last);
-            m_GameObjectMap.at(type).pop_back();
+void ObjectManager::DestroyComponents()
+{
+    for (auto& comp : m_Components)
+        if (comp->CanDestroy())
+			DestroyComponentByID(comp->m_ID);
+}
 
-            // 移動したオブジェクトのIDを更新
-            m_GameObjects.at(last)->m_ID = id;
-        }
-    }
+
+void ObjectManager::DestroyGameObjectByID(ObjectID id)
+{
+	// 所持しているコンポーネントをすべて破棄
+	for (auto* comp : m_ComponentMap.at(id))
+		DestroyComponentByID(comp->m_ID);
+
+	// GameObjectリストとコンポーネントマップで対象IDと最後尾を入れ替え
+	std::swap(m_GameObjects.at(id), m_GameObjects.back());
+	std::swap(m_ComponentMap.at(id), m_ComponentMap.back());
+
+	// 最後尾を削除
+	m_GameObjects.pop_back();
+	m_ComponentMap.pop_back();
+
+	// 入れ替えたGameObjectのIDを更新
+	m_GameObjects.at(id)->m_ID = id;
+}
+
+
+void ObjectManager::DestroyComponentByID(ObjectID id)
+{
+	// Componentリストで対象IDと最後尾を入れ替え
+	std::swap(m_Components.at(id), m_Components.back());
+
+	// 最後尾を削除
+	m_Components.pop_back();
+
+	// 入れ替えたComponentのIDを更新
+	m_Components.at(id)->m_ID = id;
 }

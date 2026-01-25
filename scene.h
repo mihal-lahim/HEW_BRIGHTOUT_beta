@@ -8,37 +8,31 @@
 ==============================================================================*/
 #ifndef SCENE_H
 #define SCENE_H
+
 #include "ObjectManager.h"
+#include "PhysicsSystem.h"
 
 class Scene
 {
 protected:
-	ObjectManager* m_object_manager;
+	// オブジェクト管理システム
+	ObjectManager m_ObjectManager{};
+
+	// 物理演算システム
+	PhysicsSystem m_PhysicsSystem{};
 
 public:
 	virtual void Enter() = 0;
-	virtual void Update(double) = 0;
+	virtual void Update() = 0;
 	virtual void Draw() = 0;
 	virtual void Exit() = 0;
+
+	// オブジェクト管理システム取得メソッド
+	ObjectManager& GetObjectManager() { return m_ObjectManager; }
+
+	// 物理演算システム取得メソッド
+	PhysicsSystem& GetPhysicsSystem() { return m_PhysicsSystem; }
+
 };
 
-#endif // SCENE_H
-
-
-//enum Scene
-//{
-//    SCENE_TITLE,
-//    SCENE_TUTORIAL,
-//    SCENE_GAME,
-//    //SCENE_FIRST_RESULT,    // 第1ラウンドの小リザルト
-//    //SCENE_ROUND2,
-//   // SCENE_SECOND_RESULT,    // 第2ラウンドの小リザルト
-//   // SCENE_ROUND3,
-//    SCENE_RESULT, // 最終リザルト
-//    SCENE_NAME_INPUT,
-//    SCENE_MAX
-//};
-//
-//void Scene_SetNextScene(Scene scene);
-//void Scene_ChangeScene();
-
+#endif

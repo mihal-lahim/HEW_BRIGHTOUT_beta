@@ -1,40 +1,16 @@
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 
-#include <cstdint>
-#include <memory>
-#include <vector>
-#include <unordered_map>
+#include <type_traits>
 #include "Component.h"
-#include <typeindex>
 #include "Transform.h"
-#include "ObjectManager.h"
-
-// Component を継承している型に制約をかけるコンセプト
-template<typename T>
-concept ComponentDerived = requires { std::is_base_of<Component, T>::value; };
+#include "Object.h"
 
 
 // ゲーム内のすべての静的オブジェクトの基底クラス
-class GameObject
+class GameObject : public Object
 {
-private:
-    uint64_t m_ID = 0; // オブジェクトの型ごとの一意なID
-    bool m_CanDestroy = false; // オブジェクトが破壊可能かどうか
-	ObjectManager* m_Owner = nullptr; // 所有者の ObjectManager へのポインタ
-	bool m_IsActive = true; // オブジェクトがアクティブかどうか
-
-	// コンポーネントリスト
-	std::vector<std::unique_ptr<Component>> m_Components;
-	// コンポーネントマップ
-	std::unordered_map<std::type_index, std::vector<uint64_t>> m_ComponentMap;
-	// 未Startコンポーネントリスト
-	std::vector<Component*> m_PreStarted;
-
-	// コンポーネント破棄メソッド
-	void DestroyComponents();
 public:
-
 	// 位置・回転・スケール情報
 	Transform Transform;
 
@@ -43,36 +19,24 @@ public:
     virtual ~GameObject() = default;
 
 
-	// 各種更新メソッド
-	void PreUpdate(double);
-	void Update(double);
-	void PostUpdate(double);
-
-
-	// アクティブフラグの取得・設定メソッド
-	bool IsActive() const { return m_IsActive; }
-	void SetActive(bool isActive) { m_IsActive = isActive; }
-
-
-	// Owner ObjectManager の取得メソッド
-	ObjectManager* GetOwner() const { return m_Owner; }
-
-
-	// 破壊可能フラグの取得・設定メソッド
-	bool CanDestroy() const { return m_CanDestroy; }
-	void Destroy() { m_CanDestroy = true; }
-
-
+	// 所持しているコンポーネントの取得テンプレートメソッド
 	template<ComponentDerived T>
 	T* GetComponent() const;
 
+	// コンポーネント追加テンプレートメソッド
 	template<ComponentDerived T, typename... Args>
 	T* AddComponent(Args... args);
 
-	friend class ObjectManager; // ObjectManager クラスをフレンドに指定
+
+	friend class ObjectManager;
 };
 
 
+#include "ObjectManager.h"
+
+// GameObject を継承している型に制約をかけるコンセプト
+template<typename T>
+concept GameObjectDerived = std::is_base_of<GameObject, T>::value;
 
 
 template<ComponentDerived T>
@@ -81,18 +45,17 @@ T* GameObject::GetComponent() const
 	// 型情報を取得
 	std::type_index typeIndex = std::type_index(typeid(T));
 
-	// コンポーネントマップからコンポーネントのIDを取得
-	auto it = m_ComponentMap.find(typeIndex);
-
-	if (it != m_ComponentMap.end())
+	for (auto& comp : m_Components)
 	{
-		uint64_t componentID = it->second;
-		// コンポーネントリストからコンポーネントを取得して返す
-		return static_cast<T*>(m_Components.at(componentID).get());
+		// 指定された型と一致するコンポーネントを返す
+		if(typeid(*comp) == typeIndex)
+		{
+			return static_cast<T*>(comp);
+		}
 	}
-	else
-		// コンポーネントが見つからなかった場合は nullptr を返す
-		return nullptr;
+
+	// 見つからなかった場合は nullptr を返す
+	return nullptr;
 }
 
 

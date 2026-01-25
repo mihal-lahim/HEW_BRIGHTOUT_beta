@@ -2,49 +2,55 @@
 #define OBJECT_MANAGER_H
 
 #include <vector>
-#include <unordered_map>
-#include <type_traits>
+#include <typeinfo>
 #include <memory>
-#include <cstdint>
-#include <typeindex>
-#include "PhysicsSystem.h"
-
-class GameObject;
-
-// GameObject を継承している型に制約をかけるコンセプト
-template<typename T>
-concept GameObjectDerived = requires { std::is_base_of<GameObject, T>::value; };
+#include "Component.h"
+#include "Object.h"
+#include "GameObject.h"
 
 
 class ObjectManager
 {
 private:
-	// 更新用ゲームオブジェクトリスト
-    std::vector<std::unique_ptr<GameObject>> m_GameObjects{};
-	// 型別ゲームオブジェクトマップ（高速検索用）
-    std::unordered_map<std::type_index, std::vector<uint64_t>> m_GameObjectMap{};
-	// 追加保留中ゲームオブジェクトリスト
-    std::vector<GameObject*> m_PendingGameObjects{};
+    // GameObjectリスト
+    std::vector<std::unique_ptr<GameObject>> m_GameObjects;
 
-	// コンポーネントの型別マップ
-    std::unordered_map<std::type_index, std::vector<Component*>> m_ComponentMap{};
+    // 追加保留中のGameObjectリスト
+    std::vector<GameObject*> m_PendingGameObjects;
 
-	// 物理演算システム
-    PhysicsSystem m_PhysicsSystem{};
+    // Componentリスト
+    std::vector<std::unique_ptr<Component>> m_Components;
+
+    // 追加保留中のComponentリスト
+    std::vector<Component*> m_PendingComponents;
 
 
-	// 更新メソッド
-	void PhysicsUpdate(double elapsedTime);
-    void PreUpdate(double elapsedTime);
-    void Update(double elapsedTime);
-    void PostUpdate(double elapsedTime);
+    // GameObjectごとのコンポーネント
+	std::vector<std::vector<Component*>> m_ComponentMap;
+
+    // 更新メソッド
+	void Start();
+    void PreUpdate();
+    void Update();
+    void PostUpdate();
     void Draw() const;
 
-	// 保留中のゲームオブジェクトを追加するメソッド
-	void AddPendingGameObjects();
+    // 保留中のゲームオブジェクトを追加するメソッド
+    void AddPendingGameObjects();
+    // 保留中のコンポーネントを追加するメソッド
+    void AddPendingComponents();
 
-    // Destroyフラグが立っているオブジェクトを削除するメソッド
+    // Destroyフラグが立っているGameObjectを削除するメソッド
     void DestroyGameObjects();
+    // Destroyフラグが立っているComponentを削除するメソッド
+    void DestroyComponents();
+
+
+	// ObjectID指定でGameObjectを削除するメソッド
+	void DestroyGameObjectByID(ObjectID id);
+
+	// ObjectID指定でComponentを削除するメソッド
+    void DestroyComponentByID(ObjectID id);
 
 public:
     ObjectManager() = default;
@@ -53,80 +59,126 @@ public:
     void Initialize();
     void Finalize();
 
-	// ゲームループの1サイクルを実行するメソッド
-    void Cycle(double elapsedTime)
+    // ゲームループの1サイクルを実行するメソッド
+    void Cycle()
     {
-		PhysicsUpdate(elapsedTime);
-        PreUpdate(elapsedTime);
-        Update(elapsedTime);
-        PostUpdate(elapsedTime);
+		Start();
+        PreUpdate();
+        Update();
+        PostUpdate();
         Draw();
     }
 
-
-	// 型指定で単一のゲームオブジェクトを取得するテンプレートメソッド
-	template<GameObjectDerived T>
-    [[nodiscard]] T* GetGameObject() const
-    {
-        if(!m_GameObjectMap.at(typeid(T)).empty() &&
-            m_GameObjectMap.find(typeid(T)) != m_GameObjectMap.end())
-        {
-            return static_cast<T*>(m_GameObjects.at(m_GameObjectMap.at(typeid(T)).front()));
-        }
-        else return nullptr;
-    }
+	// 型指定で最初のゲームオブジェクトを取得するテンプレートメソッド
+    template<GameObjectDerived T>
+    [[nodiscard]] T* GetGameObject() const;
 
     // 型指定でゲームオブジェクトの配列を取得するテンプレートメソッド
     template<GameObjectDerived T>
-    [[nodiscard]] std::vector<T*> GetGameObjects() const
-    {
-        if (!m_GameObjectMap.at(typeid(T)).empty() &&
-             m_GameObjectMap.find(typeid(T)) != m_GameObjectMap.end())
-        {
-            std::vector<T*> result(m_GameObjectMap.at(typeid(T)).size());
+    [[nodiscard]] std::vector<T*> GetGameObjects() const;
 
-			for (int i = 0; i < m_GameObjectMap.at(typeid(T)).size(); ++i)
-            {
-                result.at(i) = dynamic_cast<T*>(m_GameObjects.at(m_GameObjectMap.at(typeid(T)).at(i)));
-            }
-			return result;
-        }
-        else return {};
-    }
 
+
+    template<ComponentDerived T>
+    [[nodiscard]] T* GetComponent(const GameObject& obj) const;
 
 	// 型指定でコンポーネントの配列を取得するテンプレートメソッド
     template<ComponentDerived T>
-    [[nodiscard]] std::vector<T*> GetComponents() const
-    {
-        if (!m_ComponentMap.at(typeid(T)).empty() &&
-             m_ComponentMap.find(typeid(T)) != m_ComponentMap.end())
-        {
-			std::vector<T*> result(m_ComponentMap.at(typeid(T)).size());
+    [[nodiscard]] std::vector<T*> GetComponents(const GameObject& obj) const;
 
-			for (int i = 0; i < m_ComponentMap.at(typeid(T)).size(); ++i)
-            {
-                result.at(i) = dynamic_cast<T*>(m_ComponentMap.at(typeid(T)).at(i));
-            }
-			return result;
+
+    // GameObject登録メソッド
+    void RegisterGameObject(GameObject* obj);
+    // Component登録メソッド
+    void RegisterComponent(Component* comp);
+};
+
+
+
+
+
+template<GameObjectDerived T>
+inline T* ObjectManager::GetGameObject() const
+{
+    // 型情報を取得
+    std::type_info type = typeid(T);
+
+    // 指定された型の最初のゲームオブジェクトを検索
+    for (const auto& obj : m_GameObjects)
+    {
+        if (typeid(*obj) == type)
+        {
+            return static_cast<T*>(obj.get());
+        }
+    }
+	return nullptr;
+}
+
+template<GameObjectDerived T>
+inline std::vector<T*> ObjectManager::GetGameObjects() const
+{
+    // 型情報を取得
+    std::type_info type = typeid(T);
+
+    // 結果格納用配列
+    std::vector<T*> result{};
+
+    // 指定された型のゲームオブジェクトを収集
+    for (const auto& obj : m_GameObjects)
+    {
+        if (typeid(*obj) == type)
+        {
+            result.push_back(static_cast<T*>(obj.get()));
         }
     }
 
-    // 汎用オブジェクト作成テンプレートメソッド
-    // T は GameObject を継承している必要があります(コンパイルエラーになる)
-    template<GameObjectDerived T, typename... Args>
-    T* Create(Args... args)
+    return result;
+}
+
+template<ComponentDerived T>
+inline T* ObjectManager::GetComponent(const GameObject& obj) const
+{
+	// 取得対象のゲームオブジェクトのIDを取得
+	ObjectID objID = obj.m_ID;
+
+	// 指定された型情報を取得
+	std::type_info type = typeid(T);
+
+	for (auto* comp : m_ComponentMap.at(objID))
     {
-        T* obj = new T(args...);
-        RegisterGameObject(static_cast<GameObject*>(obj));
-        return obj;
+        // 指定された型と一致するコンポーネントを返す
+        if(typeid(*comp) == type)
+        {
+            return static_cast<T*>(comp);
+        }
     }
 
-    // 既存ゲームオブジェクトを登録するメソッド
-    void RegisterGameObject(GameObject* obj);
+	return nullptr;
+}
 
-	// コンポーネントを登録するメソッド
-	void RegisterComponent(Component* component);
-};
+template<ComponentDerived T>
+inline std::vector<T*> ObjectManager::GetComponents(const GameObject& obj) const
+{
+    // 取得対象のゲームオブジェクトのIDを取得
+    ObjectID objID = obj.m_ID;
+
+    // 指定された型情報を取得
+    std::type_info type = typeid(T);
+
+    // 結果格納用配列
+    std::vector<T*> result{};
+
+    for(auto* comp : m_ComponentMap.at(objID))
+    {
+        // 指定された型と一致するコンポーネントを配列に追加
+        if(typeid(*comp) == type)
+        {
+            result.push_back(static_cast<T*>(comp));
+        }
+	}
+
+	return result;
+}
+
 
 #endif

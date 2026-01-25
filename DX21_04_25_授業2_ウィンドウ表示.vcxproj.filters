@@ -95,6 +95,9 @@
     <Filter Include="ソース ファイル\Physics">
       <UniqueIdentifier>{1f986eb8-a036-42c7-923c-8f35cb374d29}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\ライフサイクル">
+      <UniqueIdentifier>{3c003e23-9024-4f01-9e25-1fb77c3759cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -146,9 +149,6 @@
       <Filter>ソース ファイル\電柱</Filter>
     </ClCompile>
     <ClCompile Include="ObjectManager.cpp">
-      <Filter>ソース ファイル\ゲームオブジェクト</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
       <Filter>ソース ファイル\ゲームオブジェクト</Filter>
     </ClCompile>
     <ClCompile Include="PoleManager.cpp">
@@ -244,15 +244,6 @@
     <ClCompile Include="button_hint_ui.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
-    <ClCompile Include="scene.cpp">
-      <Filter>ソース ファイル\シーン</Filter>
-    </ClCompile>
-    <ClCompile Include="scene_title.cpp">
-      <Filter>ソース ファイル\シーン</Filter>
-    </ClCompile>
-    <ClCompile Include="sceneManager.cpp">
-      <Filter>ソース ファイル\シーン</Filter>
-    </ClCompile>
     <ClCompile Include="game.cpp">
       <Filter>ソース ファイル\シーン</Filter>
     </ClCompile>
@@ -301,11 +292,8 @@
     <ClCompile Include="MeshRanderer.cpp">
       <Filter>ソース ファイル\コンポーネント</Filter>
     </ClCompile>
-    <ClCompile Include="mapcell.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="ElectricRestoreSystem.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Component.cpp">
+      <Filter>ソース ファイル\コンポーネント</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -367,9 +355,6 @@
       <Filter>ヘッダー ファイル\電柱</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>ヘッダー ファイル\ゲームオブジェクト</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectManager.h">
       <Filter>ヘッダー ファイル\ゲームオブジェクト</Filter>
     </ClInclude>
     <ClInclude Include="player.h">
@@ -474,13 +459,10 @@
     <ClInclude Include="button_hint_ui.h">
       <Filter>ヘッダー ファイル\UI</Filter>
     </ClInclude>
-    <ClInclude Include="scene_title.h">
+    <ClInclude Include="Scene.h">
       <Filter>ヘッダー ファイル\シーン</Filter>
     </ClInclude>
-    <ClInclude Include="scene.h">
-      <Filter>ヘッダー ファイル\シーン</Filter>
-    </ClInclude>
-    <ClInclude Include="sceneManager.h">
+    <ClInclude Include="GameManager.h">
       <Filter>ヘッダー ファイル\シーン</Filter>
     </ClInclude>
     <ClInclude Include="game.h">
@@ -540,7 +522,7 @@
     <ClInclude Include="debug_camera.h">
       <Filter>ヘッダー ファイル\デバッグ</Filter>
     </ClInclude>
-    <ClInclude Include="RayCast.h">
+    <ClInclude Include="Ray.h">
       <Filter>ヘッダー ファイル\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
@@ -549,11 +531,17 @@
     <ClInclude Include="MeshRenderer.h">
       <Filter>ヘッダー ファイル\コンポーネント</Filter>
     </ClInclude>
-    <ClInclude Include="mapcell.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Time.h">
+      <Filter>ヘッダー ファイル\ライフサイクル</Filter>
     </ClInclude>
-    <ClInclude Include="ElectricRestoreSystem.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>ヘッダー ファイル\ライフサイクル</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>ヘッダー ファイル\ライフサイクル</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem.h">
+      <Filter>ヘッダー ファイル\描画</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

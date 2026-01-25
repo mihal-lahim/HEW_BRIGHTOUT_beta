@@ -11,7 +11,7 @@
 class Collider;
 class RigidBody;
 class GameObject;
-class RayCast;
+class Ray;
 
 class PhysicsSystem
 {
@@ -59,7 +59,9 @@ public:
 	void PhysicsUpdate(float deltaTime);
 	void UpdateRigidBody(std::vector<RigidBody*>& rigidbodies);
 	void UpdateCollisions();
-	void UpdateRayCasts(std::vector<RayCast*>& raycasts);
+
+
+	void RayCast(Ray& ray, float distance);
 };
 
 // DirectXÀ•WŒn‚©‚çBulletÀ•WŒn‚Ö‚Ì•ÏŠ·
