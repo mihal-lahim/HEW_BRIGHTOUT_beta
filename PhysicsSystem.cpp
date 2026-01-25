@@ -2,7 +2,7 @@
 #include "PhysicsSystem.h"
 #include "RigidBody.h"
 #include "Collider.h"
-#include "RayCast.h"
+#include "Ray.h"
 #include "GameObject.h"
 
 
@@ -11,7 +11,7 @@ using namespace DirectX;
 const btTransform& PhysicsSystem::ApplyOffsets(Collider& collider)
 {
 	// 所有者のゲームオブジェクトのTransform取得
-	Transform* tf = &collider.GetOwner()->Transform;
+	Transform* tf = &collider.GameObject()->Transform;
 
 	// 位置設定
 	XMVECTOR pos = XMVectorAdd(XMLoadFloat3(&tf->Position), XMLoadFloat3(&collider.m_OffsetPos));
@@ -91,7 +91,7 @@ void PhysicsSystem::RegisterColliders(Collider* collider)
 	obj->setWorldTransform(bttf);
 
 	// ユーザーポインタ設定
-	obj->setUserPointer(collider->GetOwner());
+	obj->setUserPointer(collider->GameObject());
 
 	// トリガー設定
 	if (collider->m_IsTrigger)
@@ -131,8 +131,8 @@ void PhysicsSystem::RegisterRigidBodies(RigidBody* rigidbody)
 
 	// 初期位置設定
 	btTransform startPos;
-	startPos.setOrigin(ToBulletPosition(rigidbody->GetOwner()->Transform.Position));
-	startPos.setRotation(ToBulletRotation(rigidbody->GetOwner()->Transform.Rotation));
+	startPos.setOrigin(ToBulletPosition(rigidbody->GameObject()->Transform.Position));
+	startPos.setRotation(ToBulletRotation(rigidbody->GameObject()->Transform.Rotation));
 
 	// モーションステート作成
 	btDefaultMotionState* motionState = new btDefaultMotionState(startPos);
@@ -164,7 +164,7 @@ void PhysicsSystem::RegisterRigidBodies(RigidBody* rigidbody)
 		body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
 	// ユーザーポインタ設定
-	body->setUserPointer(rigidbody->GetOwner());
+	body->setUserPointer(rigidbody->GameObject());
 
 	// 剛体登録
 	m_DynamicsWorld->addRigidBody(body);
@@ -199,7 +199,7 @@ void PhysicsSystem::UpdateRigidBody(std::vector<RigidBody*>& rigidbodies)
 		btTransform worldTransform = rigidbody->m_RigidBody->getWorldTransform();
 
 		// 位置更新
-		Transform* tf = &rigidbody->GetOwner()->Transform;
+		Transform* tf = &rigidbody->GameObject()->Transform;
 
 		tf->Position = ToDirectXPosition(worldTransform.getOrigin());
 		tf->Rotation = ToDirectXRotation(worldTransform.getRotation());
@@ -264,36 +264,44 @@ void PhysicsSystem::UpdateCollisions()
 	}
 }
 
-void PhysicsSystem::UpdateRayCasts(std::vector<RayCast*>& raycasts)
+void PhysicsSystem::RayCast(Ray& ray, float distance)
 {
-	for (auto* raycast : raycasts)
+	// レイの始点と終点をBulletの形式に変換
+	btVector3 from = ToBulletPosition(ray.m_From);
+
+	// レイの方向を正規化して距離を掛ける
+	XMVECTOR dir = XMLoadFloat3(&ray.m_Direction);
+	dir = XMVector3Normalize(dir);
+	dir = XMVectorScale(dir, distance);
+
+	// レイの終点計算
+	XMFLOAT3 toFloat3{};
+	XMStoreFloat3(&toFloat3, XMVectorAdd(dir, XMLoadFloat3(&ray.m_From)));
+
+	// Bullet形式に変換
+	btVector3 to = ToBulletPosition(toFloat3);
+
+	// レイキャストの実行
+	btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
+
+	// レイがヒットしつつ、Triggerを無視する設定
+	if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))
 	{
-		// レイの始点と終点をBulletの形式に変換
-		btVector3 from = ToBulletPosition(raycast->m_From);
-		btVector3 to = ToBulletPosition(raycast->m_To);
-
-		// レイキャストの実行
-		btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
-
-		// レイがヒットしつつ、Triggerを無視する設定
-		if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))
-		{
-			// ヒット情報をRayCastに設定
-			raycast->m_IsHit = true;
-			raycast->m_HitPosition = ToDirectXPosition(rayCallback.m_hitPointWorld);
-			raycast->m_HitDistance = (rayCallback.m_hitPointWorld - from).length();
-			raycast->m_HitNormal = ToDirectXPosition(rayCallback.m_hitNormalWorld);
-			raycast->m_HitObject = static_cast<GameObject*>(rayCallback.m_collisionObject->getUserPointer());
-		}
-		// ヒットしなかった場合の設定
-		else 
-		{
-			raycast->m_IsHit = false;
-			raycast->m_HitPosition = XMFLOAT3{};
-			raycast->m_HitDistance = -1.0f;
-			raycast->m_HitNormal = XMFLOAT3{};
-			raycast->m_HitObject = nullptr;
-		}
+		// ヒット情報をRayCastに設定
+		ray.IsHit = true;
+		ray.HitPosition = ToDirectXPosition(rayCallback.m_hitPointWorld);
+		ray.HitDistance = (rayCallback.m_hitPointWorld - from).length();
+		ray.HitNormal = ToDirectXPosition(rayCallback.m_hitNormalWorld);
+		ray.HitObject = static_cast<GameObject*>(rayCallback.m_collisionObject->getUserPointer());
+	}
+	// ヒットしなかった場合の設定
+	else
+	{
+		ray.IsHit = false;
+		ray.HitPosition = XMFLOAT3{};
+		ray.HitDistance = -1.0f;
+		ray.HitNormal = XMFLOAT3{};
+		ray.HitObject = nullptr;
 	}
 }
 

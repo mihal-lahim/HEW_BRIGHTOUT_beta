@@ -2,46 +2,35 @@
 #define COMPONENT_H
 
 #include <cstdint>
+#include <type_traits>
+#include "Object.h"
 
+class ObjectManager;
 class GameObject;
 
-class Component
+class Component : public Object
 {
 private:
-	// コンポーネントGameObjectごとの一意なID
-	uint64_t m_ID = 0;
-	// 所有者のゲームオブジェクトポインタ
-	GameObject* m_Owner = nullptr;
-	// コンポーネントがアクティブかどうか
-	bool m_IsActive = true;
-	// コンポーネントが破壊可能かどうか
-	bool m_CanDestroy = false;
+	// 所有しているゲームオブジェクト
+	GameObject* m_GameObject = nullptr;
+
 public:
 	Component() = default;
 	virtual ~Component() = default;
 
+	// 所有しているゲームオブジェクトの取得メソッド
+	GameObject* const GameObject() const { return m_GameObject; }
 
-	// 所有者のゲームオブジェクト取得メソッド
-	GameObject* GetOwner() const { return m_Owner; }
-
-	// アクティブフラグの取得・設定メソッド
-	void SetActive(bool isActive) { m_IsActive = isActive; }
-	bool IsActive() const { return m_IsActive; }
-
-	virtual void Start() {};
-	virtual void PreUpdate(double) {};
-	virtual void Update(double) {};
-	virtual void PostUpdate(double) {};
-
-	// 破壊可能フラグの取得・設定メソッド
-	void CanDestroy() { m_CanDestroy = true; }
-	void Destroy() { m_CanDestroy = true; }
+	// オブジェクトのアクティブ状態を取得するメソッド
+	bool IsActive() const override;
 
 
-	friend class GameObject;
+	friend class ObjectManager;
 };
 
-
+// Component を継承している型に制約をかけるコンセプト
+template<typename T>
+concept ComponentDerived = std::is_base_of<Component, T>::value;
 
 
 #endif

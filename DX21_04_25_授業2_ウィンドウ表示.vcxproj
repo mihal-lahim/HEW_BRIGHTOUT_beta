@@ -170,6 +170,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="checkmark.cpp" />
     <ClCompile Include="collision.cpp" />
+    <ClCompile Include="Component.cpp" />
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="debug_camera.cpp" />
@@ -179,7 +180,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="First_Result.cpp" />
     <ClCompile Include="game.cpp" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="game_effect.cpp" />
     <ClCompile Include="game_score.cpp" />
     <ClCompile Include="grid.cpp" />
@@ -215,9 +215,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="RigidBody.cpp" />
-    <ClCompile Include="scene.cpp" />
-    <ClCompile Include="sceneManager.cpp" />
-    <ClCompile Include="scene_title.cpp" />
     <ClCompile Include="Second_Result.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shader3d.cpp" />
@@ -272,6 +269,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="mouse.h" />
     <ClInclude Include="movement.h" />
     <ClInclude Include="name_input.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="player.h" />
@@ -292,12 +290,12 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="polygon.h" />
     <ClInclude Include="PowerLine.h" />
     <ClInclude Include="Quaternion.h" />
-    <ClInclude Include="RayCast.h" />
+    <ClInclude Include="Ray.h" />
+    <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="RigidBody.h" />
-    <ClInclude Include="scene.h" />
-    <ClInclude Include="sceneManager.h" />
-    <ClInclude Include="scene_title.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="Second_Result.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shader3d.h" />
@@ -305,6 +303,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="sprite_anim.h" />
     <ClInclude Include="system_timer.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="Time.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="tps_camera.h" />
     <ClInclude Include="Transform.h" />
