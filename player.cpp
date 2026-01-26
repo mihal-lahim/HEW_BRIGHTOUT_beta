@@ -10,12 +10,12 @@ using namespace DirectX;
 
 Player::Player()
 {
-	m_HumanModel = ModelLoad("model/kirby.fbx");
+	//m_HumanModel = ModelLoad("model/kirby.fbx");
 }
 
 Player::~Player()
 {
-	ModelRelease(m_HumanModel);
+	//ModelRelease(m_HumanModel);
 }
 
 void Player::Awake()
@@ -46,18 +46,19 @@ void Player::Awake()
 
 
 	// PlayerStateMachineコンポーネント設定
-	AddComponent<PlayerStateMachine>(PlayerStates::HumanIdle);
-
-	// コライダー設定
-	auto* collider = AddComponent<Collider>(ColliderType::CAPSULE, XMFLOAT3{ 0.5f, 1.0f, 0.0f });
-
-	// RigidBody設定
-	auto* rigidbody = AddComponent<RigidBody>(1.0f, XMFLOAT3{ 1.0f, 0.0f, 1.0f });
-	rigidbody->AddCollider(collider);
+	AddComponent<PlayerStateMachine>(&PlayerStates::HumanIdle);
 
 
 	// MeshRenderer設定
 	AddComponent<MeshRenderer>();
+
+
+	// コライダー設定
+	auto* collider = AddComponent<Collider>(ColliderType::BOX, XMFLOAT3{ 1.0f, 1.0f, 1.0f });
+
+	// RigidBody設定
+	auto* rigidbody = AddComponent<RigidBody>(1.0f, XMFLOAT3{ 1.0f, 1.0f, 1.0f });
+	rigidbody->AddCollider(collider);
 }
 
 void Player::Start()
@@ -78,8 +79,12 @@ void Player::Start()
 	m_MeshRenderer = GetComponent<MeshRenderer>();
 }
 
+#include "debug_ostream.h"
+
 void Player::Update()
 {
+	hal::dout << "PlayerPosition" << transform.Position.x << ", " << transform.Position.y << ", " << transform.Position.z << std::endl;
+
 	// 状態管理コンポーネント更新
 	m_StateMachine->Update(*this);
 }

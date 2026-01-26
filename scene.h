@@ -44,15 +44,7 @@ public:
 
 	// レンダリングシステム取得メソッド
 	RenderSystem& GetRenderSystem() { return m_RenderSystem; }
-
-	// ゲームオブジェクト登録メソッド
-	template<typename T, typename... Args>
-		requires std::is_base_of<GameObject, T>::value
-	T* Instantiate(T* obj) 
-	{ 
-		m_ObjectManager.RegisterGameObject(obj);
-		return obj;
-	}
 };
+
 
 #endif

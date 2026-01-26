@@ -33,7 +33,7 @@ void PlayerState_Human::HandleInput(Player& player)
 		movement->SnapToPowerLine(nearestLine);
 
 		// ステート変更
-		stateMachine->ChangeState(PlayerStates::Electric, player);
+		stateMachine->ChangeState(&PlayerStates::Electric, player);
 		return;
 	}
 
@@ -52,7 +52,7 @@ void PlayerState_Human::Update(Player& player)
 	// 空中判定
 	if (!movement->IsOnGround())
 	{
-		stateMachine->ChangeState(PlayerStates::HumanMidAir, player);
+		stateMachine->ChangeState(&PlayerStates::HumanMidAir, player);
 		return;
 	}
 

@@ -8,10 +8,10 @@
 // TPSカメラ設定構造体
 struct TPSCameraCtx
 {
-    float Height = 10.0f;
+    float Height = 3.0f;
 
-    float SensitivityX = 4.0f; // 水平回転感度
-	float SensitivityY = 2.0f; // 垂直（高さ）調整感度
+    float SensitivityX = 0.5f; // 水平回転感度
+	float SensitivityY = 0.5f; // 垂直（高さ）調整感度
 	float FollowSpeed = 3.0f; // 自動追従の速度
 	float MinDistance = 2.0f; // プレイヤーとの最小距離
 	float MaxDistance = 15.0f; // プレイヤーとの最大距離
@@ -21,14 +21,11 @@ struct TPSCameraCtx
 class TPSCamera : public Camera
 {
 private:
-	
-	Camera* m_Camera = nullptr; // カメラコンポーネント
-
 	GameObject* m_Target = nullptr; // 注視対象オブジェクト
 
 	TPSCameraCtx m_Ctx; // カメラ設定値
 
-	float Distance = 8.0f;
+	float Distance = 10.0f;
 
 	float m_AngleX = 0.0f; // 水平回転角度
 	float m_AngleY = 0.0f; // 垂直（高さ）調整角度

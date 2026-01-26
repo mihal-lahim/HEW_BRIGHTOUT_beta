@@ -24,7 +24,6 @@ private:
 
 	// シーンスタック
 	inline static std::stack<std::unique_ptr<Scene>> SceneStack{};
-
 public:
 	// シーン変更テンプレートメソッド
 	template<typename T>

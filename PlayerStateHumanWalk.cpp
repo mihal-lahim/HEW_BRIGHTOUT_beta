@@ -30,7 +30,7 @@ void PlayerState_Human_Walk::HandleInput(Player& player)
 	if(inputX == 0.0f &&
 		inputZ == 0.0f)
 	{
-		stateMachine->ChangeState(PlayerStates::HumanIdle, player);
+		stateMachine->ChangeState(&PlayerStates::HumanIdle, player);
 		return;
 	}
 

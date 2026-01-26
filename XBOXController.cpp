@@ -5,6 +5,7 @@
 /////////////////////////////////////////
 
 #include "XBOXController.h"
+#include "debug_ostream.h"
 #include <cmath>
 
 #pragma comment(lib, "Xinput.lib")
@@ -104,8 +105,8 @@ StickState Controller::GetLeftStick() const
 	// デッドゾーン判定と正規化・値のセット
 	state.isOutside = length > m_LeftStickDeadZone;
 	state.length = state.isOutside ? length * STICK_DIVIDER : 0.0f;
-	state.x = state.isOutside * STICK_DIVIDER ? lx : 0.0f;
-	state.y = state.isOutside * STICK_DIVIDER ? ly : 0.0f;
+	state.x = state.isOutside ? lx * STICK_DIVIDER : 0.0f;
+	state.y = state.isOutside ? ly * STICK_DIVIDER : 0.0f;
 
 	return state;
 }
@@ -122,11 +123,11 @@ StickState Controller::GetRightStick() const
 	// スティックの倒れ具合を計算
 	float length = sqrtf(rx * rx + ry * ry);
 
-	// デッドゾーン判定と値のセット
-	state.isOutside = length > (m_LeftStickDeadZone * STICK_DIVIDER);
+	// デッドゾーン判定と正規化・値のセット
+	state.isOutside = length > m_RightStickDeadZone;
 	state.length = state.isOutside ? length * STICK_DIVIDER : 0.0f;
-	state.x = state.isOutside * STICK_DIVIDER ? rx : 0.0f;
-	state.y = state.isOutside * STICK_DIVIDER ? ry : 0.0f;
+	state.x = state.isOutside ? rx * STICK_DIVIDER : 0.0f;
+	state.y = state.isOutside ? ry * STICK_DIVIDER : 0.0f;
 
 	return state;
 }
@@ -163,7 +164,7 @@ TriggerState Controller::GetRightTrigger() const
 	state.value = value >= m_TriggerThreshold ? value : 0.0f;
 
 	// 閾値を超えたかどうか
-	state.isDowned = m_CurState.Gamepad.bLeftTrigger > m_TriggerThreshold;
+	state.isDowned = m_CurState.Gamepad.bRightTrigger > m_TriggerThreshold;
 
 	return state;
 }

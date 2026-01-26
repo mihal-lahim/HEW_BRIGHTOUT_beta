@@ -74,7 +74,7 @@ void PhysicsSystem::Initialize()
 		m_Solver.get(),
 		m_CollisionConfiguration.get());
 
-	m_DynamicsWorld->setGravity(btVector3(0, 0, 0));
+	m_DynamicsWorld->setGravity(btVector3(0, 0.0f, 0));
 }
 
 void PhysicsSystem::Finalize()
@@ -116,7 +116,7 @@ void PhysicsSystem::RegisterCollider(Collider* collider)
 	// コライダー登録
 	m_DynamicsWorld->addCollisionObject(obj);
 
-	collider->m_CollisionObject = std::unique_ptr<btCollisionObject>(std::move(obj));
+	collider->m_CollisionObject = std::unique_ptr<btCollisionObject>(obj);
 }
 
 void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
@@ -145,6 +145,12 @@ void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
 	if (rigidbody->m_Mass > 0.0f)
 		compoundShape->calculateLocalInertia(rigidbody->m_Mass, localInertia);
 
+	// 固定される回転軸の慣性テンソルを0に設定
+	localInertia.setX(rigidbody->m_FixedRotation.x == 1.0f ? 0.0f : localInertia.x());
+	localInertia.setY(rigidbody->m_FixedRotation.y == 1.0f ? 0.0f : localInertia.y());
+	localInertia.setZ(rigidbody->m_FixedRotation.z == 1.0f ? 0.0f : localInertia.z());
+
+
 	// 初期位置設定
 	btTransform startPos;
 	startPos.setOrigin(ToBulletPosition(rigidbody->gameObject()->transform.Position));
@@ -163,11 +169,10 @@ void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
 	// 剛体作成
 	btRigidBody* body = new btRigidBody(rbInfo);
 
-	// XMFLOAT3をbtVector3に変換
-	btVector3 gravity = ToBulletPosition(rigidbody->m_Gravity);
 
-	// 重力の設定
-	body->setGravity(gravity);
+	// 剛体登録
+	m_DynamicsWorld->addRigidBody(body);
+
 
 	// トリガー設定
 	if (rigidbody->m_IsTrigger)
@@ -176,18 +181,29 @@ void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
 	// ユーザーポインタ設定
 	body->setUserPointer(rigidbody->gameObject());
 
-	// 剛体登録
-	m_DynamicsWorld->addRigidBody(body);
 
-	rigidbody->m_RigidBody = std::unique_ptr<btRigidBody>(body);
-	rigidbody->m_MotionState = std::unique_ptr<btMotionState>(motionState);
+
+	// XMFLOAT3をbtVector3に変換
+	btVector3 gravity = ToBulletPosition(rigidbody->m_Gravity);
+
+	// 重力の設定
+	body->setGravity(gravity);
+
 
 
 	// XMFLOAT3をbtVector3に変換
 	btVector3 angularFactor = ToBulletPosition(rigidbody->m_FixedRotation);
 
 	// 角度の固定設定
-	rigidbody->m_RigidBody->setAngularFactor(angularFactor);
+	body->setAngularFactor(angularFactor);
+
+
+	// メンバ変数に設定
+	rigidbody->m_RigidBody = std::unique_ptr<btRigidBody>(body);
+	rigidbody->m_MotionState = std::unique_ptr<btMotionState>(motionState);
+
+	// 登録されている剛体リストに追加
+	m_RigidBodies.push_back(rigidbody);
 }
 
 void PhysicsSystem::UnregisterCollider(Collider* collider)
@@ -207,10 +223,11 @@ void PhysicsSystem::PhysicsUpdate(float deltaTime)
 	m_DynamicsWorld->stepSimulation(deltaTime);
 }
 
+#include "debug_ostream.h"
 
-void PhysicsSystem::UpdateRigidBody(std::vector<RigidBody*>& rigidbodies)
+void PhysicsSystem::UpdateRigidBody()
 {
-	for (auto* rigidbody : rigidbodies)
+	for (auto* rigidbody : m_RigidBodies)
 	{
 		// トランスフォーム取得
 		btTransform worldTransform = rigidbody->m_RigidBody->getWorldTransform();
@@ -220,6 +237,8 @@ void PhysicsSystem::UpdateRigidBody(std::vector<RigidBody*>& rigidbodies)
 
 		tf->Position = ToDirectXPosition(worldTransform.getOrigin());
 		tf->Rotation = ToDirectXRotation(worldTransform.getRotation());
+
+		hal::dout << "Position: " << tf->Position.x << ", " << tf->Position.y << ", " << tf->Position.z << std::endl;
 
 		// 力をリセット
 		rigidbody->m_RigidBody->clearForces();
@@ -283,9 +302,6 @@ void PhysicsSystem::UpdateCollisions()
 
 void PhysicsSystem::RayCast(Ray& ray, float distance)
 {
-	// レイの始点と終点をBulletの形式に変換
-	btVector3 from = ToBulletPosition(ray.m_From);
-
 	// レイの方向を正規化して距離を掛ける
 	XMVECTOR dir = XMLoadFloat3(&ray.m_Direction);
 	dir = XMVector3Normalize(dir);
@@ -295,31 +311,38 @@ void PhysicsSystem::RayCast(Ray& ray, float distance)
 	XMFLOAT3 toFloat3{};
 	XMStoreFloat3(&toFloat3, XMVectorAdd(dir, XMLoadFloat3(&ray.m_From)));
 
-	// Bullet形式に変換
-	btVector3 to = ToBulletPosition(toFloat3);
-
-	// レイキャストの実行
-	btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
-
-	// レイがヒットしつつ、Triggerを無視する設定
-	if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))
+	// 始点と終点が作るベクトルがゼロベクトルの場合は処理をスキップ
+	if (!XMVectorGetX(XMVectorEqual(XMVectorSubtract(XMLoadFloat3(&toFloat3), XMLoadFloat3(&ray.m_From)), XMVectorZero())) == 0.0f)
 	{
-		// ヒット情報をRayCastに設定
-		ray.IsHit = true;
-		ray.HitPosition = ToDirectXPosition(rayCallback.m_hitPointWorld);
-		ray.HitDistance = (rayCallback.m_hitPointWorld - from).length();
-		ray.HitNormal = ToDirectXPosition(rayCallback.m_hitNormalWorld);
-		ray.HitObject = static_cast<GameObject*>(rayCallback.m_collisionObject->getUserPointer());
+		// レイの始点と終点をBulletの形式に変換
+		btVector3 from = ToBulletPosition(ray.m_From);
+		btVector3 to = ToBulletPosition(toFloat3);
+
+		// レイキャストの実行
+		btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
+
+		// レイテスト実行
+		m_DynamicsWorld->rayTest(from, to, rayCallback);
+
+		// レイがヒットしつつ、Triggerを無視する設定
+		if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))
+		{
+			// ヒット情報をRayCastに設定
+			ray.IsHit = true;
+			ray.HitPosition = ToDirectXPosition(rayCallback.m_hitPointWorld);
+			ray.HitDistance = (rayCallback.m_hitPointWorld - from).length();
+			ray.HitNormal = ToDirectXPosition(rayCallback.m_hitNormalWorld);
+			ray.HitObject = static_cast<GameObject*>(rayCallback.m_collisionObject->getUserPointer());
+			return;
+		}
 	}
-	// ヒットしなかった場合の設定
-	else
-	{
-		ray.IsHit = false;
-		ray.HitPosition = XMFLOAT3{};
-		ray.HitDistance = -1.0f;
-		ray.HitNormal = XMFLOAT3{};
-		ray.HitObject = nullptr;
-	}
+
+	// ヒットしなかった場合の初期化
+	ray.IsHit = false;
+	ray.HitPosition = XMFLOAT3{};
+	ray.HitDistance = -1.0f;
+	ray.HitNormal = XMFLOAT3{};
+	ray.HitObject = nullptr;
 }
 
 

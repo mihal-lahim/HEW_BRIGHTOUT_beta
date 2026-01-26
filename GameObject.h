@@ -17,7 +17,7 @@ public:
 	// 位置・回転・スケール情報
 	Transform transform;
 
-	GameObject() = default;
+	GameObject();
     virtual ~GameObject() = default;
 
 	// 所持しているコンポーネントの取得テンプレートメソッド

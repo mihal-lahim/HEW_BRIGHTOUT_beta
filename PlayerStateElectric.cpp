@@ -37,7 +37,7 @@ void PlayerState_Electric::HandleInput(Player& player)
 			inputSystem->GetValue<PlayerCommand_MoveZ>());
 
 		// lŠÔŒ`‘Ô‚Ö•Ïg
-		stateMachine->ChangeState(PlayerStates::HumanMidAir, player);
+		stateMachine->ChangeState(&PlayerStates::HumanMidAir, player);
 		return;
 	}
 

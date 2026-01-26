@@ -49,7 +49,7 @@ public:
 	virtual ~RigidBody() { m_PhysicsSystem->UnregisterRigidBody(this); }
 
 	// Awakeメソッド
-	void Awake() override { m_PhysicsSystem->RegisterRigidBody(this); }
+	void Start() override { m_PhysicsSystem->RegisterRigidBody(this); }
 
 	// コライダー追加メソッド
 	void AddCollider(Collider* collider);

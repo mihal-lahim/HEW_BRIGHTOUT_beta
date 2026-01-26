@@ -3,8 +3,8 @@
 //Author: hiroshi kasiwagi
 //Date: 2025/11/26
 /////////////////////////////////////////
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#ifndef XBOX_CONTROLLER_H
+#define XBOX_CONTROLLER_H
 
 #include <windows.h>
 #include <Xinput.h>
@@ -56,7 +56,7 @@ public:
 	~Controller() = default;
     
     // 毎フレーム呼ぶ
-    void PreUpdate();
+    void PreUpdate() override;
 
 	// 入力値取得（親クラスからオーバーライド）
 	float GetInputValue(InputKey input, InputCondition inputCondition) override;

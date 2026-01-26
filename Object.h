@@ -4,7 +4,6 @@
 
 #include <typeindex>
 #include <cstdint>
-#include <type_traits>
 
 class ObjectManager;
 class GameObject;
@@ -31,7 +30,7 @@ private:
 public:
 
 	// コンストラクタ
-	Object() = default;
+	Object();
 	virtual ~Object() = default;
 
 
@@ -71,10 +70,6 @@ public:
 	virtual void PreUpdate() {};
 	virtual void Update() {};
 	virtual void PostUpdate() {};
-
-
-	// オブジェクトマネージャーへの登録メソッド
-	void Instantiate(GameObject* obj);
 
 
 	friend class ObjectManager;

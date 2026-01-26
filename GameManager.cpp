@@ -2,11 +2,10 @@
 #include "ObjectManager.h"
 #include "PhysicsSystem.h"
 #include "RenderSystem.h"
-#include "GameObject.h"
 #include "GameManager.h"
 
 
-Scene* const GameManager::GetCurrentScene() 
+Scene* const GameManager::GetCurrentScene()
 { 
 	return CurrentScene.get(); 
 }

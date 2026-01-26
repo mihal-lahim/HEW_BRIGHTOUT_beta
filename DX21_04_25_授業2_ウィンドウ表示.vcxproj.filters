@@ -148,9 +148,6 @@
     <ClCompile Include="PlayerStateHumanIdle.cpp">
       <Filter>ソース ファイル\プレイヤー\ステート</Filter>
     </ClCompile>
-    <ClCompile Include="controller.cpp">
-      <Filter>ソース ファイル\入力</Filter>
-    </ClCompile>
     <ClCompile Include="key_logger.cpp">
       <Filter>ソース ファイル\入力</Filter>
     </ClCompile>
@@ -262,6 +259,9 @@
     <ClCompile Include="CubeObject.cpp">
       <Filter>ソース ファイル\オブジェクト</Filter>
     </ClCompile>
+    <ClCompile Include="XBOXController.cpp">
+      <Filter>ソース ファイル\入力</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="texture.h">
@@ -324,15 +324,6 @@
     <ClInclude Include="movement.h">
       <Filter>ヘッダー ファイル\コンポーネント</Filter>
     </ClInclude>
-    <ClInclude Include="controller.h">
-      <Filter>ヘッダー ファイル\入力</Filter>
-    </ClInclude>
-    <ClInclude Include="input_device.h">
-      <Filter>ヘッダー ファイル\入力</Filter>
-    </ClInclude>
-    <ClInclude Include="input_system.h">
-      <Filter>ヘッダー ファイル\入力</Filter>
-    </ClInclude>
     <ClInclude Include="key_logger.h">
       <Filter>ヘッダー ファイル\入力</Filter>
     </ClInclude>
@@ -386,9 +377,6 @@
     </ClInclude>
     <ClInclude Include="PlayerCommand.h">
       <Filter>ヘッダー ファイル\プレイヤー</Filter>
-    </ClInclude>
-    <ClInclude Include="command_set.h">
-      <Filter>ヘッダー ファイル\入力</Filter>
     </ClInclude>
     <ClInclude Include="PlayerCommandSet.h">
       <Filter>ヘッダー ファイル\プレイヤー</Filter>
@@ -444,9 +432,6 @@
     <ClInclude Include="RenderSystem.h">
       <Filter>ヘッダー ファイル\描画</Filter>
     </ClInclude>
-    <ClInclude Include="TPSCamera.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>ヘッダー ファイル\シーン</Filter>
     </ClInclude>
@@ -455,6 +440,21 @@
     </ClInclude>
     <ClInclude Include="CubeObject.h">
       <Filter>ヘッダー ファイル\オブジェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandSet.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="InputDevice.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSystem.h">
+      <Filter>ヘッダー ファイル\入力</Filter>
+    </ClInclude>
+    <ClInclude Include="XBOXController.h">
+      <Filter>ヘッダー ファイル\入力</Filter>
+    </ClInclude>
+    <ClInclude Include="TPSCamera.h">
+      <Filter>ヘッダー ファイル\コンポーネント</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -10,14 +10,15 @@ using namespace DirectX;
 void Game::Initialize()
 {
 	// PoleManagerオブジェクトの生成
-	Instantiate(new PoleManager());
+	new PoleManager();
 
 	// プレイヤーオブジェクトの生成
-	Instantiate(new Player());
+	Player* player = new Player();
+	player->transform.Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
 	// 床オブジェクトの生成
-	CubeObject* cube = Instantiate(new CubeObject());
+	CubeObject* cube = new CubeObject();
 
-	cube->transform.Position = XMFLOAT3(0.0f, -5.0f, 0.0f);
-	cube->transform.Scale = XMFLOAT3(50.0f, 1.0f, 50.0f);
+	cube->transform.Position = XMFLOAT3(0.0f, -20.0f, 0.0f);
+	cube->transform.Scale = XMFLOAT3(10.0f, 1.0f, 10.0f);
 }

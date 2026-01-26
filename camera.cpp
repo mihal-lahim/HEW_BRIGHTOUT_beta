@@ -1,4 +1,4 @@
-#include "camera.h"
+#include "Camera.h"
 #include "direct3d.h"
 #include "shader3d.h"
 #include "GameObject.h"

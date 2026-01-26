@@ -39,8 +39,8 @@ private:
 	ColliderType m_Type;
 
 	// オフセット位置・回転
-	DirectX::XMFLOAT3 m_OffsetPos{};
-	Quaternion m_OffsetRot{};
+	DirectX::XMFLOAT3 m_OffsetPos{ 0.0f,0.0f,0.0f };
+	Quaternion m_OffsetRot{ Quaternion::Identity() };
 	DirectX::XMFLOAT3 m_Scale{ 1.0f,1.0f,1.0f };
 
 	// 静的コライダーかどうか
@@ -61,8 +61,8 @@ public:
 	{}
 	virtual ~Collider() { if (m_IsStatic) m_PhysicsSystem->UnregisterCollider(this); }
 
-	// Awakeメソッド
-	void Awake() override { if (m_IsStatic) m_PhysicsSystem->RegisterCollider(this); }
+	// Startメソッド
+	void Start() override { if (m_IsStatic) m_PhysicsSystem->RegisterCollider(this); }
 
 	// 衝突取得メソッド
 	std::vector<GameObject*> GetCollisionEnter(GameObject* obj) { return m_PhysicsSystem->GetCollisionEnter(obj); }

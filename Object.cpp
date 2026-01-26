@@ -1,7 +1,6 @@
 #include "Object.h"
-#include "ObjectManager.h"
+#include "GameManager.h"
 
-void Object::Instantiate(GameObject* obj)
-{
-	objectManager()->RegisterGameObject(obj);
-}
+Object::Object()
+	: m_ObjectManager(&GameManager::GetObjectManager())
+{}

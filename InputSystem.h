@@ -6,6 +6,7 @@
 #include "InputDevice.h"
 #include "CommandSet.h"
 #include "Component.h"
+#include "debug_ostream.h"
 
 
 class InputSystem : public Component
@@ -55,9 +56,12 @@ inline float InputSystem::GetValue() const
 	// ƒRƒ}ƒ“ƒhî•ñ‚ğæ“¾
 	const auto* info = m_CommandSet->GetCommandInfo<COM>();
 
+
 	// “o˜^‚³‚ê‚Ä‚¢‚ê‚Î’l‚ğ•Ô‚·
 	if (info)
 		return m_InputDevice->GetInputValue(info->first, info->second);
+
+
 
 	// –¢“o˜^‚Ìê‡‚Í0‚ğ•Ô‚·
 	return 0.0f;

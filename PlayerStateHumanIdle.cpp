@@ -18,7 +18,7 @@ void PlayerState_Human_Idle::HandleInput(Player& player)
 	if (inputSystem->IsIssued<PlayerCommand_MoveX>()
 		|| inputSystem->IsIssued<PlayerCommand_MoveZ>())
 	{
-		stateMachine->ChangeState(PlayerStates::HumanWalk, player);
+		stateMachine->ChangeState(&PlayerStates::HumanWalk, player);
 		return;
 	}
 

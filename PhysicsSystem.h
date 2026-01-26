@@ -40,6 +40,9 @@ private:
 	// トリガーマップ（前回）
 	std::unordered_map<GameObject*, std::vector<GameObject*>> m_PreviousTriggers{};
 
+	// 登録されている剛体
+	std::vector<RigidBody*> m_RigidBodies{};
+
 	// コライダーのオフセット適用
 	btTransform ApplyOffsets(Collider& collider);
 public:
@@ -72,10 +75,10 @@ public:
 
 	// 更新
 	void PhysicsUpdate(float deltaTime);
-	void UpdateRigidBody(std::vector<RigidBody*>& rigidbodies);
+	void UpdateRigidBody();
 	void UpdateCollisions();
 
-
+	// レイキャスト
 	void RayCast(Ray& ray, float distance);
 };
 

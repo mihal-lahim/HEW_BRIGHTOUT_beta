@@ -24,6 +24,8 @@ void Scene::Update()
 	{
 		Time::ConsumeFixedStep();
 		m_PhysicsSystem.PhysicsUpdate((float)Time::FixedDeltaTime());
+		m_PhysicsSystem.UpdateRigidBody();
+		m_PhysicsSystem.UpdateCollisions();
 	}
 
 	// オブジェクト管理システムの更新

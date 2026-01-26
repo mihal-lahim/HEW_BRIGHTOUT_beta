@@ -3,13 +3,12 @@
 #define RAY_H
 
 #include <DirectXMath.h>
-#include "GameObject.h"
 #include "GameManager.h"
 #include "PhysicsSystem.h"
 
 class PhysicsSystem;
 
-class Ray : public GameObject
+class Ray
 {
 private:
 	// レイの始点と終点

@@ -1,8 +1,7 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
-#include <cstdint>
-#include <type_traits>
+
 #include "Object.h"
 
 class ObjectManager;

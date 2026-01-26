@@ -121,7 +121,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	Mouse_Initialize(hWnd);
 
 	//マウスのカーソル
-	Mouse_SetVisible(true);
+	Mouse_SetVisible(false);
 
 	// キーロガーの初期化
 	KeyLogger_Initialize();

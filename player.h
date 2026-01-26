@@ -37,11 +37,10 @@ struct MODEL;
 // プレイヤーステート格納構造体
 struct PlayerStates
 {
-	inline static PlayerState_Human_Idle* HumanIdle{};
-	inline static PlayerState_Human_Walk* HumanWalk{};
-	inline static PlayerState_Human_MidAir* HumanMidAir{};
-	inline static PlayerState_Electric* Electric{};
-
+	inline static PlayerState_Human_Idle HumanIdle{};
+	inline static PlayerState_Human_Walk HumanWalk{};
+	inline static PlayerState_Human_MidAir HumanMidAir{};
+	inline static PlayerState_Electric Electric{};
 };
 
 

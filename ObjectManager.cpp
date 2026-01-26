@@ -110,8 +110,10 @@ void ObjectManager::RegisterComponent(Component* comp)
 void ObjectManager::AddPendingGameObjects()
 {
 	// 保留中のゲームオブジェクトをメインリストに追加
-    for (auto* obj : m_PendingGameObjects)
+	for (int i = 0; i < m_PendingGameObjects.size(); i++)
     {
+		auto* obj = m_PendingGameObjects.at(i);
+
 		// オブジェクトのオーナーを設定
 		obj->m_ObjectManager = this;
 
@@ -135,8 +137,10 @@ void ObjectManager::AddPendingGameObjects()
 void ObjectManager::AddPendingComponents()
 {
 	// 保留中のコンポーネントをメインリストに追加
-    for (auto* comp : m_PendingComponents)
+    for (int i = 0; i < m_PendingComponents.size(); i++)
     {
+		auto* comp = m_PendingComponents.at(i);
+
 		// コンポーネントのオーナーを設定
 		comp->m_ObjectManager = this;
 
