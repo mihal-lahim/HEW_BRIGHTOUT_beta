@@ -5,11 +5,6 @@
 //
 //=======================================
 
-
-
-#include <stdlib.h>
-#include <crtdbg.h>
-
 #define WIN32_LEAN_AND_MEAN //古いウィンドウズのファイルを使わないように飛ばすため
 #include<Windows.h>
 #include <algorithm>
@@ -29,6 +24,8 @@
 #include "GameManager.h"
 #include "Game.h"
 #include <sstream>
+
+#include "light.h"
 
 
 using namespace DirectX;
@@ -52,7 +49,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstance*/,
 	_In_ LPSTR /*lpCmdLine*/, _In_ int nCmdShow)
 {
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	(void)CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
@@ -164,7 +160,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
-	
+	/*
 	hal::DebugText dt(Direct3D_GetDevice(), Direct3D_GetContext(),
 		L"texture/consolab_ascii_512.png",
 		Direct3D_GetBackBufferWidth(), Direct3D_GetBackBufferHeight(),
@@ -172,10 +168,15 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 		0, 0,
 		0.0f, 0.0f
 	);
+	*/
 
+
+	Light_Initialize();
+
+	Light_SetAmbient({ 0.6f,0.6f,0.6f,1.0f });
 
 	// シーンの変更　最初のシーンをセット
-	//GameManager::ChangeScene<Game>();
+	GameManager::ChangeScene<Game>();
 
 	//ゲームループ
 	MSG msg;
@@ -192,13 +193,13 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 			Mouse_State ms{};
 			Mouse_GetState(&ms);
 
-			Direct3D_Clear();
-			SetViewport(0);
-			KeyLogger_Update();// キーボード
+
+			// キーボード
+			KeyLogger_Update();
 
 
 			// シーンの更新
-			//GameManager::GetCurrentScene()->Update();
+			GameManager::GetCurrentScene()->Update();
 
 			/*
 #if defined (DEBUG) || defined(_DEBUG)
@@ -210,11 +211,11 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 				dt.Clear();	// FPSのクリア
 #endif
 */
-			Direct3D_Present();
 		}
 	} while (msg.message != WM_QUIT);
 
 	// 終了処理
+	Light_Finalize();
 	UninitAudio();          // オーディオの終了処理
 	Mouse_Finalize();       // マウスの終了処理
 	Shader3d_Finalize();    // シェーダー3dの終了処理
@@ -226,7 +227,6 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 
 
 	CoUninitialize();
-	_CrtDumpMemoryLeaks();
 
 	return (int)msg.wParam;	// メッセージのwParamを返す
 }

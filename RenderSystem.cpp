@@ -1,9 +1,27 @@
 #include "RenderSystem.h"
 #include "Camera.h"
 #include "MeshRenderer.h"
+#include "direct3d.h"
+
+void RenderSystem::Initialize()
+{
+	m_Cameras.clear();
+	m_MeshRenderers.clear();
+}
+
+void RenderSystem::Finalize()
+{
+    m_Cameras.clear();
+	m_MeshRenderers.clear();
+}
 
 void RenderSystem::Render()
 {
+    Direct3D_Clear();
+    SetViewport(0);
+
+	Direct3D_SetDepthTest(true);
+
     // —Dæ“x‡‚É•`‰æ
     for (auto& [priority, cameras] : m_Cameras)
     {
@@ -23,6 +41,8 @@ void RenderSystem::Render()
             }
         }
     }
+
+    Direct3D_Present();
 }
 
 void RenderSystem::RegisterCamera(Camera* camera)

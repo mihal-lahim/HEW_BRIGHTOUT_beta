@@ -17,8 +17,11 @@ private:
 	// 登録されているメッシュレンダラーの配列
 	std::vector<MeshRenderer*> m_MeshRenderers;
 public:
-	RenderSystem() = default;
-	~RenderSystem() = default;
+	RenderSystem() { Initialize(); }
+	~RenderSystem() { Finalize(); }
+
+	void Initialize();
+	void Finalize();
 
 	// 描画メソッド
 	void Render();

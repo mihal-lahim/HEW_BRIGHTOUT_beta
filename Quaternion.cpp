@@ -7,7 +7,6 @@ Quaternion::Quaternion()
 	// 単位クオータニオンで初期化
 	XMVECTOR quatVec = XMQuaternionIdentity();
 	XMStoreFloat4(&Quat, quatVec);
-
 }
 
 Quaternion Quaternion::Identity()

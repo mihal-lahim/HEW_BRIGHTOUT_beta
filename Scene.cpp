@@ -1,6 +1,20 @@
 #include "Scene.h"
 #include "Time.h"
 
+Scene::Scene()
+{
+	m_ObjectManager.Initialize();
+	m_PhysicsSystem.Initialize();
+	m_RenderSystem.Initialize();
+}
+
+Scene::~Scene()
+{
+	m_ObjectManager.Finalize();
+	m_PhysicsSystem.Finalize();
+	m_RenderSystem.Finalize();
+}
+
 void Scene::Update()
 {
 	Time::BeginFrame();

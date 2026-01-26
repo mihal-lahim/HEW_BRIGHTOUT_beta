@@ -172,6 +172,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="cube.cpp" />
+    <ClCompile Include="CubeObject.cpp" />
     <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="debug_ostream.cpp" />
     <ClCompile Include="debug_text.cpp" />
@@ -187,7 +188,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="key_logger.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MeshRanderer.cpp" />
+    <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="mouse.cpp" />
     <ClCompile Include="Movement.cpp" />
@@ -230,6 +231,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Component.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="cube.h" />
+    <ClInclude Include="CubeObject.h" />
     <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="debug_console.h" />
     <ClInclude Include="debug_ostream.h" />

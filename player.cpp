@@ -10,6 +10,12 @@ using namespace DirectX;
 
 Player::Player()
 {
+	m_HumanModel = ModelLoad("model/kirby.fbx");
+}
+
+Player::~Player()
+{
+	ModelRelease(m_HumanModel);
 }
 
 void Player::Awake()

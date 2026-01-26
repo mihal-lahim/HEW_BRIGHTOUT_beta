@@ -95,6 +95,12 @@
     <Filter Include="ソース ファイル\ライフサイクル">
       <UniqueIdentifier>{e6e28322-1e5d-4f2a-9a69-71a8b0785ffb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\オブジェクト">
+      <UniqueIdentifier>{abd9e297-4897-4168-85f0-c9a28e60d27e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\オブジェクト">
+      <UniqueIdentifier>{cce24c45-dcaa-4883-9a27-7e3ee233f5e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -226,7 +232,7 @@
     <ClCompile Include="RigidBody.cpp">
       <Filter>ソース ファイル\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="MeshRanderer.cpp">
+    <ClCompile Include="MeshRenderer.cpp">
       <Filter>ソース ファイル\コンポーネント</Filter>
     </ClCompile>
     <ClCompile Include="Component.cpp">
@@ -255,6 +261,9 @@
     </ClCompile>
     <ClCompile Include="ObjectManager.cpp">
       <Filter>ソース ファイル\ライフサイクル</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeObject.cpp">
+      <Filter>ソース ファイル\オブジェクト</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -449,6 +458,9 @@
     </ClInclude>
     <ClInclude Include="debug_text.h">
       <Filter>ヘッダー ファイル\デバッグ</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeObject.h">
+      <Filter>ヘッダー ファイル\オブジェクト</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

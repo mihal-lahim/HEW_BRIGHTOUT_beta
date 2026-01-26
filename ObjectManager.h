@@ -57,11 +57,11 @@ private:
 
 public:
 
-    void Initialize();
-    void Finalize();
-
     ObjectManager() { Initialize(); }
     ~ObjectManager() { Finalize(); }
+
+    void Initialize();
+    void Finalize();
 
     // ゲームループの1サイクルを実行するメソッド
     void Cycle()

@@ -61,7 +61,7 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 	return bttf;
 }
 
-PhysicsSystem::PhysicsSystem()
+void PhysicsSystem::Initialize()
 {
 	m_Broadphase = std::make_unique<btDbvtBroadphase>();
 	m_CollisionConfiguration = std::make_unique<btDefaultCollisionConfiguration>();
@@ -75,6 +75,15 @@ PhysicsSystem::PhysicsSystem()
 		m_CollisionConfiguration.get());
 
 	m_DynamicsWorld->setGravity(btVector3(0, 0, 0));
+}
+
+void PhysicsSystem::Finalize()
+{
+	m_DynamicsWorld.reset();
+	m_Solver.reset();
+	m_Dispatcher.reset();
+	m_CollisionConfiguration.reset();
+	m_Broadphase.reset();
 }
 
 void PhysicsSystem::RegisterCollider(Collider* collider)

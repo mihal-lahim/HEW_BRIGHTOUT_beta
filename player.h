@@ -78,7 +78,7 @@ public:
 
 	// コンストラクタ
 	Player();
-	~Player() = default;
+	~Player();
 
 	void Awake() override;
 	void Start() override;

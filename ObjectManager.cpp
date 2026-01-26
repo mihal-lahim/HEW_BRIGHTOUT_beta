@@ -158,8 +158,9 @@ void ObjectManager::AddPendingComponents()
 
 void ObjectManager::DestroyGameObjects()
 {
-	// Œã‚ë‚©‚çíœ‚µ‚ÄˆÀ‘S‚Éˆ—
-	for (size_t i = m_GameObjects.size(); i-- > 0;)
+	if (m_GameObjects.empty()) return;
+
+	for (size_t i = m_GameObjects.size() - 1; i-- > 0;)
 	{
 		if (m_GameObjects.at(i)->CanDestroy())
 			DestroyGameObjectByID(m_GameObjects.at(i)->m_ID);
@@ -169,8 +170,9 @@ void ObjectManager::DestroyGameObjects()
 
 void ObjectManager::DestroyComponents()
 {
-	// Œã‚ë‚©‚çíœ‚µ‚ÄˆÀ‘S‚Éˆ—
-	for (size_t i = m_GameObjects.size(); i-- > 0;)
+	if (m_Components.empty()) return;
+
+	for (size_t i = m_Components.size() - 1; i-- > 0;)
 	{
 		if (m_Components.at(i)->CanDestroy())
 			DestroyComponentByID(m_Components.at(i)->m_ID);

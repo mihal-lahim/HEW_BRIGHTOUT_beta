@@ -44,7 +44,11 @@ private:
 	btTransform ApplyOffsets(Collider& collider);
 public:
 
-	PhysicsSystem();
+	PhysicsSystem() { Initialize(); }
+	~PhysicsSystem() { Finalize(); }
+
+	void Initialize();
+	void Finalize();
 
 	// コライダー登録
 	void RegisterCollider(Collider* collider);

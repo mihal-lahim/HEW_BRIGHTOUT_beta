@@ -305,7 +305,7 @@ bool configureBackBuffer()
 
 	g_pDevice->CreateDepthStencilState(&dsd, &g_pDepthStencilStateDepthEnable);
 
-	g_pDeviceContext->OMSetDepthStencilState(g_pDepthStencilStateDepthDisable, NULL);
+	g_pDeviceContext->OMSetDepthStencilState(g_pDepthStencilStateDepthEnable, NULL);
 
 
 	return true;

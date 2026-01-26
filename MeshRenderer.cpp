@@ -6,7 +6,7 @@
 void MeshRenderer::Render()
 {
 	// トランスフォーム取得
-	Transform tf = gameObject()->transform;
+	const Transform& tf = gameObject()->transform;
 
 	// ワールド行列計算
 	DirectX::XMMATRIX mtxWorld =
@@ -22,14 +22,6 @@ void MeshRenderer::Render()
 	}
 	else
 	{
-		// モデルが設定されていない場合、テクスチャインデックスが有効ならCubeを描画
-		if (m_TextureIndex >= 0)
-		{
-			Cube_Draw(m_TextureIndex, mtxWorld);
-		}
-		else
-		{
-			Cube_Draw(-1, mtxWorld);
-		}
+		Cube_Draw(m_TextureIndex, mtxWorld);
 	}
 }

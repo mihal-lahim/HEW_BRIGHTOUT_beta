@@ -29,8 +29,8 @@ protected:
 
 public:
 
-	Scene() = default;
-	virtual ~Scene() = default;
+	Scene();
+	virtual ~Scene();
 
 	virtual void Initialize() {};
 	void Update();
@@ -46,7 +46,13 @@ public:
 	RenderSystem& GetRenderSystem() { return m_RenderSystem; }
 
 	// ゲームオブジェクト登録メソッド
-	void Instantiate(GameObject* obj) { m_ObjectManager.RegisterGameObject(obj); }
+	template<typename T, typename... Args>
+		requires std::is_base_of<GameObject, T>::value
+	T* Instantiate(T* obj) 
+	{ 
+		m_ObjectManager.RegisterGameObject(obj);
+		return obj;
+	}
 };
 
 #endif
