@@ -3,9 +3,9 @@
 #ifndef PLAYER_COMMAND_SET_H
 #define PLAYER_COMMAND_SET_H
 
-#include "command_set.h"
+#include "CommandSet.h"
 #include "PlayerCommand.h"
-#include "controller.h"
+#include "XBOXController.h"
 
 // プレイヤー用コマンドセット
 class PlayerCommandSet : public CommandSet

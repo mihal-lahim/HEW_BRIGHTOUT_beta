@@ -6,8 +6,8 @@
 #define COMMAND_SET_H
 
 
-#include "command.h"
-#include "input_device.h"
+#include "Command.h"
+#include "InputDevice.h"
 #include <unordered_map>
 #include "Component.h"
 

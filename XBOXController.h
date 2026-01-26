@@ -8,7 +8,7 @@
 
 #include <windows.h>
 #include <Xinput.h>
-#include "input_device.h"
+#include "InputDevice.h"
 
 #pragma comment(lib, "Xinput.lib")
 

@@ -10,17 +10,14 @@ using namespace DirectX;
 void Game::Initialize()
 {
 	// PoleManagerオブジェクトの生成
-	//Instantiate(new PoleManager());
+	Instantiate(new PoleManager());
 
 	// プレイヤーオブジェクトの生成
-	//Instantiate(new Player());
+	Instantiate(new Player());
 
-	// カメラオブジェクトの生成
-	Camera* camera = Instantiate<Camera>(new Camera());
+	// 床オブジェクトの生成
+	CubeObject* cube = Instantiate(new CubeObject());
 
-	camera->transform.Position = { 0.0f, 5.0f, -10.0f };
-	camera->transform.Rotation = Quaternion::SetEulerX(XMConvertToRadians(15.0f));
-
-	// キューブオブジェクトの生成
-	Instantiate(new CubeObject());
+	cube->transform.Position = XMFLOAT3(0.0f, -5.0f, 0.0f);
+	cube->transform.Scale = XMFLOAT3(50.0f, 1.0f, 50.0f);
 }

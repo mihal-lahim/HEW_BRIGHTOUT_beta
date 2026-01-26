@@ -26,4 +26,3 @@ MODEL* ModelLoad(const char* FileName, float scale = 1.0f,bool isBlender = false
 void ModelRelease(MODEL* model);
 
 void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld);
-

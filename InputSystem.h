@@ -3,8 +3,8 @@
 
 
 #include <unordered_map>
-#include "input_device.h"
-#include "command_set.h"
+#include "InputDevice.h"
+#include "CommandSet.h"
 #include "Component.h"
 
 

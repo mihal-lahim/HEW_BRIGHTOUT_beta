@@ -7,12 +7,12 @@
 #define PLAYER_H
 
 #include "GameObject.h"
-#include "input_system.h"
+#include "InputSystem.h"
 #include "PlayerState.h"
 #include "ObjectManager.h"
-#include "controller.h"
+#include "XBOXController.h"
 #include "TPSCamera.h"
-#include "health.h"
+#include "Health.h"
 #include "PlayerMovement.h"
 #include "PlayerMorphsystem.h"
 #include "PlayerCommand.h"
@@ -70,11 +70,15 @@ public:
 	// メッシュレンダラー
 	MeshRenderer* m_MeshRenderer = nullptr;
 
+
+
 	// 人間モデル
 	MODEL* m_HumanModel = nullptr;
 
 	// 電気モデル
 	MODEL* m_ElectricModel = nullptr;
+
+
 
 	// コンストラクタ
 	Player();
