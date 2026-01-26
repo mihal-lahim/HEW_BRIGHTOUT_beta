@@ -188,7 +188,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 
 
 	// シーンの変更　最初のシーンをセット
-	//GameManager::ChangeScene<Game>();
+	GameManager::ChangeScene<Game>();
 
 	//ゲームループ
 	MSG msg;
@@ -211,9 +211,9 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 
 
 			// シーンの更新
-			//GameManager::GetCurrentScene()->Update();
+			GameManager::GetCurrentScene()->Update();
 
-			RenderTest();
+			//RenderTest();
 
 			/*
 #if defined (DEBUG) || defined(_DEBUG)
@@ -310,7 +310,7 @@ void RenderTest()
 	XMMATRIX view, projection;
 	
 	// ビュー行列の作成
-	XMVECTOR eye = XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f);     // カメラの位置
+	XMVECTOR eye = XMVectorSet(0.0f, 5.0f, -10.0f, 0.0f);     // カメラの位置
 	XMVECTOR focus = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);     // 注視点
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);        // 上方向ベクトル
 	view = XMMatrixLookAtLH(eye, focus, up);

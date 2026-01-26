@@ -22,10 +22,17 @@ static Texture g_Textures[TEXTURE_MAX];
 static ID3D11Device* g_pDevice = nullptr;
 static ID3D11DeviceContext* g_pContext = nullptr;
 
+// デフォルトテクスチャID
+static int g_DefaultTexture = -1;
+
+
 void Texture_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	g_pDevice = pDevice;
 	g_pContext = pContext;
+
+	// デフォルトテクスチャ読み込み
+	g_DefaultTexture = Texture_Load(L"texture/white.png", false);
 }
 
 void Texture_Finalize()
@@ -111,7 +118,8 @@ void Texture_SetTexture(int texture_id)
 {
 	if (texture_id <0)
 	{
-		// エラーの場合はここにデバッグ表示を入れる
+		// デフォルトテクスチャ設定
+		Texture_SetTexture(g_DefaultTexture);
 		return;
 	}
 
