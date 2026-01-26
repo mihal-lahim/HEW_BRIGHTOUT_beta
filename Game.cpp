@@ -18,8 +18,8 @@ void Game::Initialize()
 	// カメラオブジェクトの生成
 	Camera* camera = Instantiate<Camera>(new Camera());
 
-	camera->transform.Position = { 0.0f, 0.0f, -10.0f };
-	camera->transform.Rotation = Quaternion::Identity();
+	camera->transform.Position = { 0.0f, 5.0f, -10.0f };
+	camera->transform.Rotation = Quaternion::SetEulerX(XMConvertToRadians(15.0f));
 
 	// キューブオブジェクトの生成
 	Instantiate(new CubeObject());
