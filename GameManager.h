@@ -10,77 +10,68 @@
 #include <memory>
 #include <stack>
 
-// Scene を継承している型に制約をかけるコンセプト
-template<typename T>
-concept SceneDerived = requires { std::is_base_of<Scene, T>::value; };
-
-
-// 現在のシーンポインタ
-inline static std::unique_ptr<Scene> CurrentScene;
-
-// シーンスタック
-inline static std::stack<std::unique_ptr<Scene>> SceneStack;
-
+class GameObject;
 class PhysicsSystem;
+class ObjectManager;
+class RenderSystem;
 
 
-// シーン変更テンプレートメソッド
-template<SceneDerived T>
-void ChangeScene();
-
-// 現在のシーン取得メソッド
-Scene* GetCurrentScene() { return CurrentScene.get(); }
-
-
-// 現在シーンをスタックに保存して新しいシーンに変更するテンプレートメソッド
-template<SceneDerived T>
-void PushScene();
-
-// スタックから前のシーンを復元するテンプレートメソッド
-template<SceneDerived T>
-void PopScene();
-
-
-// 物理演算システム取得メソッド
-PhysicsSystem& GetPhysicsSystem() { return CurrentScene->GetPhysicsSystem(); }
-// オブジェクト管理システム取得メソッド
-ObjectManager& GetObjectManager() { return CurrentScene->GetObjectManager(); }
-// レンダリングシステム取得メソッド
-RenderSystem& GetRenderSystem() { return CurrentScene->GetRenderSystem(); }
-
-
-
-#include "ObjectManager.h"
-#include "GameObject.h"
-
-
-// 汎用オブジェクト作成テンプレートメソッド
-template<GameObjectDerived T, typename... Args>
-T* CreateGameObject(Args... args)
+class GameManager
 {
-	T* obj = new T(std::forward<Args>(args)...);
-	CurrentScene->GetObjectManager().RegisterGameObject(obj);
-	return obj;
-}
+private:
+	// 現在のシーンポインタ
+	inline static std::unique_ptr<Scene> CurrentScene{};
+
+	// シーンスタック
+	inline static std::stack<std::unique_ptr<Scene>> SceneStack{};
+
+public:
+	// シーン変更テンプレートメソッド
+	template<typename T>
+		requires std::is_base_of<Scene, T>::value
+	static void ChangeScene();
+
+	// 現在のシーン取得メソッド
+	static Scene* const GetCurrentScene();
+
+	// 現在シーンをスタックに保存して新しいシーンに変更するテンプレートメソッド
+	template<typename T>
+		requires std::is_base_of<Scene, T>::value
+	static void PushScene();
+
+	// スタックから前のシーンを復元するテンプレートメソッド
+	template<typename T>
+		requires std::is_base_of<Scene, T>::value
+	static void PopScene();
+
+	// 物理演算システム取得メソッド
+	static PhysicsSystem& GetPhysicsSystem();
+	// オブジェクト管理システム取得メソッド
+	static ObjectManager& GetObjectManager();
+	// レンダリングシステム取得メソッド
+	static RenderSystem& GetRenderSystem();
+};
 
 
-template<SceneDerived T>
-void ChangeScene()
+template<typename T>
+	requires std::is_base_of<Scene, T>::value
+inline void GameManager::ChangeScene()
 {
 	// 現在のシーンが存在する場合は終了処理を呼び出す
 	if (CurrentScene)
 	{
-		CurrentScene->Exit();
+		CurrentScene->Finalize();
 	}
 	// 新しいシーンを作成して現在のシーンポインタに設定
 	CurrentScene = std::make_unique<T>();
 	// 新しいシーンの開始処理を呼び出す
-	CurrentScene->Enter();
+	CurrentScene->Initialize();
 }
 
 
-template<SceneDerived T>
-void PushScene()
+template<typename T>
+	requires std::is_base_of<Scene, T>::value
+inline void GameManager::PushScene()
 {
 	// 現在のシーンが存在する場合はスタックに保存
 	if (CurrentScene)
@@ -90,25 +81,24 @@ void PushScene()
 	// 新しいシーンを作成して現在のシーンポインタに設定
 	CurrentScene = std::make_unique<T>();
 	// 新しいシーンの開始処理を呼び出す
-	CurrentScene->Enter();
+	CurrentScene->Initialize();
 }
 
 
-template<SceneDerived T>
-void PopScene()
+template<typename T>
+	requires std::is_base_of<Scene, T>::value
+inline void GameManager::PopScene()
 {
 	// 現在のシーンが存在する場合は終了処理を呼び出す
 	if (CurrentScene)
 	{
-		CurrentScene->Exit();
+		CurrentScene->Finalize();
 	}
 	// スタックから前のシーンを復元
 	if (!SceneStack.empty())
 	{
 		CurrentScene = std::move(SceneStack.top());
 		SceneStack.pop();
-		// 復元したシーンの開始処理を呼び出す
-		CurrentScene->Enter();
 	}
 	else
 	{

@@ -14,7 +14,7 @@ using namespace DirectX;
 void TPSCamera::Rotate(float inputX, float inputY)
 {
 	// 注視対象の位置を取得
-	XMFLOAT3 targetPos = m_Target->Transform.Position;
+	XMFLOAT3 targetPos = m_Target->transform.Position;
 
 	// 高さ調整
 	targetPos.y += m_Ctx.Height;
@@ -44,8 +44,8 @@ void TPSCamera::Rotate(float inputX, float inputY)
 	XMStoreFloat3(&m_Dest, XMVectorAdd(targetVec, offset));
 }
 
-void TPSCamera::Update(double)
+void TPSCamera::Update()
 {
 	// 位置を更新
-	gameObject()->Transform.Position = m_Dest;
+	transform.Position = m_Dest;
 }

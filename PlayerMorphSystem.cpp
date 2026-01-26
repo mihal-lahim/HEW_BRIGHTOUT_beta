@@ -1,5 +1,11 @@
-#include "player_morphsystem.h"
+#include "PlayerMorphsystem.h"
 #include "ObjectManager.h"
+
+void PlayerMorphSystem::Awake()
+{
+    // PoleManager‚Ö‚ÌŽQÆ‚ðŽæ“¾
+	m_PoleManager = objectManager()->GetGameObject<PoleManager>();
+}
 
 bool PlayerMorphSystem::CanMorph()
 {
@@ -9,10 +15,4 @@ bool PlayerMorphSystem::CanMorph()
 PowerLineID PlayerMorphSystem::GetNearestPowerLineID()
 {
     return PowerLineID();
-}
-
-void PlayerMorphSystem::Start()
-{
-	// PoleManagerŽæ“¾
-	m_PoleManager = GetOwner()->GetOwner()->GetGameObject<PoleManager>();
 }

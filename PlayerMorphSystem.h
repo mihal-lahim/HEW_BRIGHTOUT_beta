@@ -10,10 +10,10 @@ class Player;
 class PlayerMorphSystem : public Component
 {
 private:
-
+	// PoleManager‚Ö‚ÌQÆ
 	PoleManager* m_PoleManager = nullptr;
 public:
-	void Start() override;
+	void Awake() override;
 
 	// •Ïg‰Â”\‚©‚Ç‚¤‚©‚ğ”»’è‚·‚é
 	bool CanMorph();

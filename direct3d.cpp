@@ -32,7 +32,6 @@ static D3D11_TEXTURE2D_DESC g_BackBufferDesc{};					// バックバッファ
 static D3D11_VIEWPORT g_Viewport[2]{};					// ビューポート
 
 static bool configureBackBuffer();	// バックバッファの設定
-static void releaseBackBuffer();	// バックバッファの解放
 
 
 bool Direct3D_Initialize(HWND hWnd)
@@ -84,7 +83,7 @@ bool Direct3D_Initialize(HWND hWnd)
 		return false;
 	}
 
-	configureBackBuffer();
+
 	if (!configureBackBuffer())
 	{
 		MessageBox(hWnd, "バックバッファの設定に失敗しました", "エラー", MB_OK);
@@ -101,7 +100,9 @@ void Direct3D_Finalize()
 	SAFE_RELEASE(g_BlendStateMultiply);
 	SAFE_RELEASE(g_BlendStateAdd);
 
-	releaseBackBuffer();
+	SAFE_RELEASE(g_pRenderTargetView);
+	SAFE_RELEASE(g_pDepthStencilBuffer);
+	SAFE_RELEASE(g_pDepthStencilView);
 
 	SAFE_RELEASE(g_pSwapChain);
 	SAFE_RELEASE(g_pDeviceContext);
@@ -110,7 +111,7 @@ void Direct3D_Finalize()
 
 void Direct3D_Clear()
 {
-	float clear_color[4] = { 0.1f, 0.2f, 0.4f, 1.0f }; // RGBA 背景の色
+	float clear_color[4] = { 0.5f, 0.5f, 0.5f, 1.0f }; // RGBA 背景の色
 	g_pDeviceContext->ClearRenderTargetView(g_pRenderTargetView, clear_color);//クリアしてくださいと命令している
 	g_pDeviceContext->ClearDepthStencilView(g_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);//この色でクリアしてくださいと命令している　 1.0f深さ、0にすると描画されない
 	//g_pDeviceContextはコマンド どこかにため続けている
@@ -183,7 +184,7 @@ bool configureBackBuffer()
 	ID3D11Texture2D* back_buffer_pointer = nullptr;
 
 	// バックバッファの取得
-	hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&back_buffer_pointer);
+	hr = g_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&back_buffer_pointer));
 
 	if (FAILED(hr)) {
 		hal::dout << "バックバッファの取得に失敗しました" << std::endl;
@@ -291,37 +292,21 @@ bool configureBackBuffer()
 	D3D11_DEPTH_STENCIL_DESC dsd = {};
 	dsd.DepthFunc = D3D11_COMPARISON_LESS;
 	dsd.StencilEnable = FALSE;
-	//dsd.DepthEnable = FALSE;	//無効にする
-	//dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 
-	//g_pDevice->CreateDepthStencilState(&dsd, &g_pDepthStencilStateDepthDisable);
+	// 深度テスト無効用ステートの作成
+	dsd.DepthEnable = FALSE;	//無効にする
+	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 
+	g_pDevice->CreateDepthStencilState(&dsd, &g_pDepthStencilStateDepthDisable);
+
+	// 深度テスト有効用ステートの作成
 	dsd.DepthEnable = TRUE;
 	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 
-	g_pDevice->CreateDepthStencilState(&dsd, &g_pDepthStencilStateDepthDisable);
+	g_pDevice->CreateDepthStencilState(&dsd, &g_pDepthStencilStateDepthEnable);
 
 	g_pDeviceContext->OMSetDepthStencilState(g_pDepthStencilStateDepthDisable, NULL);
 
 
 	return true;
 }
-
-void releaseBackBuffer()
-{
-	if (g_pRenderTargetView) {
-		g_pRenderTargetView->Release();
-		g_pRenderTargetView = nullptr;
-	}
-
-	if (g_pDepthStencilBuffer) {
-		g_pDepthStencilBuffer->Release();
-		g_pDepthStencilBuffer = nullptr;
-	}
-
-	if (g_pDepthStencilView) {
-		g_pDepthStencilView->Release();
-		g_pDepthStencilView = nullptr;
-	}
-}
-

@@ -9,7 +9,7 @@
 #include <DirectXMath.h>
 #include "Component.h"
 #include "PhysicsSystem.h"
-#include "Transform.h"
+#include "GameManager.h"
 
 class Collider;
 class PhysicsSystem;
@@ -40,16 +40,16 @@ private:
 
 	// トリガー
 	bool m_IsTrigger = false;
-
-	// 一時的に非アクティブ化されているかどうか
-	bool m_IsDeActivated = false;
 public:
 
 	// コンストラクタ
 	RigidBody(float mass = 1.0f, DirectX::XMFLOAT3 fixedRotation = {}, bool isTrigger = false)
-		: m_Mass(mass), m_FixedRotation(fixedRotation), m_IsTrigger(isTrigger)
+		: m_Mass(mass), m_FixedRotation(fixedRotation), m_IsTrigger(isTrigger), m_PhysicsSystem(&GameManager::GetPhysicsSystem())
 	{}
 	virtual ~RigidBody() { m_PhysicsSystem->UnregisterRigidBody(this); }
+
+	// Awakeメソッド
+	void Awake() override { m_PhysicsSystem->RegisterRigidBody(this); }
 
 	// コライダー追加メソッド
 	void AddCollider(Collider* collider);
@@ -60,20 +60,13 @@ public:
 	void SetVelocity(DirectX::XMFLOAT3 velocity);
 
 	// 速度を取得するメソッド
-	const DirectX::XMFLOAT3& GetVelocity();
+	DirectX::XMFLOAT3 GetVelocity();
 
 	// 重力を設定するメソッド
 	void SetGravity(DirectX::XMFLOAT3 gravity);
 
-
-	// 一時的に非アクティブ化するメソッド
-	void SetDeActivate();
-
-	// 再アクティブ化するメソッド
-	void ReturnActivate(const Transform& returnTransform);
-
-	// 非アクティブ化フラグ取得メソッド
-	bool GetDeActivateFlag() { return m_IsDeActivated; }
+	// アクティブ状態設定メソッド
+	void SetActive(bool isActive) override;
 
 	friend PhysicsSystem;
 };

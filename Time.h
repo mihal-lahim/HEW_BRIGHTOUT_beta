@@ -5,7 +5,7 @@
 #include <chrono>
 
 
-using clock = std::chrono::steady_clock;
+using Clock = std::chrono::steady_clock;
 
 class Time
 {
@@ -14,25 +14,25 @@ private:
     static inline bool s_Initialized = false;
 
 	// 最終更新時刻
-    static inline clock::time_point s_Last{};
+    static inline Clock::time_point s_Last{};
 
 	// 経過時間
-    static inline float s_DeltaTime = 0.0f;
+    static inline double s_DeltaTime = 0.0f;
 
 	// 固定更新間隔
-    static inline float s_FixedDeltaTime = 1.0f / 60.0f; // デフォルト60FPS
+    static inline double s_FixedDeltaTime = 1.0f / 60.0f; // デフォルト60FPS
 
 	// 時間スケール（倍率）
     static inline float s_TimeScale = 1.0f;
 
 	// 固定ステップ用アキュムレータ
-    static inline float s_Accumulator = 0.0f;
+    static inline double s_Accumulator = 0.0f;
 
 public:
 
     // 経過時間（秒）
-    static float DeltaTime() { return s_DeltaTime; }
-    static float FixedDeltaTime() { return s_FixedDeltaTime; }
+    static double DeltaTime() { return s_DeltaTime; }
+    static double FixedDeltaTime() { return s_FixedDeltaTime; }
     static float TimeScale() { return s_TimeScale; }
 
     static void SetTimeScale(float scale) { s_TimeScale = scale; }
@@ -42,12 +42,12 @@ public:
     static void BeginFrame()
     {
 		// 現在時刻を取得
-        auto now = clock::now();
+        auto now = Clock::now();
 
 		// 初期化済みなら経過時間を計算
         if (s_Initialized) 
         {
-            std::chrono::duration<float> dt = now - s_Last;
+            std::chrono::duration<double> dt = now - s_Last;
             s_DeltaTime = dt.count() * s_TimeScale;
         } 
 		// 初回フレームなら初期化

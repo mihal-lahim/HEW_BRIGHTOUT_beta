@@ -44,7 +44,7 @@ public:
 	void Rotate(float inputX, float inputY);
 
 	// TPSƒJƒƒ‰XVˆ—
-    void Update(double elapsed_time) override;
+    void Update() override;
 };
 
 #endif

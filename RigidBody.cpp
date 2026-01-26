@@ -1,6 +1,7 @@
 #include "RigidBody.h"
 #include "PhysicsSystem.h"
 #include "Collider.h"
+#include "GameObject.h"
 
 using namespace DirectX;
 
@@ -34,7 +35,7 @@ void RigidBody::SetVelocity(XMFLOAT3 velocity)
 	m_RigidBody->setLinearVelocity(btVelocity);
 }
 
-const DirectX::XMFLOAT3& RigidBody::GetVelocity()
+DirectX::XMFLOAT3 RigidBody::GetVelocity()
 {
 	// 速度取得
 	btVector3 btVelocity = m_RigidBody->getLinearVelocity();
@@ -58,22 +59,28 @@ void RigidBody::SetGravity(DirectX::XMFLOAT3 gravity)
 	m_RigidBody->setGravity(btGravity);
 }
 
-void RigidBody::SetDeActivate()
+void RigidBody::SetActive(bool isActive)
 {
-	m_IsDeActivated = true;
-	m_PhysicsSystem->UnregisterRigidBody(this);
-}
+	// アクティブ化される場合
+	if (isActive && IsActive() == false)
+	{
+		Transform returnTransform = gameObject()->transform;
 
-void RigidBody::ReturnActivate(const Transform& returnTransform)
-{
-	m_IsDeActivated = false;
-	m_PhysicsSystem->RegisterRigidBodies(this);
-	// 位置を設定
-	btTransform transform;
-	transform.setOrigin(ToBulletPosition(returnTransform.Position));
-	// 回転を設定
-	transform.setRotation(ToBulletRotation(returnTransform.Rotation));
+		m_PhysicsSystem->RegisterRigidBody(this);
+		// 位置を設定
+		btTransform transform;
+		transform.setOrigin(ToBulletPosition(returnTransform.Position));
+		// 回転を設定
+		transform.setRotation(ToBulletRotation(returnTransform.Rotation));
 
-	// 剛体のワールド変換を更新
-	m_RigidBody->setWorldTransform(transform);
+		// 剛体のワールド変換を更新
+		m_RigidBody->setWorldTransform(transform);
+	}
+	else if(!isActive && IsActive() == true)
+	{
+		// 剛体を非アクティブ化
+		m_PhysicsSystem->UnregisterRigidBody(this);
+	}
+
+	Component::SetActive(isActive);
 }

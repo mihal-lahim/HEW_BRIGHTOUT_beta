@@ -13,6 +13,8 @@
 #include "PhysicsSystem.h"
 #include "RenderSystem.h"
 
+class GameObject;
+
 class Scene
 {
 protected:
@@ -26,10 +28,13 @@ protected:
 	RenderSystem m_RenderSystem{};
 
 public:
-	virtual void Enter() = 0;
-	virtual void Update() = 0;
-	virtual void Draw() = 0;
-	virtual void Exit() = 0;
+
+	Scene() = default;
+	virtual ~Scene() = default;
+
+	virtual void Initialize() {};
+	void Update();
+	virtual void Finalize() {};
 
 	// オブジェクト管理システム取得メソッド
 	ObjectManager& GetObjectManager() { return m_ObjectManager; }
@@ -39,6 +44,9 @@ public:
 
 	// レンダリングシステム取得メソッド
 	RenderSystem& GetRenderSystem() { return m_RenderSystem; }
+
+	// ゲームオブジェクト登録メソッド
+	void Instantiate(GameObject* obj) { m_ObjectManager.RegisterGameObject(obj); }
 };
 
 #endif

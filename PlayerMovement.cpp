@@ -1,10 +1,10 @@
-#include "player_movement.h"
+#include "PlayerMovement.h"
 #include "player.h"
 #include "PowerLine.h"
 #include <algorithm>
 #include "Camera.h"
 #include "ObjectManager.h"
-#include "RayCast.h"
+#include "Ray.h"
 
 using namespace DirectX;
 
@@ -18,41 +18,27 @@ XMVECTOR PlayerMovement::SetInputDir(float inputX, float inputZ)
 	XMVECTOR convertedVec = ConvertToWorldFromInput(inputVec, m_Camera);
 
 	// 最後の入力方向を保存
-	m_Ctx.LastInputDir = convertedVec;
+	m_LastInputDir = convertedVec;
 
 	return convertedVec;
 }
 
-void PlayerMovement::Start()
-{
-	// PoleManager取得
-	m_PoleManager = GetOwner()->GetOwner()->GetGameObject<PoleManager>();
-
-	// 地面判定用レイキャストを作成
-	m_GroundRay = GetOwner()->GetOwner()->Create<RayCast>();
-
-	// レイキャストの更新
-	UpdateRayCast();
-}
-
 bool PlayerMovement::IsOnGround() const
 {
-	return m_GroundRay->IsHit();
+	return m_GroundRay.IsHit;
 }
 
 void PlayerMovement::UpdateRayCast()
 {
 	// レイの始点を設定
-	XMFLOAT3 from = GetOwner()->Transform.Position;
+	XMFLOAT3 from = gameObject()->transform.Position;
 	from.y -= m_Ctx.GroundDetectOffset;
 
-	// レイの終点を設定
-	XMFLOAT3 to = from;
-	to.y -= m_Ctx.RayLength;
+	// レイの作成
+	m_GroundRay = Ray(from, { 0.0f, -1.0f, 0.0f });
 
-	// レイキャストの始点・終点を設定
-	m_GroundRay->SetFrom(from);
-	m_GroundRay->SetTo(to);
+	// レイキャスト実行
+	m_GroundRay.RayCast(m_Ctx.RayLength);
 }
 
 void PlayerMovement::Walk(float inputX, float inputZ)
@@ -67,8 +53,8 @@ void PlayerMovement::Walk(float inputX, float inputZ)
 		vec = XMVectorSetY(vec, 0.0f);
 		vec = XMVectorScale(XMVector3Normalize(vec), m_Ctx.WalkSpeed);
 
-		// 現在の移動方向と新しい移動ベクトルを加算して設定
-		SetMoveVecV(XMVectorAdd(vec, GetMoveVecV()));
+		// 新しい移動ベクトルを加算
+		AddMoveVecV(vec);
 	}
 }
 
@@ -97,7 +83,7 @@ void PlayerMovement::Jump(float inputX, float inputZ, float force)
 	XMVECTOR jumpVel = XMVectorSetY(XMVectorZero(), force);
 
 	// 力量ベクトルを更新
-	SetForceVecV(XMVectorAdd(jumpVel, GetForceVecV()));
+	AddForceVecV(jumpVel);
 }
 
 void PlayerMovement::GroundJump(float inputX, float inputZ)
@@ -142,24 +128,24 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 	float dot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(lineVec), XMVector3Normalize(vec)));
 
 	// 内積の符号に基づいて開始電柱と目的地電柱を設定
-	m_Ctx.StartPole = dot >= 0.0f ? powerLine->GetPoles().first : powerLine->GetPoles().second;
-	m_Ctx.DestPole = dot >= 0.0f ? powerLine->GetPoles().second : powerLine->GetPoles().first;
+	m_StartPole = dot >= 0.0f ? powerLine->GetPoles().first : powerLine->GetPoles().second;
+	m_DestPole = dot >= 0.0f ? powerLine->GetPoles().second : powerLine->GetPoles().first;
 
 	// 電線IDを設定
-	m_Ctx.LineID = lineID;
+	m_LineID = lineID;
 
 
 	// 電線ベクトルの半分の長さを取得
 	XMVECTOR halfVec = XMVectorScale(lineVec, 0.5f);
 
 	// 電線の中央位置を取得
-	XMVECTOR lineMidPos = XMLoadFloat3(&powerLine->Transform.Position);
+	XMVECTOR lineMidPos = XMLoadFloat3(&powerLine->transform.Position);
 
 	// 開始位置を設定（内積の符号に基づく）
 	XMVECTOR startPos = dot >= 0.0f ? XMVectorSubtract(lineMidPos, halfVec) : XMVectorAdd(lineMidPos, halfVec);
 
 	// プレイヤーの現在位置を取得
-	XMVECTOR playerPos = XMLoadFloat3(&GetOwner()->Transform.Position);
+	XMVECTOR playerPos = XMLoadFloat3(&gameObject()->transform.Position);
 
 	// 開始位置からプレイヤー位置へのベクトルを取得
 	XMVECTOR toPlayerVec = XMVectorSubtract(playerPos, startPos);
@@ -168,7 +154,7 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 	float lineLength = powerLine->GetLength();
 
 	// 電線上の位置パラメータtを設定（0.0f ~ 1.0fの範囲にクランプ）
-	m_Ctx.t = std::clamp(XMVectorGetX(XMVector3Dot(toPlayerVec, lineVec)) / lineLength, 0.0f, 1.0f);
+	m_LineParam = std::clamp(XMVectorGetX(XMVector3Dot(toPlayerVec, lineVec)) / lineLength, 0.0f, 1.0f);
 
 
 
@@ -182,13 +168,13 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 void PlayerMovement::Turn(float inputX, float inputZ)
 {
 	// 現在の電線を取得
-	PowerLine* powerLine = m_PoleManager->GetPowerLine(m_Ctx.LineID);
+	PowerLine* powerLine = m_PoleManager->GetPowerLine(m_LineID);
 
 	// 接続されている電柱IDペアを取得
 	std::pair<PoleID, PoleID> poles = powerLine->GetPoles();
 
 	// 電線ベクトルを取得
-	XMVECTOR lineVec = m_Ctx.StartPole == poles.first ? powerLine->GetLineVector() : XMVectorNegate(powerLine->GetLineVector());
+	XMVECTOR lineVec = m_StartPole == poles.first ? powerLine->GetLineVector() : XMVectorNegate(powerLine->GetLineVector());
 
 	// 入力方向ベクトルを作成
 	XMVECTOR vec = SetInputDir(inputX, inputZ);
@@ -200,36 +186,42 @@ void PlayerMovement::Turn(float inputX, float inputZ)
 	if (dot < 0.0f)
 	{
 		// 目的地と開始地点を入れ替え
-		std::swap(m_Ctx.StartPole, m_Ctx.DestPole);
+		std::swap(m_StartPole, m_DestPole);
 
 		// パラメータtを反転
-		m_Ctx.t = 1.0f - m_Ctx.t;
+		m_LineParam = 1.0f - m_LineParam;
 	}
 }
 
 void PlayerMovement::LineMove()
 {
 	// 次の電柱に到達したか判定
-	if (m_Ctx.t >= 1.0f)
+	if (m_LineParam >= 1.0f)
 	{
 		// 到達したら目的地の電柱を開始電柱に設定
-		m_Ctx.StartPole = m_Ctx.DestPole;
+		m_StartPole = m_DestPole;
 		// 次の目的地の電柱を取得
-		m_Ctx.DestPole = m_PoleManager->GetDirectionalPole(m_Ctx.StartPole, m_Ctx.LastInputDir);
+		m_DestPole = m_PoleManager->GetDirectionalPole(m_StartPole, m_LastInputDir);
 		// tをリセット
-		m_Ctx.t = 0.0f;
+		m_LineParam = 0.0f;
 		// 新しい電線IDを取得
-		m_Ctx.LineID = m_PoleManager->GetPowerLineID(m_Ctx.StartPole, m_Ctx.DestPole);
+		m_LineID = m_PoleManager->GetPowerLineID(m_StartPole, m_DestPole);
 	}
 
 	// tを進める
-	float lineLength = m_PoleManager->GetPowerLineLength(m_Ctx.LineID);
-	m_Ctx.t += (m_Ctx.LineMoveSpeed / lineLength);
+	float lineLength = m_PoleManager->GetPowerLineLength(m_LineID);
+	m_LineParam += (m_Ctx.LineMoveSpeed / lineLength);
 
 	// 電線上の位置を取得
-	XMFLOAT3 newPos = m_PoleManager->GetPositionOnPowerLine(m_Ctx.StartPole, m_Ctx.DestPole, m_Ctx.t);
+	XMFLOAT3 newPos = m_PoleManager->GetPositionOnPowerLine(m_StartPole, m_DestPole, m_LineParam);
+	XMVECTOR posVec = XMLoadFloat3(&newPos);
 
-	GetOwner()->Transform.Position = newPos;
+	// 速度ベクトルを計算
+	XMVECTOR currentPos = XMLoadFloat3(&gameObject()->transform.Position);
+	XMVECTOR velocityVec = XMVectorSubtract(posVec, currentPos);
+
+	// 速度ベクトルを設定
+	SetVelocityVecV(velocityVec);
 }
 
 void PlayerMovement::Eject(float inputX, float inputZ)
@@ -238,12 +230,12 @@ void PlayerMovement::Eject(float inputX, float inputZ)
 	ElectricJump(inputX, inputZ);
 }
 
-void PlayerMovement::PostUpdate(double elapsedTime)
+void PlayerMovement::PostUpdate()
 {
 	// レイキャストの更新
 	UpdateRayCast();
 	// 基底クラスの更新処理を呼び出し
-	Movement::PostUpdate(elapsedTime);
+	Movement::PostUpdate();
 }
 
 
@@ -253,7 +245,7 @@ XMVECTOR ConvertToWorldFromInput(const XMFLOAT3 inputDir, const Camera* camera)
 	XMVECTOR inputVec = XMLoadFloat3(&inputDir);
 
 	// カメラの回転クォータニオンを取得
-	XMVECTOR rot = XMLoadFloat4(&camera->GetOwner()->Transform.Rotation.Quat);
+	XMVECTOR rot = XMLoadFloat4(&camera->transform.Rotation.Quat);
 
 	// 入力方向ベクトルを回転させてワールド座標系に変換
 	return XMVector3Rotate(inputVec, rot);

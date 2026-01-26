@@ -17,8 +17,8 @@ private:
 	int m_TextureIndex = -1;
 public:
 
-	MeshRenderer() { GetRenderSystem().RegisterMeshRenderer(this); }
-	virtual ~MeshRenderer() { GetRenderSystem().UnregisterMeshRenderer(this); }
+	MeshRenderer() { GameManager::GetRenderSystem().RegisterMeshRenderer(this); }
+	virtual ~MeshRenderer() { GameManager::GetRenderSystem().UnregisterMeshRenderer(this); }
 
 	// MODELƒ|ƒCƒ“ƒ^İ’è
 	void SetModel(MODEL* model) { m_Model = model; }

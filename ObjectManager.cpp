@@ -1,10 +1,8 @@
 #include "ObjectManager.h"
 #include "GameObject.h"
-#include "camera.h"
-#include "MeshRenderer.h"
-#include "Collider.h"
-#include "RigidBody.h"
-#include <map>
+#include "Component.h"
+
+
 
 void ObjectManager::Initialize()
 {
@@ -85,40 +83,6 @@ void ObjectManager::PostUpdate()
 }
 
 
-void ObjectManager::Draw() const
-{
-	// カメラを取得
-	auto cameraVec = GetComponents<Camera>();
-
-	// カメラを優先度順にマップに格納
-	std::map<int, std::vector<Camera*>> cameraMap;
-    for (auto* camera : cameraVec)
-		cameraMap[camera->Priority].push_back(camera);
-
-	auto meshrenderers = GetComponents<MeshRenderer>();
-
-	// 優先度順に描画
-    for (auto& [priority, cameras] : cameraMap)
-    {
-		// 同一優先度のカメラごとに描画
-        for (auto* camera : cameras)
-        {
-            if (camera->IsActive() == false) continue;
-
-            // カメラ行列を設定
-            camera->SetMatrix();
-
-			// メッシュレンダラーを描画
-            for (auto* meshrenderer : meshrenderers)
-            {
-                if (meshrenderer->IsActive())
-                    meshrenderer->Render();
-			}
-        }
-    }
-}
-
-
 void ObjectManager::RegisterGameObject(GameObject* obj)
 {
 	if (!obj) return;
@@ -152,7 +116,7 @@ void ObjectManager::AddPendingGameObjects()
 		obj->m_ObjectManager = this;
 
 		// IDを設定
-		obj->m_ID = m_GameObjects.size();
+		obj->m_ID = (ObjectID)m_GameObjects.size();
 
 
 		// Componentマップ用の空セットを追加
@@ -177,10 +141,10 @@ void ObjectManager::AddPendingComponents()
 		comp->m_ObjectManager = this;
 
 		// IDを設定
-		comp->m_ID = m_Components.size();
+		comp->m_ID = (ObjectID)m_Components.size();
 
 		// GameObjectごとのコンポーネントマップに登録
-		m_ComponentMap.at(comp->GameObject()->m_ID).push_back(comp);
+		m_ComponentMap.at(comp->gameObject()->m_ID).push_back(comp);
 
         m_Components.push_back(std::unique_ptr<Component>(comp));
 
@@ -195,7 +159,7 @@ void ObjectManager::AddPendingComponents()
 void ObjectManager::DestroyGameObjects()
 {
 	// 後ろから削除して安全に処理
-	for (int i = m_GameObjects.size() - 1; i >= 0; i--)
+	for (size_t i = m_GameObjects.size(); i-- > 0;)
 	{
 		if (m_GameObjects.at(i)->CanDestroy())
 			DestroyGameObjectByID(m_GameObjects.at(i)->m_ID);
@@ -206,7 +170,7 @@ void ObjectManager::DestroyGameObjects()
 void ObjectManager::DestroyComponents()
 {
 	// 後ろから削除して安全に処理
-	for (int i = m_Components.size() - 1; i >= 0; i--)
+	for (size_t i = m_GameObjects.size(); i-- > 0;)
 	{
 		if (m_Components.at(i)->CanDestroy())
 			DestroyComponentByID(m_Components.at(i)->m_ID);
@@ -253,7 +217,7 @@ void ObjectManager::DestroyComponentMap(ObjectID componentID)
 {
 	// 削除対象のコンポーネントを取得
 	Component* targetComp = m_Components.at(componentID).get();
-	ObjectID gameObjectID = targetComp->GameObject()->m_ID;
+	ObjectID gameObjectID = targetComp->gameObject()->m_ID;
 
 	// m_ComponentMapから該当コンポーネントを削除
 	auto& compList = m_ComponentMap.at(gameObjectID);

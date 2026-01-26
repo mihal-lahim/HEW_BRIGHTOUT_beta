@@ -4,8 +4,9 @@
 #include <DirectXMath.h>
 #include "movement.h"
 #include "PoleManager.h"
+#include "Ray.h"
 
-class RayCast;
+class Ray;
 class Player;
 class Camera;
 
@@ -27,13 +28,6 @@ struct PlayerMoveCtx
 	// 重力加速度
 	float Gravity = -9.8f;
 
-	// 電柱
-	PoleID StartPole = -1;
-	PoleID DestPole = -1;
-	// 電線ID
-	PowerLineID LineID = -1;
-	// 電線上の位置パラメータ
-	float t = 0.0f;
 	// 電線上移動速度
 	float LineMoveSpeed = 0.0f;
 	// 電線上移動速度の最小値
@@ -43,9 +37,6 @@ struct PlayerMoveCtx
 	float GroundDetectOffset = 0.5f;
 	// レイの長さ
 	float RayLength = 0.01f;
-
-	// 最後の入力方向
-	DirectX::XMVECTOR LastInputDir{};
 };
 
 
@@ -63,13 +54,28 @@ private:
 	PoleManager* m_PoleManager = nullptr;
 
 	// 地面判定用レイキャスト
-	RayCast* m_GroundRay = nullptr;
+	Ray m_GroundRay{ {},{} };
+
+
+
+	// 電柱
+	PoleID m_StartPole = -1;
+	PoleID m_DestPole = -1;
+
+	// 電線ID
+	PowerLineID m_LineID = -1;
+
+	// 電線上の位置パラメータ
+	float m_LineParam = 0.0f;
+
+	// 最後の入力方向
+	DirectX::XMVECTOR m_LastInputDir{};
+
+
 
 	// 入力方向を保存
 	DirectX::XMVECTOR SetInputDir(float inputX, float inputZ);
 public:
-
-	void Start() override;
 
 	// 地面判定処理
 	bool IsOnGround() const;
@@ -106,7 +112,7 @@ public:
 	{}
 
 	// 更新処理
-	void PostUpdate(double elapsedTime) override;
+	void PostUpdate() override;
 };
 
 // 入力方向をワールド座標系に変換する関数

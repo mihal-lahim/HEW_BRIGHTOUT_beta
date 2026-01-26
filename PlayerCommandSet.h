@@ -4,7 +4,7 @@
 #define PLAYER_COMMAND_SET_H
 
 #include "command_set.h"
-#include "player_command.h"
+#include "PlayerCommand.h"
 #include "controller.h"
 
 // プレイヤー用コマンドセット

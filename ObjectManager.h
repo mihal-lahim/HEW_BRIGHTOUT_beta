@@ -4,36 +4,36 @@
 #include <vector>
 #include <typeinfo>
 #include <memory>
-#include "Component.h"
 #include "Object.h"
 #include "GameObject.h"
+#include "Component.h"
+
 
 
 class ObjectManager
 {
 private:
     // GameObjectリスト
-    std::vector<std::unique_ptr<GameObject>> m_GameObjects;
+    std::vector<std::unique_ptr<GameObject>> m_GameObjects{};
 
     // 追加保留中のGameObjectリスト
-    std::vector<GameObject*> m_PendingGameObjects;
+    std::vector<GameObject*> m_PendingGameObjects{};
 
     // Componentリスト
-    std::vector<std::unique_ptr<Component>> m_Components;
+    std::vector<std::unique_ptr<Component>> m_Components{};
 
     // 追加保留中のComponentリスト
-    std::vector<Component*> m_PendingComponents;
+    std::vector<Component*> m_PendingComponents{};
 
 
     // GameObjectごとのコンポーネント
-	std::vector<std::vector<Component*>> m_ComponentMap;
+    std::vector<std::vector<Component*>> m_ComponentMap{};
 
     // 更新メソッド
 	void Start();
     void PreUpdate();
     void Update();
     void PostUpdate();
-    void Draw() const;
 
     // 保留中のゲームオブジェクトを追加するメソッド
     void AddPendingGameObjects();
@@ -56,11 +56,12 @@ private:
 	void DestroyComponentMap(ObjectID componentID);
 
 public:
-    ObjectManager() = default;
-    ~ObjectManager() = default;
 
     void Initialize();
     void Finalize();
+
+    ObjectManager() { Initialize(); }
+    ~ObjectManager() { Finalize(); }
 
     // ゲームループの1サイクルを実行するメソッド
     void Cycle()
@@ -69,24 +70,27 @@ public:
         PreUpdate();
         Update();
         PostUpdate();
-        Draw();
     }
 
 	// 型指定で最初のゲームオブジェクトを取得するテンプレートメソッド
-    template<GameObjectDerived T>
+    template<typename T>
+        requires std::is_base_of<GameObject, T>::value
     [[nodiscard]] T* GetGameObject() const;
 
     // 型指定でゲームオブジェクトの配列を取得するテンプレートメソッド
-    template<GameObjectDerived T>
+    template<typename T>
+        requires std::is_base_of<GameObject, T>::value
     [[nodiscard]] std::vector<T*> GetGameObjects() const;
 
 
 
-    template<ComponentDerived T>
+    template<typename T>
+		requires std::is_base_of<Component, T>::value
     [[nodiscard]] T* GetComponent(const GameObject& obj) const;
 
 	// 型指定でコンポーネントの配列を取得するテンプレートメソッド
-    template<ComponentDerived T>
+    template<typename T>
+		requires std::is_base_of<Component, T>::value
     [[nodiscard]] std::vector<T*> GetComponents(const GameObject& obj) const;
 
 
@@ -100,11 +104,14 @@ public:
 
 
 
-template<GameObjectDerived T>
+
+
+template<typename T>
+	requires std::is_base_of<GameObject, T>::value
 T* ObjectManager::GetGameObject() const
 {
     // 型情報を取得
-    std::type_info type = typeid(T);
+    const std::type_info& type = typeid(T);
 
     // 指定された型の最初のゲームオブジェクトを検索
     for (const auto& obj : m_GameObjects)
@@ -117,11 +124,12 @@ T* ObjectManager::GetGameObject() const
 	return nullptr;
 }
 
-template<GameObjectDerived T>
+template<typename T>
+	requires std::is_base_of<GameObject, T>::value
 std::vector<T*> ObjectManager::GetGameObjects() const
 {
     // 型情報を取得
-    std::type_info type = typeid(T);
+    const std::type_info& type = typeid(T);
 
     // 結果格納用配列
     std::vector<T*> result{};
@@ -138,14 +146,15 @@ std::vector<T*> ObjectManager::GetGameObjects() const
     return result;
 }
 
-template<ComponentDerived T>
+template<typename T>
+	requires std::is_base_of<Component, T>::value
 T* ObjectManager::GetComponent(const GameObject& obj) const
 {
 	// 取得対象のゲームオブジェクトのIDを取得
 	ObjectID objID = obj.m_ID;
 
 	// 指定された型情報を取得
-	std::type_info type = typeid(T);
+	const std::type_info& type = typeid(T);
 
 	for (auto* comp : m_ComponentMap.at(objID))
     {
@@ -159,14 +168,15 @@ T* ObjectManager::GetComponent(const GameObject& obj) const
 	return nullptr;
 }
 
-template<ComponentDerived T>
+template<typename T>
+	requires std::is_base_of<Component, T>::value
 std::vector<T*> ObjectManager::GetComponents(const GameObject& obj) const
 {
     // 取得対象のゲームオブジェクトのIDを取得
     ObjectID objID = obj.m_ID;
 
     // 指定された型情報を取得
-    std::type_info type = typeid(T);
+    const std::type_info& type = typeid(T);
 
     // 結果格納用配列
     std::vector<T*> result{};

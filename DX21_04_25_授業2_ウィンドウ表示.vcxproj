@@ -124,6 +124,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalIncludeDirectories>Assimp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <DisableSpecificWarnings>4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,6 +150,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalIncludeDirectories>Assimp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <DisableSpecificWarnings>4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -166,111 +168,104 @@ for %%F in ("$(TargetDir)*.cso") do (
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="button_hint_ui.cpp" />
-    <ClCompile Include="camera.cpp" />
-    <ClCompile Include="collision.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="cube.cpp" />
-    <ClCompile Include="debug_camera.cpp" />
+    <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="debug_ostream.cpp" />
     <ClCompile Include="debug_text.cpp" />
     <ClCompile Include="direct3d.cpp" />
     <ClCompile Include="fade.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="game_effect.cpp" />
-    <ClCompile Include="game_score.cpp" />
     <ClCompile Include="grid.cpp" />
-    <ClCompile Include="health.cpp" />
+    <ClCompile Include="Health.cpp" />
     <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="key_logger.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="map.cpp" />
     <ClCompile Include="MeshRanderer.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="mouse.cpp" />
-    <ClCompile Include="movement.cpp" />
+    <ClCompile Include="Movement.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
-    <ClCompile Include="player.cpp" />
-    <ClCompile Include="PlayerSystem.cpp" />
-    <ClCompile Include="player_morphsystem.cpp" />
-    <ClCompile Include="player_movement.cpp" />
-    <ClCompile Include="player_state.cpp" />
-    <ClCompile Include="player_state_electric.cpp" />
-    <ClCompile Include="player_state_human.cpp" />
-    <ClCompile Include="player_state_human_ground.cpp" />
-    <ClCompile Include="player_state_human_idle.cpp" />
-    <ClCompile Include="player_state_human_midair.cpp" />
-    <ClCompile Include="player_state_human_walk.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerMorphSystem.cpp" />
+    <ClCompile Include="PlayerMovement.cpp" />
+    <ClCompile Include="PlayerState.cpp" />
+    <ClCompile Include="PlayerStateElectric.cpp" />
+    <ClCompile Include="PlayerStateHuman.cpp" />
+    <ClCompile Include="PlayerStateHumanGround.cpp" />
+    <ClCompile Include="PlayerStateHumanIdle.cpp" />
+    <ClCompile Include="PlayerStateHumanMidAir.cpp" />
+    <ClCompile Include="PlayerStateHumanWalk.cpp" />
     <ClCompile Include="Pole.cpp" />
     <ClCompile Include="PoleManager.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="PowerLine.cpp" />
     <ClCompile Include="Quaternion.cpp" />
+    <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="RigidBody.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shader3d.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="sprite_anim.cpp" />
-    <ClCompile Include="system_timer.cpp" />
+    <ClCompile Include="SystemTimer.cpp" />
     <ClCompile Include="texture.cpp" />
-    <ClCompile Include="tps_camera.cpp" />
-    <ClCompile Include="UI_Charge.cpp" />
-    <ClCompile Include="UI_house.cpp" />
-    <ClCompile Include="UI_HouseCount.cpp" />
-    <ClCompile Include="UI_Timer.cpp" />
+    <ClCompile Include="TPSCamera.cpp" />
     <ClCompile Include="WICTextureLoader11.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio.h" />
-    <ClInclude Include="button_hint_ui.h" />
-    <ClInclude Include="camera.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Collider.h" />
-    <ClInclude Include="collision.h" />
     <ClInclude Include="command.h" />
     <ClInclude Include="command_set.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="cube.h" />
-    <ClInclude Include="debug_camera.h" />
+    <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="debug_console.h" />
     <ClInclude Include="debug_ostream.h" />
     <ClInclude Include="debug_text.h" />
     <ClInclude Include="direct3d.h" />
     <ClInclude Include="fade.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="game_effect.h" />
-    <ClInclude Include="game_score.h" />
     <ClInclude Include="grid.h" />
-    <ClInclude Include="health.h" />
+    <ClInclude Include="Health.h" />
     <ClInclude Include="input_system.h" />
     <ClInclude Include="input_device.h" />
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="key_logger.h" />
     <ClInclude Include="light.h" />
-    <ClInclude Include="map.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="mouse.h" />
-    <ClInclude Include="movement.h" />
+    <ClInclude Include="Movement.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="PhysicsSystem.h" />
-    <ClInclude Include="player.h" />
-    <ClInclude Include="PlayerSystem.h" />
-    <ClInclude Include="player_command.h" />
-    <ClInclude Include="player_command_set.h" />
-    <ClInclude Include="player_morphsystem.h" />
-    <ClInclude Include="player_movement.h" />
-    <ClInclude Include="player_state.h" />
-    <ClInclude Include="player_state_electric.h" />
-    <ClInclude Include="player_state_human_ground.h" />
-    <ClInclude Include="player_state_human.h" />
-    <ClInclude Include="player_state_human_idle.h" />
-    <ClInclude Include="player_state_human_midair.h" />
-    <ClInclude Include="player_state_human_walk.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerCommand.h" />
+    <ClInclude Include="PlayerCommandSet.h" />
+    <ClInclude Include="PlayerMorphSystem.h" />
+    <ClInclude Include="PlayerMovement.h" />
+    <ClInclude Include="PlayerState.h" />
+    <ClInclude Include="PlayerState_Electric.h" />
+    <ClInclude Include="PlayerState_Human_Ground.h" />
+    <ClInclude Include="PlayerState_Human.h" />
+    <ClInclude Include="PlayerState_Human_Idle.h" />
+    <ClInclude Include="PlayerState_Human_MidAir.h" />
+    <ClInclude Include="PlayerState_Human_Walk.h" />
     <ClInclude Include="Pole.h" />
     <ClInclude Include="PoleManager.h" />
     <ClInclude Include="polygon.h" />
@@ -285,16 +280,11 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="shader3d.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="sprite_anim.h" />
-    <ClInclude Include="system_timer.h" />
+    <ClInclude Include="SystemTimer.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="Time.h" />
-    <ClInclude Include="tps_camera.h" />
+    <ClInclude Include="TPSCamera.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="UI.h" />
-    <ClInclude Include="UI_Charge.h" />
-    <ClInclude Include="UI_house.h" />
-    <ClInclude Include="UI_HouseCount.h" />
-    <ClInclude Include="UI_Timer.h" />
     <ClInclude Include="WICTextureLoader11.h" />
   </ItemGroup>
   <ItemGroup>

@@ -7,12 +7,13 @@
 #include <type_traits>
 
 class ObjectManager;
+class GameObject;
 
 using ObjectID = uint32_t;
 
 class Object
 {
-protected:
+private:
 	// オブジェクトの所有者オブジェクトマネージャー
 	ObjectManager* m_ObjectManager = nullptr;
 
@@ -50,12 +51,12 @@ public:
 
 
 	// オブジェクトの所有者オブジェクトマネージャーを取得するメソッド
-	ObjectManager* const ObjectManager() const { return m_ObjectManager; }
+	ObjectManager* const objectManager() const { return m_ObjectManager; }
 
 
 	// オブジェクトの型を比較するテンプレートメソッド
 	template<typename T>
-	bool CompareType() { return typeid(this*) == typeid(T); }
+	bool CompareType() { return typeid(*this) == typeid(T); }
 
 
 
@@ -72,14 +73,11 @@ public:
 	virtual void PostUpdate() {};
 
 
+	// オブジェクトマネージャーへの登録メソッド
+	void Instantiate(GameObject* obj);
+
+
 	friend class ObjectManager;
 };
-
-
-
-// Object を継承している型に制約をかけるコンセプト
-template<typename T>
-concept ObjectDerived = std::is_base_of<Object, T>::value;
-
 
 #endif

@@ -6,12 +6,13 @@
 #include "GameObject.h"
 
 
+
 using namespace DirectX;
 
-const btTransform& PhysicsSystem::ApplyOffsets(Collider& collider)
+btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 {
 	// 所有者のゲームオブジェクトのTransform取得
-	Transform* tf = &collider.GameObject()->Transform;
+	Transform* tf = &collider.gameObject()->transform;
 
 	// 位置設定
 	XMVECTOR pos = XMVectorAdd(XMLoadFloat3(&tf->Position), XMLoadFloat3(&collider.m_OffsetPos));
@@ -47,10 +48,10 @@ const btTransform& PhysicsSystem::ApplyOffsets(Collider& collider)
 		collider.m_Shape = std::make_unique<btBoxShape>(size);
 		break;
 	case ColliderType::SPHERE:
-		collider.m_Shape = std::make_unique<btSphereShape>(size);
+		collider.m_Shape = std::make_unique<btSphereShape>(size.x());
 		break;
 	case ColliderType::CAPSULE:
-		collider.m_Shape = std::make_unique<btCapsuleShape>(size);
+		collider.m_Shape = std::make_unique<btCapsuleShape>(size.x(), size.y());
 		break;
 	case ColliderType::CYLINDER:
 		collider.m_Shape = std::make_unique<btCylinderShape>(size);
@@ -62,15 +63,21 @@ const btTransform& PhysicsSystem::ApplyOffsets(Collider& collider)
 
 PhysicsSystem::PhysicsSystem()
 {
-	btBroadphaseInterface* broadphase = new btDbvtBroadphase();
-	btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
-	btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
-	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver();
+	m_Broadphase = std::make_unique<btDbvtBroadphase>();
+	m_CollisionConfiguration = std::make_unique<btDefaultCollisionConfiguration>();
+	m_Dispatcher = std::make_unique<btCollisionDispatcher>(m_CollisionConfiguration.get());
+	m_Solver = std::make_unique<btSequentialImpulseConstraintSolver>();
+
+	m_DynamicsWorld = std::make_unique<btDiscreteDynamicsWorld>(
+		m_Dispatcher.get(),
+		m_Broadphase.get(),
+		m_Solver.get(),
+		m_CollisionConfiguration.get());
+
 	m_DynamicsWorld->setGravity(btVector3(0, 0, 0));
-	m_DynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 }
 
-void PhysicsSystem::RegisterColliders(Collider* collider)
+void PhysicsSystem::RegisterCollider(Collider* collider)
 {
 	// 所属するPhysicsSystem設定
 	collider->m_PhysicsSystem = this;
@@ -91,7 +98,7 @@ void PhysicsSystem::RegisterColliders(Collider* collider)
 	obj->setWorldTransform(bttf);
 
 	// ユーザーポインタ設定
-	obj->setUserPointer(collider->GameObject());
+	obj->setUserPointer(collider->gameObject());
 
 	// トリガー設定
 	if (collider->m_IsTrigger)
@@ -100,10 +107,10 @@ void PhysicsSystem::RegisterColliders(Collider* collider)
 	// コライダー登録
 	m_DynamicsWorld->addCollisionObject(obj);
 
-	collider->m_CollisionObject = std::unique_ptr<btCollisionObject>(obj);
+	collider->m_CollisionObject = std::unique_ptr<btCollisionObject>(std::move(obj));
 }
 
-void PhysicsSystem::RegisterRigidBodies(RigidBody* rigidbody)
+void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
 {
 	// 所属するPhysicsSystem設定
 	rigidbody->m_PhysicsSystem = this;
@@ -131,8 +138,8 @@ void PhysicsSystem::RegisterRigidBodies(RigidBody* rigidbody)
 
 	// 初期位置設定
 	btTransform startPos;
-	startPos.setOrigin(ToBulletPosition(rigidbody->GameObject()->Transform.Position));
-	startPos.setRotation(ToBulletRotation(rigidbody->GameObject()->Transform.Rotation));
+	startPos.setOrigin(ToBulletPosition(rigidbody->gameObject()->transform.Position));
+	startPos.setRotation(ToBulletRotation(rigidbody->gameObject()->transform.Rotation));
 
 	// モーションステート作成
 	btDefaultMotionState* motionState = new btDefaultMotionState(startPos);
@@ -153,24 +160,25 @@ void PhysicsSystem::RegisterRigidBodies(RigidBody* rigidbody)
 	// 重力の設定
 	body->setGravity(gravity);
 
-	// XMFLOAT3をbtVector3に変換
-	btVector3 angularFactor = ToBulletPosition(rigidbody->m_FixedRotation);
-
-	// 角度の固定設定
-	rigidbody->m_RigidBody->setAngularFactor(angularFactor);
-
 	// トリガー設定
 	if (rigidbody->m_IsTrigger)
 		body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
 	// ユーザーポインタ設定
-	body->setUserPointer(rigidbody->GameObject());
+	body->setUserPointer(rigidbody->gameObject());
 
 	// 剛体登録
 	m_DynamicsWorld->addRigidBody(body);
 
 	rigidbody->m_RigidBody = std::unique_ptr<btRigidBody>(body);
 	rigidbody->m_MotionState = std::unique_ptr<btMotionState>(motionState);
+
+
+	// XMFLOAT3をbtVector3に変換
+	btVector3 angularFactor = ToBulletPosition(rigidbody->m_FixedRotation);
+
+	// 角度の固定設定
+	rigidbody->m_RigidBody->setAngularFactor(angularFactor);
 }
 
 void PhysicsSystem::UnregisterCollider(Collider* collider)
@@ -199,7 +207,7 @@ void PhysicsSystem::UpdateRigidBody(std::vector<RigidBody*>& rigidbodies)
 		btTransform worldTransform = rigidbody->m_RigidBody->getWorldTransform();
 
 		// 位置更新
-		Transform* tf = &rigidbody->GameObject()->Transform;
+		Transform* tf = &rigidbody->gameObject()->transform;
 
 		tf->Position = ToDirectXPosition(worldTransform.getOrigin());
 		tf->Rotation = ToDirectXRotation(worldTransform.getRotation());

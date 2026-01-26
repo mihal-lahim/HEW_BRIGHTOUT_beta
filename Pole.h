@@ -38,7 +38,7 @@ public:
 	void SetHeight(float height)
 	{ 
 		m_Height = height;
-		m_TopPos = DirectX::XMFLOAT3(Transform.Position.x, Transform.Position.y + m_Height, Transform.Position.z);
+		m_TopPos = DirectX::XMFLOAT3(transform.Position.x, transform.Position.y + m_Height, transform.Position.z);
 	}
 	// 電柱の頂点位置取得メソッド
 	const DirectX::XMFLOAT3& GetTopPos() const { return m_TopPos; }

@@ -5,16 +5,15 @@
 ////////////////////////////////
 #ifndef DEBUG_CAMERA_H
 #define DEBUG_CAMERA_H
-#include "camera.h"
+#include "Camera.h"
 
 class DebugCamera : public Camera
 {
 public:
-
 	DebugCamera() = default;
 
 	//キー入力による更新
-	void Update(double elapsed_time)override;
+	void Update() override;
 };
 
 #endif // DEBUG_CAMERA_H

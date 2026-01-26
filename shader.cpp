@@ -15,6 +15,7 @@ using namespace DirectX;
 
 static ID3D11VertexShader* g_pVertexShader = nullptr;
 static ID3D11InputLayout* g_pInputLayout = nullptr;
+
 static ID3D11Buffer* g_pVSConstantBuffer0 = nullptr;// proj
 static ID3D11Buffer* g_pVSConstantBuffer1 = nullptr;// world
 
@@ -167,8 +168,10 @@ void Shader_Finalize()
 	SAFE_RELEASE(g_pSamplerState);
 	SAFE_RELEASE(g_pPSConstantBuffer);
 	SAFE_RELEASE(g_pPixelShader);
+
 	SAFE_RELEASE(g_pVSConstantBuffer0);
 	SAFE_RELEASE(g_pVSConstantBuffer1);
+
 	SAFE_RELEASE(g_pInputLayout);
 	SAFE_RELEASE(g_pVertexShader);
 }

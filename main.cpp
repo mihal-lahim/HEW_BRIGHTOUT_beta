@@ -4,41 +4,32 @@
 // Date		:2025/10/16
 //
 //=======================================
-#define _CRTDBG_MAP_ALLOC
+
+
+
 #include <stdlib.h>
 #include <crtdbg.h>
 
-#include <SDKDDKVer.h>
 #define WIN32_LEAN_AND_MEAN //古いウィンドウズのファイルを使わないように飛ばすため
 #include<Windows.h>
 #include <algorithm>
-#include "system_timer.h"
+#include "SystemTimer.h"
 #include "direct3d.h"
 #include "shader.h"
 #include "shader3d.h"
 #include "texture.h"
 #include "cube.h"
-#include "grid.h"
 #include "sprite.h"
-#include "sprite_anim.h"
 #include "debug_ostream.h"
 #include "debug_text.h"
 #include "keyboard.h"
 #include "mouse.h"
 #include "key_logger.h"
 #include "Audio.h"
-#include "fade.h"
+#include "GameManager.h"
+#include "Game.h"
 #include <sstream>
 
-#include "scene.h"
-#include "game.h"
-
-
-// ゲームパッド用
-#include <Xinput.h>
-#pragma comment(lib,"xinput.lib")
-
-#include "controller.h"
 
 using namespace DirectX;
 
@@ -61,8 +52,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstance*/,
 	_In_ LPSTR /*lpCmdLine*/, _In_ int nCmdShow)
 {
-
-	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	(void)CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
@@ -141,7 +131,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	ShowWindow(hWnd, nCmdShow);	//ウィンドウ表示
 	UpdateWindow(hWnd);			//ウィンドウの描画の更新
 
-	// テ平線の初期化
+	// Direct3Dの初期化
 	if (!Direct3D_Initialize(hWnd))
 	{
 		PostQuitMessage(0);//メッセージを表示
@@ -152,6 +142,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	}
 	else
 	{
+		
 		if (!Shader_Initialize(Direct3D_GetDevice(), Direct3D_GetContext()))
 		{
 			PostQuitMessage(0);//メッセージを表示
@@ -159,16 +150,12 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 		else
 		{
 			Texture_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
-			Sprite_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());		//スプライトの初期化
 
-			//フェードの初期化
-			Fade_Initialize();
+			//スプライトの初期化
+			Sprite_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
 
 			// キューブの初期化
 			Cube_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
-
-			// シーンの初期化
-			Scene_Initialize();
 		}
 	}
 
@@ -177,6 +164,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
+	
 	hal::DebugText dt(Direct3D_GetDevice(), Direct3D_GetContext(),
 		L"texture/consolab_ascii_512.png",
 		Direct3D_GetBackBufferWidth(), Direct3D_GetBackBufferHeight(),
@@ -185,15 +173,9 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 		0.0f, 0.0f
 	);
 
-	//時間計測用
-	double exec_last_time = 0.0f;
-	double fps_last_time = 0.0f;
-	double current_time = 0.0f;
-	double fps = 0.0f;
-	ULONG frame_count = 0;
 
-	//実行時間とFPS計測時間の初期化
-	exec_last_time = fps_last_time = SystemTimer_GetAbsoluteTime();
+	// シーンの変更　最初のシーンをセット
+	//GameManager::ChangeScene<Game>();
 
 	//ゲームループ
 	MSG msg;
@@ -205,57 +187,20 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 		}
 		else// ゲームの処理
 		{
-			current_time = SystemTimer_GetAbsoluteTime();		// システム時間を取得
-			double elapsed_time = current_time - fps_last_time;	//	FPS計測用の更新時間を計算
-			if (elapsed_time >= 1.0) // 1秒経過したら
-			{
-				fps = frame_count / elapsed_time;
-				fps_last_time = current_time;		// FPS計測時間を保存
-				frame_count = 0;					//カレントをクリア
-			}
 
-			elapsed_time = current_time - exec_last_time;
-			if ((elapsed_time) >= (1 / 60.0)) // 1/60秒ごとに実行
-			{
-				exec_last_time = current_time;		// 処理した時刻を保存
+			// マウス
+			Mouse_State ms{};
+			Mouse_GetState(&ms);
 
-				// マウス
-				Mouse_State ms{};
-				Mouse_GetState(&ms);
-
-				Direct3D_Clear();
-				SetViewport(0);
-
-				// ゲームパッド用
-				XINPUT_STATE xs{};
-				XInputGetState(0, &xs);//どのパッドの入力を受け取りたいかを引数にいれる　第二引数
-
-				// 振動 振動のON/OFFを書く
-				XINPUT_VIBRATION xv{};
-				if (xs.Gamepad.wButtons & XINPUT_GAMEPAD_A)
-				{
-					xv.wLeftMotorSpeed = 65535;
-					xv.wRightMotorSpeed = 65535;
-					XInputSetState(0, &xv);
-				}
-				else
-				{
-					xv.wLeftMotorSpeed = 0;
-					xv.wRightMotorSpeed = 0;
-					XInputSetState(0, &xv);
-				}
-				KeyLogger_Update();// キーボード
-
-				Fade_Update(elapsed_time);
-				Scene_Update(elapsed_time);
+			Direct3D_Clear();
+			SetViewport(0);
+			KeyLogger_Update();// キーボード
 
 
-				Direct3D_Clear();
-				SetViewport(0);
+			// シーンの更新
+			//GameManager::GetCurrentScene()->Update();
 
-				Scene_Draw();
-				Fade_Draw();// フェードの描画
-
+			/*
 #if defined (DEBUG) || defined(_DEBUG)
 				// FPSを表示する
 				std::stringstream ss;
@@ -264,25 +209,24 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 				dt.Draw();	// FPSの描画
 				dt.Clear();	// FPSのクリア
 #endif
-				Direct3D_Present();
-
-				frame_count++;	// フレームカウントを増やす
-				Scene_ChangeScene();// シーンの変更の確認
-			}
+*/
+			Direct3D_Present();
 		}
 	} while (msg.message != WM_QUIT);
 
-	Scene_Finalize();		// シーンの終了処理
+	// 終了処理
+	UninitAudio();          // オーディオの終了処理
+	Mouse_Finalize();       // マウスの終了処理
+	Shader3d_Finalize();    // シェーダー3dの終了処理
+	Cube_Finalize();        // キューブの終了処理
+	Sprite_Finalize();      // スプライトの終了処理
+	Texture_Finalize();     // テクスチャの終了処理
+	Shader_Finalize();      // シェーダーの終了処理
+	Direct3D_Finalize();    // Direct3Dの終了処理
 
-	Fade_Finalize();		// フェードの終了処理
-	Cube_Finalize();		// キューブの終了処理
-	Shader_Finalize();		// シェーダーの終了処理
-	Shader3d_Finalize();	// シェーダー3dの終了処理
-	Texture_Finalize();		// テクスチャの終了処理
-	Direct3D_Finalize();	// Direct3Dの終了処理
-	Sprite_Finalize();		// スプライトの終了処理
-	Mouse_Finalize();		// マウスの終了処理
-	UninitAudio();			// オーディオの終了処理
+
+	CoUninitialize();
+	_CrtDumpMemoryLeaks();
 
 	return (int)msg.wParam;	// メッセージのwParamを返す
 }

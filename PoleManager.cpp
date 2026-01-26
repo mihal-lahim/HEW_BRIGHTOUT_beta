@@ -31,8 +31,8 @@ PowerLineID PoleManager::RegisterPowerLine(PowerLine* line)
 	pole2->SetPowerLine((PoleID)m_PowerLines.size() - 1);
 
 	// 電柱の座標を取得
-	XMVECTOR pos1 = XMLoadFloat3(&pole1->Transform.Position);
-	XMVECTOR pos2 = XMLoadFloat3(&pole2->Transform.Position);
+	XMVECTOR pos1 = XMLoadFloat3(&pole1->transform.Position);
+	XMVECTOR pos2 = XMLoadFloat3(&pole2->transform.Position);
 
 	// 電線の長さを設定
 	line->SetLength(XMVectorGetX(XMVector3Length(XMVectorSubtract(pos1, pos2))));

@@ -1,5 +1,6 @@
 
 #ifndef RAY_H
+#define RAY_H
 
 #include <DirectXMath.h>
 #include "GameObject.h"
@@ -41,7 +42,7 @@ public:
 	virtual ~Ray() = default;
 
 	// レイキャスト実行メソッド
-	void RayCast(float distance) { GetPhysicsSystem().RayCast(*this, distance); }
+	void RayCast(float distance) { GameManager::GetPhysicsSystem().RayCast(*this, distance); }
 
 	friend class PhysicsSystem;
 };

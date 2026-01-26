@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include "btBulletDynamicsCommon.h"
 #include "Transform.h"
+#include <memory>
+
 
 class Collider;
 class RigidBody;
@@ -17,7 +19,16 @@ class PhysicsSystem
 {
 private:
 	// Bulletの物理演算ワールド
-	btDiscreteDynamicsWorld* m_DynamicsWorld = nullptr;
+	std::unique_ptr<btDiscreteDynamicsWorld> m_DynamicsWorld = nullptr;
+
+	// ブロードフェーズインターフェース
+	std::unique_ptr<btBroadphaseInterface> m_Broadphase = nullptr;
+	// 衝突設定
+	std::unique_ptr<btDefaultCollisionConfiguration> m_CollisionConfiguration = nullptr;
+	// 衝突ディスパッチャー
+	std::unique_ptr<btCollisionDispatcher> m_Dispatcher = nullptr;
+	// 制約ソルバー
+	std::unique_ptr<btSequentialImpulseConstraintSolver> m_Solver = nullptr;
 
 	// 衝突マップ（現在）
 	std::unordered_map<GameObject*, std::vector<GameObject*>> m_CurrentCollisions{};
@@ -30,15 +41,15 @@ private:
 	std::unordered_map<GameObject*, std::vector<GameObject*>> m_PreviousTriggers{};
 
 	// コライダーのオフセット適用
-	const btTransform& ApplyOffsets(Collider& collider);
+	btTransform ApplyOffsets(Collider& collider);
 public:
 
 	PhysicsSystem();
 
 	// コライダー登録
-	void RegisterColliders(Collider* collider);
+	void RegisterCollider(Collider* collider);
 	// 剛体登録
-	void RegisterRigidBodies(RigidBody* rigidbody);
+	void RegisterRigidBody(RigidBody* rigidbody);
 
 	// コライダー登録解除
 	void UnregisterCollider(Collider* collider);
@@ -65,15 +76,15 @@ public:
 };
 
 // DirectX座標系からBullet座標系への変換
-btVector3 ToBulletPosition(const DirectX::XMFLOAT3 pos) { return btVector3(pos.x, pos.y, -pos.z); }
+inline btVector3 ToBulletPosition(const DirectX::XMFLOAT3 pos) { return btVector3(pos.x, pos.y, -pos.z); }
 
 // Bullet座標系からDirectX座標系への変換
-DirectX::XMFLOAT3 ToDirectXPosition(const btVector3& vec) { return DirectX::XMFLOAT3(vec.x(), vec.y(), -vec.z()); }
+inline DirectX::XMFLOAT3 ToDirectXPosition(const btVector3& vec) { return DirectX::XMFLOAT3(vec.x(), vec.y(), -vec.z()); }
 
 // DirectX回転からBullet回転への変換
-const btQuaternion& ToBulletRotation(const Quaternion& rot) { return btQuaternion(rot.Quat.x, rot.Quat.y, -rot.Quat.z, rot.Quat.w); }
+inline btQuaternion ToBulletRotation(const Quaternion& rot) { return btQuaternion(rot.Quat.x, rot.Quat.y, -rot.Quat.z, rot.Quat.w); }
 
 // Bullet回転（クォータニオン）からDirectX回転（オイラー角）への変換
-const Quaternion& ToDirectXRotation(const btQuaternion& quat) { return Quaternion{ DirectX::XMFLOAT4(quat.x(), quat.y(), -quat.z(), quat.w()) }; }
+inline Quaternion ToDirectXRotation(const btQuaternion& quat) { return Quaternion{ DirectX::XMFLOAT4(quat.x(), quat.y(), -quat.z(), quat.w()) }; }
 
 #endif

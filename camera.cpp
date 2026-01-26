@@ -7,11 +7,6 @@ using namespace DirectX;
 
 void Camera::SetMatrix() const
 {
-	// 所有者のゲームオブジェクトを取得
-	GameObject* owner = gameObject();
-
-	Transform& transform = owner->Transform;
-
 	// 回転行列を作成
 	XMMATRIX matRot = XMMatrixRotationQuaternion(XMLoadFloat4(&transform.Rotation.Quat));
 

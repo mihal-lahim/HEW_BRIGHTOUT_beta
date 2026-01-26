@@ -3,19 +3,20 @@
 //Author: Hiroshi Kasiwagi
 //Date: 2025/10/28
 ////////////////////////////////
-#include "debug_camera.h"
+#include "DebugCamera.h"
 #include "key_logger.h"
+#include "Time.h"
 
 using namespace DirectX;
 
-void DebugCamera::Update(double elapsed_time)
+void DebugCamera::Update()
 {
 	//速度設定
-	const float MOVE_SPEED = static_cast<float>(2.0f * elapsed_time); //移動速度
-	const float ROTATION_SPEED = static_cast<float>(60.0f * elapsed_time); //回転速度
+	const float MOVE_SPEED = static_cast<float>(2.0f * Time::DeltaTime()); //移動速度
+	const float ROTATION_SPEED = static_cast<float>(60.0f * Time::DeltaTime()); //回転速度
 
 	//オーナーのTransform取得
-	Transform& camtf = this->GetOwner()->Transform;
+	Transform& camtf = transform;
 
 	//リセット
 	if (KeyLogger_IsTrigger(KK_TAB))

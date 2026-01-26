@@ -8,6 +8,7 @@
 #include "Component.h"
 #include "PhysicsSystem.h"
 #include "Quaternion.h"
+#include "GameManager.h"
 
 // コライダーの種類
 enum class ColliderType
@@ -25,7 +26,6 @@ class RigidBody;
 class Collider : public Component
 {
 private:
-
 	// 所属するPhysicsSystem
 	PhysicsSystem* m_PhysicsSystem = nullptr;
 
@@ -57,9 +57,12 @@ public:
 	// offsetPos : オフセット位置
 	// offsetRot : オフセット回転（オイラー角）
 	Collider(ColliderType type, DirectX::XMFLOAT3 size, bool isTrigger = false, DirectX::XMFLOAT3 offsetPos = {}, Quaternion offsetRot = {})
-		: m_Type(type), m_IsTrigger(isTrigger), m_Scale(size), m_OffsetPos(offsetPos), m_OffsetRot(offsetRot)
+		: m_Type(type), m_IsTrigger(isTrigger), m_Scale(size), m_OffsetPos(offsetPos), m_OffsetRot(offsetRot), m_PhysicsSystem(&GameManager::GetPhysicsSystem())
 	{}
-	virtual ~Collider() { m_PhysicsSystem->UnregisterCollider(this); }
+	virtual ~Collider() { if (m_IsStatic) m_PhysicsSystem->UnregisterCollider(this); }
+
+	// Awakeメソッド
+	void Awake() override { if (m_IsStatic) m_PhysicsSystem->RegisterCollider(this); }
 
 	// 衝突取得メソッド
 	std::vector<GameObject*> GetCollisionEnter(GameObject* obj) { return m_PhysicsSystem->GetCollisionEnter(obj); }

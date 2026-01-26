@@ -24,13 +24,9 @@ public:
 	// オブジェクトのアクティブ状態を取得するメソッド
 	bool IsActive() const override;
 
-
+	friend class GameObject;
 	friend class ObjectManager;
 };
-
-// Component を継承している型に制約をかけるコンセプト
-template<typename T>
-concept ComponentDerived = std::is_base_of<Component, T>::value;
 
 
 #endif

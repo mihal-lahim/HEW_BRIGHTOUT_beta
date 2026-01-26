@@ -31,8 +31,8 @@ public:
 
 
 
-	Camera() { GetRenderSystem().RegisterCamera(this); }
-	virtual ~Camera() { GetRenderSystem().UnregisterCamera(this); }
+	Camera() { GameManager::GetRenderSystem().RegisterCamera(this); }
+	virtual ~Camera() { GameManager::GetRenderSystem().UnregisterCamera(this); }
 
 	// 行列を定数バッファに設定するメソッド
 	void SetMatrix() const;
