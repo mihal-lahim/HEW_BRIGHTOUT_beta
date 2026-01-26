@@ -43,6 +43,11 @@ static constexpr char TITLE[] = "ƒQ[ƒ€ƒEƒBƒ“ƒhƒE";		//¶ã‚Ìƒ^ƒCƒgƒ‹ƒo[‚ÌƒeƒLƒ
 //=======================================
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+
+
+
+void RenderTest();
+
 //=======================================
 // ƒƒCƒ“
 //=======================================
@@ -170,13 +175,20 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	);
 	*/
 
-
 	Light_Initialize();
 
-	Light_SetAmbient({ 0.6f,0.6f,0.6f,1.0f });
+	XMFLOAT3 direction;
+	{
+		XMVECTOR dirVec = XMVectorSet(-1.0f, -1.5f, 1.0f, 0.0f);
+		XMStoreFloat3(&direction, dirVec);
+	}
+	Light_SetDiffuse({ 0.7f,0.7f,0.7f }, direction);
+
+	Light_SetAmbient({ 0.2f,0.1f,0.1f,1.0f });
+
 
 	// ƒV[ƒ“‚Ì•ÏX@Å‰‚ÌƒV[ƒ“‚ğƒZƒbƒg
-	GameManager::ChangeScene<Game>();
+	//GameManager::ChangeScene<Game>();
 
 	//ƒQ[ƒ€ƒ‹[ƒv
 	MSG msg;
@@ -199,7 +211,9 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 
 
 			// ƒV[ƒ“‚ÌXV
-			GameManager::GetCurrentScene()->Update();
+			//GameManager::GetCurrentScene()->Update();
+
+			RenderTest();
 
 			/*
 #if defined (DEBUG) || defined(_DEBUG)
@@ -282,7 +296,47 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+void RenderTest()
+{
+	// ƒoƒbƒNƒoƒbƒtƒ@‚ÌƒNƒŠƒA
+	Direct3D_Clear();
 
+	Direct3D_SetDepthTest(true); // ƒfƒvƒXƒeƒXƒg—LŒø
+
+	// ƒrƒ…[ƒ|[ƒg‚Ìİ’èi’Ç‰Áj
+	SetViewport(0);
+
+	// ƒJƒƒ‰‚Ìİ’è
+	XMMATRIX view, projection;
+	
+	// ƒrƒ…[s—ñ‚Ìì¬
+	XMVECTOR eye = XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f);     // ƒJƒƒ‰‚ÌˆÊ’u
+	XMVECTOR focus = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);     // ’‹“_
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);        // ã•ûŒüƒxƒNƒgƒ‹
+	view = XMMatrixLookAtLH(eye, focus, up);
+
+	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚Ìì¬
+	float fov = XMConvertToRadians(60.0f);                     // ‹–ìŠpi60“xj
+	float aspect = (float)Direct3D_GetBackBufferWidth() / (float)Direct3D_GetBackBufferHeight();
+	float nearZ = 0.1f;
+	float farZ = 1000.0f;
+	projection = XMMatrixPerspectiveFovLH(fov, aspect, nearZ, farZ);
+
+
+	// ƒrƒ…[s—ñ‚ÆƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚Ìİ’è
+	Shader3d_SetViewMatrix(view);
+	Shader3d_SetProjectionMatrix(projection);
+
+
+	// ƒ[ƒ‹ƒhs—ñ‚Ìì¬iŒ´“_‚É”z’uj
+	XMMATRIX world = XMMatrixIdentity();
+
+	// —§•û‘Ì‚Ì•`‰æiƒeƒNƒXƒ`ƒƒID -1‚ğg—pj
+	Cube_Draw(-1, world);
+
+	// ƒoƒbƒNƒoƒbƒtƒ@‚Ì•\¦
+	Direct3D_Present();
+}
 
 
 
