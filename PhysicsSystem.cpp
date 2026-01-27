@@ -15,14 +15,9 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 	Transform* tf = &collider.gameObject()->transform;
 
 	// 位置設定
-	XMVECTOR pos = XMLoadFloat3(&collider.m_OffsetPos);
+	Vector3 pos = collider.m_OffsetPos;
 	if (collider.m_IsStatic)
-		pos = XMVectorAdd(pos, XMLoadFloat3(&tf->Position));
-
-
-
-	XMFLOAT3 btPos{};
-	XMStoreFloat3(&btPos, pos);
+		pos = pos + tf->Position;
 
 
 	// 回転設定
@@ -30,22 +25,22 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 	Quaternion offsetRot = collider.m_OffsetRot;
 
 	// 回転の組み合わせ
-	XMFLOAT4 combinedRot{};
+	Quaternion combinedRot;
 	if (collider.m_IsStatic)
-		combinedRot = (ownerRot * offsetRot).Quat;
+		combinedRot = ownerRot * offsetRot;
 	else
-		combinedRot = offsetRot.Quat;
+		combinedRot = offsetRot;
 
 
 	// トランスフォーム設定
 	btTransform bttf{};
-	bttf.setOrigin(ToBulletPosition(btPos));
-	bttf.setRotation(ToBulletRotation(Quaternion{ combinedRot }));
+	bttf.setOrigin(ToBulletPosition(pos));
+	bttf.setRotation(ToBulletRotation(combinedRot));
 
 
 	// サイズ設定
-	XMFLOAT3 scale = collider.m_Scale;
-	XMFLOAT3 ownerScale = tf->Scale;
+	Vector3 scale = collider.m_Scale;
+	Vector3 ownerScale = tf->Scale;
 
 	scale.x *= ownerScale.x;
 	scale.y *= ownerScale.y;
@@ -86,7 +81,7 @@ void PhysicsSystem::Initialize()
 		m_Solver.get(),
 		m_CollisionConfiguration.get());
 
-	m_DynamicsWorld->setGravity(btVector3(0, 0.0f, 0));
+	m_DynamicsWorld->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 }
 
 void PhysicsSystem::Finalize()
@@ -194,12 +189,8 @@ void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
 	body->setUserPointer(rigidbody->gameObject());
 
 
-
-	// XMFLOAT3をbtVector3に変換
-	btVector3 gravity = ToBulletPosition(rigidbody->m_Gravity);
-
 	// 重力の設定
-	body->setGravity(gravity);
+	body->setGravity({ 0.0f,0.0f,0.0f });
 
 
 
@@ -311,32 +302,31 @@ void PhysicsSystem::UpdateCollisions()
 void PhysicsSystem::RayCast(Ray& ray, float distance)
 {
 	// レイの方向を正規化して距離を掛ける
-	XMVECTOR dir = XMLoadFloat3(&ray.m_Direction);
+	Vector3 dir = ray.m_Direction;
 
 	// ゼロベクトルならスキップ 
-	if (XMVector3Equal(dir, XMVectorZero()))
+	if (dir.IsZero())
 	{
 		ray.Reset();
 		return;
 	}
 
-	dir = XMVector3Normalize(dir);
-	dir = XMVectorScale(dir, distance);
+	dir = dir.Normalize();
+	dir = dir * distance;
 
 	// レイの終点計算
-	XMFLOAT3 toFloat3{};
-	XMStoreFloat3(&toFloat3, XMVectorAdd(dir, XMLoadFloat3(&ray.m_From)));
+	Vector3 to = ray.m_From + dir;
 
 
 	// レイの始点と終点をBulletの形式に変換
 	btVector3 from = ToBulletPosition(ray.m_From);
-	btVector3 to = ToBulletPosition(toFloat3);
+	btVector3 toVec = ToBulletPosition(to);
 
 	// レイキャストの実行
-	btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
+	btCollisionWorld::ClosestRayResultCallback rayCallback(from, toVec);
 
 	// レイテスト実行
-	m_DynamicsWorld->rayTest(from, to, rayCallback);
+	m_DynamicsWorld->rayTest(from, toVec, rayCallback);
 
 	// レイがヒットしつつ、Triggerを無視する設定
 	if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))

@@ -82,7 +82,7 @@ DirectX::XMFLOAT3 PoleManager::GetPositionOnPowerLine(PoleID start, PoleID dest,
 	return result;
 }
 
-PoleID PoleManager::GetDirectionalPole(PoleID from, const XMVECTOR& direction) const
+PoleID PoleManager::GetDirectionalPole(PoleID from, const Vector3& direction) const
 {
 	// 指定された方向ベクトルを正規化
 	XMVECTOR dirVec = XMVector3Normalize(direction);

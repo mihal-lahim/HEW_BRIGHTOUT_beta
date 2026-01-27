@@ -1,8 +1,9 @@
 
+
 #ifndef RAY_H
 #define RAY_H
 
-#include <DirectXMath.h>
+#include "Vector3.h"
 #include "GameManager.h"
 #include "PhysicsSystem.h"
 
@@ -12,16 +13,16 @@ class Ray
 {
 private:
 	// レイの始点と終点
-	DirectX::XMFLOAT3 m_From{};
-	DirectX::XMFLOAT3 m_Direction{};
+	Vector3 m_From{};
+	Vector3 m_Direction{};
 
 	// ヒット情報リセットメソッド
 	void Reset()
 	{
 		IsHit = false;
-		HitPosition = DirectX::XMFLOAT3{};
+		HitPosition = Vector3{};
 		HitDistance = -1.0f;
-		HitNormal = DirectX::XMFLOAT3{};
+		HitNormal = Vector3{};
 		HitObject = nullptr;
 	}
 public:
@@ -29,13 +30,13 @@ public:
 	bool IsHit = false;
 
 	// ヒットした位置
-	DirectX::XMFLOAT3 HitPosition{};
+	Vector3 HitPosition{};
 
 	// ヒット位置までの距離
 	float HitDistance = -1.0f;
 
 	// ヒットした法線
-	DirectX::XMFLOAT3 HitNormal{};
+	Vector3 HitNormal{};
 
 	// ヒットしたオブジェクト
 	GameObject* HitObject = nullptr;
@@ -43,7 +44,7 @@ public:
 
 	// コンストラクタ
 	// 引数：始点、終点
-	Ray(DirectX::XMFLOAT3 from, DirectX::XMFLOAT3 direction)
+	Ray(Vector3 from, Vector3 direction)
 		: m_From(from), m_Direction(direction)
 	{}
 

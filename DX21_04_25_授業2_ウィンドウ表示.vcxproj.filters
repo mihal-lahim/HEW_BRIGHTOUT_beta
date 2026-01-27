@@ -101,6 +101,12 @@
     <Filter Include="ソース ファイル\オブジェクト">
       <UniqueIdentifier>{cce24c45-dcaa-4883-9a27-7e3ee233f5e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Math">
+      <UniqueIdentifier>{3a76c6cf-c5de-4fac-9092-66399edca2d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Math">
+      <UniqueIdentifier>{b0742a15-e54d-46db-84cd-aace891b9400}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -214,9 +220,6 @@
     <ClCompile Include="PhysicsSystem.cpp">
       <Filter>ソース ファイル\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Quaternion.cpp">
-      <Filter>ソース ファイル\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="camera.cpp">
       <Filter>ソース ファイル\コンポーネント</Filter>
     </ClCompile>
@@ -264,6 +267,18 @@
     </ClCompile>
     <ClCompile Include="Collider.cpp">
       <Filter>ソース ファイル\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Quaternion.cpp">
+      <Filter>ソース ファイル\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector2.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector4.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -405,9 +420,6 @@
     <ClInclude Include="Transform.h">
       <Filter>ヘッダー ファイル\コンポーネント</Filter>
     </ClInclude>
-    <ClInclude Include="Quaternion.h">
-      <Filter>ヘッダー ファイル\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="camera.h">
       <Filter>ヘッダー ファイル\コンポーネント</Filter>
     </ClInclude>
@@ -461,6 +473,18 @@
     </ClInclude>
     <ClInclude Include="DebugCounter.h">
       <Filter>ヘッダー ファイル\デバッグ</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2.h">
+      <Filter>ヘッダー ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.h">
+      <Filter>ヘッダー ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector4.h">
+      <Filter>ヘッダー ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Quaternion.h">
+      <Filter>ヘッダー ファイル\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

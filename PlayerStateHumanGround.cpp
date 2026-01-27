@@ -8,7 +8,8 @@ using namespace DirectX;
 
 void PlayerState_Human_Ground::Enter(Player& player)
 {
-	player.m_RigidBody->SetGravity({ 0.0f,0.0f,0.0f });
+	// 速度リセット
+	player.m_Movement->ResetVelocity();
 
 	PlayerState_Human::Enter(player);
 }
@@ -39,11 +40,6 @@ void PlayerState_Human_Ground::HandleInput(Player& player)
 
 void PlayerState_Human_Ground::Update(Player& player)
 {
-	// 移動コンポーネント取得
-	PlayerMovement* movement = player.m_Movement;
-
-	// 速度リセット
-	movement->ResetVelocity();
 
 	PlayerState_Human::Update(player);
 }

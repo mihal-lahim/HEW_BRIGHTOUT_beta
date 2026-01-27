@@ -7,8 +7,6 @@
 
 void PlayerState_Human_MidAir::Enter(Player& player)
 {
-	player.m_RigidBody->SetGravity({ 0.0f,-9.8f,0.0f });
-
 	PlayerState_Human::Enter(player);
 }
 
@@ -42,6 +40,7 @@ void PlayerState_Human_MidAir::Update(Player& player)
 		player.m_StateMachine->ChangeState(&PlayerStates::HumanIdle, player);
 		return;
 	}
+
 
 	PlayerState_Human::Update(player);
 }

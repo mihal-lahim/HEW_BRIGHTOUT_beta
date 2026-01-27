@@ -54,10 +54,10 @@ void Player::Awake()
 
 
 	// コライダー設定
-	auto* collider = AddComponent<Collider>(ColliderType::BOX, XMFLOAT3{ 1.0f, 1.0f, 1.0f });
+	auto* collider = AddComponent<Collider>(ColliderType::BOX, { 1.0f, 1.0f, 1.0f });
 
 	// RigidBody設定
-	m_RigidBody = AddComponent<RigidBody>(1.0f, XMFLOAT3{ 1.0f, 1.0f, 1.0f });
+	m_RigidBody = AddComponent<RigidBody>(1.0f, { 1.0f, 1.0f, 1.0f });
 	m_RigidBody->AddCollider(collider);
 }
 

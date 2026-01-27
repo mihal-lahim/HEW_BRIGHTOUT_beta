@@ -1,4 +1,5 @@
 
+
 #ifndef RIGIDBODY_H
 #define RIGIDBODY_H
 
@@ -6,10 +7,10 @@
 #include "btBulletDynamicsCommon.h"
 #include <memory>
 #include <vector>
-#include <DirectXMath.h>
 #include "Component.h"
 #include "PhysicsSystem.h"
 #include "GameManager.h"
+#include "Vector3.h"
 
 class Collider;
 class PhysicsSystem;
@@ -33,17 +34,15 @@ private:
 
 	// 質量
 	float m_Mass = 1.0f;
-	// 重力加速度
-	DirectX::XMFLOAT3 m_Gravity = { 0.0f, -9.8f, 0.0f };
 	// 固定される回転軸（1で固定、0で自由）
-	DirectX::XMFLOAT3 m_FixedRotation = {};
+	Vector3 m_FixedRotation = {};
 
 	// トリガー
 	bool m_IsTrigger = false;
 public:
 
 	// コンストラクタ
-	RigidBody(float mass = 1.0f, DirectX::XMFLOAT3 fixedRotation = {}, bool isTrigger = false)
+	RigidBody(float mass = 1.0f, Vector3 fixedRotation = {}, bool isTrigger = false)
 		: m_Mass(mass), m_FixedRotation(fixedRotation), m_IsTrigger(isTrigger), m_PhysicsSystem(&GameManager::GetPhysicsSystem())
 	{ Component::SetActive(false); }
 
@@ -56,15 +55,14 @@ public:
 	void AddCollider(Collider* collider);
 
 	// 力を加えるメソッド
-	void AddForce(DirectX::XMFLOAT3 force);
+	void AddForce(Vector3 force);
+	// インパルスを加えるメソッド
+	void AddImpulse(Vector3 impulse);
 	// 速度を設定するメソッド
-	void SetVelocity(DirectX::XMFLOAT3 velocity);
+	void SetVelocity(Vector3 velocity);
 
 	// 速度を取得するメソッド
-	DirectX::XMFLOAT3 GetVelocity();
-
-	// 重力を設定するメソッド
-	void SetGravity(DirectX::XMFLOAT3 gravity);
+	Vector3 GetVelocity();
 
 	// アクティブ状態設定メソッド
 	void SetActive(bool isActive) override;

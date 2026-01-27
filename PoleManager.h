@@ -35,7 +35,7 @@ public:
 	// t: 0.0f ~ 1.0f　の範囲を指定することで、今現在の電線上の位置を取得できる
 	DirectX::XMFLOAT3 GetPositionOnPowerLine(PoleID start, PoleID dest, float t) const;
 	// 指定した方向に最も合う、接続されている電柱のIDを取得するメソッド
-	PoleID GetDirectionalPole(PoleID from, const DirectX::XMVECTOR& direction) const;
+	PoleID GetDirectionalPole(PoleID from, const Vector3& direction) const;
 
 	// 電柱取得メソッド
 	Pole* GetPole(PoleID id) const { return m_Poles.at(id); };

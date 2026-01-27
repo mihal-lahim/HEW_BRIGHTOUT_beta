@@ -25,9 +25,6 @@ struct PlayerMoveCtx
 	// 電気ジャンプ力
 	float ElectricJumpForce = 20.0f;
 
-	// 重力加速度
-	float Gravity = -9.8f;
-
 	// 電線上移動速度
 	float LineMoveSpeed = 0.0f;
 	// 電線上移動速度の最小値
@@ -39,6 +36,9 @@ struct PlayerMoveCtx
 	float GroundDetectOffset = 0.5f;
 	// レイの長さ
 	float RayLength = 10.0f;
+
+	// 重力加速度
+	float Gravity = -9.8f;
 };
 
 
@@ -71,12 +71,12 @@ private:
 	float m_LineParam = 0.0f;
 
 	// 最後の入力方向
-	DirectX::XMVECTOR m_LastInputDir{};
+	Vector3 m_LastInputDir{};
 
 
 
 	// 入力方向を保存
-	DirectX::XMVECTOR SetInputDir(float inputX, float inputZ);
+	Vector3 SetInputDir(float inputX, float inputZ);
 public:
 
 	// 地面判定処理
@@ -85,8 +85,15 @@ public:
 	// レイキャスト更新処理
 	void UpdateRayCast();
 
+	// 重力適用処理
+	void ApplyGravity();
+
+	// 地上移動処理
+	void GroundMove(float inputX, float inputZ, float velocity);
 	// 歩行処理
 	void Walk(float inputX, float inputZ);
+	// 走行処理
+	void Run(float inputX, float inputZ);
 	// ジャンプ呼び出し処理
 	void Jump(float inputX, float inputZ, float force);
 	// 地上ジャンプ処理
@@ -118,7 +125,7 @@ public:
 };
 
 // 入力方向をワールド座標系に変換する関数
-DirectX::XMVECTOR ConvertToWorldFromInput(const DirectX::XMFLOAT3 inputDir, const Camera* camera);
+Vector3 ConvertToWorldFromInput(const Vector3& inputDir, const Camera* camera);
 
 
 #endif

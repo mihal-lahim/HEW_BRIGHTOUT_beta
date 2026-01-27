@@ -9,13 +9,13 @@
 using namespace DirectX;
 
 
-XMVECTOR PlayerMovement::SetInputDir(float inputX, float inputZ)
+Vector3 PlayerMovement::SetInputDir(float inputX, float inputZ)
 {
 	// 入力方向ベクトルを作成
-	XMFLOAT3 inputVec = { inputX, 0.0f, inputZ };
+	Vector3 inputVec{ inputX, 0.0f, inputZ };
 
 	// 入力方向をカメラの向きに合わせて変換
-	XMVECTOR convertedVec = ConvertToWorldFromInput(inputVec, m_Camera);
+	Vector3 convertedVec = ConvertToWorldFromInput(inputVec, m_Camera);
 
 	// 最後の入力方向を保存
 	m_LastInputDir = convertedVec;
@@ -34,7 +34,7 @@ bool PlayerMovement::IsOnGround() const
 void PlayerMovement::UpdateRayCast()
 {
 	// レイの始点を設定
-	XMFLOAT3 from = gameObject()->transform.Position;
+	Vector3 from = gameObject()->transform.Position;
 	from.y -= m_Ctx.RayCastOffset;
 
 	// レイの作成
@@ -44,21 +44,34 @@ void PlayerMovement::UpdateRayCast()
 	m_GroundRay.RayCast(m_Ctx.RayLength);
 }
 
-void PlayerMovement::Walk(float inputX, float inputZ)
+void PlayerMovement::ApplyGravity()
+{
+	ForceVec.y += m_Ctx.Gravity;
+}
+
+void PlayerMovement::GroundMove(float inputX, float inputZ, float velocity)
 {
 	// 入力方向ベクトルを作成
-	XMVECTOR vec = SetInputDir(inputX, inputZ);
+	Vector3 vec = SetInputDir(inputX, inputZ);
 
 	// 移動方向がゼロベクトルでなければ移動ベクトルを更新
-	if (XMVectorGetX(vec) != 0.0f || XMVectorGetZ(vec) != 0.0f)
+	if (vec.x != 0.0f || vec.z != 0.0f)
 	{
 		// Y成分を0にする
-		vec = XMVectorSetY(vec, 0.0f);
-		vec = XMVectorScale(XMVector3Normalize(vec), m_Ctx.WalkSpeed);
+		vec.y = 0.0f;
+		vec = vec.Normalize() * velocity;
 
 		// 新しい移動ベクトルを加算
-		AddMoveVecV(vec);
+		MoveVec += vec;
 	}
+}
+
+void PlayerMovement::Walk(float inputX, float inputZ)
+{
+}
+
+void PlayerMovement::Run(float inputX, float inputZ)
+{
 }
 
 
@@ -242,14 +255,8 @@ void PlayerMovement::PostUpdate()
 }
 
 
-XMVECTOR ConvertToWorldFromInput(const XMFLOAT3 inputDir, const Camera* camera)
+Vector3 ConvertToWorldFromInput(const Vector3& inputDir, const Camera* camera)
 {
-	// 入力方向のベクトル
-	XMVECTOR inputVec = XMLoadFloat3(&inputDir);
-
-	// カメラの回転クォータニオンを取得
-	XMVECTOR rot = XMLoadFloat4(&camera->transform.Rotation.Quat);
-
 	// 入力方向ベクトルを回転させてワールド座標系に変換
-	return XMVector3Rotate(inputVec, rot);
+	return inputDir.Rotate(camera->transform.Rotation);
 }
