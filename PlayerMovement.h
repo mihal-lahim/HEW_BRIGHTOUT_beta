@@ -14,14 +14,14 @@ class Camera;
 struct PlayerMoveCtx
 {
 	// 歩行速度
-	float WalkSpeed = 5.0f;
+	float WalkSpeed = 30.0f;
 	// 空中移動速度
 	float AirMoveSpeed = 3.0f;
 	// 空中最小速度の倍率
 	float AirMinSpeedFactor = 0.2f;
 
 	// ジャンプ力
-	float JumpForce = 10.0f;
+	float JumpForce = 100.0f;
 	// 電気ジャンプ力
 	float ElectricJumpForce = 20.0f;
 
@@ -31,12 +31,14 @@ struct PlayerMoveCtx
 	// 電線上移動速度
 	float LineMoveSpeed = 0.0f;
 	// 電線上移動速度の最小値
-	float LineMoveSpeedMin = 10.0f;
+	float LineMoveSpeedMin = 1.0f;
 
+	// レイキャストオフセット距離
+	float RayCastOffset = 0.5f;
 	// 地面検出オフセット距離
-	float GroundDetectOffset = 0.0f;
+	float GroundDetectOffset = 0.5f;
 	// レイの長さ
-	float RayLength = 0.1f;
+	float RayLength = 10.0f;
 };
 
 

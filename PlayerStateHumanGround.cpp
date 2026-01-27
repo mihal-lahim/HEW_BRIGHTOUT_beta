@@ -1,15 +1,22 @@
 #include "PlayerState_Human_Ground.h"
 #include "Player.h"
+#include "debug_ostream.h"
+
+#include <iostream>
 
 using namespace DirectX;
 
 void PlayerState_Human_Ground::Enter(Player& player)
 {
+	player.m_RigidBody->SetGravity({ 0.0f,0.0f,0.0f });
+
 	PlayerState_Human::Enter(player);
 }
 
 void PlayerState_Human_Ground::HandleInput(Player& player)
 {
+	hal::dout << "HumanGround" << std::endl;
+
 	// “ü—ÍƒVƒXƒeƒ€Žæ“¾
 	const InputSystem* inputSystem = player.m_InputSystem;
 

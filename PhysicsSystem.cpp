@@ -235,8 +235,6 @@ void PhysicsSystem::PhysicsUpdate(float deltaTime)
 	m_DynamicsWorld->stepSimulation(deltaTime);
 }
 
-#include "debug_ostream.h"
-
 void PhysicsSystem::UpdateRigidBody()
 {
 	for (auto* rigidbody : m_RigidBodies)
@@ -249,8 +247,6 @@ void PhysicsSystem::UpdateRigidBody()
 
 		tf->Position = ToDirectXPosition(worldTransform.getOrigin());
 		tf->Rotation = ToDirectXRotation(worldTransform.getRotation());
-
-		hal::dout << "Position: " << tf->Position.x << ", " << tf->Position.y << ", " << tf->Position.z << std::endl;
 
 		// —Í‚ðƒŠƒZƒbƒg
 		rigidbody->m_RigidBody->clearForces();

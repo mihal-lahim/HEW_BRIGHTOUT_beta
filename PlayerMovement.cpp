@@ -25,16 +25,17 @@ XMVECTOR PlayerMovement::SetInputDir(float inputX, float inputZ)
 
 bool PlayerMovement::IsOnGround() const
 {
-	return m_GroundRay.IsHit;
-}
+	if (m_GroundRay.HitDistance > m_Ctx.GroundDetectOffset)
+		return false;
 
-#include "DebugCounter.h"
+	else return true;
+}
 
 void PlayerMovement::UpdateRayCast()
 {
 	// レイの始点を設定
 	XMFLOAT3 from = gameObject()->transform.Position;
-	from.y -= m_Ctx.GroundDetectOffset;
+	from.y -= m_Ctx.RayCastOffset;
 
 	// レイの作成
 	m_GroundRay = Ray(from, { 0.0f, -1.0f, 0.0f });

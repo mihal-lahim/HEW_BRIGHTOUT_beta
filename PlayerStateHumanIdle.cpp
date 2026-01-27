@@ -1,6 +1,9 @@
 
 #include "Player.h"
 #include "DebugCounter.h"
+#include "debug_ostream.h"
+
+#include <iostream>
 
 void PlayerState_Human_Idle::Enter(Player& player)
 {
@@ -9,6 +12,8 @@ void PlayerState_Human_Idle::Enter(Player& player)
 
 void PlayerState_Human_Idle::HandleInput(Player& player)
 {
+	hal::dout << "HumanIdle" << std::endl;
+
 	// “ü—ÍƒVƒXƒeƒ€Žæ“¾
 	const InputSystem* inputSystem = player.m_InputSystem;
 
@@ -24,11 +29,10 @@ void PlayerState_Human_Idle::HandleInput(Player& player)
 	}
 
 
-	PlayerState_Human::HandleInput(player);
+	PlayerState_Human_Ground::HandleInput(player);
 }
 
 void PlayerState_Human_Idle::Update(Player& player)
 {
-
 	PlayerState_Human::Update(player);
 }

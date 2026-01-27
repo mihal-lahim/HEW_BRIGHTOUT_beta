@@ -1,14 +1,21 @@
 
 #include "Player.h"
 #include "DebugCounter.h"
+#include "debug_ostream.h"
+
+#include <iostream>
 
 void PlayerState_Human_MidAir::Enter(Player& player)
 {
+	player.m_RigidBody->SetGravity({ 0.0f,-9.8f,0.0f });
+
 	PlayerState_Human::Enter(player);
 }
 
 void PlayerState_Human_MidAir::HandleInput(Player& player)
 {
+	hal::dout << "HumanMidAir" << std::endl;
+
 	// 入力システム取得
 	const InputSystem* inputSystem = player.m_InputSystem;
 
@@ -29,5 +36,12 @@ void PlayerState_Human_MidAir::HandleInput(Player& player)
 
 void PlayerState_Human_MidAir::Update(Player& player)
 {
+	// 地上判定
+	if (player.m_Movement->IsOnGround())
+	{
+		player.m_StateMachine->ChangeState(&PlayerStates::HumanIdle, player);
+		return;
+	}
+
 	PlayerState_Human::Update(player);
 }

@@ -82,12 +82,8 @@ void Player::Start()
 	m_StateMachine->ChangeState(&PlayerStates::HumanIdle, *this);
 }
 
-#include "debug_ostream.h"
-
 void Player::Update()
 {
-	hal::dout << "PlayerPosition" << transform.Position.x << ", " << transform.Position.y << ", " << transform.Position.z << std::endl;
-
 	// 状態管理コンポーネント更新
 	m_StateMachine->Update(*this);
 }

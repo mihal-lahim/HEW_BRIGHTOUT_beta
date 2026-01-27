@@ -1,4 +1,7 @@
 #include "Player.h"
+#include "debug_ostream.h"
+
+#include <iostream>
 
 void PlayerState_Electric::Enter(Player& player)
 {
@@ -22,6 +25,8 @@ void PlayerState_Electric::Enter(Player& player)
 
 void PlayerState_Electric::HandleInput(Player& player)
 {
+	hal::dout << "Electric" << std::endl;
+
 	// “ü—ÍƒVƒXƒeƒ€Žæ“¾
 	const InputSystem* inputSystem = player.m_InputSystem;
 

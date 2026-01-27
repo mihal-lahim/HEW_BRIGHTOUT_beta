@@ -1,4 +1,7 @@
 #include "Player.h"
+#include "debug_ostream.h"
+
+#include <iostream>
 
 
 void PlayerState_Human::Enter(Player& player)
@@ -14,6 +17,8 @@ void PlayerState_Human::Enter(Player& player)
 
 void PlayerState_Human::HandleInput(Player& player)
 {
+	hal::dout << "Human" << std::endl;
+
 	// 入力システム取得
 	const InputSystem* inputSystem = player.m_InputSystem;
 
@@ -38,12 +43,6 @@ void PlayerState_Human::HandleInput(Player& player)
 		// ステート変更
 		stateMachine->ChangeState(&PlayerStates::Electric, player);
 		return;
-	}
-
-
-	if (player.m_Movement->IsOnGround())
-	{
-		throw 0;
 	}
 
 	PlayerState::HandleInput(player);

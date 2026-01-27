@@ -17,6 +17,9 @@ Controller::Controller(int controllerNumber)
 	  m_IsConnected(false)
 {}
 
+#include "string.h"
+#include "debug_ostream.h"
+
 void Controller::PreUpdate()
 {
 	// ëOâÒÇÃèÛë‘Çï€ë∂
@@ -173,6 +176,14 @@ float Controller::GetButtonValue(XBOXButton btn, InputCondition inputCondition) 
 {
 	bool isCurrentPressed = (btn & m_CurState.Gamepad.wButtons) != 0;
 	bool isPrevPressed = (btn & m_PrevState.Gamepad.wButtons) != 0;
+
+	bool curButtonA = m_CurState.Gamepad.wButtons & XBOXButton::BUTTON_A ? 1 : 0;
+	bool prevButtonA = m_PrevState.Gamepad.wButtons & XBOXButton::BUTTON_A ? 1 : 0;
+
+	std::string debugOutput = curButtonA && !prevButtonA ? "âüÇ≥ÇÍÇΩÇ†Ç†Ç†Ç†Ç†" : "";
+
+	if (debugOutput != "" && btn == XBOXButton::BUTTON_A)
+		hal::dout << debugOutput << std::endl;
 
 	switch (inputCondition)
 	{
