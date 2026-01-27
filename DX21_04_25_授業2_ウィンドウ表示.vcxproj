@@ -229,6 +229,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandSet.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="miniaudio.h" />
     <ClInclude Include="XBOXController.h" />
     <ClInclude Include="cube.h" />
     <ClInclude Include="CubeObject.h" />

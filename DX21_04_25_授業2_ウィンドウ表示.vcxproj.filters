@@ -459,6 +459,9 @@
     <ClInclude Include="TPSCamera.h">
       <Filter>ヘッダー ファイル\コンポーネント</Filter>
     </ClInclude>
+    <ClInclude Include="miniaudio.h">
+      <Filter>ヘッダー ファイル\オーディオ</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader2d.hlsl">

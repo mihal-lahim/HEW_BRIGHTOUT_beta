@@ -127,7 +127,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	KeyLogger_Initialize();
 
 	// オーディオの初期化
-	InitAudio();
+	g_Audio.Init();
 
 	ShowWindow(hWnd, nCmdShow);	//ウィンドウ表示
 	UpdateWindow(hWnd);			//ウィンドウの描画の更新
@@ -230,7 +230,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 
 	// 終了処理
 	Light_Finalize();
-	UninitAudio();          // オーディオの終了処理
+	g_Audio.Uninit();          // オーディオの終了処理
 	Mouse_Finalize();       // マウスの終了処理
 	Shader3d_Finalize();    // シェーダー3dの終了処理
 	Cube_Finalize();        // キューブの終了処理
@@ -337,8 +337,3 @@ void RenderTest()
 	// バックバッファの表示
 	Direct3D_Present();
 }
-
-
-
-
-

@@ -1,166 +1,149 @@
-/////////////////////////////////////////////////
-//  オーディオ処理	 
-// Author: Namisyo
-//////////////////////
+#include "Audio.h"
+#include <iostream>
 
-#include <xaudio2.h>
-#include <assert.h>
-#include "audio.h"
+AudioManager g_Audio;
 
-#pragma comment(lib, "winmm.lib")
-
-
-static IXAudio2* g_Xaudio{};
-static IXAudio2MasteringVoice* g_MasteringVoice{};
-
-
-void InitAudio()
+AudioManager::AudioManager()
 {
-	// XAudio生成
-	XAudio2Create(&g_Xaudio, 0);
-
-	// マスタリングボイス生成
-	g_Xaudio->CreateMasteringVoice(&g_MasteringVoice);
 }
 
-
-void UninitAudio()
+AudioManager::~AudioManager()
 {
-	g_MasteringVoice->DestroyVoice();
-	g_Xaudio->Release();
+    Uninit();
 }
 
-struct AUDIO
+// ===============================
+// オーディオエンジン初期化
+// ===============================
+bool AudioManager::Init()
 {
-	IXAudio2SourceVoice* SourceVoice{};
-	BYTE* SoundData{};
-
-	int						Length{};
-	int						PlayLength{};
-};
-
-#define AUDIO_MAX 100
-static AUDIO g_Audio[AUDIO_MAX]{};
-
-
-
-int LoadAudio(const char* FileName)
-{
-	int index = -1;
-
-	for (int i = 0; i < AUDIO_MAX; i++)
-	{
-		if (g_Audio[i].SourceVoice == nullptr)
-		{
-			index = i;
-			break;
-		}
-	}
-
-	if (index == -1)
-		return -1;
-
-	// サウンドデータ読込
-	WAVEFORMATEX wfx = { 0 };
-
-	{
-		HMMIO hmmio = NULL;
-		MMIOINFO mmioinfo = { 0 };
-		MMCKINFO riffchunkinfo = { 0 };
-		MMCKINFO datachunkinfo = { 0 };
-		MMCKINFO mmckinfo = { 0 };
-		UINT32 buflen;
-		LONG readlen;
-
-
-		hmmio = mmioOpen((LPSTR)FileName, &mmioinfo, MMIO_READ);
-		assert(hmmio);
-
-		riffchunkinfo.fccType = mmioFOURCC('W', 'A', 'V', 'E');
-		mmioDescend(hmmio, &riffchunkinfo, NULL, MMIO_FINDRIFF);
-
-		mmckinfo.ckid = mmioFOURCC('f', 'm', 't', ' ');
-		mmioDescend(hmmio, &mmckinfo, &riffchunkinfo, MMIO_FINDCHUNK);
-
-		if (mmckinfo.cksize >= sizeof(WAVEFORMATEX))
-		{
-			mmioRead(hmmio, (HPSTR)&wfx, sizeof(wfx));
-		}
-		else
-		{
-			PCMWAVEFORMAT pcmwf = { 0 };
-			mmioRead(hmmio, (HPSTR)&pcmwf, sizeof(pcmwf));
-			memset(&wfx, 0x00, sizeof(wfx));
-			memcpy(&wfx, &pcmwf, sizeof(pcmwf));
-			wfx.cbSize = 0;
-		}
-		mmioAscend(hmmio, &mmckinfo, 0);
-
-		datachunkinfo.ckid = mmioFOURCC('d', 'a', 't', 'a');
-		mmioDescend(hmmio, &datachunkinfo, &riffchunkinfo, MMIO_FINDCHUNK);
-
-
-
-		buflen = datachunkinfo.cksize;
-		g_Audio[index].SoundData = new unsigned char[buflen];
-		readlen = mmioRead(hmmio, (HPSTR)g_Audio[index].SoundData, buflen);
-
-
-		g_Audio[index].Length = readlen;
-		g_Audio[index].PlayLength = readlen / wfx.nBlockAlign;
-
-
-		mmioClose(hmmio, 0);
-	}
-
-
-	// サウンドソース生成
-	g_Xaudio->CreateSourceVoice(&g_Audio[index].SourceVoice, &wfx);
-	assert(g_Audio[index].SourceVoice);
-
-
-	return index;
+    // miniaudio のエンジンを初期化
+    if (ma_engine_init(nullptr, &m_Engine) != MA_SUCCESS)
+    {
+        std::cout << "Audio Engine 初期化失敗\n";
+        return false;
+    }
+    return true;
 }
 
-void UnloadAudio(int Index)
+// ===============================
+// オーディオエンジン解放
+// ===============================
+void AudioManager::Uninit()
 {
-	g_Audio[Index].SourceVoice->Stop();
-	g_Audio[Index].SourceVoice->DestroyVoice();
+    // BGM が再生中なら解放
+    if (m_BGMPlaying)
+    {
+        ma_sound_uninit(&m_BGM);
+        m_BGMPlaying = false;
+    }
 
-	delete[] g_Audio[Index].SoundData;
-	g_Audio[Index].SoundData = nullptr;
+    // エンジン解放
+    ma_engine_uninit(&m_Engine);
 }
 
-void PlayAudio(int Index, bool Loop)
+// ===============================
+// 効果音(SE) 再生（ワンショット）
+// ===============================
+void AudioManager::PlaySE(const std::string& filePath, float volume)
 {
-	g_Audio[Index].SourceVoice->Stop();
-	g_Audio[Index].SourceVoice->FlushSourceBuffers();
+    ma_sound* se = new ma_sound();
 
+    if (ma_sound_init_from_file(
+        &m_Engine,
+        filePath.c_str(),
+        0,
+        nullptr,
+        nullptr,
+        se) != MA_SUCCESS)
+    {
+        std::cout << "SE 読み込み失敗: " << filePath << "\n";
+        delete se;
+        return;
+    }
 
-	// バッファ設定
-	XAUDIO2_BUFFER bufinfo;
+    ma_sound_set_volume(se, volume);
 
-	memset(&bufinfo, 0x00, sizeof(bufinfo));
-	bufinfo.AudioBytes = g_Audio[Index].Length;
-	bufinfo.pAudioData = g_Audio[Index].SoundData;
-	bufinfo.PlayBegin = 0;
-	bufinfo.PlayLength = g_Audio[Index].PlayLength;
+    //再生終了時に自動解放
+    ma_sound_set_end_callback(se, OnSEFinished, nullptr);
 
-	// ループ設定
-	if (Loop)
-	{
-		bufinfo.LoopBegin = 0;
-		bufinfo.LoopLength = g_Audio[Index].PlayLength;
-		bufinfo.LoopCount = XAUDIO2_LOOP_INFINITE;
-	}
-
-	g_Audio[Index].SourceVoice->SubmitSourceBuffer(&bufinfo, NULL);
-
-
-	// 再生
-	g_Audio[Index].SourceVoice->Start();
-
+    ma_sound_start(se);
 }
 
+// ===============================
+// BGM 再生（ストリーミング）
+// ===============================
+bool AudioManager::PlayBGM(const std::string& filePath, bool loop)
+{
+    // すでにBGMが鳴っていたら停止＆解放
+    if (m_BGMPlaying)
+    {
+        ma_sound_stop(&m_BGM);
+        ma_sound_uninit(&m_BGM);
+    }
 
+    // BGM をストリーミング再生で読み込み
+    if (ma_sound_init_from_file(
+        &m_Engine,
+        filePath.c_str(),
+        MA_SOUND_FLAG_STREAM,   // BGMはストリーミング
+        nullptr,
+        nullptr,
+        &m_BGM) != MA_SUCCESS)
+    {
+        std::cout << "BGM 読み込み失敗\n";
+        return false;
+    }
 
+    // ループ設定
+    ma_sound_set_looping(&m_BGM, loop ? MA_TRUE : MA_FALSE);
+
+    // 再生開始
+    ma_sound_start(&m_BGM);
+
+    m_BGMPlaying = true;
+    return true;
+}
+
+// ===============================
+// BGM 停止
+// ===============================
+void AudioManager::StopBGM()
+{
+    if (!m_BGMPlaying) return;
+
+    ma_sound_stop(&m_BGM);
+    ma_sound_uninit(&m_BGM);
+    m_BGMPlaying = false;
+}
+
+// ===============================
+// マスター音量設定（全体）
+// ===============================
+void AudioManager::SetMasterVolume(float volume)
+{
+    ma_engine_set_volume(&m_Engine, volume);
+}
+
+// ===============================
+// BGM 音量設定
+// ===============================
+void AudioManager::SetBGMVolume(float volume)
+{
+    if (m_BGMPlaying)
+    {
+        ma_sound_set_volume(&m_BGM, volume);
+    }
+}
+
+// ===============================
+// SE コールバック
+// ===============================
+void AudioManager::OnSEFinished(void*, ma_sound* pSound)
+{
+    if (pSound)
+    {
+        ma_sound_uninit(pSound);
+        delete pSound;
+    }
+}
