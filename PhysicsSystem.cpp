@@ -15,6 +15,7 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 	Transform* tf = &collider.gameObject()->transform;
 
 	// �ʒu�ݒ�
+	// Static colliders use world space, rigidbody colliders use local offsets in compound shapes.
 	XMVECTOR pos = XMLoadFloat3(&collider.m_OffsetPos);
 	if (collider.m_IsStatic)
 	{
@@ -27,7 +28,16 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 	Quaternion ownerRot = tf->Rotation;
 	Quaternion offsetRot = collider.m_OffsetRot;
 
-	XMFLOAT4 combinedRot = collider.m_IsStatic ? (ownerRot * offsetRot).Quat : offsetRot.Quat;
+	// Static colliders combine owner rotation; rigidbody colliders use local rotation only.
+	XMFLOAT4 combinedRot{};
+	if (collider.m_IsStatic)
+	{
+		combinedRot = (ownerRot * offsetRot).Quat;
+	}
+	else
+	{
+		combinedRot = offsetRot.Quat;
+	}
 
 	// �g�����X�t�H�[���ݒ�
 	btTransform bttf{};
