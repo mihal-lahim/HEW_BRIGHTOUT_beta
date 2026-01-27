@@ -83,7 +83,7 @@ public:
     [[nodiscard]] std::vector<T*> GetGameObjects() const;
 
 
-
+	// 型指定でコンポーネントを取得するテンプレートメソッド
     template<typename T>
 		requires std::is_base_of<Component, T>::value
     [[nodiscard]] T* GetComponent(const GameObject& obj) const;
@@ -93,6 +93,9 @@ public:
 		requires std::is_base_of<Component, T>::value
     [[nodiscard]] std::vector<T*> GetComponents(const GameObject& obj) const;
 
+
+	// 指定されたGameObjectが持つすべてのコンポーネントを取得するメソッド
+	[[nodiscard]] std::vector<Component*> GetAllComponents(const GameObject& obj) const;
 
     // GameObject登録メソッド
     void RegisterGameObject(GameObject* obj);

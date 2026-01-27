@@ -45,11 +45,12 @@ public:
 	// コンストラクタ
 	RigidBody(float mass = 1.0f, DirectX::XMFLOAT3 fixedRotation = {}, bool isTrigger = false)
 		: m_Mass(mass), m_FixedRotation(fixedRotation), m_IsTrigger(isTrigger), m_PhysicsSystem(&GameManager::GetPhysicsSystem())
-	{}
-	virtual ~RigidBody() { m_PhysicsSystem->UnregisterRigidBody(this); }
+	{ Component::SetActive(false); }
 
-	// Awakeメソッド
-	void Start() override { m_PhysicsSystem->RegisterRigidBody(this); }
+	virtual ~RigidBody() { if (IsActive()) m_PhysicsSystem->UnregisterRigidBody(this); }
+
+	// Startメソッド
+	void Awake() override { SetActive(true); }
 
 	// コライダー追加メソッド
 	void AddCollider(Collider* collider);

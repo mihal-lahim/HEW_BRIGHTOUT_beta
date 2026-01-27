@@ -38,6 +38,9 @@ public:
 	// 既存のコンポーネントを追加するメソッド
 	void RegisterComponent(Component* comp);
 
+	// オブジェクトのアクティブ状態を設定するメソッド
+	void SetActive(bool active) override;
+
 
 	friend class ObjectManager;
 };

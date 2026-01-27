@@ -6,20 +6,22 @@
 
 void ObjectManager::Initialize()
 {
-    m_GameObjects.clear();
 	m_Components.clear();
 	m_ComponentMap.clear();
-	m_PendingGameObjects.clear();
 	m_PendingComponents.clear();
+
+    m_GameObjects.clear();
+	m_PendingGameObjects.clear();
 }
 
 void ObjectManager::Finalize()
 {
-    m_GameObjects.clear();
 	m_Components.clear();
 	m_ComponentMap.clear();
-	m_PendingGameObjects.clear();
 	m_PendingComponents.clear();
+
+	m_GameObjects.clear();
+	m_PendingGameObjects.clear();
 }
 
 
@@ -76,12 +78,22 @@ void ObjectManager::PostUpdate()
 		if (comp->m_IsActive) comp->PostUpdate();
 	}
 
+	DestroyComponents();
     DestroyGameObjects();
-    DestroyComponents();
+
     AddPendingGameObjects();
-    AddPendingComponents();
+	AddPendingComponents();
 }
 
+
+std::vector<Component*> ObjectManager::GetAllComponents(const GameObject& obj) const
+{
+	// 取得対象のゲームオブジェクトのIDを取得
+	ObjectID objID = obj.m_ID;
+
+	// コンポーネントリストを返す
+	return m_ComponentMap.at(objID);
+}
 
 void ObjectManager::RegisterGameObject(GameObject* obj)
 {

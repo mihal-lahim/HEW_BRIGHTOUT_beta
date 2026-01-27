@@ -66,6 +66,9 @@ public:
 	// 体力コンポーネント
 	Health* m_Health = nullptr;
 
+	// 剛体
+	RigidBody* m_RigidBody = nullptr;
+
 	// メッシュレンダラー
 	MeshRenderer* m_MeshRenderer = nullptr;
 

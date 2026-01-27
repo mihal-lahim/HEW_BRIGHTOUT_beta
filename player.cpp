@@ -46,7 +46,7 @@ void Player::Awake()
 
 
 	// PlayerStateMachineコンポーネント設定
-	AddComponent<PlayerStateMachine>(&PlayerStates::HumanIdle);
+	AddComponent<PlayerStateMachine>(nullptr);
 
 
 	// MeshRenderer設定
@@ -57,8 +57,8 @@ void Player::Awake()
 	auto* collider = AddComponent<Collider>(ColliderType::BOX, XMFLOAT3{ 1.0f, 1.0f, 1.0f });
 
 	// RigidBody設定
-	auto* rigidbody = AddComponent<RigidBody>(1.0f, XMFLOAT3{ 1.0f, 1.0f, 1.0f });
-	rigidbody->AddCollider(collider);
+	m_RigidBody = AddComponent<RigidBody>(1.0f, XMFLOAT3{ 1.0f, 1.0f, 1.0f });
+	m_RigidBody->AddCollider(collider);
 }
 
 void Player::Start()
@@ -77,6 +77,9 @@ void Player::Start()
 
 	// メッシュレンダラー取得
 	m_MeshRenderer = GetComponent<MeshRenderer>();
+
+
+	m_StateMachine->ChangeState(&PlayerStates::HumanIdle, *this);
 }
 
 #include "debug_ostream.h"

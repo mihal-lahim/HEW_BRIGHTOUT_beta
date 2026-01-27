@@ -62,23 +62,13 @@ void RigidBody::SetGravity(DirectX::XMFLOAT3 gravity)
 void RigidBody::SetActive(bool isActive)
 {
 	// アクティブ化される場合
-	if (isActive && IsActive() == false)
+	if (isActive && !IsActive())
 	{
-		Transform returnTransform = gameObject()->transform;
-
 		m_PhysicsSystem->RegisterRigidBody(this);
-		// 位置を設定
-		btTransform transform;
-		transform.setOrigin(ToBulletPosition(returnTransform.Position));
-		// 回転を設定
-		transform.setRotation(ToBulletRotation(returnTransform.Rotation));
-
-		// 剛体のワールド変換を更新
-		m_RigidBody->setWorldTransform(transform);
 	}
-	else if(!isActive && IsActive() == true)
+	// 剛体を非アクティブ化
+	else if(!isActive && IsActive())
 	{
-		// 剛体を非アクティブ化
 		m_PhysicsSystem->UnregisterRigidBody(this);
 	}
 

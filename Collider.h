@@ -58,11 +58,12 @@ public:
 	// offsetRot : オフセット回転（オイラー角）
 	Collider(ColliderType type, DirectX::XMFLOAT3 size, bool isTrigger = false, DirectX::XMFLOAT3 offsetPos = {}, Quaternion offsetRot = {})
 		: m_Type(type), m_IsTrigger(isTrigger), m_Scale(size), m_OffsetPos(offsetPos), m_OffsetRot(offsetRot), m_PhysicsSystem(&GameManager::GetPhysicsSystem())
-	{}
-	virtual ~Collider() { if (m_IsStatic) m_PhysicsSystem->UnregisterCollider(this); }
+	{ Component::SetActive(false); }
 
-	// Startメソッド
-	void Start() override { if (m_IsStatic) m_PhysicsSystem->RegisterCollider(this); }
+	virtual ~Collider() { if (m_IsStatic && IsActive()) m_PhysicsSystem->UnregisterCollider(this); }
+
+	// 開始メソッド
+	void Awake() override { if (m_IsStatic) SetActive(true); }
 
 	// 衝突取得メソッド
 	std::vector<GameObject*> GetCollisionEnter(GameObject* obj) { return m_PhysicsSystem->GetCollisionEnter(obj); }
@@ -73,6 +74,9 @@ public:
 	std::vector<GameObject*> GetTriggerEnter(GameObject* obj) { return m_PhysicsSystem->GetTriggerEnter(obj); }
 	std::vector<GameObject*> GetTriggerStay(GameObject* obj) { return m_PhysicsSystem->GetTriggerStay(obj); }
 	std::vector<GameObject*> GetTriggerExit(GameObject* obj) { return m_PhysicsSystem->GetTriggerExit(obj); }
+
+
+	void SetActive(bool isActive) override;
 
 	friend class PhysicsSystem;
 	friend class RigidBody;

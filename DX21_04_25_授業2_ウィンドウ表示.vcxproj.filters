@@ -262,6 +262,9 @@
     <ClCompile Include="XBOXController.cpp">
       <Filter>ソース ファイル\入力</Filter>
     </ClCompile>
+    <ClCompile Include="Collider.cpp">
+      <Filter>ソース ファイル\Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="texture.h">

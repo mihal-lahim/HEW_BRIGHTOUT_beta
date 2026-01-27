@@ -3,6 +3,9 @@
 
 void PlayerState_Human::Enter(Player& player)
 {
+	// 剛体を有効化
+	player.m_RigidBody->SetActive(true);
+
 	// モデルを人間形態に設定
 	player.m_MeshRenderer->SetModel(player.m_HumanModel);
 

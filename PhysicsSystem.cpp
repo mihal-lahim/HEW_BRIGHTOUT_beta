@@ -15,15 +15,27 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 	Transform* tf = &collider.gameObject()->transform;
 
 	// 位置設定
-	XMVECTOR pos = XMVectorAdd(XMLoadFloat3(&tf->Position), XMLoadFloat3(&collider.m_OffsetPos));
+	XMVECTOR pos = XMLoadFloat3(&collider.m_OffsetPos);
+	if (collider.m_IsStatic)
+		pos = XMVectorAdd(pos, XMLoadFloat3(&tf->Position));
+
+
+
 	XMFLOAT3 btPos{};
 	XMStoreFloat3(&btPos, pos);
+
 
 	// 回転設定
 	Quaternion ownerRot = tf->Rotation;
 	Quaternion offsetRot = collider.m_OffsetRot;
 
-	XMFLOAT4 combinedRot = (ownerRot * offsetRot).Quat;
+	// 回転の組み合わせ
+	XMFLOAT4 combinedRot{};
+	if (collider.m_IsStatic)
+		combinedRot = (ownerRot * offsetRot).Quat;
+	else
+		combinedRot = offsetRot.Quat;
+
 
 	// トランスフォーム設定
 	btTransform bttf{};

@@ -3,5 +3,5 @@
 
 bool Component::IsActive() const
 {
-	{ return Object::IsActive() && m_GameObject->IsActive(); }
+	return Object::IsActive() && m_GameObject->IsActive();
 }

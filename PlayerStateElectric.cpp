@@ -2,6 +2,9 @@
 
 void PlayerState_Electric::Enter(Player& player)
 {
+	// 剛体を無効化
+	player.m_RigidBody->SetActive(false);
+
 	// モデルを電気形態に設定
 	player.m_MeshRenderer->SetModel(player.m_ElectricModel);
 

@@ -14,7 +14,7 @@ void Game::Initialize()
 
 	// プレイヤーオブジェクトの生成
 	Player* player = new Player();
-	player->transform.Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	player->transform.Position = XMFLOAT3(0.0f, 5.0f, 0.0f);
 
 	// 床オブジェクトの生成
 	CubeObject* cube = new CubeObject();
