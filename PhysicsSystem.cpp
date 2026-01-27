@@ -11,10 +11,10 @@ using namespace DirectX;
 
 btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 {
-	// Š—LÒ‚ÌƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚ÌTransformæ“¾
+	// ï¿½ï¿½ï¿½Lï¿½Ò‚ÌƒQï¿½[ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½Transformï¿½æ“¾
 	Transform* tf = &collider.gameObject()->transform;
 
-	// ˆÊ’uİ’è
+	// ï¿½Ê’uï¿½İ’ï¿½
 	XMVECTOR pos = XMLoadFloat3(&collider.m_OffsetPos);
 	if (collider.m_IsStatic)
 		pos = XMVectorAdd(pos, XMLoadFloat3(&tf->Position));
@@ -25,11 +25,11 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 	XMStoreFloat3(&btPos, pos);
 
 
-	// ‰ñ“]İ’è
+	// ï¿½ï¿½]ï¿½İ’ï¿½
 	Quaternion ownerRot = tf->Rotation;
 	Quaternion offsetRot = collider.m_OffsetRot;
 
-	// ‰ñ“]‚Ì‘g‚İ‡‚í‚¹
+	// ï¿½ï¿½]ï¿½Ì‘gï¿½İï¿½ï¿½í‚¹
 	XMFLOAT4 combinedRot{};
 	if (collider.m_IsStatic)
 		combinedRot = (ownerRot * offsetRot).Quat;
@@ -37,13 +37,13 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 		combinedRot = offsetRot.Quat;
 
 
-	// ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€İ’è
+	// ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½tï¿½Hï¿½[ï¿½ï¿½ï¿½İ’ï¿½
 	btTransform bttf{};
 	bttf.setOrigin(ToBulletPosition(btPos));
 	bttf.setRotation(ToBulletRotation(Quaternion{ combinedRot }));
 
 
-	// ƒTƒCƒYİ’è
+	// ï¿½Tï¿½Cï¿½Yï¿½İ’ï¿½
 	XMFLOAT3 scale = collider.m_Scale;
 	XMFLOAT3 ownerScale = tf->Scale;
 
@@ -53,7 +53,7 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 
 	btVector3 size = btVector3(scale.x * 0.5f, scale.y * 0.5f, scale.z * 0.5f);
 
-	// ƒRƒŠƒWƒ‡ƒ“Œ`óİ’è
+	// ï¿½Rï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½`ï¿½ï¿½İ’ï¿½
 	switch (collider.m_Type)
 	{
 	case ColliderType::BOX:
@@ -100,32 +100,32 @@ void PhysicsSystem::Finalize()
 
 void PhysicsSystem::RegisterCollider(Collider* collider)
 {
-	// Š‘®‚·‚éPhysicsSystemİ’è
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½PhysicsSystemï¿½İ’ï¿½
 	collider->m_PhysicsSystem = this;
 
-	// ƒIƒtƒZƒbƒg“K—p
+	// ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½Kï¿½p
 	btTransform bttf = ApplyOffsets(*collider);
 
-	// Ã“IƒRƒ‰ƒCƒ_[‚Ìê‡ƒXƒLƒbƒv
+	// ï¿½Ã“Iï¿½Rï¿½ï¿½ï¿½Cï¿½_ï¿½[ï¿½Ìê‡ï¿½Xï¿½Lï¿½bï¿½v
 	if (!collider->m_IsStatic) return;
 
-	// ƒRƒŠƒWƒ‡ƒ“ƒIƒuƒWƒFƒNƒgì¬
+	// ï¿½Rï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ì¬
 	btCollisionObject* obj = new btCollisionObject();
 
-	// ƒRƒŠƒWƒ‡ƒ“Œ`óİ’è
+	// ï¿½Rï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½`ï¿½ï¿½İ’ï¿½
 	obj->setCollisionShape(collider->m_Shape.get());
 
-	// ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€İ’è
+	// ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½tï¿½Hï¿½[ï¿½ï¿½ï¿½İ’ï¿½
 	obj->setWorldTransform(bttf);
 
-	// ƒ†[ƒU[ƒ|ƒCƒ“ƒ^İ’è
+	// ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½|ï¿½Cï¿½ï¿½ï¿½^ï¿½İ’ï¿½
 	obj->setUserPointer(collider->gameObject());
 
-	// ƒgƒŠƒK[İ’è
+	// ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½İ’ï¿½
 	if (collider->m_IsTrigger)
 		obj->setCollisionFlags(obj->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
-	// ƒRƒ‰ƒCƒ_[“o˜^
+	// ï¿½Rï¿½ï¿½ï¿½Cï¿½_ï¿½[ï¿½oï¿½^
 	m_DynamicsWorld->addCollisionObject(obj);
 
 	collider->m_CollisionObject = std::unique_ptr<btCollisionObject>(obj);
@@ -133,88 +133,88 @@ void PhysicsSystem::RegisterCollider(Collider* collider)
 
 void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
 {
-	// Š‘®‚·‚éPhysicsSystemİ’è
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½PhysicsSystemï¿½İ’ï¿½
 	rigidbody->m_PhysicsSystem = this;
 
-	// ƒRƒ“ƒpƒEƒ“ƒhƒVƒFƒCƒvì¬
+	// ï¿½Rï¿½ï¿½ï¿½pï¿½Eï¿½ï¿½ï¿½hï¿½Vï¿½Fï¿½Cï¿½vï¿½ì¬
 	rigidbody->m_CompoundShape = std::make_unique<btCompoundShape>();
 	btCompoundShape* compoundShape = rigidbody->m_CompoundShape.get();
 
 	for (auto* collider : rigidbody->m_Colliders)
 	{
-		// ƒIƒtƒZƒbƒg“K—p
+		// ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½Kï¿½p
 		btTransform bttf = ApplyOffsets(*collider);
 
-		// ƒRƒ“ƒpƒEƒ“ƒhƒVƒFƒCƒv‚É’Ç‰Á
+		// ï¿½Rï¿½ï¿½ï¿½pï¿½Eï¿½ï¿½ï¿½hï¿½Vï¿½Fï¿½Cï¿½vï¿½É’Ç‰ï¿½
 		compoundShape->addChildShape(bttf, collider->m_Shape.get());
 	}
 
 
-	// Šµ«ƒeƒ“ƒ\ƒ‹
+	// ï¿½ï¿½ï¿½ï¿½ï¿½eï¿½ï¿½ï¿½\ï¿½ï¿½
 	btVector3 localInertia(0, 0, 0);
 
-	// ¿—Ê‚ª‚ ‚éê‡‚ÍŠµ«ƒeƒ“ƒ\ƒ‹‚ğŒvZ
+	// ï¿½ï¿½ï¿½Ê‚ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½ÍŠï¿½ï¿½ï¿½ï¿½eï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½vï¿½Z
 	if (rigidbody->m_Mass > 0.0f)
 		compoundShape->calculateLocalInertia(rigidbody->m_Mass, localInertia);
 
-	// ŒÅ’è‚³‚ê‚é‰ñ“]²‚ÌŠµ«ƒeƒ“ƒ\ƒ‹‚ğ0‚Éİ’è
+	// ï¿½Å’è‚³ï¿½ï¿½ï¿½ï¿½]ï¿½ï¿½ï¿½ÌŠï¿½ï¿½ï¿½ï¿½eï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½0ï¿½Éİ’ï¿½
 	localInertia.setX(rigidbody->m_FixedRotation.x == 1.0f ? 0.0f : localInertia.x());
 	localInertia.setY(rigidbody->m_FixedRotation.y == 1.0f ? 0.0f : localInertia.y());
 	localInertia.setZ(rigidbody->m_FixedRotation.z == 1.0f ? 0.0f : localInertia.z());
 
 
-	// ‰ŠúˆÊ’uİ’è
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Ê’uï¿½İ’ï¿½
 	btTransform startPos;
 	startPos.setOrigin(ToBulletPosition(rigidbody->gameObject()->transform.Position));
 	startPos.setRotation(ToBulletRotation(rigidbody->gameObject()->transform.Rotation));
 
-	// ƒ‚[ƒVƒ‡ƒ“ƒXƒe[ƒgì¬
+	// ï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½ì¬
 	btDefaultMotionState* motionState = new btDefaultMotionState(startPos);
 
-	// „‘Ìì¬î•ñİ’è
+	// ï¿½ï¿½ï¿½Ìì¬ï¿½ï¿½ï¿½İ’ï¿½
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(
 		rigidbody->m_Mass,
 		motionState,
 		compoundShape,
 		localInertia);
 
-	// „‘Ìì¬
+	// ï¿½ï¿½ï¿½Ìì¬
 	btRigidBody* body = new btRigidBody(rbInfo);
 
 
-	// „‘Ì“o˜^
+	// ï¿½ï¿½ï¿½Ì“oï¿½^
 	m_DynamicsWorld->addRigidBody(body);
 
 
-	// ƒgƒŠƒK[İ’è
+	// ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½İ’ï¿½
 	if (rigidbody->m_IsTrigger)
 		body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
-	// ƒ†[ƒU[ƒ|ƒCƒ“ƒ^İ’è
+	// ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½|ï¿½Cï¿½ï¿½ï¿½^ï¿½İ’ï¿½
 	body->setUserPointer(rigidbody->gameObject());
 
 
 
-	// XMFLOAT3‚ğbtVector3‚É•ÏŠ·
+	// XMFLOAT3ï¿½ï¿½btVector3ï¿½É•ÏŠï¿½
 	btVector3 gravity = ToBulletPosition(rigidbody->m_Gravity);
 
-	// d—Í‚Ìİ’è
+	// ï¿½dï¿½Í‚Ìİ’ï¿½
 	body->setGravity(gravity);
 
 
 
-	// XMFLOAT3‚ğbtVector3‚É•ÏŠ·
+	// XMFLOAT3ï¿½ï¿½btVector3ï¿½É•ÏŠï¿½
 	btVector3 angularFactor = ToBulletPosition(rigidbody->m_FixedRotation);
 
-	// Šp“x‚ÌŒÅ’èİ’è
+	// ï¿½pï¿½xï¿½ÌŒÅ’ï¿½İ’ï¿½
 	body->setAngularFactor(angularFactor);
 
 
-	// ƒƒ“ƒo•Ï”‚Éİ’è
+	// ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½Ïï¿½ï¿½Éİ’ï¿½
 	rigidbody->m_RigidBody = std::unique_ptr<btRigidBody>(body);
 	rigidbody->m_MotionState = std::unique_ptr<btMotionState>(motionState);
 
-	// “o˜^‚³‚ê‚Ä‚¢‚é„‘ÌƒŠƒXƒg‚É’Ç‰Á
+	// ï¿½oï¿½^ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é„ï¿½Ìƒï¿½ï¿½Xï¿½gï¿½É’Ç‰ï¿½
 	m_RigidBodies.push_back(rigidbody);
 }
 
@@ -231,7 +231,7 @@ void PhysicsSystem::UnregisterRigidBody(RigidBody* rigidbody)
 
 void PhysicsSystem::PhysicsUpdate(float deltaTime)
 {
-	// •¨—‰‰ZƒXƒeƒbƒv
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½Xï¿½eï¿½bï¿½v
 	m_DynamicsWorld->stepSimulation(deltaTime);
 }
 
@@ -241,10 +241,10 @@ void PhysicsSystem::UpdateRigidBody()
 {
 	for (auto* rigidbody : m_RigidBodies)
 	{
-		// ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€æ“¾
+		// ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½tï¿½Hï¿½[ï¿½ï¿½ï¿½æ“¾
 		btTransform worldTransform = rigidbody->m_RigidBody->getWorldTransform();
 
-		// ˆÊ’uXV
+		// ï¿½Ê’uï¿½Xï¿½V
 		Transform* tf = &rigidbody->gameObject()->transform;
 
 		tf->Position = ToDirectXPosition(worldTransform.getOrigin());
@@ -252,58 +252,58 @@ void PhysicsSystem::UpdateRigidBody()
 
 		hal::dout << "Position: " << tf->Position.x << ", " << tf->Position.y << ", " << tf->Position.z << std::endl;
 
-		// —Í‚ğƒŠƒZƒbƒg
+		// ï¿½Í‚ï¿½ï¿½ï¿½ï¿½Zï¿½bï¿½g
 		rigidbody->m_RigidBody->clearForces();
 	}
 }
 
 void PhysicsSystem::UpdateCollisions()
 {
-	// ‘O‰ñ‚ÌÕ“Ëî•ñ‚ğ•Û‘¶
+	// ï¿½Oï¿½ï¿½ÌÕ“Ëï¿½ï¿½ï¿½Û‘ï¿½
 	m_PreviousCollisions = m_CurrentCollisions;
 
-	// Õ“Ëî•ñ‚Ìæ“¾
+	// ï¿½Õ“Ëï¿½ï¿½Ìæ“¾
 	int numManifolds = m_DynamicsWorld->getDispatcher()->getNumManifolds();
 
 	for (int i = 0; i < numManifolds; i++)
 	{
-		// Õ“Ëƒ}ƒjƒz[ƒ‹ƒhæ“¾
+		// ï¿½Õ“Ëƒ}ï¿½jï¿½zï¿½[ï¿½ï¿½ï¿½hï¿½æ“¾
 		btPersistentManifold* contactManifold = m_DynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
 
-		// Õ“ËƒIƒuƒWƒFƒNƒgæ“¾
+		// ï¿½Õ“ËƒIï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½æ“¾
 		const btCollisionObject* obA = contactManifold->getBody0();
 		const btCollisionObject* obB = contactManifold->getBody1();
 
-		// ƒQ[ƒ€ƒIƒuƒWƒFƒNƒgæ“¾
+		// ï¿½Qï¿½[ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½æ“¾
 		GameObject* gameObjectA = static_cast<GameObject*>(obA->getUserPointer());
 		GameObject* gameObjectB = static_cast<GameObject*>(obB->getUserPointer());
 
-		// Õ“Ë“_”æ“¾
+		// ï¿½Õ“Ë“_ï¿½ï¿½ï¿½æ“¾
 		int numContacts = contactManifold->getNumContacts();
 
 		for (int j = 0; j < numContacts; j++)
 		{
-			// Õ“Ë“_æ“¾
+			// ï¿½Õ“Ë“_ï¿½æ“¾
 			btManifoldPoint& pt = contactManifold->getContactPoint(j);
 
-			// Õ“Ë‚µ‚Ä‚¢‚é‚©Šm”F
+			// ï¿½Õ“Ë‚ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½mï¿½F
 			if (pt.getDistance() < 0.0f)
 			{
-				// ƒgƒŠƒK[‚©‚Ç‚¤‚©Šm”F
+				// ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½mï¿½F
 				bool isTriggerA = obA->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE;
 				bool isTriggerB = obB->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE;
 
-				// ƒgƒŠƒK[‚Ìê‡
+				// ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½Ìê‡
 				if (isTriggerA || isTriggerB)
 				{
-					// ƒgƒŠƒK[î•ñ‚É’Ç‰Á
+					// ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½ï¿½É’Ç‰ï¿½
 					m_CurrentTriggers[gameObjectA].push_back(gameObjectB);
 					m_CurrentTriggers[gameObjectB].push_back(gameObjectA);
 				}
-				// ƒgƒŠƒK[‚Å‚È‚¢ê‡
+				// ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½Å‚È‚ï¿½ï¿½ê‡
 				else
 				{
-					// Õ“Ëî•ñ‚É’Ç‰Á
+					// ï¿½Õ“Ëï¿½ï¿½É’Ç‰ï¿½
 					m_CurrentCollisions[gameObjectA].push_back(gameObjectB);
 					m_CurrentCollisions[gameObjectB].push_back(gameObjectA);
 				}
@@ -314,32 +314,32 @@ void PhysicsSystem::UpdateCollisions()
 
 void PhysicsSystem::RayCast(Ray& ray, float distance)
 {
-	// ƒŒƒC‚Ì•ûŒü‚ğ³‹K‰»‚µ‚Ä‹——£‚ğŠ|‚¯‚é
+	// ï¿½ï¿½ï¿½Cï¿½Ì•ï¿½ï¿½ï¿½ï¿½ğ³‹Kï¿½ï¿½ï¿½ï¿½ï¿½Ä‹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½|ï¿½ï¿½ï¿½ï¿½
 	XMVECTOR dir = XMLoadFloat3(&ray.m_Direction);
 	dir = XMVector3Normalize(dir);
 	dir = XMVectorScale(dir, distance);
 
-	// ƒŒƒC‚ÌI“_ŒvZ
+	// ï¿½ï¿½ï¿½Cï¿½ÌIï¿½_ï¿½vï¿½Z
 	XMFLOAT3 toFloat3{};
 	XMStoreFloat3(&toFloat3, XMVectorAdd(dir, XMLoadFloat3(&ray.m_From)));
 
-	// n“_‚ÆI“_‚ªì‚éƒxƒNƒgƒ‹‚ªƒ[ƒƒxƒNƒgƒ‹‚Ìê‡‚Íˆ—‚ğƒXƒLƒbƒv
-	if (!XMVectorGetX(XMVectorEqual(XMVectorSubtract(XMLoadFloat3(&toFloat3), XMLoadFloat3(&ray.m_From)), XMVectorZero())) == 0.0f)
+	// ï¿½nï¿½_ï¿½ÆIï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½xï¿½Nï¿½gï¿½ï¿½ï¿½Ìê‡ï¿½Íï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½Lï¿½bï¿½v
+	if (XMVectorGetX(XMVector3LengthSq(XMVectorSubtract(XMLoadFloat3(&toFloat3), XMLoadFloat3(&ray.m_From)))) > 0.0f)
 	{
-		// ƒŒƒC‚Ìn“_‚ÆI“_‚ğBullet‚ÌŒ`®‚É•ÏŠ·
+		// ï¿½ï¿½ï¿½Cï¿½Ìnï¿½_ï¿½ÆIï¿½_ï¿½ï¿½Bulletï¿½ÌŒ`ï¿½ï¿½ï¿½É•ÏŠï¿½
 		btVector3 from = ToBulletPosition(ray.m_From);
 		btVector3 to = ToBulletPosition(toFloat3);
 
-		// ƒŒƒCƒLƒƒƒXƒg‚ÌÀs
+		// ï¿½ï¿½ï¿½Cï¿½Lï¿½ï¿½ï¿½Xï¿½gï¿½Ìï¿½ï¿½s
 		btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
 
-		// ƒŒƒCƒeƒXƒgÀs
+		// ï¿½ï¿½ï¿½Cï¿½eï¿½Xï¿½gï¿½ï¿½ï¿½s
 		m_DynamicsWorld->rayTest(from, to, rayCallback);
 
-		// ƒŒƒC‚ªƒqƒbƒg‚µ‚Â‚ÂATrigger‚ğ–³‹‚·‚éİ’è
+		// ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½qï¿½bï¿½gï¿½ï¿½ï¿½Â‚ÂATriggerï¿½ğ–³ï¿½ï¿½ï¿½ï¿½ï¿½İ’ï¿½
 		if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))
 		{
-			// ƒqƒbƒgî•ñ‚ğRayCast‚Éİ’è
+			// ï¿½qï¿½bï¿½gï¿½ï¿½ï¿½ï¿½RayCastï¿½Éİ’ï¿½
 			ray.IsHit = true;
 			ray.HitPosition = ToDirectXPosition(rayCallback.m_hitPointWorld);
 			ray.HitDistance = (rayCallback.m_hitPointWorld - from).length();
@@ -349,7 +349,7 @@ void PhysicsSystem::RayCast(Ray& ray, float distance)
 		}
 	}
 
-	// ƒqƒbƒg‚µ‚È‚©‚Á‚½ê‡‚Ì‰Šú‰»
+	// ï¿½qï¿½bï¿½gï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 	ray.IsHit = false;
 	ray.HitPosition = XMFLOAT3{};
 	ray.HitDistance = -1.0f;
@@ -361,12 +361,12 @@ void PhysicsSystem::RayCast(Ray& ray, float distance)
 
 std::vector<GameObject*> PhysicsSystem::GetCollisionEnter(GameObject* obj)
 {
-	// Õ“ËŠJnƒIƒuƒWƒFƒNƒgƒŠƒXƒg
+	// ï¿½Õ“ËŠJï¿½nï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½Xï¿½g
 	std::vector<GameObject*> enterObjects;
 
 	for (auto* currentObj : m_CurrentCollisions[obj])
 	{
-		// ‘O‰ñ‚ÌÕ“Ëî•ñ‚É‘¶İ‚µ‚È‚¢ê‡AÕ“ËŠJn
+		// ï¿½Oï¿½ï¿½ÌÕ“Ëï¿½ï¿½É‘ï¿½ï¿½İ‚ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½Aï¿½Õ“ËŠJï¿½n
 		auto it = std::find(m_PreviousCollisions[obj].begin(), m_PreviousCollisions[obj].end(), currentObj);
 
 		if (it == m_PreviousCollisions[obj].end())
@@ -378,12 +378,12 @@ std::vector<GameObject*> PhysicsSystem::GetCollisionEnter(GameObject* obj)
 
 std::vector<GameObject*> PhysicsSystem::GetCollisionStay(GameObject* obj)
 {
-	// Õ“ËŒp‘±ƒIƒuƒWƒFƒNƒgƒŠƒXƒg
+	// ï¿½Õ“ËŒpï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½Xï¿½g
 	std::vector<GameObject*> stayObjects;
 
 	for (auto* currentObj : m_CurrentCollisions[obj])
 	{
-		// ‘O‰ñ‚ÌÕ“Ëî•ñ‚É‘¶İ‚·‚éê‡AÕ“ËŒp‘±
+		// ï¿½Oï¿½ï¿½ÌÕ“Ëï¿½ï¿½É‘ï¿½ï¿½İ‚ï¿½ï¿½ï¿½ê‡ï¿½Aï¿½Õ“ËŒpï¿½ï¿½
 		auto it = std::find(m_PreviousCollisions[obj].begin(), m_PreviousCollisions[obj].end(), currentObj);
 
 		if (it != m_PreviousCollisions[obj].end())
@@ -395,12 +395,12 @@ std::vector<GameObject*> PhysicsSystem::GetCollisionStay(GameObject* obj)
 
 std::vector<GameObject*> PhysicsSystem::GetCollisionExit(GameObject* obj)
 {
-	// Õ“ËI—¹ƒIƒuƒWƒFƒNƒgƒŠƒXƒg
+	// ï¿½Õ“ËIï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½Xï¿½g
 	std::vector<GameObject*> exitObjects;
 
 	for (auto* previousObj : m_PreviousCollisions[obj])
 	{
-		// Œ»İ‚ÌÕ“Ëî•ñ‚É‘¶İ‚µ‚È‚¢ê‡AÕ“ËI—¹
+		// ï¿½ï¿½ï¿½İ‚ÌÕ“Ëï¿½ï¿½É‘ï¿½ï¿½İ‚ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½Aï¿½Õ“ËIï¿½ï¿½
 		auto it = std::find(m_CurrentCollisions[obj].begin(), m_CurrentCollisions[obj].end(), previousObj);
 
 		if (it == m_CurrentCollisions[obj].end())
@@ -412,12 +412,12 @@ std::vector<GameObject*> PhysicsSystem::GetCollisionExit(GameObject* obj)
 
 std::vector<GameObject*> PhysicsSystem::GetTriggerEnter(GameObject* obj)
 {
-	// ƒgƒŠƒK[ŠJnƒIƒuƒWƒFƒNƒgƒŠƒXƒg
+	// ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½Jï¿½nï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½Xï¿½g
 	std::vector<GameObject*> enterObjects;
 
 	for (auto* currentObj : m_CurrentTriggers[obj])
 	{
-		// ‘O‰ñ‚ÌƒgƒŠƒK[î•ñ‚É‘¶İ‚µ‚È‚¢ê‡AƒgƒŠƒK[ŠJn
+		// ï¿½Oï¿½ï¿½Ìƒgï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½ï¿½É‘ï¿½ï¿½İ‚ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½Aï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½Jï¿½n
 		auto it = std::find(m_PreviousTriggers[obj].begin(), m_PreviousTriggers[obj].end(), currentObj);
 
 		if (it == m_PreviousTriggers[obj].end())
@@ -429,12 +429,12 @@ std::vector<GameObject*> PhysicsSystem::GetTriggerEnter(GameObject* obj)
 
 std::vector<GameObject*> PhysicsSystem::GetTriggerStay(GameObject* obj)
 {
-	// ƒgƒŠƒK[Œp‘±ƒIƒuƒWƒFƒNƒgƒŠƒXƒg
+	// ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½pï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½Xï¿½g
 	std::vector<GameObject*> stayObjects;
 
 	for (auto* currentObj : m_CurrentTriggers[obj])
 	{
-		// ‘O‰ñ‚ÌƒgƒŠƒK[î•ñ‚É‘¶İ‚·‚éê‡AƒgƒŠƒK[Œp‘±
+		// ï¿½Oï¿½ï¿½Ìƒgï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½ï¿½É‘ï¿½ï¿½İ‚ï¿½ï¿½ï¿½ê‡ï¿½Aï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½pï¿½ï¿½
 		auto it = std::find(m_PreviousTriggers[obj].begin(), m_PreviousTriggers[obj].end(), currentObj);
 
 		if (it != m_PreviousTriggers[obj].end())
@@ -446,12 +446,12 @@ std::vector<GameObject*> PhysicsSystem::GetTriggerStay(GameObject* obj)
 
 std::vector<GameObject*> PhysicsSystem::GetTriggerExit(GameObject* obj)
 {
-	// ƒgƒŠƒK[I—¹ƒIƒuƒWƒFƒNƒgƒŠƒXƒg
+	// ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½Iï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½Xï¿½g
 	std::vector<GameObject*> exitObjects;
 
 	for (auto* previousObj : m_PreviousTriggers[obj])
 	{
-		// Œ»İ‚ÌƒgƒŠƒK[î•ñ‚É‘¶İ‚µ‚È‚¢ê‡AƒgƒŠƒK[I—¹
+		// ï¿½ï¿½ï¿½İ‚Ìƒgï¿½ï¿½ï¿½Kï¿½[ï¿½ï¿½ï¿½É‘ï¿½ï¿½İ‚ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½Aï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½Iï¿½ï¿½
 		auto it = std::find(m_CurrentTriggers[obj].begin(), m_CurrentTriggers[obj].end(), previousObj);
 
 		if (it == m_CurrentTriggers[obj].end())
