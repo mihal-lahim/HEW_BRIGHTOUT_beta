@@ -34,7 +34,7 @@ struct PlayerMoveCtx
 	float LineMoveSpeedMin = 10.0f;
 
 	// 地面検出オフセット距離
-	float GroundDetectOffset = 0.5f;
+	float GroundDetectOffset = 0.0f;
 	// レイの長さ
 	float RayLength = 0.1f;
 };

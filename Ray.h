@@ -15,6 +15,15 @@ private:
 	DirectX::XMFLOAT3 m_From{};
 	DirectX::XMFLOAT3 m_Direction{};
 
+	// ヒット情報リセットメソッド
+	void Reset()
+	{
+		IsHit = false;
+		HitPosition = DirectX::XMFLOAT3{};
+		HitDistance = -1.0f;
+		HitNormal = DirectX::XMFLOAT3{};
+		HitObject = nullptr;
+	}
 public:
 	// ヒットしたかどうか
 	bool IsHit = false;

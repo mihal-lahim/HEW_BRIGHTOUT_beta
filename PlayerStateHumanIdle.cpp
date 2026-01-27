@@ -1,5 +1,6 @@
 
 #include "Player.h"
+#include "DebugCounter.h"
 
 void PlayerState_Human_Idle::Enter(Player& player)
 {
@@ -21,6 +22,7 @@ void PlayerState_Human_Idle::HandleInput(Player& player)
 		stateMachine->ChangeState(&PlayerStates::HumanWalk, player);
 		return;
 	}
+
 
 	PlayerState_Human::HandleInput(player);
 }

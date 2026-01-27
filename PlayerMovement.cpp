@@ -28,6 +28,8 @@ bool PlayerMovement::IsOnGround() const
 	return m_GroundRay.IsHit;
 }
 
+#include "DebugCounter.h"
+
 void PlayerMovement::UpdateRayCast()
 {
 	// ƒŒƒC‚Ìn“_‚ğİ’è

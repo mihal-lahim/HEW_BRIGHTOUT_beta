@@ -1,5 +1,6 @@
 
 #include "Player.h"
+#include "DebugCounter.h"
 
 void PlayerState_Human_MidAir::Enter(Player& player)
 {
@@ -21,6 +22,7 @@ void PlayerState_Human_MidAir::HandleInput(Player& player)
 	// 電気ジャンプ処理
 	if (inputSystem->IsIssued<PlayerCommand_Jump>())
 		movement->ElectricJump(inputX, inputZ);
+
 
 	PlayerState_Human::HandleInput(player);
 }

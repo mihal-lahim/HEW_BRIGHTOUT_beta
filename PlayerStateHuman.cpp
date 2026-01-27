@@ -41,6 +41,11 @@ void PlayerState_Human::HandleInput(Player& player)
 	}
 
 
+	if (player.m_Movement->IsOnGround())
+	{
+		throw 0;
+	}
+
 	PlayerState::HandleInput(player);
 }
 

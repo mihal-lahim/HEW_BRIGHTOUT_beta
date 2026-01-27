@@ -316,6 +316,14 @@ void PhysicsSystem::RayCast(Ray& ray, float distance)
 {
 	// レイの方向を正規化して距離を掛ける
 	XMVECTOR dir = XMLoadFloat3(&ray.m_Direction);
+
+	// ゼロベクトルならスキップ 
+	if (XMVector3Equal(dir, XMVectorZero()))
+	{
+		ray.Reset();
+		return;
+	}
+
 	dir = XMVector3Normalize(dir);
 	dir = XMVectorScale(dir, distance);
 
@@ -323,38 +331,33 @@ void PhysicsSystem::RayCast(Ray& ray, float distance)
 	XMFLOAT3 toFloat3{};
 	XMStoreFloat3(&toFloat3, XMVectorAdd(dir, XMLoadFloat3(&ray.m_From)));
 
-	// 始点と終点が作るベクトルがゼロベクトルの場合は処理をスキップ
-	if (!XMVectorGetX(XMVectorEqual(XMVectorSubtract(XMLoadFloat3(&toFloat3), XMLoadFloat3(&ray.m_From)), XMVectorZero())) == 0.0f)
+
+	// レイの始点と終点をBulletの形式に変換
+	btVector3 from = ToBulletPosition(ray.m_From);
+	btVector3 to = ToBulletPosition(toFloat3);
+
+	// レイキャストの実行
+	btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
+
+	// レイテスト実行
+	m_DynamicsWorld->rayTest(from, to, rayCallback);
+
+	// レイがヒットしつつ、Triggerを無視する設定
+	if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))
 	{
-		// レイの始点と終点をBulletの形式に変換
-		btVector3 from = ToBulletPosition(ray.m_From);
-		btVector3 to = ToBulletPosition(toFloat3);
-
-		// レイキャストの実行
-		btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
-
-		// レイテスト実行
-		m_DynamicsWorld->rayTest(from, to, rayCallback);
-
-		// レイがヒットしつつ、Triggerを無視する設定
-		if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))
-		{
-			// ヒット情報をRayCastに設定
-			ray.IsHit = true;
-			ray.HitPosition = ToDirectXPosition(rayCallback.m_hitPointWorld);
-			ray.HitDistance = (rayCallback.m_hitPointWorld - from).length();
-			ray.HitNormal = ToDirectXPosition(rayCallback.m_hitNormalWorld);
-			ray.HitObject = static_cast<GameObject*>(rayCallback.m_collisionObject->getUserPointer());
-			return;
-		}
+		// ヒット情報をRayCastに設定
+		ray.IsHit = true;
+		ray.HitPosition = ToDirectXPosition(rayCallback.m_hitPointWorld);
+		ray.HitDistance = (rayCallback.m_hitPointWorld - from).length();
+		ray.HitNormal = ToDirectXPosition(rayCallback.m_hitNormalWorld);
+		ray.HitObject = static_cast<GameObject*>(rayCallback.m_collisionObject->getUserPointer());
+		return;
 	}
-
-	// ヒットしなかった場合の初期化
-	ray.IsHit = false;
-	ray.HitPosition = XMFLOAT3{};
-	ray.HitDistance = -1.0f;
-	ray.HitNormal = XMFLOAT3{};
-	ray.HitObject = nullptr;
+	else
+	{
+		// ヒットしなかった場合の初期化
+		ray.Reset();
+	}
 }
 
 
