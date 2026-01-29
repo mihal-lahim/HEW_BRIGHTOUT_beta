@@ -10,7 +10,7 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 #include "direct3d.h"
-#include "debug_ostream.h"
+#include "DebugOstream.h"
 #include <fstream>
 
 static ID3D11VertexShader* g_pVertexShader = nullptr;

@@ -3,7 +3,6 @@
 #include "shader3d.h"
 #include <DirectXMath.h>
 #include "direct3d.h"
-#include "debug_ostream.h"
 #include <cmath>
 #include <algorithm>
 #include "GameObject.h"

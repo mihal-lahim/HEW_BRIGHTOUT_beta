@@ -6,11 +6,15 @@
 #ifndef DEBUG_CAMERA_H
 #define DEBUG_CAMERA_H
 #include "Camera.h"
+#include "Keyboard.h"
 
 class DebugCamera : public Camera
 {
+private:
+	Keyboard* m_Keyboard = nullptr; //キーボード入力コンポーネント
+
 public:
-	DebugCamera() = default;
+	DebugCamera();
 
 	//キー入力による更新
 	void Update() override;

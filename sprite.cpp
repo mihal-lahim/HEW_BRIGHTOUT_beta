@@ -14,7 +14,7 @@ using namespace DirectX;
 #include "shader.h"
 #include "sprite.h"
 #include "texture.h"
-#include "debug_ostream.h"
+#include "DebugOstream.h"
 
 
 static constexpr int NUM_VERTEX = 4; // í∏ì_êî

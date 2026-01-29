@@ -5,7 +5,7 @@
 
 #include "CommandSet.h"
 #include "PlayerCommand.h"
-#include "XBOXController.h"
+#include "XinputController.h"
 
 // プレイヤー用コマンドセット
 class PlayerCommandSet : public CommandSet

@@ -4,10 +4,14 @@
 //Date: 2025/10/28
 ////////////////////////////////
 #include "DebugCamera.h"
-#include "key_logger.h"
 #include "Time.h"
 
 using namespace DirectX;
+
+DebugCamera::DebugCamera()
+{
+	m_Keyboard = AddComponent<Keyboard>();
+}
 
 void DebugCamera::Update()
 {
@@ -19,18 +23,18 @@ void DebugCamera::Update()
 	Transform& camtf = transform;
 
 	//リセット
-	if (KeyLogger_IsTrigger(KK_TAB))
+	if (m_Keyboard->IsDown(KK_TAB))
 	{
 		camtf.Position = { 0.0f, 0.0f, 0.0f };
 		camtf.Rotation = Quaternion::Identity();
 	}
 
 	//ズームアウト
-	if (KeyLogger_IsPressed(KK_K))
+	if (m_Keyboard->IsPressed(KK_K))
 		Fov += 0.1f;
 
 	//ズームイン
-	if (KeyLogger_IsPressed(KK_L))
+	if (m_Keyboard->IsPressed(KK_L))
 	{
 		Fov -= 0.1f;
 
@@ -39,50 +43,50 @@ void DebugCamera::Update()
 	}
 
 	//右回転
-	if (KeyLogger_IsPressed(KK_RIGHT))
+	if (m_Keyboard->IsPressed(KK_RIGHT))
 		camtf.Rotation *= Quaternion::SetEulerY(ROTATION_SPEED);
 
 	//左回転
-	if (KeyLogger_IsPressed(KK_LEFT))
+	if (m_Keyboard->IsPressed(KK_LEFT))
 		camtf.Rotation *= Quaternion::SetEulerY(-ROTATION_SPEED);
 
 	//上回転
-	if (KeyLogger_IsPressed(KK_UP))
+	if (m_Keyboard->IsPressed(KK_UP))
 		camtf.Rotation *= Quaternion::SetEulerX(ROTATION_SPEED);
 
 	//下回転
-	if (KeyLogger_IsPressed(KK_DOWN))
+	if (m_Keyboard->IsPressed(KK_DOWN))
 		camtf.Rotation *= Quaternion::SetEulerX(-ROTATION_SPEED);
 
 	//きりもみ右回転
-	if (KeyLogger_IsPressed(KK_P))
+	if (m_Keyboard->IsPressed(KK_P))
 		camtf.Rotation *= Quaternion::SetEulerZ(ROTATION_SPEED);
 
 	//きりもみ左回転
-	if (KeyLogger_IsPressed(KK_O))
+	if (m_Keyboard->IsPressed(KK_O))
 		camtf.Rotation *= Quaternion::SetEulerZ(ROTATION_SPEED);
 
 	//前進
-	if (KeyLogger_IsPressed(KK_W))
+	if (m_Keyboard->IsPressed(KK_W))
 		camtf.Position.z += MOVE_SPEED;
 
 	//右移動
-	if (KeyLogger_IsPressed(KK_D))
+	if (m_Keyboard->IsPressed(KK_D))
 		camtf.Position.x += MOVE_SPEED;
 
 	//左移動
-	if (KeyLogger_IsPressed(KK_A))
+	if (m_Keyboard->IsPressed(KK_A))
 		camtf.Position.x -= MOVE_SPEED;
 
 	//後退
-	if (KeyLogger_IsPressed(KK_S))
+	if (m_Keyboard->IsPressed(KK_S))
 		camtf.Position.z -= MOVE_SPEED;
 
 	//上移動
-	if (KeyLogger_IsPressed(KK_SPACE))
+	if (m_Keyboard->IsPressed(KK_SPACE))
 		camtf.Position.y += MOVE_SPEED;
 
 	//下移動
-	if (KeyLogger_IsPressed(KK_LEFTSHIFT))
+	if (m_Keyboard->IsPressed(KK_LEFTSHIFT))
 		camtf.Position.y -= MOVE_SPEED;
 }

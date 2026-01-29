@@ -12,13 +12,12 @@
 // http://go.microsoft.com/fwlink/?LinkId=248929
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //--------------------------------------------------------------------------------------
-#ifndef HAL_YOUHEI_KEYBOARD_H
-#define HAL_YOUHEI_KEYBOARD_H
-#pragma once
+#ifndef KEYBOARD_H
+#define KEYBOARD_H
 
 
 #include <windows.h>
-#include <memory>
+#include "InputDevice.h"
 
 
 // キー列挙
@@ -414,25 +413,47 @@ void Keyboard_Reset(void);
 void Keyboard_ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam);
 
 
-//
-// For a Win32 desktop application, call this function from your Window Message Procedure
-//
-// LResult CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-// {
-//     switch (message)
-//     {
-//
-//     case WM_ACTIVATEAPP:
-//     case WM_KEYDOWN:
-//     case WM_SYSKEYDOWN:
-//     case WM_KEYUP:
-//     case WM_SYSKEYUP:
-//         Keyboard_ProcessMessage(message, wParam, lParam);
-//         break;
-//
-//     }
-// }
-//
 
 
-#endif // HAL_YOUHEI_KEYBOARD_H
+// Keyboardクラス（InputDeviceを継承）
+class Keyboard : public InputDevice
+{
+private:
+    // ヘルパ関数
+    void KeyDown(int key);
+    void KeyUp(int key);
+    bool IsKeyInState(Keyboard_Keys key, const Keyboard_State* pState) const;
+
+    // 前回と今回の状態
+    Keyboard_State m_PrevState{};
+    Keyboard_State m_CurState{};
+
+public:
+	// コンストラクタ・デストラクタ
+	Keyboard();
+	~Keyboard() = default;
+
+	// 毎フレーム呼ぶ
+	void PreUpdate() override;
+
+	// 入力値取得（親クラスからオーバーライド）
+	float GetInputValue(InputKey input, InputCondition inputCondition) override;
+
+	// ボタン状態
+	bool IsDown(Keyboard_Keys key) const;
+	bool IsPressed(Keyboard_Keys key) const;
+	bool IsReleased(Keyboard_Keys key) const;
+
+	// 状態取得
+	const Keyboard_State& GetCurrentState() const { return m_CurState; }
+	const Keyboard_State& GetPreviousState() const { return m_PrevState; }
+
+	// リセット
+	void Reset();
+
+	// メッセージ処理（ウィンドウプロシージャから呼ぶ）
+	void ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam);
+};
+
+
+#endif

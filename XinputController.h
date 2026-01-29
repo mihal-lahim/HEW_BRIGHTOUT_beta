@@ -1,10 +1,10 @@
 /////////////////////////////////////////
-//controller.h[コントローラー制御]
+//XinputController.h[コントローラー制御]
 //Author: hiroshi kasiwagi
 //Date: 2025/11/26
 /////////////////////////////////////////
-#ifndef XBOX_CONTROLLER_H
-#define XBOX_CONTROLLER_H
+#ifndef XINPUT_CONTROLLER_H
+#define XINPUT_CONTROLLER_H
 
 #include <windows.h>
 #include <Xinput.h>
@@ -48,12 +48,12 @@ struct TriggerState {
     bool isDowned; // 閾値を超えたかどうか
 };
 
-class Controller : public InputDevice
+class XinputController : public InputDevice
 {
 public:
 	// コンストラクタ・デストラクタ
-    Controller(int controllerNumber = 0);
-	~Controller() = default;
+    XinputController(int controllerNumber = 0);
+	~XinputController() = default;
     
     // 毎フレーム呼ぶ
     void PreUpdate() override;

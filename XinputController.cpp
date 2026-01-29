@@ -1,22 +1,22 @@
 /////////////////////////////////////////
-//controller.cpp[コントローラー制御]
+//XinputController.cpp[コントローラー制御]
 //Author: hiroshi kasiwagi
 //Date: 2025/11/26
 /////////////////////////////////////////
 
-#include "XBOXController.h"
+#include "XinputController.h"
 #include <cmath>
 
 #pragma comment(lib, "Xinput.lib")
 
-Controller::Controller(int controllerNumber)
+XinputController::XinputController(int controllerNumber)
 	: m_ControllerNumber(controllerNumber),
 	  m_PrevState({}),
 	  m_CurState({}),
 	  m_IsConnected(false)
 {}
 
-void Controller::PreUpdate()
+void XinputController::PreUpdate()
 {
 	// 前回の状態を保存
 	m_PrevState = m_CurState;
@@ -45,7 +45,7 @@ void Controller::PreUpdate()
 	m_CurState = state;
 }
 
-float Controller::GetInputValue(InputKey input, InputCondition inputCondition)
+float XinputController::GetInputValue(InputKey input, InputCondition inputCondition)
 {
 	XBOXButton btn = static_cast<XBOXButton>(input);
 	
@@ -71,17 +71,17 @@ float Controller::GetInputValue(InputKey input, InputCondition inputCondition)
 }
 
 
-bool Controller::IsDown(XBOXButton btn) const
+bool XinputController::IsDown(XBOXButton btn) const
 {
 	return (btn & m_CurState.Gamepad.wButtons) && !(btn & m_PrevState.Gamepad.wButtons);
 }
 
-bool Controller::IsPressed(XBOXButton btn) const
+bool XinputController::IsPressed(XBOXButton btn) const
 {
 	return (btn & m_CurState.Gamepad.wButtons) && (btn & m_PrevState.Gamepad.wButtons);
 }
 
-bool Controller::IsReleased(XBOXButton btn) const
+bool XinputController::IsReleased(XBOXButton btn) const
 {
 	return !(btn & m_CurState.Gamepad.wButtons) && (btn & m_PrevState.Gamepad.wButtons);
 }
@@ -89,7 +89,7 @@ bool Controller::IsReleased(XBOXButton btn) const
 
 static constexpr float STICK_DIVIDER = 1.0f / 32767.0f;
 
-StickState Controller::GetLeftStick() const
+StickState XinputController::GetLeftStick() const
 {
 	// 左スティックの状態
 	StickState state{};
@@ -110,7 +110,7 @@ StickState Controller::GetLeftStick() const
 	return state;
 }
 
-StickState Controller::GetRightStick() const
+StickState XinputController::GetRightStick() const
 {
 	// 右スティックの状態
 	StickState state{};
@@ -134,7 +134,7 @@ StickState Controller::GetRightStick() const
 
 static constexpr float TRIGGER_DIVIDER = 1.0f / 255.0f;
 
-TriggerState Controller::GetLeftTrigger() const
+TriggerState XinputController::GetLeftTrigger() const
 {
 	// 左トリガーの状態
 	TriggerState state{};
@@ -151,7 +151,7 @@ TriggerState Controller::GetLeftTrigger() const
 	return state;
 }
 
-TriggerState Controller::GetRightTrigger() const
+TriggerState XinputController::GetRightTrigger() const
 {
 	// 右トリガーの状態
 	TriggerState state{};
@@ -168,7 +168,7 @@ TriggerState Controller::GetRightTrigger() const
 	return state;
 }
 
-float Controller::GetButtonValue(XBOXButton btn, InputCondition inputCondition) const
+float XinputController::GetButtonValue(XBOXButton btn, InputCondition inputCondition) const
 {
 	bool isCurrentPressed = (btn & m_CurState.Gamepad.wButtons) != 0;
 	bool isPrevPressed = (btn & m_PrevState.Gamepad.wButtons) != 0;
@@ -190,7 +190,7 @@ float Controller::GetButtonValue(XBOXButton btn, InputCondition inputCondition) 
 	}
 }
 
-float Controller::GetTriggerValue(XBOXButton btn, InputCondition inputCondition) const
+float XinputController::GetTriggerValue(XBOXButton btn, InputCondition inputCondition) const
 {
 	TriggerState current{}, prev{};
 	
@@ -225,7 +225,7 @@ float Controller::GetTriggerValue(XBOXButton btn, InputCondition inputCondition)
 	}
 }
 
-float Controller::GetStickValue(XBOXButton btn, InputCondition inputCondition) const
+float XinputController::GetStickValue(XBOXButton btn, InputCondition inputCondition) const
 {
 	StickState currentLeft = GetLeftStick();
 	StickState currentRight = GetRightStick();

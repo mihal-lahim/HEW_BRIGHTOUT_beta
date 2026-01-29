@@ -1,13 +1,13 @@
 /*==============================================================================
 
-   キーボード入力の記録 [key_logger.cpp]
+   キーボード入力の記録 [KeyLogger.cpp]
 														 Author : sumi rintarou
 														 Date   : 2025/06/27
 --------------------------------------------------------------------------------
 
 ==============================================================================*/
 
-#include "key_logger.h"
+#include "KeyLogger.h"
 
 static Keyboard_State g_PrevState = {};
 static Keyboard_State g_TriggerState = {};

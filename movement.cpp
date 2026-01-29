@@ -24,7 +24,6 @@ void Movement::RotateByMoveVec()
 	gameObject()->transform.Rotation *= Quaternion::SetEulerY(yaw);
 }
 
-#include "debug_ostream.h"
 
 void Movement::PostUpdate()
 {

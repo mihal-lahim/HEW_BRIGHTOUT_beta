@@ -5,9 +5,10 @@
 
 #include "Vector3.h"
 #include "Quaternion.h"
+#include "Component.h"
 
 
-class Transform
+class Transform : public Component
 {
 public:
 	// 位置
@@ -19,6 +20,9 @@ public:
 
 	Transform() = default;
 	~Transform() = default;
+
+	// オブジェクトのアクティブ状態を設定するメソッド（Transformでは無効化）
+	void SetActive(bool) override {}
 };
 
 

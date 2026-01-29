@@ -1,6 +1,6 @@
 
-#ifndef RENDER_SYSTEM_H
-#define RENDER_SYSTEM_H
+#ifndef RENDERING_SYSTEM_H
+#define RENDERING_SYSTEM_H
 
 #include <vector>
 #include <map>
@@ -8,7 +8,7 @@
 class Camera;
 class MeshRenderer;
 
-class RenderSystem
+class RenderingSystem
 {
 private:
 	// 登録されているカメラのマップ（優先度順）
@@ -17,8 +17,8 @@ private:
 	// 登録されているメッシュレンダラーの配列
 	std::vector<MeshRenderer*> m_MeshRenderers;
 public:
-	RenderSystem() { Initialize(); }
-	~RenderSystem() { Finalize(); }
+	RenderingSystem() { Initialize(); }
+	~RenderingSystem() { Finalize(); }
 
 	void Initialize();
 	void Finalize();

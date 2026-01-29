@@ -1,21 +1,18 @@
 #include "Player.h"
-#include "debug_ostream.h"
-
-#include <iostream>
 
 void PlayerState_Electric::Enter(Player& player)
 {
 	// 剛体を無効化
-	player.m_RigidBody->SetActive(false);
+	player.rigidBody->SetActive(false);
 
 	// モデルを電気形態に設定
-	player.m_MeshRenderer->SetModel(player.m_ElectricModel);
+	player.meshRenderer->SetModel(player.electricModel);
 
 	// 移動コンポーネント取得
-	PlayerMovement* movement = player.m_Movement;
+	PlayerMovement* movement = player.movement;
 
 	// 変身コンポーネント取得
-	PlayerMorphSystem* morphSystem = player.m_MorphSystem;
+	PlayerMorphSystem* morphSystem = player.morphSystem;
 
 	// 電線上にスナップ
 	movement->SnapToPowerLine(morphSystem->GetNearestPowerLineID());
@@ -25,16 +22,15 @@ void PlayerState_Electric::Enter(Player& player)
 
 void PlayerState_Electric::HandleInput(Player& player)
 {
-	hal::dout << "Electric" << std::endl;
 
 	// 入力システム取得
-	const InputSystem* inputSystem = player.m_InputSystem;
+	const InputSystem* inputSystem = player.inputSystem;
 
 	// 移動コンポーネント取得
-	PlayerMovement* movement = player.m_Movement;
+	PlayerMovement* movement = player.movement;
 
 	// ステートマシン取得
-	PlayerStateMachine* stateMachine = player.m_StateMachine;
+	PlayerStateMachine* stateMachine = player.stateMachine;
 
 	// ジャンプコマンドが発行されたら射出・変身処理
 	if (inputSystem->IsIssued<PlayerCommand_Jump>())
@@ -65,7 +61,7 @@ void PlayerState_Electric::HandleInput(Player& player)
 void PlayerState_Electric::Update(Player& player)
 {
 	// 移動コンポーネント取得
-	PlayerMovement* movement = player.m_Movement;
+	PlayerMovement* movement = player.movement;
 
 	// 電線上移動処理
 	movement->LineMove();

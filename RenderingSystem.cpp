@@ -1,21 +1,21 @@
-#include "RenderSystem.h"
+#include "RenderingSystem.h"
 #include "Camera.h"
 #include "MeshRenderer.h"
 #include "direct3d.h"
 
-void RenderSystem::Initialize()
+void RenderingSystem::Initialize()
 {
 	m_Cameras.clear();
 	m_MeshRenderers.clear();
 }
 
-void RenderSystem::Finalize()
+void RenderingSystem::Finalize()
 {
     m_Cameras.clear();
 	m_MeshRenderers.clear();
 }
 
-void RenderSystem::Render()
+void RenderingSystem::Render()
 {
     Direct3D_Clear();
     SetViewport(0);
@@ -45,19 +45,19 @@ void RenderSystem::Render()
     Direct3D_Present();
 }
 
-void RenderSystem::RegisterCamera(Camera* camera)
+void RenderingSystem::RegisterCamera(Camera* camera)
 {
 	// カメラを優先度別に登録
 	m_Cameras[camera->Priority].push_back(camera);
 }
 
-void RenderSystem::RegisterMeshRenderer(MeshRenderer* meshRenderer)
+void RenderingSystem::RegisterMeshRenderer(MeshRenderer* meshRenderer)
 {
     // メッシュレンダラーを登録
 	m_MeshRenderers.push_back(meshRenderer);
 }
 
-void RenderSystem::UnregisterCamera(Camera* camera)
+void RenderingSystem::UnregisterCamera(Camera* camera)
 {
     // 優先度からカメラの配列を取得
 	auto& vec = m_Cameras.at(camera->Priority);
@@ -72,7 +72,7 @@ void RenderSystem::UnregisterCamera(Camera* camera)
     vec.pop_back();
 }
 
-void RenderSystem::UnregisterMeshRenderer(MeshRenderer* meshRenderer)
+void RenderingSystem::UnregisterMeshRenderer(MeshRenderer* meshRenderer)
 {
     // 目標のメッシュレンダラーを取得
     auto it = std::find(m_MeshRenderers.begin(), m_MeshRenderers.end(), meshRenderer);

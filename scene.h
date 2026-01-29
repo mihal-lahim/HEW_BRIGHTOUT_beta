@@ -9,24 +9,38 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "ObjectManager.h"
-#include "PhysicsSystem.h"
-#include "RenderSystem.h"
+#include "GameObject.h"
+#include "Component.h"
+#include "ObjectPool.h"
 
-class GameObject;
+class GameContext;
 
 class Scene
 {
-protected:
-	// オブジェクト管理システム
-	ObjectManager m_ObjectManager{};
+private:
+	// 現在のゲームコンテキスト
+	GameContext* m_gameContext = nullptr;
+	// シーン内のゲームオブジェクト配列
+	std::vector<std::vector<std::unique_ptr<ObjectPoolBase>>> m_gameObjects;
+	// シーン内のコンポーネント配列
+	std::vector<std::vector<std::unique_ptr<ObjectPoolBase>>> m_components;
 
-	// 物理演算システム
-	PhysicsSystem m_PhysicsSystem{};
+	// 保留中のオブジェクト情報
+	struct Pending
+	{
+		uint32_t AllocationID;
+		uint32_t TypeID;
+	};
 
-	// レンダリングシステム
-	RenderSystem m_RenderSystem{};
+	// 作成保留中のゲームオブジェクト配列
+	std::vector<Pending> m_pendingCreateGameObjects;
+	// 破棄保留中のゲームオブジェクト配列
+	std::vector<Pending> m_pendingDestroyGameObjects;
 
+	// 作成保留中のコンポーネント配列
+	std::vector<Pending> m_pendingCreateComponents;
+	// 破棄保留中のコンポーネント配列
+	std::vector<Pending> m_pendingDestroyComponents;
 public:
 
 	Scene();
@@ -36,14 +50,27 @@ public:
 	void Update();
 	virtual void Finalize() {};
 
-	// オブジェクト管理システム取得メソッド
-	ObjectManager& GetObjectManager() { return m_ObjectManager; }
 
-	// 物理演算システム取得メソッド
-	PhysicsSystem& GetPhysicsSystem() { return m_PhysicsSystem; }
+	// ゲームオブジェクト作成テンプレートメソッド
+	template<typename T, typename... Args>
+		requires std::is_base_of<GameObject, T>::value
+	T* CreateGameObject(Args... args);
 
-	// レンダリングシステム取得メソッド
-	RenderSystem& GetRenderSystem() { return m_RenderSystem; }
+	// コンポーネント作成テンプレートメソッド
+	template<typename T, typename... Args>
+		requires std::is_base_of<Component, T>::value
+	T* CreateComponent(Args... args);
+
+
+	// ゲームオブジェクトの配列を受け取るテンプレートメソッド
+	template<typename T>
+		requires std::is_base_of<GameObject, T>::value
+	std::vector<T*> GetGameObjects();
+
+	// コンポーネントの配列を受け取るテンプレートメソッド
+	template<typename T>
+		requires std::is_base_of<Component, T>::value
+	std::vector<T*> GetComponents();
 };
 
 

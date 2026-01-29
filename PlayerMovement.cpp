@@ -203,7 +203,7 @@ void PlayerMovement::LineMove()
 
 	// 電線上の位置を取得
 	Vector3 newPos;
-	newPos.FromXMFLOAT3(m_PoleManager->GetPositionOnPowerLine(m_StartPole, m_DestPole, m_LineParam));
+	newPos = m_PoleManager->GetPositionOnPowerLine(m_StartPole, m_DestPole, m_LineParam);
 
 	// 速度ベクトルを計算
 	Vector3 currentPos = gameObject()->transform.Position;

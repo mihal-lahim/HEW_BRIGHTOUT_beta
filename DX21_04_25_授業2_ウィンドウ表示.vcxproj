@@ -175,28 +175,26 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Vector4.cpp" />
-    <ClCompile Include="XBOXController.cpp" />
+    <ClCompile Include="XinputController.cpp" />
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="CubeObject.cpp" />
     <ClCompile Include="DebugCamera.cpp" />
-    <ClCompile Include="debug_ostream.cpp" />
-    <ClCompile Include="debug_text.cpp" />
+    <ClCompile Include="DebugOstream.cpp" />
+    <ClCompile Include="DebugText.cpp" />
     <ClCompile Include="direct3d.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameManager.cpp" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="game_effect.cpp" />
     <ClCompile Include="Health.cpp" />
-    <ClCompile Include="keyboard.cpp" />
-    <ClCompile Include="key_logger.cpp" />
-    <ClCompile Include="light.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="KeyLogger.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="model.cpp" />
-    <ClCompile Include="mouse.cpp" />
+    <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Movement.cpp" />
-    <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -213,7 +211,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="PowerLine.cpp" />
     <ClCompile Include="Quaternion.cpp" />
-    <ClCompile Include="RenderSystem.cpp" />
+    <ClCompile Include="RenderingSystem.cpp" />
     <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -233,31 +231,36 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="CommandSet.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="DebugCounter.h" />
+    <ClInclude Include="GameContext.h" />
+    <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="ObjectPool.h" />
+    <ClInclude Include="ScriptComponent.h" />
+    <ClInclude Include="ScriptComponentSystem.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
-    <ClInclude Include="XBOXController.h" />
+    <ClInclude Include="XinputController.h" />
     <ClInclude Include="cube.h" />
     <ClInclude Include="CubeObject.h" />
     <ClInclude Include="DebugCamera.h" />
-    <ClInclude Include="debug_console.h" />
-    <ClInclude Include="debug_ostream.h" />
-    <ClInclude Include="debug_text.h" />
+    <ClInclude Include="DebugConsole.h" />
+    <ClInclude Include="DebugOstream.h" />
+    <ClInclude Include="DebugText.h" />
     <ClInclude Include="direct3d.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="game_effect.h" />
     <ClInclude Include="Health.h" />
-    <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="InputHandler.h" />
     <ClInclude Include="InputDevice.h" />
-    <ClInclude Include="keyboard.h" />
-    <ClInclude Include="key_logger.h" />
-    <ClInclude Include="light.h" />
+    <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="KeyLogger.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="model.h" />
-    <ClInclude Include="mouse.h" />
+    <ClInclude Include="Mouse.h" />
     <ClInclude Include="Movement.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
@@ -280,7 +283,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="PowerLine.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Ray.h" />
-    <ClInclude Include="RenderSystem.h" />
+    <ClInclude Include="RenderingSystem.h" />
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="GameManager.h" />
@@ -324,6 +327,11 @@ for %%F in ("$(TargetDir)*.cso") do (
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Component.inl" />
+    <None Include="GameObject.inl" />
+    <None Include="Scene.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

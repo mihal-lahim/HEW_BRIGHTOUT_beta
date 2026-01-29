@@ -21,17 +21,17 @@ Player::~Player()
 void Player::Awake()
 {
 	// TPSCamera作成
-	m_Camera = new TPSCamera(this);
+	camera = new TPSCamera(this);
 
 
 	// Controller設定
-	auto* controller = AddComponent<Controller>();
+	auto* controller = AddComponent<XinputController>();
 
 	// プレイヤー用コマンドセット作成
 	auto* commandSet = AddComponent<PlayerCommandSet>();
 
 	// InputSystem設定
-	m_InputSystem = AddComponent<InputSystem>(controller, commandSet);
+	inputSystem = AddComponent<InputSystem>(controller, commandSet);
 
 
 
@@ -39,36 +39,36 @@ void Player::Awake()
 	AddComponent<Health>(100.0f);
 
 	// PlayerMovementコンポーネント設定
-	m_Movement = AddComponent<PlayerMovement>(m_Camera);
+	movement = AddComponent<PlayerMovement>(camera);
 
 	// PlayerMorphSystemコンポーネント設定
-	m_MorphSystem = AddComponent<PlayerMorphSystem>();
+	morphSystem = AddComponent<PlayerMorphSystem>();
 
 
 	// PlayerStateMachineコンポーネント設定
-	m_StateMachine = AddComponent<PlayerStateMachine>();
+	stateMachine = AddComponent<PlayerStateMachine>();
 
 
 	// MeshRenderer設定
-	m_MeshRenderer = AddComponent<MeshRenderer>();
+	meshRenderer = AddComponent<MeshRenderer>();
 
 
 	// コライダー設定
 	auto* collider = AddComponent<Collider>(ColliderType::CAPSULE, Vector3{ 0.5f, 1.0f, 0.0f });
 
 	// RigidBody設定
-	m_RigidBody = AddComponent<RigidBody>(1.0f, Vector3{ 1.0f, 1.0f, 1.0f });
-	m_RigidBody->AddCollider(collider);
+	rigidBody = AddComponent<RigidBody>(1.0f, Vector3{ 1.0f, 1.0f, 1.0f });
+	rigidBody->AddCollider(collider);
 }
 
 void Player::Start()
 {
 	// 初期状態設定
-	m_StateMachine->ChangeState(&PlayerStates::HumanIdle, *this);
+	stateMachine->ChangeState(&PlayerStates::HumanIdle, *this);
 }
 
 void Player::Update()
 {
 	// 状態管理コンポーネント更新
-	m_StateMachine->Update(*this);
+	stateMachine->Update(*this);
 }

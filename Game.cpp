@@ -4,17 +4,17 @@
 #include "GameManager.h"
 #include "Camera.h"
 #include "CubeObject.h"
+#include "DebugCamera.h"
 
 using namespace DirectX;
 
 void Game::Initialize()
 {
 	// PoleManagerオブジェクトの生成
-	new PoleManager();
+	//new PoleManager();
 
 	// プレイヤーオブジェクトの生成
-	Player* player = new Player();
-	player->transform.Position = Vector3(10.0f, 10.0f, 0.0f);
+	new DebugCamera();
 
 	// 床オブジェクトの生成
 	CubeObject* cube = new CubeObject();

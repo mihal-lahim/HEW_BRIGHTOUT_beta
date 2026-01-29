@@ -1,9 +1,7 @@
 
 #include "Player.h"
 #include "DebugCounter.h"
-#include "debug_ostream.h"
 
-#include <iostream>
 
 void PlayerState_Human_Idle::Enter(Player& player)
 {
@@ -14,10 +12,10 @@ void PlayerState_Human_Idle::HandleInput(Player& player)
 {
 
 	// 入力システム取得
-	const InputSystem* inputSystem = player.m_InputSystem;
+	const InputSystem* inputSystem = player.inputSystem;
 
 	// ステートマシン取得
-	PlayerStateMachine* stateMachine = player.m_StateMachine;
+	PlayerStateMachine* stateMachine = player.stateMachine;
 
 	// 移動コマンドが発行されたら歩行状態へ遷移
 	if (inputSystem->IsIssued<PlayerCommand_MoveX>()

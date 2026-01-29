@@ -1,0 +1,76 @@
+
+#ifndef OBJECT_POOL_H
+#define OBJECT_POOL_H
+
+#include <vector>
+#include <memory>
+#include "Object.h"
+
+// オブジェクトプールの基底クラス
+class ObjectPoolBase
+{
+public:
+	virtual ~ObjectPoolBase() = default;
+};
+
+
+// 特定の型Tのオブジェクトを効率的に管理・再利用するためのオブジェクトプールクラス
+template<typename T>
+	requires std::is_base_of<Object, T>::value
+class ObjectPool : public ObjectPoolBase
+{
+private:
+	// オブジェクトのプール
+	std::vector<std::unique_ptr<T>> m_pool;
+public:
+	// オブジェクトを作成してプールに追加
+	template<typename... Args>
+	T* Create(Args... args)
+	{
+		// 新しいオブジェクトを作成し、プールに追加
+		auto newObj = std::make_unique<T>(std::forward<Args>(args...));
+		T * objPtr = newObj.get();
+		// オブジェクトのallocationIDを設定
+		objPtr->m_allocationID = static_cast<uint32_t>(m_pool.size());
+		m_pool.push_back(std::move(newObj));
+		return objPtr;
+	}
+
+	// 既存のオブジェクトをプールに登録
+	void Register(T* obj)
+	{
+		// オブジェクトのallocationIDを設定
+		obj->m_allocationID = static_cast<uint32_t>(m_pool.size());
+		m_pool.push_back(std::unique_ptr<T>(obj));
+	}
+
+
+	// プールからオブジェクトを取得
+	T* Get(uint32_t idx)
+	{
+		if (m_pool.size() <= idx) return nullptr;
+		return m_pool.at(idx).get();
+	}
+
+	// オブジェクトを削除
+	void Destroy(uint32_t idx)
+	{
+		if (m_pool.size() <= idx) return;
+
+		// 最後の要素と入れ替えてから削除
+		std::swap(m_pool.at(idx), m_pool.back());
+		m_pool.pop_back();
+
+		// 入れ替えたオブジェクトのallocationIDを更新
+		m_pool.at(idx)->m_allocationID = idx;
+	}
+};
+
+
+
+
+
+
+
+
+#endif
