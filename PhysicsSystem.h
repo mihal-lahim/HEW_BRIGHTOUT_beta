@@ -1,12 +1,13 @@
 
+
 #ifndef PHYSICS_SYSTEM_H
 #define PHYSICS_SYSTEM_H
 
 #include <vector>
-#include <DirectXMath.h>
 #include <unordered_map>
 #include "btBulletDynamicsCommon.h"
 #include "Transform.h"
+#include "Vector3.h"
 #include <memory>
 
 
@@ -83,15 +84,15 @@ public:
 };
 
 // DirectX座標系からBullet座標系への変換
-inline btVector3 ToBulletPosition(const DirectX::XMFLOAT3 pos) { return btVector3(pos.x, pos.y, -pos.z); }
+inline btVector3 ToBulletPosition(const Vector3& pos) { return btVector3(pos.x, pos.y, -pos.z); }
 
 // Bullet座標系からDirectX座標系への変換
-inline DirectX::XMFLOAT3 ToDirectXPosition(const btVector3& vec) { return DirectX::XMFLOAT3(vec.x(), vec.y(), -vec.z()); }
+inline Vector3 ToDirectXPosition(const btVector3& vec) { return Vector3(vec.x(), vec.y(), -vec.z()); }
 
 // DirectX回転からBullet回転への変換
 inline btQuaternion ToBulletRotation(const Quaternion& rot) { return btQuaternion(rot.Quat.x, rot.Quat.y, -rot.Quat.z, rot.Quat.w); }
 
 // Bullet回転（クォータニオン）からDirectX回転（オイラー角）への変換
-inline Quaternion ToDirectXRotation(const btQuaternion& quat) { return Quaternion{ DirectX::XMFLOAT4(quat.x(), quat.y(), -quat.z(), quat.w()) }; }
+inline Quaternion ToDirectXRotation(const btQuaternion& quat) { return Quaternion{ Vector4(quat.x(), quat.y(), -quat.z(), quat.w()) }; }
 
 #endif

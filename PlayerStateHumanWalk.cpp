@@ -1,5 +1,9 @@
 
 #include "Player.h"
+#include "DebugCounter.h"
+#include "debug_ostream.h"
+
+#include <iostream>
 
 using namespace DirectX;
 
@@ -10,6 +14,8 @@ void PlayerState_Human_Walk::Enter(Player& player)
 
 void PlayerState_Human_Walk::HandleInput(Player& player)
 {
+	hal::dout << "HumanWalk" << std::endl;
+
 	// “ü—ÍƒVƒXƒeƒ€Žæ“¾
 	const InputSystem* inputSystem = player.m_InputSystem;
 
@@ -34,7 +40,7 @@ void PlayerState_Human_Walk::HandleInput(Player& player)
 		return;
 	}
 
-	PlayerState_Human::HandleInput(player);
+	PlayerState_Human_Ground::HandleInput(player);
 }
 
 void PlayerState_Human_Walk::Update(Player& player)

@@ -1,15 +1,22 @@
 #include "PlayerState_Human_Ground.h"
 #include "Player.h"
+#include "debug_ostream.h"
+
+#include <iostream>
 
 using namespace DirectX;
 
 void PlayerState_Human_Ground::Enter(Player& player)
 {
+	// 速度リセット
+	player.m_Movement->VelocityVec = { 0.0f, 0.0f, 0.0f };
+
 	PlayerState_Human::Enter(player);
 }
 
 void PlayerState_Human_Ground::HandleInput(Player& player)
 {
+
 	// 入力システム取得
 	const InputSystem* inputSystem = player.m_InputSystem;
 
@@ -32,11 +39,5 @@ void PlayerState_Human_Ground::HandleInput(Player& player)
 
 void PlayerState_Human_Ground::Update(Player& player)
 {
-	// 移動コンポーネント取得
-	PlayerMovement* movement = player.m_Movement;
-
-	// 速度リセット
-	movement->ResetVelocity();
-
 	PlayerState_Human::Update(player);
 }

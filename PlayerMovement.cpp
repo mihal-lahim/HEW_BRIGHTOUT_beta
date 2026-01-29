@@ -6,16 +6,14 @@
 #include "ObjectManager.h"
 #include "Ray.h"
 
-using namespace DirectX;
 
-
-XMVECTOR PlayerMovement::SetInputDir(float inputX, float inputZ)
+Vector3 PlayerMovement::SetInputDir(float inputX, float inputZ)
 {
 	// 入力方向ベクトルを作成
-	XMFLOAT3 inputVec = { inputX, 0.0f, inputZ };
+	Vector3 inputVec{ inputX, 0.0f, inputZ };
 
 	// 入力方向をカメラの向きに合わせて変換
-	XMVECTOR convertedVec = ConvertToWorldFromInput(inputVec, m_Camera);
+	Vector3 convertedVec = ConvertToWorldFromInput(inputVec, m_Camera);
 
 	// 最後の入力方向を保存
 	m_LastInputDir = convertedVec;
@@ -25,14 +23,17 @@ XMVECTOR PlayerMovement::SetInputDir(float inputX, float inputZ)
 
 bool PlayerMovement::IsOnGround() const
 {
-	return m_GroundRay.IsHit;
+	if (!m_GroundRay.IsHit || m_GroundRay.HitDistance > m_Ctx.GroundDetectOffset)
+		return false;
+
+	return true;
 }
 
 void PlayerMovement::UpdateRayCast()
 {
 	// レイの始点を設定
-	XMFLOAT3 from = gameObject()->transform.Position;
-	from.y -= m_Ctx.GroundDetectOffset;
+	Vector3 from = gameObject()->transform.Position;
+	from.y -= m_Ctx.RayCastOffset;
 
 	// レイの作成
 	m_GroundRay = Ray(from, { 0.0f, -1.0f, 0.0f });
@@ -41,49 +42,39 @@ void PlayerMovement::UpdateRayCast()
 	m_GroundRay.RayCast(m_Ctx.RayLength);
 }
 
-void PlayerMovement::Walk(float inputX, float inputZ)
+void PlayerMovement::ApplyGravity()
+{
+	ForceVec.y += m_Ctx.Gravity;
+}
+
+void PlayerMovement::GroundMove(float inputX, float inputZ, float speed)
 {
 	// 入力方向ベクトルを作成
-	XMVECTOR vec = SetInputDir(inputX, inputZ);
+	Vector3 vec = ConvertToXZPlane(SetInputDir(inputX, inputZ));
 
 	// 移動方向がゼロベクトルでなければ移動ベクトルを更新
-	if (XMVectorGetX(vec) != 0.0f || XMVectorGetZ(vec) != 0.0f)
-	{
-		// Y成分を0にする
-		vec = XMVectorSetY(vec, 0.0f);
-		vec = XMVectorScale(XMVector3Normalize(vec), m_Ctx.WalkSpeed);
-
+	if (!vec.IsZero())
 		// 新しい移動ベクトルを加算
-		AddMoveVecV(vec);
-	}
+		MoveVec += vec * speed;
+}
+
+void PlayerMovement::Walk(float inputX, float inputZ)
+{
+	GroundMove(inputX, inputZ, m_Ctx.WalkSpeed);
+}
+
+void PlayerMovement::Run(float inputX, float inputZ)
+{
+	GroundMove(inputX, inputZ, m_Ctx.WalkSpeed * 2.0f);
 }
 
 
 void PlayerMovement::Jump(float inputX, float inputZ, float force)
 {
 	// 入力方向ベクトルを作成
-	XMVECTOR inputDir = SetInputDir(inputX, inputZ);
+	Vector3 inputDir = ConvertToXZPlane(SetInputDir(inputX, inputZ));
 
-	// 速度ベクトルのXZ成分
-	XMVECTOR xzVel = XMVectorSetY(GetVelocityVecV(), 0.0f);
-
-	// 速度ベクトルと入力した方向の内積を計算
-	float dot = XMVectorGetX(XMVector3Dot(inputDir, XMVector3Normalize(xzVel)));
-
-	// 内積に基づいてスケーリングファクターを計算
-	float factor = m_Ctx.AirMinSpeedFactor + (1.0f - m_Ctx.AirMinSpeedFactor) * ((dot + 1.0f) * 0.5f);
-
-	// XZ成分の速度ベクトルをスケーリング
-	xzVel = XMVectorScale(xzVel, factor);
-
-	// 速度ベクトルを更新
-	SetMoveVecV(xzVel);
-
-	// ジャンプベクトルを計算
-	XMVECTOR jumpVel = XMVectorSetY(XMVectorZero(), force);
-
-	// 力量ベクトルを更新
-	AddForceVecV(jumpVel);
+	ImpulseVec += inputDir * force + Vector3{ 0.0f, force, 0.0f };
 }
 
 void PlayerMovement::GroundJump(float inputX, float inputZ)
@@ -104,19 +95,19 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 	PowerLine* powerLine = m_PoleManager->GetPowerLine(lineID);
 
 	// 電線ベクトルを取得
-	XMVECTOR lineVec = powerLine->GetLineVector();
+	Vector3 lineVec = powerLine->GetLineVector();
 
 	// 現在の速度ベクトルを取得
-	XMVECTOR vec = GetVelocityVecV();
+	Vector3 vec = VelocityVec;
 
 	// 速度ベクトルがゼロベクトルの場合
-	if (XMVectorGetX(XMVectorEqual(vec, XMVectorZero())))
+	if (vec.IsZero())
 	{
 		// 移動ベクトルを使用
-		vec = GetMoveVecV();
+		vec = MoveVec;
 
 		// 移動ベクトルもゼロベクトルの場合
-		if (XMVectorGetX(XMVectorEqual(vec, XMVectorZero())))
+		if (MoveVec.IsZero())
 		{
 			// カメラ方向を設定
 			vec = ConvertToWorldFromInput({ 0.0f, 0.0f, 1.0f }, m_Camera);
@@ -125,7 +116,7 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 
 
 	// 速度ベクトルと電線ベクトルの内積を計算
-	float dot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(lineVec), XMVector3Normalize(vec)));
+	float dot = lineVec.Normalize().Dot(vec.Normalize());
 
 	// 内積の符号に基づいて開始電柱と目的地電柱を設定
 	m_StartPole = dot >= 0.0f ? powerLine->GetPoles().first : powerLine->GetPoles().second;
@@ -136,30 +127,28 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 
 
 	// 電線ベクトルの半分の長さを取得
-	XMVECTOR halfVec = XMVectorScale(lineVec, 0.5f);
+	Vector3 halfVec = lineVec * 0.5f;
 
 	// 電線の中央位置を取得
-	XMVECTOR lineMidPos = XMLoadFloat3(&powerLine->transform.Position);
+	Vector3 lineMidPos = powerLine->transform.Position;
 
 	// 開始位置を設定（内積の符号に基づく）
-	XMVECTOR startPos = dot >= 0.0f ? XMVectorSubtract(lineMidPos, halfVec) : XMVectorAdd(lineMidPos, halfVec);
+	Vector3 startPos = dot >= 0.0f ? lineMidPos - halfVec : lineMidPos + halfVec;
 
 	// プレイヤーの現在位置を取得
-	XMVECTOR playerPos = XMLoadFloat3(&gameObject()->transform.Position);
+	Vector3 playerPos = gameObject()->transform.Position;
 
 	// 開始位置からプレイヤー位置へのベクトルを取得
-	XMVECTOR toPlayerVec = XMVectorSubtract(playerPos, startPos);
+	Vector3 toPlayerVec = playerPos - startPos;
 	
 	// 電線ベクトルの長さを取得
 	float lineLength = powerLine->GetLength();
 
 	// 電線上の位置パラメータtを設定（0.0f ~ 1.0fの範囲にクランプ）
-	m_LineParam = std::clamp(XMVectorGetX(XMVector3Dot(toPlayerVec, lineVec)) / lineLength, 0.0f, 1.0f);
-
-
+	m_LineParam = std::clamp(toPlayerVec.Dot(lineVec) / lineLength, 0.0f, 1.0f);
 
 	// 速度ベクトルの長さを取得
-	float velocityLength = XMVectorGetX(XMVector3Length(vec));
+	float velocityLength = vec.Length();
 
 	// 電線上速度を設定
 	m_Ctx.LineMoveSpeed = velocityLength >= m_Ctx.LineMoveSpeedMin ? velocityLength : m_Ctx.LineMoveSpeedMin;
@@ -174,13 +163,13 @@ void PlayerMovement::Turn(float inputX, float inputZ)
 	std::pair<PoleID, PoleID> poles = powerLine->GetPoles();
 
 	// 電線ベクトルを取得
-	XMVECTOR lineVec = m_StartPole == poles.first ? powerLine->GetLineVector() : XMVectorNegate(powerLine->GetLineVector());
+	Vector3 lineVec = m_StartPole == poles.first ? powerLine->GetLineVector() : powerLine->GetLineVector() * -1.0f;
 
 	// 入力方向ベクトルを作成
-	XMVECTOR vec = SetInputDir(inputX, inputZ);
+	Vector3 vec = SetInputDir(inputX, inputZ);
 
 	// 電線ベクトルと入力方向ベクトルの内積を計算
-	float dot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(lineVec), XMVector3Normalize(vec)));
+	float dot = lineVec.Normalize().Dot(vec.Normalize());
 
 	// 内積が負の場合、方向を反転
 	if (dot < 0.0f)
@@ -213,15 +202,15 @@ void PlayerMovement::LineMove()
 	m_LineParam += (m_Ctx.LineMoveSpeed / lineLength);
 
 	// 電線上の位置を取得
-	XMFLOAT3 newPos = m_PoleManager->GetPositionOnPowerLine(m_StartPole, m_DestPole, m_LineParam);
-	XMVECTOR posVec = XMLoadFloat3(&newPos);
+	Vector3 newPos;
+	newPos.FromXMFLOAT3(m_PoleManager->GetPositionOnPowerLine(m_StartPole, m_DestPole, m_LineParam));
 
 	// 速度ベクトルを計算
-	XMVECTOR currentPos = XMLoadFloat3(&gameObject()->transform.Position);
-	XMVECTOR velocityVec = XMVectorSubtract(posVec, currentPos);
+	Vector3 currentPos = gameObject()->transform.Position;
+	Vector3 velocityVec = newPos - currentPos;
 
 	// 速度ベクトルを設定
-	SetVelocityVecV(velocityVec);
+	VelocityVec = velocityVec;
 }
 
 void PlayerMovement::Eject(float inputX, float inputZ)
@@ -239,14 +228,34 @@ void PlayerMovement::PostUpdate()
 }
 
 
-XMVECTOR ConvertToWorldFromInput(const XMFLOAT3 inputDir, const Camera* camera)
+Vector3 ConvertToWorldFromInput(const Vector3& inputDir, const Camera* camera)
 {
-	// 入力方向のベクトル
-	XMVECTOR inputVec = XMLoadFloat3(&inputDir);
-
-	// カメラの回転クォータニオンを取得
-	XMVECTOR rot = XMLoadFloat4(&camera->transform.Rotation.Quat);
-
 	// 入力方向ベクトルを回転させてワールド座標系に変換
-	return XMVector3Rotate(inputVec, rot);
+	return inputDir.Rotate(camera->transform.Rotation);
+}
+
+Vector3 ConvertToXZPlane(const Vector3& worldDir)
+{
+	// ゼロベクトルの場合はそのまま返す
+	if (worldDir.IsZero())
+		return Vector3(0.0f, 0.0f, 0.0f);
+
+
+	// 元のベクトルの長さを保存
+	float originalLength = worldDir.Length();
+	
+
+	// Y成分を0にしてXZ平面に投影
+	Vector3 xzDir = worldDir;
+	xzDir.y = 0.0f;
+	
+
+	// XZ成分がゼロの場合（Y軸に平行な場合）はゼロベクトルを返す
+	if (xzDir.IsZero())
+		return Vector3(0.0f, 0.0f, 0.0f);
+
+
+
+	// 元の長さを保持したままXZ平面上に投影
+	return xzDir.Normalize() * originalLength;
 }

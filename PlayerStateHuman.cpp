@@ -1,4 +1,7 @@
 #include "Player.h"
+#include "debug_ostream.h"
+
+#include <iostream>
 
 
 void PlayerState_Human::Enter(Player& player)
@@ -14,6 +17,8 @@ void PlayerState_Human::Enter(Player& player)
 
 void PlayerState_Human::HandleInput(Player& player)
 {
+	//hal::dout << "Human" << std::endl;
+
 	// “ü—ÍƒVƒXƒeƒ€Žæ“¾
 	const InputSystem* inputSystem = player.m_InputSystem;
 
@@ -39,7 +44,6 @@ void PlayerState_Human::HandleInput(Player& player)
 		stateMachine->ChangeState(&PlayerStates::Electric, player);
 		return;
 	}
-
 
 	PlayerState::HandleInput(player);
 }

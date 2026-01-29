@@ -15,14 +15,9 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 	Transform* tf = &collider.gameObject()->transform;
 
 	// 位置設定
-	XMVECTOR pos = XMLoadFloat3(&collider.m_OffsetPos);
+	Vector3 pos = collider.m_OffsetPos;
 	if (collider.m_IsStatic)
-		pos = XMVectorAdd(pos, XMLoadFloat3(&tf->Position));
-
-
-
-	XMFLOAT3 btPos{};
-	XMStoreFloat3(&btPos, pos);
+		pos = pos + tf->Position;
 
 
 	// 回転設定
@@ -30,22 +25,22 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 	Quaternion offsetRot = collider.m_OffsetRot;
 
 	// 回転の組み合わせ
-	XMFLOAT4 combinedRot{};
+	Quaternion combinedRot;
 	if (collider.m_IsStatic)
-		combinedRot = (ownerRot * offsetRot).Quat;
+		combinedRot = ownerRot * offsetRot;
 	else
-		combinedRot = offsetRot.Quat;
+		combinedRot = offsetRot;
 
 
 	// トランスフォーム設定
 	btTransform bttf{};
-	bttf.setOrigin(ToBulletPosition(btPos));
-	bttf.setRotation(ToBulletRotation(Quaternion{ combinedRot }));
+	bttf.setOrigin(ToBulletPosition(pos));
+	bttf.setRotation(ToBulletRotation(combinedRot));
 
 
 	// サイズ設定
-	XMFLOAT3 scale = collider.m_Scale;
-	XMFLOAT3 ownerScale = tf->Scale;
+	Vector3 scale = collider.m_Scale;
+	Vector3 ownerScale = tf->Scale;
 
 	scale.x *= ownerScale.x;
 	scale.y *= ownerScale.y;
@@ -86,7 +81,7 @@ void PhysicsSystem::Initialize()
 		m_Solver.get(),
 		m_CollisionConfiguration.get());
 
-	m_DynamicsWorld->setGravity(btVector3(0, 0.0f, 0));
+	m_DynamicsWorld->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 }
 
 void PhysicsSystem::Finalize()
@@ -194,12 +189,8 @@ void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
 	body->setUserPointer(rigidbody->gameObject());
 
 
-
-	// XMFLOAT3をbtVector3に変換
-	btVector3 gravity = ToBulletPosition(rigidbody->m_Gravity);
-
 	// 重力の設定
-	body->setGravity(gravity);
+	body->setGravity({ 0.0f,0.0f,0.0f });
 
 
 
@@ -235,8 +226,6 @@ void PhysicsSystem::PhysicsUpdate(float deltaTime)
 	m_DynamicsWorld->stepSimulation(deltaTime);
 }
 
-#include "debug_ostream.h"
-
 void PhysicsSystem::UpdateRigidBody()
 {
 	for (auto* rigidbody : m_RigidBodies)
@@ -249,8 +238,6 @@ void PhysicsSystem::UpdateRigidBody()
 
 		tf->Position = ToDirectXPosition(worldTransform.getOrigin());
 		tf->Rotation = ToDirectXRotation(worldTransform.getRotation());
-
-		hal::dout << "Position: " << tf->Position.x << ", " << tf->Position.y << ", " << tf->Position.z << std::endl;
 
 		// 力をリセット
 		rigidbody->m_RigidBody->clearForces();
@@ -315,46 +302,48 @@ void PhysicsSystem::UpdateCollisions()
 void PhysicsSystem::RayCast(Ray& ray, float distance)
 {
 	// レイの方向を正規化して距離を掛ける
-	XMVECTOR dir = XMLoadFloat3(&ray.m_Direction);
-	dir = XMVector3Normalize(dir);
-	dir = XMVectorScale(dir, distance);
+	Vector3 dir = ray.m_Direction;
 
-	// レイの終点計算
-	XMFLOAT3 toFloat3{};
-	XMStoreFloat3(&toFloat3, XMVectorAdd(dir, XMLoadFloat3(&ray.m_From)));
-
-	// 始点と終点が作るベクトルがゼロベクトルの場合は処理をスキップ
-	if (!XMVectorGetX(XMVectorEqual(XMVectorSubtract(XMLoadFloat3(&toFloat3), XMLoadFloat3(&ray.m_From)), XMVectorZero())) == 0.0f)
+	// ゼロベクトルならスキップ 
+	if (dir.IsZero())
 	{
-		// レイの始点と終点をBulletの形式に変換
-		btVector3 from = ToBulletPosition(ray.m_From);
-		btVector3 to = ToBulletPosition(toFloat3);
-
-		// レイキャストの実行
-		btCollisionWorld::ClosestRayResultCallback rayCallback(from, to);
-
-		// レイテスト実行
-		m_DynamicsWorld->rayTest(from, to, rayCallback);
-
-		// レイがヒットしつつ、Triggerを無視する設定
-		if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))
-		{
-			// ヒット情報をRayCastに設定
-			ray.IsHit = true;
-			ray.HitPosition = ToDirectXPosition(rayCallback.m_hitPointWorld);
-			ray.HitDistance = (rayCallback.m_hitPointWorld - from).length();
-			ray.HitNormal = ToDirectXPosition(rayCallback.m_hitNormalWorld);
-			ray.HitObject = static_cast<GameObject*>(rayCallback.m_collisionObject->getUserPointer());
-			return;
-		}
+		ray.Reset();
+		return;
 	}
 
-	// ヒットしなかった場合の初期化
-	ray.IsHit = false;
-	ray.HitPosition = XMFLOAT3{};
-	ray.HitDistance = -1.0f;
-	ray.HitNormal = XMFLOAT3{};
-	ray.HitObject = nullptr;
+	dir = dir.Normalize();
+	dir = dir * distance;
+
+	// レイの終点計算
+	Vector3 to = ray.m_From + dir;
+
+
+	// レイの始点と終点をBulletの形式に変換
+	btVector3 from = ToBulletPosition(ray.m_From);
+	btVector3 toVec = ToBulletPosition(to);
+
+	// レイキャストの実行
+	btCollisionWorld::ClosestRayResultCallback rayCallback(from, toVec);
+
+	// レイテスト実行
+	m_DynamicsWorld->rayTest(from, toVec, rayCallback);
+
+	// レイがヒットしつつ、Triggerを無視する設定
+	if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))
+	{
+		// ヒット情報をRayCastに設定
+		ray.IsHit = true;
+		ray.HitPosition = ToDirectXPosition(rayCallback.m_hitPointWorld);
+		ray.HitDistance = (rayCallback.m_hitPointWorld - from).length();
+		ray.HitNormal = ToDirectXPosition(rayCallback.m_hitNormalWorld);
+		ray.HitObject = static_cast<GameObject*>(rayCallback.m_collisionObject->getUserPointer());
+		return;
+	}
+	else
+	{
+		// ヒットしなかった場合の初期化
+		ray.Reset();
+	}
 }
 
 

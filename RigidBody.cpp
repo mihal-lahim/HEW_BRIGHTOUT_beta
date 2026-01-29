@@ -11,8 +11,10 @@ void RigidBody::AddCollider(Collider* collider)
 	m_Colliders.push_back(collider);
 }
 
-void RigidBody::AddForce(XMFLOAT3 force)
+void RigidBody::AddForce(Vector3 force)
 {
+	if (!IsActive()) return;
+
 	// 剛体をアクティブ化
 	m_RigidBody->activate(true);
 
@@ -23,8 +25,24 @@ void RigidBody::AddForce(XMFLOAT3 force)
 	m_RigidBody->applyCentralForce(btForce);
 }
 
-void RigidBody::SetVelocity(XMFLOAT3 velocity)
+void RigidBody::AddImpulse(Vector3 impulse)
 {
+	if (!IsActive()) return;
+
+	// 剛体をアクティブ化
+	m_RigidBody->activate(true);
+
+	// Bullet座標系に変換
+	btVector3 btImpulse = ToBulletPosition(impulse);
+
+	// インパルスを加える
+	m_RigidBody->applyCentralImpulse(btImpulse);
+}
+
+void RigidBody::SetVelocity(Vector3 velocity)
+{
+	if (!IsActive()) return;
+
 	// 剛体をアクティブ化
 	m_RigidBody->activate(true);
 
@@ -35,28 +53,17 @@ void RigidBody::SetVelocity(XMFLOAT3 velocity)
 	m_RigidBody->setLinearVelocity(btVelocity);
 }
 
-DirectX::XMFLOAT3 RigidBody::GetVelocity()
+Vector3 RigidBody::GetVelocity()
 {
+	if (!IsActive()) return {};
+
 	// 速度取得
 	btVector3 btVelocity = m_RigidBody->getLinearVelocity();
 
 	// DirectX座標系に変換
-	XMFLOAT3 velocity = ToDirectXPosition(btVelocity);
+	Vector3 velocity = ToDirectXPosition(btVelocity);
 
 	return velocity;
-}
-
-void RigidBody::SetGravity(DirectX::XMFLOAT3 gravity)
-{
-	// Bullet座標系に変換
-	btVector3 btGravity = ToBulletPosition(gravity);
-
-	// メンバ変数更新
-	m_Gravity = gravity;
-
-	// 重力を設定
-	if(m_RigidBody)
-	m_RigidBody->setGravity(btGravity);
 }
 
 void RigidBody::SetActive(bool isActive)

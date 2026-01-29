@@ -24,21 +24,25 @@ public:
     virtual ~PowerLine() = default;
 
 	// 電線ID設定・取得メソッド
-	void SetID(PowerLineID id) { m_ID = id; }
 	PowerLineID GetID() const { return m_ID; }
 
-	// 所有者の PoleManager 設定メソッド
-	void SetOwner(PoleManager* manager) { m_PoleManager = manager; }
+
 	// 接続されている電柱IDペア取得メソッド
 	void SetPoles(PoleID first, PoleID second) { m_ConnectedPoles = { first, second }; }
+
 	// 接続されている電柱IDペア取得メソッド
 	std::pair<PoleID, PoleID> GetPoles() const { return m_ConnectedPoles; }
+
 	// 長さ設定メソッド
 	void SetLength(float length) { m_Length = length; }
+
 	// 長さ取得メソッド
 	float GetLength() const { return m_Length; }
+
 	// 電線ベクトル取得メソッド
-	DirectX::XMVECTOR GetLineVector() const;
+	Vector3 GetLineVector() const;
+
+	friend class PoleManager;
 };
 
 #endif

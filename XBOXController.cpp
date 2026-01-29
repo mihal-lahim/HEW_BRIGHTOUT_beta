@@ -5,7 +5,6 @@
 /////////////////////////////////////////
 
 #include "XBOXController.h"
-#include "debug_ostream.h"
 #include <cmath>
 
 #pragma comment(lib, "Xinput.lib")

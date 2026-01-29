@@ -8,7 +8,7 @@ using namespace DirectX;
 void Camera::SetMatrix() const
 {
 	// 回転行列を作成
-	XMMATRIX matRot = XMMatrixRotationQuaternion(XMLoadFloat4(&transform.Rotation.Quat));
+	XMMATRIX matRot = transform.Rotation.ToXMMATRIX();
 
 	// 前方向ベクトルを計算
 	XMVECTOR forward = XMVector3TransformNormal(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), matRot);
@@ -17,7 +17,7 @@ void Camera::SetMatrix() const
 	XMVECTOR up = XMVector3TransformNormal(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), matRot);
 
 	// カメラ位置を設定
-	XMVECTOR eye = XMLoadFloat3(&transform.Position);
+	XMVECTOR eye = transform.Position.ToXMVECTOR();
 
 	// 注視点を計算
 	XMVECTOR target = XMVectorAdd(eye, forward);

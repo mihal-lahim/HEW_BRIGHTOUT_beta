@@ -1,5 +1,9 @@
 
 #include "Player.h"
+#include "DebugCounter.h"
+#include "debug_ostream.h"
+
+#include <iostream>
 
 void PlayerState_Human_MidAir::Enter(Player& player)
 {
@@ -8,6 +12,7 @@ void PlayerState_Human_MidAir::Enter(Player& player)
 
 void PlayerState_Human_MidAir::HandleInput(Player& player)
 {
+
 	// 入力システム取得
 	const InputSystem* inputSystem = player.m_InputSystem;
 
@@ -22,10 +27,21 @@ void PlayerState_Human_MidAir::HandleInput(Player& player)
 	if (inputSystem->IsIssued<PlayerCommand_Jump>())
 		movement->ElectricJump(inputX, inputZ);
 
+
 	PlayerState_Human::HandleInput(player);
 }
 
 void PlayerState_Human_MidAir::Update(Player& player)
 {
+	// 地上判定
+	if (player.m_Movement->IsOnGround())
+	{
+		player.m_StateMachine->ChangeState(&PlayerStates::HumanIdle, player);
+		return;
+	}
+
+	// 重力適用
+	player.m_Movement->ApplyGravity();
+
 	PlayerState_Human::Update(player);
 }

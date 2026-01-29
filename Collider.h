@@ -1,14 +1,15 @@
 
+
 #ifndef COLLIDER_H
 #define COLLIDER_H
 
 #include "btBulletDynamicsCommon.h"
-#include <DirectXMath.h>
 #include <memory>
 #include "Component.h"
 #include "PhysicsSystem.h"
 #include "Quaternion.h"
 #include "GameManager.h"
+#include "Vector3.h"
 
 // コライダーの種類
 enum class ColliderType
@@ -39,9 +40,9 @@ private:
 	ColliderType m_Type;
 
 	// オフセット位置・回転
-	DirectX::XMFLOAT3 m_OffsetPos{ 0.0f,0.0f,0.0f };
+	Vector3 m_OffsetPos{ 0.0f, 0.0f, 0.0f };
 	Quaternion m_OffsetRot{ Quaternion::Identity() };
-	DirectX::XMFLOAT3 m_Scale{ 1.0f,1.0f,1.0f };
+	Vector3 m_Scale{ 1.0f, 1.0f, 1.0f };
 
 	// 静的コライダーかどうか
 	bool m_IsStatic = true;
@@ -56,7 +57,7 @@ public:
 	// size : ボックスの場合は各辺の長さ、球の場合は半径、カプセルの場合は(半径、高さ) 
 	// offsetPos : オフセット位置
 	// offsetRot : オフセット回転（オイラー角）
-	Collider(ColliderType type, DirectX::XMFLOAT3 size, bool isTrigger = false, DirectX::XMFLOAT3 offsetPos = {}, Quaternion offsetRot = {})
+	Collider(ColliderType type, Vector3 size, bool isTrigger = false, Vector3 offsetPos = {}, Quaternion offsetRot = {})
 		: m_Type(type), m_IsTrigger(isTrigger), m_Scale(size), m_OffsetPos(offsetPos), m_OffsetRot(offsetRot), m_PhysicsSystem(&GameManager::GetPhysicsSystem())
 	{ Component::SetActive(false); }
 
