@@ -14,11 +14,11 @@ void Game::Initialize()
 
 	// プレイヤーオブジェクトの生成
 	Player* player = new Player();
-	player->transform.Position = XMFLOAT3(0.0f, 10.0f, 0.0f);
+	player->transform.Position = Vector3(10.0f, 10.0f, 0.0f);
 
 	// 床オブジェクトの生成
 	CubeObject* cube = new CubeObject();
 
-	cube->transform.Position = XMFLOAT3(0.0f, -20.0f, 0.0f);
-	cube->transform.Scale = XMFLOAT3(10.0f, 10.0f, 10.0f);
+	cube->transform.Position = Vector3(0.0f, -20.0f, 0.0f);
+	cube->transform.Scale = Vector3(100.0f, 1.0f, 100.0f);
 }

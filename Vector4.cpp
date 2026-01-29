@@ -45,13 +45,14 @@ float Vector4::Length() const
 }
 
 
-Vector4& Vector4::Normalize()
+Vector4 Vector4::Normalize() const
 {
 	if (IsZero())
 		return *this;
 
-	FromXMVECTOR(XMVector4Normalize(ToXMVECTOR()));
-	return *this;
+	Vector4 result;
+	result.FromXMVECTOR(XMVector4Normalize(ToXMVECTOR()));
+	return result;
 }
 
 

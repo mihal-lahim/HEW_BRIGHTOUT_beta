@@ -29,9 +29,7 @@ private:
 	PlayerState* m_CurrentState = nullptr;
 public:
 
-	PlayerStateMachine(PlayerState* state)
-		: m_CurrentState(state)
-	{}
+	PlayerStateMachine() = default;
 	~PlayerStateMachine() = default;
 
 	// ステート変更

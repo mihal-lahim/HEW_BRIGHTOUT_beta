@@ -57,20 +57,23 @@ public:
 	// ベクトルの長さを計算
 	float Length() const;
 
-	// 正規化（自分自身を変更）
-	Vector3& Normalize();
+	// 正規化
+	Vector3 Normalize() const;
 
 	// 内積の計算
 	float Dot(const Vector3& other) const;
 
-	// 外積の計算
+	// 外積の計算（スカラー）
 	float Cross(const Vector3& other) const;
 
-	// Quaternionによる回転（自分自身を変更）
-	Vector3& Rotate(const Quaternion& quat);
+	// 外積ベクトルの計算
+	Vector3 CrossVector(const Vector3& other) const;
 
-	// 任意軸周りの回転（自分自身を変更）
-	Vector3& RotateAxis(const Vector3& axis, float angle);
+	// Quaternionによる回転
+	Vector3 Rotate(const Quaternion& quat) const;
+
+	// 任意軸周りの回転
+	Vector3 RotateAxis(const Vector3& axis, float angle) const;
 };
 
 

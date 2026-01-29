@@ -14,16 +14,16 @@ class Camera;
 struct PlayerMoveCtx
 {
 	// 歩行速度
-	float WalkSpeed = 30.0f;
+	float WalkSpeed = 10.0f;
 	// 空中移動速度
 	float AirMoveSpeed = 3.0f;
 	// 空中最小速度の倍率
 	float AirMinSpeedFactor = 0.2f;
 
 	// ジャンプ力
-	float JumpForce = 100.0f;
+	float JumpForce = 20.0f;
 	// 電気ジャンプ力
-	float ElectricJumpForce = 20.0f;
+	float ElectricJumpForce = 30.0f;
 
 	// 電線上移動速度
 	float LineMoveSpeed = 0.0f;
@@ -31,14 +31,14 @@ struct PlayerMoveCtx
 	float LineMoveSpeedMin = 1.0f;
 
 	// レイキャストオフセット距離
-	float RayCastOffset = 0.5f;
+	float RayCastOffset = 0.0f;
 	// 地面検出オフセット距離
 	float GroundDetectOffset = 0.5f;
 	// レイの長さ
 	float RayLength = 10.0f;
 
 	// 重力加速度
-	float Gravity = -9.8f;
+	float Gravity = -30.0f;
 };
 
 
@@ -127,5 +127,7 @@ public:
 // 入力方向をワールド座標系に変換する関数
 Vector3 ConvertToWorldFromInput(const Vector3& inputDir, const Camera* camera);
 
+// ワールド座標系の方向ベクトルをXZ平面上のベクトルに変換する関数
+Vector3 ConvertToXZPlane(const Vector3& worldDir);
 
 #endif

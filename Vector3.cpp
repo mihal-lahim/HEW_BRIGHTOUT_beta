@@ -46,13 +46,14 @@ float Vector3::Length() const
 }
 
 
-Vector3& Vector3::Normalize()
+Vector3 Vector3::Normalize() const
 {
 	if (IsZero())
 		return *this;
 
-	FromXMVECTOR(XMVector3Normalize(ToXMVECTOR()));
-	return *this;
+	Vector3 result;
+	result.FromXMVECTOR(XMVector3Normalize(ToXMVECTOR()));
+	return result;
 }
 
 
@@ -67,6 +68,16 @@ float Vector3::Cross(const Vector3& other) const
 	XMVECTOR cross = XMVector3Cross(ToXMVECTOR(), other.ToXMVECTOR());
 	return XMVectorGetX(cross);
 }
+
+
+Vector3 Vector3::CrossVector(const Vector3& other) const
+{
+	XMVECTOR cross = XMVector3Cross(ToXMVECTOR(), other.ToXMVECTOR());
+	Vector3 result;
+	result.FromXMVECTOR(cross);
+	return result;
+}
+
 
 
 DirectX::XMFLOAT3 Vector3::ToXMFLOAT3() const
@@ -121,15 +132,15 @@ Vector3& Vector3::operator*=(float scalar)
 }
 
 
-Vector3& Vector3::Rotate(const Quaternion& quat)
+Vector3 Vector3::Rotate(const Quaternion& quat) const
 {
 	XMVECTOR rotated = XMVector3Rotate(ToXMVECTOR(), quat.ToXMVECTOR());
-	FromXMVECTOR(rotated);
-
-	return *this;
+	Vector3 result;
+	result.FromXMVECTOR(rotated);
+	return result;
 }
 
-Vector3& Vector3::RotateAxis(const Vector3& axis, float angle)
+Vector3 Vector3::RotateAxis(const Vector3& axis, float angle) const
 {
 	Quaternion quat = Quaternion::SetAngleAxis(angle, axis);
 	return Rotate(quat);

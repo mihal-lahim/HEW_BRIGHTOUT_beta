@@ -9,14 +9,13 @@ using namespace DirectX;
 void PlayerState_Human_Ground::Enter(Player& player)
 {
 	// 速度リセット
-	player.m_Movement->ResetVelocity();
+	player.m_Movement->VelocityVec = { 0.0f, 0.0f, 0.0f };
 
 	PlayerState_Human::Enter(player);
 }
 
 void PlayerState_Human_Ground::HandleInput(Player& player)
 {
-	hal::dout << "HumanGround" << std::endl;
 
 	// 入力システム取得
 	const InputSystem* inputSystem = player.m_InputSystem;
@@ -40,6 +39,5 @@ void PlayerState_Human_Ground::HandleInput(Player& player)
 
 void PlayerState_Human_Ground::Update(Player& player)
 {
-
 	PlayerState_Human::Update(player);
 }

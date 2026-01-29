@@ -5,7 +5,6 @@
 /////////////////////////////////////////
 
 #include "XBOXController.h"
-#include "debug_ostream.h"
 #include <cmath>
 
 #pragma comment(lib, "Xinput.lib")
@@ -16,9 +15,6 @@ Controller::Controller(int controllerNumber)
 	  m_CurState({}),
 	  m_IsConnected(false)
 {}
-
-#include "string.h"
-#include "debug_ostream.h"
 
 void Controller::PreUpdate()
 {
@@ -176,14 +172,6 @@ float Controller::GetButtonValue(XBOXButton btn, InputCondition inputCondition) 
 {
 	bool isCurrentPressed = (btn & m_CurState.Gamepad.wButtons) != 0;
 	bool isPrevPressed = (btn & m_PrevState.Gamepad.wButtons) != 0;
-
-	bool curButtonA = m_CurState.Gamepad.wButtons & XBOXButton::BUTTON_A ? 1 : 0;
-	bool prevButtonA = m_PrevState.Gamepad.wButtons & XBOXButton::BUTTON_A ? 1 : 0;
-
-	std::string debugOutput = curButtonA && !prevButtonA ? "‰Ÿ‚³‚ê‚½‚ ‚ ‚ ‚ ‚ " : "";
-
-	if (debugOutput != "" && btn == XBOXButton::BUTTON_A)
-		hal::dout << debugOutput << std::endl;
 
 	switch (inputCondition)
 	{

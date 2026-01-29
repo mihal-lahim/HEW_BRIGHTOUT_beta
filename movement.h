@@ -39,9 +39,6 @@ public:
 	// 移動ベクトルの方向にオブジェクトを回転させる
 	void RotateByMoveVec();
 
-	// RigidBodyの速度をリセットするメソッド
-	void ResetVelocity() { m_RigidBody->SetVelocity({ 0.0f, 0.0f, 0.0f }); }
-
 	// 更新処理
 	virtual void PostUpdate();
 };

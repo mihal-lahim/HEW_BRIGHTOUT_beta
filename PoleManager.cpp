@@ -1,4 +1,4 @@
-ï»¿#include "PoleManager.h"
+#include "PoleManager.h"
 #include "PowerLine.h"
 #include "Pole.h"
 
@@ -6,13 +6,13 @@ using namespace DirectX;
 
 PoleID PoleManager::RegisterPole(Pole* pole)
 {
-	// é›»æŸ±ã‚’ç™»éŒ²ã—ã€ãã®IDã‚’è¿”ã™
+	// “d’Œ‚ð“o˜^‚µA‚»‚ÌID‚ð•Ô‚·
 	m_Poles.push_back(pole);
 	
-	// PoleManagerã‚’é›»æŸ±ã«è¨­å®š
+	// PoleManager‚ð“d’Œ‚ÉÝ’è
 	pole->SetOwner(this);
 
-	// é›»æŸ±IDã‚’è¨­å®š
+	// “d’ŒID‚ðÝ’è
 	PoleID id = (PoleID)(m_Poles.size() - 1);
 	pole->SetID(id);
 
@@ -21,26 +21,26 @@ PoleID PoleManager::RegisterPole(Pole* pole)
 
 PowerLineID PoleManager::RegisterPowerLine(PowerLine* line)
 {
-	// é›»ç·šã‚’ç™»éŒ²
+	// “dü‚ð“o˜^
 	m_PowerLines.push_back(line);
 
-	// æŽ¥ç¶šã•ã‚Œã¦ã„ã‚‹é›»æŸ±ã«ã‚‚é›»ç·šã®IDã‚’ç™»éŒ²
+	// Ú‘±‚³‚ê‚Ä‚¢‚é“d’Œ‚É‚à“dü‚ÌID‚ð“o˜^
 	Pole* pole1 = m_Poles.at(line->GetPoles().first);
 	Pole* pole2 = m_Poles.at(line->GetPoles().second);
 	pole1->SetPowerLine((PoleID)m_PowerLines.size() - 1);
 	pole2->SetPowerLine((PoleID)m_PowerLines.size() - 1);
 
-	// é›»æŸ±ã®åº§æ¨™ã‚’å–å¾—
-	XMVECTOR pos1 = XMLoadFloat3(&pole1->transform.Position);
-	XMVECTOR pos2 = XMLoadFloat3(&pole2->transform.Position);
+	// “d’Œ‚ÌÀ•W‚ðŽæ“¾
+	Vector3 pos1 = pole1->transform.Position;
+	Vector3 pos2 = pole2->transform.Position;
 
-	// é›»ç·šã®é•·ã•ã‚’è¨­å®š
-	line->SetLength(XMVectorGetX(XMVector3Length(XMVectorSubtract(pos1, pos2))));
+	// “dü‚Ì’·‚³‚ðÝ’èi2“_ŠÔ‚Ì‹——£j
+	line->SetLength((pos2 - pos1).Length());
 
-	// PoleManagerã‚’é›»ç·šã«è¨­å®š
+	// PoleManager‚ð“dü‚ÉÝ’è
 	line->SetOwner(this);
 
-	// é›»ç·šIDã‚’è¨­å®š
+	// “düID‚ðÝ’è
 	PowerLineID id = (PowerLineID)(m_PowerLines.size() - 1);
 	line->SetID(id);
 
@@ -51,58 +51,57 @@ float PoleManager::GetPowerLineLength(PowerLineID id) const { return m_PowerLine
 
 PowerLineID PoleManager::GetPowerLineID(PoleID start, PoleID dest) const
 {
-	// æŒ‡å®šã•ã‚ŒãŸ2ã¤ã®é›»æŸ±ã‚’çµã¶é›»ç·šã‚’æ¤œç´¢
+	// Žw’è‚³‚ê‚½2‚Â‚Ì“d’Œ‚ðŒ‹‚Ô“dü‚ðŒŸõ
 	for (PowerLineID lineID : m_Poles.at(start)->GetLines())
 	{
-		// é›»ç·šã‚’å–å¾—
+		// “dü‚ðŽæ“¾
 		PowerLine* line = m_PowerLines.at(lineID);
 
-		// æŽ¥ç¶šã•ã‚Œã¦ã„ã‚‹é›»æŸ±ã®IDãƒšã‚¢ã‚’å–å¾—
+		// Ú‘±‚³‚ê‚Ä‚¢‚é“d’Œ‚ÌIDƒyƒA‚ðŽæ“¾
 		auto [firstPole, secondPole] = line->GetPoles();
 
-		// é›»æŸ±ã®çµ„ã¿åˆã‚ã›ãŒä¸€è‡´ã™ã‚‹ã‹ç¢ºèª
+		// “d’Œ‚Ì‘g‚Ý‡‚í‚¹‚ªˆê’v‚·‚é‚©Šm”F
 		if ((firstPole == start && secondPole == dest) || (firstPole == dest && secondPole == start))
 			return lineID;
 	}
 	
-	// è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã¯-1ã‚’è¿”ã™
+	// Œ©‚Â‚©‚ç‚È‚©‚Á‚½ê‡‚Í-1‚ð•Ô‚·
 	return -1;
 }
 
 DirectX::XMFLOAT3 PoleManager::GetPositionOnPowerLine(PoleID start, PoleID dest, float t) const
 {
-	// é›»æŸ±ã®é ‚ç‚¹ä½ç½®ã‚’å–å¾—
-	XMVECTOR startVec = XMLoadFloat3(&m_Poles.at(start)->GetTopPos());
-	XMVECTOR destVec = XMLoadFloat3(&m_Poles.at(dest)->GetTopPos());
+	// “d’Œ‚Ì’¸“_ˆÊ’u‚ðŽæ“¾
+	Vector3 startVec = m_Poles.at(start)->GetTopPos();
+	Vector3 destVec = m_Poles.at(dest)->GetTopPos();
 		
-	// ç·šå½¢è£œé–“ã§é›»ç·šä¸Šã®ä½ç½®ã‚’å–å¾—
-	XMFLOAT3 result{};
-	XMStoreFloat3(&result, XMVectorLerp(startVec, destVec, t));
+	// üŒ`•âŠÔ‚Å“düã‚ÌˆÊ’u‚ðŽæ“¾istart + (dest - start) * tj
+	Vector3 result = startVec + (destVec - startVec) * t;
 	
-	return result;
+	return result.ToXMFLOAT3();
 }
 
 PoleID PoleManager::GetDirectionalPole(PoleID from, const Vector3& direction) const
 {
-	// æŒ‡å®šã•ã‚ŒãŸæ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ­£è¦åŒ–
-	XMVECTOR dirVec = XMVector3Normalize(direction);
+	// Žw’è‚³‚ê‚½•ûŒüƒxƒNƒgƒ‹‚ð³‹K‰»
+	Vector3 dirVec = direction.Normalize();
 	float maxDot = -1.0f;
 	PoleID bestPole = -1;
 
-	// æŽ¥ç¶šã•ã‚Œã¦ã„ã‚‹é›»æŸ±ã‚’ã™ã¹ã¦èµ°æŸ»
+	// Ú‘±‚³‚ê‚Ä‚¢‚é“d’Œ‚ð‚·‚×‚Ä‘–¸
 	for (PoleID lineID : m_Poles.at(from)->GetLines())
 	{
-		// ãã®é›»ç·šãŒæŽ¥ç¶šã—ã¦ã„ã‚‹ã‚‚ã†ä¸€æ–¹ã®é›»æŸ±ã‚’å–å¾—
+		// ‚»‚Ì“dü‚ªÚ‘±‚µ‚Ä‚¢‚é‚à‚¤ˆê•û‚Ì“d’Œ‚ðŽæ“¾
 		PowerLine* line = m_PowerLines.at(lineID);
 		PoleID destID = (line->GetPoles().first == from) ? line->GetPoles().second : line->GetPoles().first;
 
-		// æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã¨ã®å†…ç©ã‚’è¨ˆç®—
-		XMVECTOR destPos = XMLoadFloat3(&m_Poles.at(destID)->GetTopPos());
-		XMVECTOR fromPos = XMLoadFloat3(&m_Poles.at(from)->GetTopPos());
-		XMVECTOR toOtherVec = XMVector3Normalize(XMVectorSubtract(destPos, fromPos));
-		float dot = XMVectorGetX(XMVector3Dot(dirVec, toOtherVec));
+		// •ûŒüƒxƒNƒgƒ‹‚Æ‚Ì“àÏ‚ðŒvŽZ
+		Vector3 destPos = m_Poles.at(destID)->GetTopPos();
+		Vector3 fromPos = m_Poles.at(from)->GetTopPos();
+		Vector3 toOtherVec = (destPos - fromPos).Normalize();
+		float dot = dirVec.Dot(toOtherVec);
 
-		// æœ€å¤§ã®å†…ç©ã‚’æŒã¤é›»æŸ±ã‚’è¨˜éŒ²
+		// Å‘å‚Ì“àÏ‚ðŽ‚Â“d’Œ‚ð‹L˜^
 		if (dot > maxDot)
 		{
 			maxDot = dot;

@@ -31,7 +31,7 @@ void Player::Awake()
 	auto* commandSet = AddComponent<PlayerCommandSet>();
 
 	// InputSystem設定
-	AddComponent<InputSystem>(controller, commandSet);
+	m_InputSystem = AddComponent<InputSystem>(controller, commandSet);
 
 
 
@@ -39,46 +39,31 @@ void Player::Awake()
 	AddComponent<Health>(100.0f);
 
 	// PlayerMovementコンポーネント設定
-	AddComponent<PlayerMovement>(m_Camera);
+	m_Movement = AddComponent<PlayerMovement>(m_Camera);
 
 	// PlayerMorphSystemコンポーネント設定
-	AddComponent<PlayerMorphSystem>();
+	m_MorphSystem = AddComponent<PlayerMorphSystem>();
 
 
 	// PlayerStateMachineコンポーネント設定
-	AddComponent<PlayerStateMachine>(nullptr);
+	m_StateMachine = AddComponent<PlayerStateMachine>();
 
 
 	// MeshRenderer設定
-	AddComponent<MeshRenderer>();
+	m_MeshRenderer = AddComponent<MeshRenderer>();
 
 
 	// コライダー設定
-	auto* collider = AddComponent<Collider>(ColliderType::BOX, { 1.0f, 1.0f, 1.0f });
+	auto* collider = AddComponent<Collider>(ColliderType::CAPSULE, Vector3{ 0.5f, 1.0f, 0.0f });
 
 	// RigidBody設定
-	m_RigidBody = AddComponent<RigidBody>(1.0f, { 1.0f, 1.0f, 1.0f });
+	m_RigidBody = AddComponent<RigidBody>(1.0f, Vector3{ 1.0f, 1.0f, 1.0f });
 	m_RigidBody->AddCollider(collider);
 }
 
 void Player::Start()
 {
-	// 状態管理コンポーネント取得
-	m_StateMachine = GetComponent<PlayerStateMachine>();
-
-	// 入力システム取得
-	m_InputSystem = GetComponent<InputSystem>();
-
-	// 移動コンポーネント取得
-	m_Movement = GetComponent<PlayerMovement>();
-
-	// 変身システム取得
-	m_MorphSystem = GetComponent<PlayerMorphSystem>();
-
-	// メッシュレンダラー取得
-	m_MeshRenderer = GetComponent<MeshRenderer>();
-
-
+	// 初期状態設定
 	m_StateMachine->ChangeState(&PlayerStates::HumanIdle, *this);
 }
 

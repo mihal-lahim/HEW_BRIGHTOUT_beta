@@ -13,6 +13,8 @@ void RigidBody::AddCollider(Collider* collider)
 
 void RigidBody::AddForce(Vector3 force)
 {
+	if (!IsActive()) return;
+
 	// 剛体をアクティブ化
 	m_RigidBody->activate(true);
 
@@ -25,6 +27,8 @@ void RigidBody::AddForce(Vector3 force)
 
 void RigidBody::AddImpulse(Vector3 impulse)
 {
+	if (!IsActive()) return;
+
 	// 剛体をアクティブ化
 	m_RigidBody->activate(true);
 
@@ -37,6 +41,8 @@ void RigidBody::AddImpulse(Vector3 impulse)
 
 void RigidBody::SetVelocity(Vector3 velocity)
 {
+	if (!IsActive()) return;
+
 	// 剛体をアクティブ化
 	m_RigidBody->activate(true);
 
@@ -49,6 +55,8 @@ void RigidBody::SetVelocity(Vector3 velocity)
 
 Vector3 RigidBody::GetVelocity()
 {
+	if (!IsActive()) return {};
+
 	// 速度取得
 	btVector3 btVelocity = m_RigidBody->getLinearVelocity();
 

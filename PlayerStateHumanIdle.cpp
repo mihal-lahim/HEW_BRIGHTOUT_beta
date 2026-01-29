@@ -7,12 +7,11 @@
 
 void PlayerState_Human_Idle::Enter(Player& player)
 {
-	PlayerState_Human::Enter(player);
+	PlayerState_Human_Ground::Enter(player);
 }
 
 void PlayerState_Human_Idle::HandleInput(Player& player)
 {
-	hal::dout << "HumanIdle" << std::endl;
 
 	// “ü—ÍƒVƒXƒeƒ€Žæ“¾
 	const InputSystem* inputSystem = player.m_InputSystem;
@@ -34,5 +33,5 @@ void PlayerState_Human_Idle::HandleInput(Player& player)
 
 void PlayerState_Human_Idle::Update(Player& player)
 {
-	PlayerState_Human::Update(player);
+	PlayerState_Human_Ground::Update(player);
 }

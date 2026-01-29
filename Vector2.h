@@ -52,8 +52,8 @@ public:
 	// ベクトルの長さを計算
 	float Length() const;
 
-	// 正規化（自分自身を変更）
-	Vector2& Normalize();
+	// 正規化
+	Vector2 Normalize() const;
 
 	// 内積の計算
 	float Dot(const Vector2& other) const;

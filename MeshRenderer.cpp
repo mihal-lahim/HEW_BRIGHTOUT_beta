@@ -11,7 +11,7 @@ void MeshRenderer::Render()
 	// ワールド行列計算
 	DirectX::XMMATRIX mtxWorld =
 		DirectX::XMMatrixScaling(tf.Scale.x, tf.Scale.y, tf.Scale.z) *
-		DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&tf.Rotation.Quat)) *
+		tf.Rotation.ToXMMATRIX() *
 		DirectX::XMMatrixTranslation(tf.Position.x, tf.Position.y, tf.Position.z);
 
 	// モデルが設定されている場合

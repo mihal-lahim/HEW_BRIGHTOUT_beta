@@ -12,7 +12,6 @@ void PlayerState_Human_MidAir::Enter(Player& player)
 
 void PlayerState_Human_MidAir::HandleInput(Player& player)
 {
-	hal::dout << "HumanMidAir" << std::endl;
 
 	// 入力システム取得
 	const InputSystem* inputSystem = player.m_InputSystem;
@@ -41,6 +40,8 @@ void PlayerState_Human_MidAir::Update(Player& player)
 		return;
 	}
 
+	// 重力適用
+	player.m_Movement->ApplyGravity();
 
 	PlayerState_Human::Update(player);
 }
