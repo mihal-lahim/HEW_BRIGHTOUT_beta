@@ -3,17 +3,19 @@
 #define GAME_CONTEXT_H
 
 
+class SceneSystem;
 class PhysicsSystem;
-class Scene;
-class ComponentSystem;
+
+class InputSystem;
 class RenderingSystem;
 
 // ゲーム全体のコンテキスト情報を保持する構造体
 struct GameContext
 {
-	Scene* currentScene;
-	ComponentSystem* componentSystem;
+	SceneSystem* sceneSystem;
 	PhysicsSystem* physicsSystem;
+
+	InputSystem* inputSystem;
 	RenderingSystem* renderingSystem;
 };
 

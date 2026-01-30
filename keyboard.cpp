@@ -17,10 +17,10 @@
 #include <assert.h>
 
 
-static_assert(sizeof(Keyboard_State) == 256 / 8, "キーボード状態構造体のサイズ不一致");
+static_assert(sizeof(KeyboardState) == 256 / 8, "キーボード状態構造体のサイズ不一致");
 
 
-static Keyboard_State gState = {};
+static KeyboardState gState = {};
 
 
 static void keyDown(int key)
@@ -49,7 +49,7 @@ void Keyboard_Initialize(void)
 }
 
 
-bool Keyboard_IsKeyDown(Keyboard_Keys key, const Keyboard_State* pState)
+bool Keyboard_IsKeyDown(KeyboardKeys key, const KeyboardState* pState)
 {
 	if (key <= 0xfe)
 	{
@@ -61,7 +61,7 @@ bool Keyboard_IsKeyDown(Keyboard_Keys key, const Keyboard_State* pState)
 }
 
 
-bool Keyboard_IsKeyUp(Keyboard_Keys key, const Keyboard_State* pState)
+bool Keyboard_IsKeyUp(KeyboardKeys key, const KeyboardState* pState)
 {
 	if (key <= 0xfe)
 	{
@@ -73,20 +73,20 @@ bool Keyboard_IsKeyUp(Keyboard_Keys key, const Keyboard_State* pState)
 }
 
 
-bool Keyboard_IsKeyDown(Keyboard_Keys key)
+bool Keyboard_IsKeyDown(KeyboardKeys key)
 {
 	return Keyboard_IsKeyDown(key, &gState);
 }
 
 
-bool Keyboard_IsKeyUp(Keyboard_Keys key)
+bool Keyboard_IsKeyUp(KeyboardKeys key)
 {
 	return Keyboard_IsKeyUp(key, &gState);
 }
 
 
 // キーボードの現在の状態を取得する
-const Keyboard_State* Keyboard_GetState(void)
+const KeyboardState* Keyboard_GetState(void)
 {
 	return &gState;
 }
@@ -94,7 +94,7 @@ const Keyboard_State* Keyboard_GetState(void)
 
 void Keyboard_Reset(void)
 {
-	ZeroMemory(&gState, sizeof(Keyboard_State));
+	ZeroMemory(&gState, sizeof(KeyboardState));
 }
 
 
@@ -163,7 +163,7 @@ Keyboard::Keyboard()
 {
 }
 
-void Keyboard::PreUpdate()
+void Keyboard::InputUpdate()
 {
 	// 前回の状態を保存
 	m_PrevState = m_CurState;
@@ -171,7 +171,7 @@ void Keyboard::PreUpdate()
 
 float Keyboard::GetInputValue(InputKey input, InputCondition inputCondition)
 {
-	Keyboard_Keys key = static_cast<Keyboard_Keys>(input);
+	KeyboardKeys key = static_cast<KeyboardKeys>(input);
 
 	switch (inputCondition)
 	{
@@ -189,25 +189,25 @@ float Keyboard::GetInputValue(InputKey input, InputCondition inputCondition)
 	}
 }
 
-bool Keyboard::IsDown(Keyboard_Keys key) const
+bool Keyboard::IsDown(KeyboardKeys key) const
 {
 	return IsKeyInState(key, &m_CurState) && !IsKeyInState(key, &m_PrevState);
 }
 
-bool Keyboard::IsPressed(Keyboard_Keys key) const
+bool Keyboard::IsPressed(KeyboardKeys key) const
 {
 	return IsKeyInState(key, &m_CurState) && IsKeyInState(key, &m_PrevState);
 }
 
-bool Keyboard::IsReleased(Keyboard_Keys key) const
+bool Keyboard::IsReleased(KeyboardKeys key) const
 {
 	return !IsKeyInState(key, &m_CurState) && IsKeyInState(key, &m_PrevState);
 }
 
 void Keyboard::Reset()
 {
-	ZeroMemory(&m_PrevState, sizeof(Keyboard_State));
-	ZeroMemory(&m_CurState, sizeof(Keyboard_State));
+	ZeroMemory(&m_PrevState, sizeof(KeyboardState));
+	ZeroMemory(&m_CurState, sizeof(KeyboardState));
 }
 
 void Keyboard::ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam)
@@ -283,7 +283,7 @@ void Keyboard::KeyUp(int key)
 	p[(key >> 5)] &= ~bf;
 }
 
-bool Keyboard::IsKeyInState(Keyboard_Keys key, const Keyboard_State* pState) const
+bool Keyboard::IsKeyInState(KeyboardKeys key, const KeyboardState* pState) const
 {
 	if (key <= 0xfe)
 	{

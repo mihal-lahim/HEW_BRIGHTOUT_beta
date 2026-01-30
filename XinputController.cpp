@@ -16,7 +16,7 @@ XinputController::XinputController(int controllerNumber)
 	  m_IsConnected(false)
 {}
 
-void XinputController::PreUpdate()
+void XinputController::InputUpdate()
 {
 	// ‘O‰ñ‚Ìó‘Ô‚ğ•Û‘¶
 	m_PrevState = m_CurState;

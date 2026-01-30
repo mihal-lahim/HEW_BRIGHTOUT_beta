@@ -3,6 +3,7 @@
 
 #include "GameObject.h"
 #include "GameContext.h"
+#include "Scene.h"
 
 template<typename T>
 	requires std::is_base_of<Component, T>::value
@@ -49,27 +50,11 @@ T* GameObject::AddComponent(Args... args)
 	static_assert(!std::is_same_v<T, Transform>, "TransformはAddComponentで追加できません。");
 
 	// 新しいコンポーネントを作成し、コンポーネント配列に追加する
-	auto newComponent = std::make_unique<T>(args...);
-	T* componentPtr = newComponent.get();
-	components.push_back(std::move(newComponent));
-	componentPtr->gameObject = this;
-	componentPtr->gameContext = this->m_gameContext;
+	T* componentPtr = m_gameContext->currentScene->CreateComponent<T>(args...);
+	m_components.push_back(componentPtr);
+	componentPtr.m_gameObject = this;
 
 	return componentPtr;
-}
-
-
-template<typename T, typename... Args>
-T* GameObject::CreateGameObject(Args... args)
-{}
-
-
-template<typename T>
-	requires std::is_base_of<GameObject, T>::value
-size_t GameObject::GetTypeID()
-{
-	static size_t id = counter++;
-	return id;
 }
 
 

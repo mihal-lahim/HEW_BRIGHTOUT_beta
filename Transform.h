@@ -10,16 +10,26 @@
 
 class Transform : public Component
 {
-public:
+private:
 	// 位置
-	Vector3 Position{};
+	Vector3 m_position{};
 	// 回転（クオータニオン）
-	Quaternion Rotation{};
+	Quaternion m_rotation{};
 	// スケール
-	Vector3 Scale{ 1.0f, 1.0f, 1.0f };
+	Vector3 m_scale{ 1.0f, 1.0f, 1.0f };
+public:
 
 	Transform() = default;
 	~Transform() = default;
+
+	// 位置の取得・設定メソッド
+	Vector3& position() { return m_position; }
+
+	// 回転の取得・設定メソッド
+	Quaternion& rotation() { return m_rotation; }
+
+	// スケールの取得・設定メソッド
+	Vector3& scale() { return m_scale; }
 
 	// オブジェクトのアクティブ状態を設定するメソッド（Transformでは無効化）
 	void SetActive(bool) override {}

@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <memory>
+#include <type_traits>
 #include "Object.h"
 
 // オブジェクトプールの基底クラス
@@ -50,6 +51,12 @@ public:
 	{
 		if (m_pool.size() <= idx) return nullptr;
 		return m_pool.at(idx).get();
+	}
+
+	// プール内のオブジェクト数を取得
+	size_t Size() const
+	{
+		return m_pool.size();
 	}
 
 	// オブジェクトを削除

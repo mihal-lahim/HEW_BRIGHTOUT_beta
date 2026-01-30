@@ -21,7 +21,7 @@
 
 
 // キー列挙
-typedef enum Keyboard_Keys_tag : unsigned char
+typedef enum KeyboardKeysTag : WORD
 {
     KK_NONE               = 0x0,
                             
@@ -199,8 +199,13 @@ typedef enum Keyboard_Keys_tag : unsigned char
                             
     KK_PA1                = 0xfd,
     KK_OEMCLEAR           = 0xfe,
-} Keyboard_Keys;
+} KeyboardKeys;
 
+
+struct temp
+{
+	int dummy : 8;
+};
 
 // キーボード状態構造体
 typedef struct Keyboard_State_tag
@@ -389,22 +394,22 @@ typedef struct Keyboard_State_tag
     bool Pa1 : 1;               // VK_PA1, 0xFD
     bool OemClear : 1;          // VK_OEM_CLEAR, 0xFE
     bool Reserved26 : 1;
-} Keyboard_State;
+} KeyboardState;
 
 
 // キーボードモジュールの初期化
 void Keyboard_Initialize(void);
 
 // キーボードの現在のキー毎の状態を取得する
-bool Keyboard_IsKeyDown(Keyboard_Keys key);
-bool Keyboard_IsKeyUp(Keyboard_Keys key);
+bool Keyboard_IsKeyDown(KeyboardKeys key);
+bool Keyboard_IsKeyUp(KeyboardKeys key);
 
 // キーボードの現在の状態を取得する
-const Keyboard_State* Keyboard_GetState(void);
+const KeyboardState* Keyboard_GetState(void);
 
 // キーボードの状態からキー毎の状態を取得する
-bool Keyboard_IsKeyDown(Keyboard_Keys key, const Keyboard_State* pState);
-bool Keyboard_IsKeyUp(Keyboard_Keys key, const Keyboard_State* pState);
+bool Keyboard_IsKeyDown(KeyboardKeys key, const KeyboardState* pState);
+bool Keyboard_IsKeyUp(KeyboardKeys key, const KeyboardState* pState);
 
 // キーボードの状態をリセットする
 void Keyboard_Reset(void);
@@ -422,11 +427,11 @@ private:
     // ヘルパ関数
     void KeyDown(int key);
     void KeyUp(int key);
-    bool IsKeyInState(Keyboard_Keys key, const Keyboard_State* pState) const;
+    bool IsKeyInState(KeyboardKeys key, const KeyboardState* pState) const;
 
     // 前回と今回の状態
-    Keyboard_State m_PrevState{};
-    Keyboard_State m_CurState{};
+    KeyboardState m_PrevState{};
+    KeyboardState m_CurState{};
 
 public:
 	// コンストラクタ・デストラクタ
@@ -434,19 +439,19 @@ public:
 	~Keyboard() = default;
 
 	// 毎フレーム呼ぶ
-	void PreUpdate() override;
+	void InputUpdate();
 
 	// 入力値取得（親クラスからオーバーライド）
 	float GetInputValue(InputKey input, InputCondition inputCondition) override;
 
 	// ボタン状態
-	bool IsDown(Keyboard_Keys key) const;
-	bool IsPressed(Keyboard_Keys key) const;
-	bool IsReleased(Keyboard_Keys key) const;
+	bool IsDown(KeyboardKeys key) const;
+	bool IsPressed(KeyboardKeys key) const;
+	bool IsReleased(KeyboardKeys key) const;
 
 	// 状態取得
-	const Keyboard_State& GetCurrentState() const { return m_CurState; }
-	const Keyboard_State& GetPreviousState() const { return m_PrevState; }
+	const KeyboardState& GetCurrentState() const { return m_CurState; }
+	const KeyboardState& GetPreviousState() const { return m_PrevState; }
 
 	// リセット
 	void Reset();

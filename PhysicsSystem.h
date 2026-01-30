@@ -15,40 +15,48 @@ class Collider;
 class RigidBody;
 class GameObject;
 class Ray;
+class Scene;
+class EngineCore;
 
 class PhysicsSystem
 {
 private:
+	// 所属するエンジンコア
+	EngineCore* m_engineCore = nullptr;
+
 	// Bulletの物理演算ワールド
-	std::unique_ptr<btDiscreteDynamicsWorld> m_DynamicsWorld = nullptr;
+	std::unique_ptr<btDiscreteDynamicsWorld> m_dynamicsWorld = nullptr;
 
 	// ブロードフェーズインターフェース
-	std::unique_ptr<btBroadphaseInterface> m_Broadphase = nullptr;
+	std::unique_ptr<btBroadphaseInterface> m_broadphase = nullptr;
 	// 衝突設定
-	std::unique_ptr<btDefaultCollisionConfiguration> m_CollisionConfiguration = nullptr;
+	std::unique_ptr<btDefaultCollisionConfiguration> m_collisionConfiguration = nullptr;
 	// 衝突ディスパッチャー
-	std::unique_ptr<btCollisionDispatcher> m_Dispatcher = nullptr;
+	std::unique_ptr<btCollisionDispatcher> m_dispatcher = nullptr;
 	// 制約ソルバー
-	std::unique_ptr<btSequentialImpulseConstraintSolver> m_Solver = nullptr;
+	std::unique_ptr<btSequentialImpulseConstraintSolver> m_solver = nullptr;
 
 	// 衝突マップ（現在）
-	std::unordered_map<GameObject*, std::vector<GameObject*>> m_CurrentCollisions{};
+	std::unordered_map<GameObject*, std::vector<GameObject*>> m_currentCollisions{};
 	// 衝突マップ（前回）
-	std::unordered_map<GameObject*, std::vector<GameObject*>> m_PreviousCollisions{};
+	std::unordered_map<GameObject*, std::vector<GameObject*>> m_previousCollisions{};
 
 	// トリガーマップ（現在）
-	std::unordered_map<GameObject*, std::vector<GameObject*>> m_CurrentTriggers{};
+	std::unordered_map<GameObject*, std::vector<GameObject*>> m_currentTriggers{};
 	// トリガーマップ（前回）
-	std::unordered_map<GameObject*, std::vector<GameObject*>> m_PreviousTriggers{};
+	std::unordered_map<GameObject*, std::vector<GameObject*>> m_previousTriggers{};
 
-	// 登録されている剛体
-	std::vector<RigidBody*> m_RigidBodies{};
 
 	// コライダーのオフセット適用
 	btTransform ApplyOffsets(Collider& collider);
+
+	void UpdateRigidBody(std::vector<RigidBody*>& rigidbodies);
+	void UpdateCollisions();
 public:
 
-	PhysicsSystem() { Initialize(); }
+	PhysicsSystem(EngineCore* engineCore)
+		: m_engineCore(engineCore)
+	{ Initialize(); }
 	~PhysicsSystem() { Finalize(); }
 
 	void Initialize();
@@ -75,9 +83,7 @@ public:
 	std::vector<GameObject*> GetTriggerExit(GameObject* obj);
 
 	// 更新
-	void PhysicsUpdate(float deltaTime);
-	void UpdateRigidBody();
-	void UpdateCollisions();
+	void PhysicsUpdate(Scene& scene, float deltaTime);
 
 	// レイキャスト
 	void RayCast(Ray& ray, float distance);

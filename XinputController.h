@@ -56,7 +56,7 @@ public:
 	~XinputController() = default;
     
     // 毎フレーム呼ぶ
-    void PreUpdate() override;
+    void InputUpdate();
 
 	// 入力値取得（親クラスからオーバーライド）
 	float GetInputValue(InputKey input, InputCondition inputCondition) override;

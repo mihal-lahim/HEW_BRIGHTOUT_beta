@@ -125,6 +125,15 @@
     <Filter Include="inlFile\Scene">
       <UniqueIdentifier>{ea021800-abc7-436e-825e-adcda6beb065}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HeaderFile\Scene\Base">
+      <UniqueIdentifier>{e71489d0-0d70-48c2-9181-89d80d9c3783}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SorceFile\Scene\Base">
+      <UniqueIdentifier>{c03883dc-c11d-4058-9535-dad4c7ef2700}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HeaderFile\OS">
+      <UniqueIdentifier>{432a01f2-9a61-4d5a-95d3-39d69f32b0fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -292,6 +301,15 @@
     <ClCompile Include="GameManager.cpp">
       <Filter>SorceFile\LifeCycle</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>SorceFile\GameObject\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneSystem.cpp">
+      <Filter>SorceFile\Scene\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineCore.cpp">
+      <Filter>SorceFile\LifeCycle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="texture.h">
@@ -380,9 +398,6 @@
     </ClInclude>
     <ClInclude Include="shader.h">
       <Filter>HeaderFile\Direct3D</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>HeaderFile\Scene</Filter>
     </ClInclude>
     <ClInclude Include="command.h">
       <Filter>HeaderFile\Input</Filter>
@@ -492,7 +507,7 @@
     <ClInclude Include="InputDevice.h">
       <Filter>HeaderFile\Input</Filter>
     </ClInclude>
-    <ClInclude Include="GameManager.h">
+    <ClInclude Include="EngineCore.h">
       <Filter>HeaderFile\LifeCycle</Filter>
     </ClInclude>
     <ClInclude Include="RenderingSystem.h">
@@ -512,6 +527,18 @@
     </ClInclude>
     <ClInclude Include="ObjectPool.h">
       <Filter>HeaderFile\LifeCycle</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>HeaderFile\Scene\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneSystem.h">
+      <Filter>HeaderFile\Scene\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowSystem.h">
+      <Filter>HeaderFile\OS</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>HeaderFile\OS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -536,6 +563,9 @@
       <Filter>inlFile\Component</Filter>
     </None>
     <None Include="Scene.inl">
+      <Filter>inlFile\Scene</Filter>
+    </None>
+    <None Include="SceneSystem.inl">
       <Filter>inlFile\Scene</Filter>
     </None>
   </ItemGroup>

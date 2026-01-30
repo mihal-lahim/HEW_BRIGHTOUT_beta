@@ -171,7 +171,10 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="EngineCore.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="PoleManager.cpp" />
+    <ClCompile Include="SceneSystem.cpp" />
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Vector4.cpp" />
@@ -234,11 +237,14 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="GameContext.h" />
     <ClInclude Include="InputSystem.h" />
     <ClInclude Include="ObjectPool.h" />
+    <ClInclude Include="SceneSystem.h" />
     <ClInclude Include="ScriptComponent.h" />
     <ClInclude Include="ScriptComponentSystem.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
+    <ClInclude Include="Window.h" />
+    <ClInclude Include="WindowSystem.h" />
     <ClInclude Include="XinputController.h" />
     <ClInclude Include="cube.h" />
     <ClInclude Include="CubeObject.h" />
@@ -286,7 +292,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="RenderingSystem.h" />
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="Scene.h" />
-    <ClInclude Include="GameManager.h" />
+    <ClInclude Include="EngineCore.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shader3d.h" />
     <ClInclude Include="sprite.h" />
@@ -332,6 +338,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <None Include="Component.inl" />
     <None Include="GameObject.inl" />
     <None Include="Scene.inl" />
+    <None Include="SceneSystem.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

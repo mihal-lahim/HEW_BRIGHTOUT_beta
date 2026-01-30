@@ -6,16 +6,16 @@
 #include "Transform.h"
 #include "Object.h"
 
-class GameContext;
+class Scene;
 class Component;
 
 
 // ゲーム内のすべてのオブジェクトの基底クラス
-class GameObject : public Object
+class GameObject final : public Object
 {
 private:
-	// 現在のゲームコンテキスト
-	GameContext* m_gameContext;
+	// 所属しているシーン
+	Scene* m_scene = nullptr;
 
 	// 位置・回転・スケール情報
 	Transform* m_transform = nullptr;
@@ -23,21 +23,15 @@ private:
 	// オブジェクトのアクティブ状態
 	bool m_isActive = true;
 
-	// 破壊可能フラグ
-	bool m_canDestroy = false;
-
 	// 所持しているコンポーネントの配列
 	std::vector<Component*> m_components;
-
-	// ゲームオブジェクト型ID生成用カウンタ
-	static inline size_t m_counter = 0;
 public:
 
 	GameObject() = default;
     virtual ~GameObject() = default;
 
 	// Transformコンポーネントの取得メソッド
-	Transform* const transform() const { return m_transform; }
+	Transform& transform() const { return *m_transform; }
 
 	// オブジェクトのアクティブ状態を設定するメソッド
 	void SetActive(bool active) { m_isActive = active; }
@@ -45,8 +39,14 @@ public:
 	// オブジェクトのアクティブ状態を取得するメッド
 	bool IsActiveSelf() const { return m_isActive; }
 
+	// オブジェクトが階層内でアクティブかどうかを取得するメソッド
+	bool IsActiveInHierarchy() const { return m_isActive; /*将来的に機能追加*/ }
+
 	// オブジェクトの破壊を許可するメソッド
-	void Destroy() { m_canDestroy = true; }
+	void Destroy();
+
+	// 所属しているシーンの取得メソッド
+	Scene& scene() const { return *m_scene; }
 
 
 	// 所持しているコンポーネントの取得テンプレートメソッド
@@ -66,15 +66,7 @@ public:
 	T* AddComponent(Args... args);
 
 
-	// ゲームオブジェクト作成テンプレートメソッド
-	template<typename T, typename... Args>
-	T* CreateGameObject(Args... args);
-
-
-	// ゲームオブジェクトの型ID取得テンプレートメソッド
-	template<typename T>
-		requires std::is_base_of<GameObject, T>::value
-	static size_t GetTypeID();
+	friend class Scene;
 };
 
 #endif

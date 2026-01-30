@@ -3,126 +3,108 @@
 #define GAME_OBJECT_INL
 
 #include "Scene.h"
+#include "ScriptComponent.h"
 
-template<typename T, typename... Args>
-	requires std::is_base_of<GameObject, T>::value
-T* Scene::CreateGameObject(Args... args)
-{
-	// ゲームオブジェクトプールの型IDを取得
-	size_t typeID = GameObject::GetTypeID<T>();
-
-	// プールが存在しない場合、新規作成
-	if (m_gameObjects.size() <= typeID)
-	{
-		m_gameObjects.resize(typeID + 1);
-	}
-	if (m_gameObjects.at(typeID) == nullptr)
-	{
-		m_gameObjects.at(typeID) = std::make_unique<ObjectPool<T>>();
-	}
-
-	// オブジェクトプールから新しいゲームオブジェクトを作成
-	auto pool = static_cast<ObjectPool<T>*>(m_gameObjects.at(typeID).get());
-	T* newGameObject = pool->Create(args...);
-
-	// ゲームコンテキストを設定
-	newGameObject->m_gameContext = m_gameContext;
-
-	// 作成保留リストに追加
-	Pending pending{};
-	pending.AllocationID = newGameObject->m_allocationID;
-	pending.TypeID = static_cast<uint32_t>(typeID);
-	m_pendingCreateGameObjects.push_back(pending);
-	return newGameObject;
-}
 
 template<typename T, typename... Args>
 	requires std::is_base_of<Component, T>::value
 T* Scene::CreateComponent(Args... args)
 {
+	// 新しいコンポーネントを作成
+	T* newComponent = new T(args...);
+
 	// コンポーネントプールの型IDを取得
-	size_t typeID = Component::GetTypeID<T>();
+	uint32_t typeID = Component::GetTypeID<T>();
 
-	// プールが存在しない場合、新規作成
-	if (m_components.size() <= typeID)
-	{
-		m_components.resize(typeID + 1);
-	}
-	if (m_components.at(typeID) == nullptr)
-	{
-		m_components.at(typeID) = std::make_unique<ObjectPool<T>>();
-	}
-
-	// オブジェクトプールから新しいコンポーネントを作成
-	auto pool = static_cast<ObjectPool<T>*>(m_components.at(typeID).get());
-	T* newComponent = pool->Create(args...);
-
-	// ゲームコンテキストを設定
-	newComponent->m_gameContext = m_gameContext;
-
-	// 作成保留リストに追加
-	Pending pending{};
-	pending.AllocationID = newComponent->m_allocationID;
+	// 遅延構造体の作成保留リストに追加
+	AddPending pending{};
+	pending.ObjectPtr = newComponent;
 	pending.TypeID = static_cast<uint32_t>(typeID);
-	m_pendingCreateComponents.push_back(pending);
+
+	if constexpr (std::is_base_of<ScriptComponent, T>::value)
+	{
+		m_pendingAddScriptComponents.push(pending);
+	}
+	else
+	{
+		m_pendingAddComponents.push(pending);
+	}
+
 	return newComponent;
 }
 
-
 template<typename T>
-	requires std::is_base_of<GameObject, T>::value
-std::vector<T*> Scene::GetGameObjects()
+	requires std::is_base_of<Component, T>::value
+std::vector<T*> Scene::GetComponents() const
 {
-	std::vector<T*> result;
+	std::vector<T*> result{};
 
-	// ゲームオブジェクトプールの型IDを取得
-	size_t typeID = GameObject::GetTypeID<T>();
+	// コンポーネントプールの型IDを取得
+	uint32_t typeID = Component::GetTypeID<T>();
 
-	// プールが存在しない場合、空の配列を返す
-	if (m_gameObjects.size() <= typeID || m_gameObjects.at(typeID) == nullptr)
+	if constexpr (std::is_base_of<ScriptComponent, T>::value)
 	{
+		// プールが存在しない場合、空の配列を返す
+		if (m_scriptComponents.size() <= typeID || m_scriptComponents.at(typeID) == nullptr)
+		{
+			return result;
+		}
+		// オブジェクトプールからスクリプトコンポーネントを取得
+		auto pool = static_cast<ObjectPool<T>*>(m_scriptComponents.at(typeID).get());
+
+		// プール内のすべてのオブジェクトを収集
+		for (uint32_t i = 0;; i++)
+		{
+			T* comp = pool->Get(i);
+			if (comp == nullptr) break;
+			result.push_back(comp);
+		}
+		return result;
+	}
+	else
+	{
+		// プールが存在しない場合、空の配列を返す
+		if (m_components.size() <= typeID || m_components.at(typeID) == nullptr)
+		{
+			return result;
+		}
+
+		// オブジェクトプールからコンポーネントを取得
+		auto pool = static_cast<ObjectPool<T>*>(m_components.at(typeID).get());
+
+		// プール内のすべてのオブジェクトを収集
+		for (uint32_t i = 0;; i++)
+		{
+			T* comp = pool->Get(i);
+			if (comp == nullptr) break;
+			result.push_back(comp);
+		}
 		return result;
 	}
 
-	// オブジェクトプールからゲームオブジェクトを取得
-	auto pool = static_cast<ObjectPool<T>*>(m_gameObjects.at(typeID).get());
-
-	// プール内のすべてのオブジェクトを収集
-	for (uint32_t i = 0;; i++)
-	{
-		T* obj = pool->Get(i);
-		if (obj == nullptr) break;
-		result.push_back(obj);
-	}
 	return result;
 }
 
 template<typename T>
 	requires std::is_base_of<Component, T>::value
-std::vector<T*> Scene::GetComponents()
+void Scene::DestroyComponent(T* component)
 {
-	std::vector<T*> result;
-
 	// コンポーネントプールの型IDを取得
-	size_t typeID = Component::GetTypeID<T>();
+	uint32_t typeID = Component::GetTypeID<T>();
 
-	// プールが存在しない場合、空の配列を返す
-	if (m_components.size() <= typeID || m_components.at(typeID) == nullptr)
+	// 破棄保留リストに追加
+	DestroyPending pending{};
+	pending.AllocationID = component->m_allocationID;
+	pending.TypeID = typeID;
+
+	if constexpr (std::is_base_of<ScriptComponent, T>::value)
 	{
-		return result;
+		m_pendingDestroyScriptComponents.push(pending);
 	}
-
-	// オブジェクトプールからコンポーネントを取得
-	auto pool = static_cast<ObjectPool<T>*>(m_components.at(typeID).get());
-
-	// プール内のすべてのオブジェクトを収集
-	for (uint32_t i = 0;; i++)
+	else
 	{
-		T* comp = pool->Get(i);
-		if (comp == nullptr) break;
-		result.push_back(comp);
+		m_pendingDestroyComponents.push(pending);
 	}
-	return result;
 }
 
 

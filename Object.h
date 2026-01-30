@@ -6,6 +6,7 @@
 #include <cstdint>
 
 template<typename T>
+	requires std::is_base_of<Object, T>::value
 class ObjectPool;
 
 class Object
@@ -23,7 +24,9 @@ public:
 	bool CompareType() { return typeid(*this) == typeid(T); }
 
 	template<typename T>
+		requires std::is_base_of<Object, T>::value
 	friend class ObjectPool;
+	friend class Scene;
 };
 
 #endif

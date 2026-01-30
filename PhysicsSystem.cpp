@@ -4,24 +4,23 @@
 #include "Collider.h"
 #include "Ray.h"
 #include "GameObject.h"
-
-
+#include "Scene.h"
 
 using namespace DirectX;
 
 btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 {
 	// 所有者のゲームオブジェクトのTransform取得
-	Transform* tf = &collider.gameObject()->transform;
+	Transform& tf = collider.gameObject().transform();
 
 	// 位置設定
 	Vector3 pos = collider.m_OffsetPos;
 	if (collider.m_IsStatic)
-		pos = pos + tf->Position;
+		pos = pos + tf.position();
 
 
 	// 回転設定
-	Quaternion ownerRot = tf->Rotation;
+	Quaternion ownerRot = tf.rotation();
 	Quaternion offsetRot = collider.m_OffsetRot;
 
 	// 回転の組み合わせ
@@ -40,7 +39,7 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 
 	// サイズ設定
 	Vector3 scale = collider.m_Scale;
-	Vector3 ownerScale = tf->Scale;
+	Vector3 ownerScale = tf.scale();
 
 	scale.x *= ownerScale.x;
 	scale.y *= ownerScale.y;
@@ -70,27 +69,27 @@ btTransform PhysicsSystem::ApplyOffsets(Collider& collider)
 
 void PhysicsSystem::Initialize()
 {
-	m_Broadphase = std::make_unique<btDbvtBroadphase>();
-	m_CollisionConfiguration = std::make_unique<btDefaultCollisionConfiguration>();
-	m_Dispatcher = std::make_unique<btCollisionDispatcher>(m_CollisionConfiguration.get());
-	m_Solver = std::make_unique<btSequentialImpulseConstraintSolver>();
+	m_broadphase = std::make_unique<btDbvtBroadphase>();
+	m_collisionConfiguration = std::make_unique<btDefaultCollisionConfiguration>();
+	m_dispatcher = std::make_unique<btCollisionDispatcher>(m_collisionConfiguration.get());
+	m_solver = std::make_unique<btSequentialImpulseConstraintSolver>();
 
-	m_DynamicsWorld = std::make_unique<btDiscreteDynamicsWorld>(
-		m_Dispatcher.get(),
-		m_Broadphase.get(),
-		m_Solver.get(),
-		m_CollisionConfiguration.get());
+	m_dynamicsWorld = std::make_unique<btDiscreteDynamicsWorld>(
+		m_dispatcher.get(),
+		m_broadphase.get(),
+		m_solver.get(),
+		m_collisionConfiguration.get());
 
-	m_DynamicsWorld->setGravity(btVector3(0.0f, 0.0f, 0.0f));
+	m_dynamicsWorld->setGravity(btVector3(0.0f, 0.0f, 0.0f));
 }
 
 void PhysicsSystem::Finalize()
 {
-	m_DynamicsWorld.reset();
-	m_Solver.reset();
-	m_Dispatcher.reset();
-	m_CollisionConfiguration.reset();
-	m_Broadphase.reset();
+	m_dynamicsWorld.reset();
+	m_solver.reset();
+	m_dispatcher.reset();
+	m_collisionConfiguration.reset();
+	m_broadphase.reset();
 }
 
 void PhysicsSystem::RegisterCollider(Collider* collider)
@@ -114,14 +113,14 @@ void PhysicsSystem::RegisterCollider(Collider* collider)
 	obj->setWorldTransform(bttf);
 
 	// ユーザーポインタ設定
-	obj->setUserPointer(collider->gameObject());
+	obj->setUserPointer(&collider->gameObject());
 
 	// トリガー設定
 	if (collider->m_IsTrigger)
 		obj->setCollisionFlags(obj->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
 	// コライダー登録
-	m_DynamicsWorld->addCollisionObject(obj);
+	m_dynamicsWorld->addCollisionObject(obj);
 
 	collider->m_CollisionObject = std::unique_ptr<btCollisionObject>(obj);
 }
@@ -160,8 +159,8 @@ void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
 
 	// 初期位置設定
 	btTransform startPos;
-	startPos.setOrigin(ToBulletPosition(rigidbody->gameObject()->transform.Position));
-	startPos.setRotation(ToBulletRotation(rigidbody->gameObject()->transform.Rotation));
+	startPos.setOrigin(ToBulletPosition(rigidbody->gameObject().transform().position()));
+	startPos.setRotation(ToBulletRotation(rigidbody->gameObject().transform().rotation()));
 
 	// モーションステート作成
 	btDefaultMotionState* motionState = new btDefaultMotionState(startPos);
@@ -178,7 +177,7 @@ void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
 
 
 	// 剛体登録
-	m_DynamicsWorld->addRigidBody(body);
+	m_dynamicsWorld->addRigidBody(body);
 
 
 	// トリガー設定
@@ -186,7 +185,7 @@ void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
 		body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
 	// ユーザーポインタ設定
-	body->setUserPointer(rigidbody->gameObject());
+	body->setUserPointer(&rigidbody->gameObject());
 
 
 	// 重力の設定
@@ -204,40 +203,43 @@ void PhysicsSystem::RegisterRigidBody(RigidBody* rigidbody)
 	// メンバ変数に設定
 	rigidbody->m_RigidBody = std::unique_ptr<btRigidBody>(body);
 	rigidbody->m_MotionState = std::unique_ptr<btMotionState>(motionState);
-
-	// 登録されている剛体リストに追加
-	m_RigidBodies.push_back(rigidbody);
 }
 
 void PhysicsSystem::UnregisterCollider(Collider* collider)
 {
-	m_DynamicsWorld->removeCollisionObject(collider->m_CollisionObject.get());
+	m_dynamicsWorld->removeCollisionObject(collider->m_CollisionObject.get());
 }
 
 void PhysicsSystem::UnregisterRigidBody(RigidBody* rigidbody)
 {
-	m_DynamicsWorld->removeRigidBody(rigidbody->m_RigidBody.get());
+	m_dynamicsWorld->removeRigidBody(rigidbody->m_RigidBody.get());
 }
 
 
-void PhysicsSystem::PhysicsUpdate(float deltaTime)
+void PhysicsSystem::PhysicsUpdate(Scene& scene, float deltaTime)
 {
 	// 物理演算ステップ
-	m_DynamicsWorld->stepSimulation(deltaTime);
+	m_dynamicsWorld->stepSimulation(deltaTime);
+	// シーン内の剛体取得
+	std::vector<RigidBody*> rigidbodies = scene.GetComponents<RigidBody>();
+	UpdateRigidBody(rigidbodies);
+	UpdateCollisions();
 }
 
-void PhysicsSystem::UpdateRigidBody()
+void PhysicsSystem::UpdateRigidBody(std::vector<RigidBody*>& rigidbodies)
 {
-	for (auto* rigidbody : m_RigidBodies)
+	for (auto* rigidbody : rigidbodies)
 	{
+		if (!rigidbody->IsActive()) continue;
+
 		// トランスフォーム取得
 		btTransform worldTransform = rigidbody->m_RigidBody->getWorldTransform();
 
 		// 位置更新
-		Transform* tf = &rigidbody->gameObject()->transform;
+		Transform& tf = rigidbody->gameObject().transform();
 
-		tf->Position = ToDirectXPosition(worldTransform.getOrigin());
-		tf->Rotation = ToDirectXRotation(worldTransform.getRotation());
+		tf.position() = ToDirectXPosition(worldTransform.getOrigin());
+		tf.rotation() = ToDirectXRotation(worldTransform.getRotation());
 
 		// 力をリセット
 		rigidbody->m_RigidBody->clearForces();
@@ -247,15 +249,15 @@ void PhysicsSystem::UpdateRigidBody()
 void PhysicsSystem::UpdateCollisions()
 {
 	// 前回の衝突情報を保存
-	m_PreviousCollisions = m_CurrentCollisions;
+	m_previousCollisions = m_currentCollisions;
 
 	// 衝突情報の取得
-	int numManifolds = m_DynamicsWorld->getDispatcher()->getNumManifolds();
+	int numManifolds = m_dynamicsWorld->getDispatcher()->getNumManifolds();
 
 	for (int i = 0; i < numManifolds; i++)
 	{
 		// 衝突マニホールド取得
-		btPersistentManifold* contactManifold = m_DynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+		btPersistentManifold* contactManifold = m_dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
 
 		// 衝突オブジェクト取得
 		const btCollisionObject* obA = contactManifold->getBody0();
@@ -284,15 +286,15 @@ void PhysicsSystem::UpdateCollisions()
 				if (isTriggerA || isTriggerB)
 				{
 					// トリガー情報に追加
-					m_CurrentTriggers[gameObjectA].push_back(gameObjectB);
-					m_CurrentTriggers[gameObjectB].push_back(gameObjectA);
+					m_currentTriggers[gameObjectA].push_back(gameObjectB);
+					m_currentTriggers[gameObjectB].push_back(gameObjectA);
 				}
 				// トリガーでない場合
 				else
 				{
 					// 衝突情報に追加
-					m_CurrentCollisions[gameObjectA].push_back(gameObjectB);
-					m_CurrentCollisions[gameObjectB].push_back(gameObjectA);
+					m_currentCollisions[gameObjectA].push_back(gameObjectB);
+					m_currentCollisions[gameObjectB].push_back(gameObjectA);
 				}
 			}
 		}
@@ -326,7 +328,7 @@ void PhysicsSystem::RayCast(Ray& ray, float distance)
 	btCollisionWorld::ClosestRayResultCallback rayCallback(from, toVec);
 
 	// レイテスト実行
-	m_DynamicsWorld->rayTest(from, toVec, rayCallback);
+	m_dynamicsWorld->rayTest(from, toVec, rayCallback);
 
 	// レイがヒットしつつ、Triggerを無視する設定
 	if (rayCallback.hasHit() && !(rayCallback.m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE))
@@ -353,12 +355,12 @@ std::vector<GameObject*> PhysicsSystem::GetCollisionEnter(GameObject* obj)
 	// 衝突開始オブジェクトリスト
 	std::vector<GameObject*> enterObjects;
 
-	for (auto* currentObj : m_CurrentCollisions[obj])
+	for (auto* currentObj : m_currentCollisions[obj])
 	{
 		// 前回の衝突情報に存在しない場合、衝突開始
-		auto it = std::find(m_PreviousCollisions[obj].begin(), m_PreviousCollisions[obj].end(), currentObj);
+		auto it = std::find(m_previousCollisions[obj].begin(), m_previousCollisions[obj].end(), currentObj);
 
-		if (it == m_PreviousCollisions[obj].end())
+		if (it == m_previousCollisions[obj].end())
 			enterObjects.push_back(currentObj);
 	}
 
@@ -370,12 +372,12 @@ std::vector<GameObject*> PhysicsSystem::GetCollisionStay(GameObject* obj)
 	// 衝突継続オブジェクトリスト
 	std::vector<GameObject*> stayObjects;
 
-	for (auto* currentObj : m_CurrentCollisions[obj])
+	for (auto* currentObj : m_currentCollisions[obj])
 	{
 		// 前回の衝突情報に存在する場合、衝突継続
-		auto it = std::find(m_PreviousCollisions[obj].begin(), m_PreviousCollisions[obj].end(), currentObj);
+		auto it = std::find(m_previousCollisions[obj].begin(), m_previousCollisions[obj].end(), currentObj);
 
-		if (it != m_PreviousCollisions[obj].end())
+		if (it != m_previousCollisions[obj].end())
 			stayObjects.push_back(currentObj);
 	}
 
@@ -387,12 +389,12 @@ std::vector<GameObject*> PhysicsSystem::GetCollisionExit(GameObject* obj)
 	// 衝突終了オブジェクトリスト
 	std::vector<GameObject*> exitObjects;
 
-	for (auto* previousObj : m_PreviousCollisions[obj])
+	for (auto* previousObj : m_previousCollisions[obj])
 	{
 		// 現在の衝突情報に存在しない場合、衝突終了
-		auto it = std::find(m_CurrentCollisions[obj].begin(), m_CurrentCollisions[obj].end(), previousObj);
+		auto it = std::find(m_currentCollisions[obj].begin(), m_currentCollisions[obj].end(), previousObj);
 
-		if (it == m_CurrentCollisions[obj].end())
+		if (it == m_currentCollisions[obj].end())
 			exitObjects.push_back(previousObj);
 	}
 
@@ -404,12 +406,12 @@ std::vector<GameObject*> PhysicsSystem::GetTriggerEnter(GameObject* obj)
 	// トリガー開始オブジェクトリスト
 	std::vector<GameObject*> enterObjects;
 
-	for (auto* currentObj : m_CurrentTriggers[obj])
+	for (auto* currentObj : m_currentTriggers[obj])
 	{
 		// 前回のトリガー情報に存在しない場合、トリガー開始
-		auto it = std::find(m_PreviousTriggers[obj].begin(), m_PreviousTriggers[obj].end(), currentObj);
+		auto it = std::find(m_previousTriggers[obj].begin(), m_previousTriggers[obj].end(), currentObj);
 
-		if (it == m_PreviousTriggers[obj].end())
+		if (it == m_previousTriggers[obj].end())
 			enterObjects.push_back(currentObj);
 	}
 
@@ -421,12 +423,12 @@ std::vector<GameObject*> PhysicsSystem::GetTriggerStay(GameObject* obj)
 	// トリガー継続オブジェクトリスト
 	std::vector<GameObject*> stayObjects;
 
-	for (auto* currentObj : m_CurrentTriggers[obj])
+	for (auto* currentObj : m_currentTriggers[obj])
 	{
 		// 前回のトリガー情報に存在する場合、トリガー継続
-		auto it = std::find(m_PreviousTriggers[obj].begin(), m_PreviousTriggers[obj].end(), currentObj);
+		auto it = std::find(m_previousTriggers[obj].begin(), m_previousTriggers[obj].end(), currentObj);
 
-		if (it != m_PreviousTriggers[obj].end())
+		if (it != m_previousTriggers[obj].end())
 			stayObjects.push_back(currentObj);
 	}
 
@@ -438,12 +440,12 @@ std::vector<GameObject*> PhysicsSystem::GetTriggerExit(GameObject* obj)
 	// トリガー終了オブジェクトリスト
 	std::vector<GameObject*> exitObjects;
 
-	for (auto* previousObj : m_PreviousTriggers[obj])
+	for (auto* previousObj : m_previousTriggers[obj])
 	{
 		// 現在のトリガー情報に存在しない場合、トリガー終了
-		auto it = std::find(m_CurrentTriggers[obj].begin(), m_CurrentTriggers[obj].end(), previousObj);
+		auto it = std::find(m_currentTriggers[obj].begin(), m_currentTriggers[obj].end(), previousObj);
 
-		if (it == m_CurrentTriggers[obj].end())
+		if (it == m_currentTriggers[obj].end())
 			exitObjects.push_back(previousObj);
 	}
 
