@@ -1,6 +1,6 @@
 /*==============================================================================
 
-   キーボード入力 [key_logger.h]
+   キーボード入力 [KeyLogger.h]
 														 Author : sumi rintarou
 														 Date   : 2025/06/27
 --------------------------------------------------------------------------------
@@ -13,9 +13,9 @@
 
 void KeyLogger_Initialize();
 void KeyLogger_Update();
-bool KeyLogger_IsPressed(Keyboard_Keys key);
-bool KeyLogger_IsTrigger(Keyboard_Keys key);
-bool KeyLogger_IsRelease(Keyboard_Keys key);
+bool KeyLogger_IsPressed(KeyboardKeys key);
+bool KeyLogger_IsTrigger(KeyboardKeys key);
+bool KeyLogger_IsRelease(KeyboardKeys key);
 
 
 #endif // KEY_LOGGER_H

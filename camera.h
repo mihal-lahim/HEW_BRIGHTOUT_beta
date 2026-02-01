@@ -11,11 +11,10 @@
 
 
 #include "Component.h"
-#include "GameManager.h"
-#include "GameObject.h"
+#include <DirectXMath.h>
 
 
-class Camera : public GameObject
+class Camera : public Component
 {
 public:
 
@@ -29,13 +28,14 @@ public:
 
 	int Priority = 0;       // カメラの優先度（数値が小さいほど優先される）
 
+	Camera() = default;
+	virtual ~Camera() = default;
 
+	// ビュー行列取得メソッド
+	DirectX::XMMATRIX GetViewMatrix() const;
 
-	Camera() { GameManager::GetRenderSystem().RegisterCamera(this); }
-	virtual ~Camera() { GameManager::GetRenderSystem().UnregisterCamera(this); }
-
-	// 行列を定数バッファに設定するメソッド
-	void SetMatrix() const;
+	// プロジェクション行列取得メソッド
+	DirectX::XMMATRIX GetProjectionMatrix() const;
 };
 
 #endif

@@ -1,5 +1,3 @@
-
-
 #ifndef PHYSICS_SYSTEM_H
 #define PHYSICS_SYSTEM_H
 
@@ -9,78 +7,94 @@
 #include "Transform.h"
 #include "Vector3.h"
 #include <memory>
+#include "UniqueQueue.h"
 
 
-class Collider;
-class RigidBody;
-class GameObject;
-class Ray;
+struct ColliderShape;
+class PhysicsBody;
+struct Ray;
+class Scene;
+class EngineCore;
 
 class PhysicsSystem
 {
-private:
-	// Bulletの物理演算ワールド
-	std::unique_ptr<btDiscreteDynamicsWorld> m_DynamicsWorld = nullptr;
-
-	// ブロードフェーズインターフェース
-	std::unique_ptr<btBroadphaseInterface> m_Broadphase = nullptr;
-	// 衝突設定
-	std::unique_ptr<btDefaultCollisionConfiguration> m_CollisionConfiguration = nullptr;
-	// 衝突ディスパッチャー
-	std::unique_ptr<btCollisionDispatcher> m_Dispatcher = nullptr;
-	// 制約ソルバー
-	std::unique_ptr<btSequentialImpulseConstraintSolver> m_Solver = nullptr;
-
-	// 衝突マップ（現在）
-	std::unordered_map<GameObject*, std::vector<GameObject*>> m_CurrentCollisions{};
-	// 衝突マップ（前回）
-	std::unordered_map<GameObject*, std::vector<GameObject*>> m_PreviousCollisions{};
-
-	// トリガーマップ（現在）
-	std::unordered_map<GameObject*, std::vector<GameObject*>> m_CurrentTriggers{};
-	// トリガーマップ（前回）
-	std::unordered_map<GameObject*, std::vector<GameObject*>> m_PreviousTriggers{};
-
-	// 登録されている剛体
-	std::vector<RigidBody*> m_RigidBodies{};
-
-	// コライダーのオフセット適用
-	btTransform ApplyOffsets(Collider& collider);
 public:
+	// レイキャスト
+	void RayCast(Ray& ray, float distance);
 
-	PhysicsSystem() { Initialize(); }
-	~PhysicsSystem() { Finalize(); }
+
+	PhysicsSystem(EngineCore* engineCore)
+		: m_engineCore(engineCore)
+	{ 
+		Initialize();
+	}
+	~PhysicsSystem() 
+	{ 
+		Finalize();
+	}
 
 	void Initialize();
 	void Finalize();
 
-	// コライダー登録
-	void RegisterCollider(Collider* collider);
-	// 剛体登録
-	void RegisterRigidBody(RigidBody* rigidbody);
 
-	// コライダー登録解除
-	void UnregisterCollider(Collider* collider);
-	// 剛体登録解除
-	void UnregisterRigidBody(RigidBody* rigidbody);
+	// 物理ボディ初期化
+	void InitializePhysicsBody(PhysicsBody* physicsBody);
+
+	// 物理ボディ登録
+	void RegisterPhysicsBody(PhysicsBody* physicsBody);
+	// 物理ボディ登録解除
+	void UnregisterPhysicsBody(PhysicsBody* physicsBody);
+
 
 	// 衝突取得メソッド
-	std::vector<GameObject*> GetCollisionEnter(GameObject* obj);
-	std::vector<GameObject*> GetCollisionStay(GameObject* obj);
-	std::vector<GameObject*> GetCollisionExit(GameObject* obj);
+	std::vector<PhysicsBody*> GetCollisionEnter(PhysicsBody* obj);
+	std::vector<PhysicsBody*> GetCollisionStay(PhysicsBody* obj);
+	std::vector<PhysicsBody*> GetCollisionExit(PhysicsBody* obj);
 
 	// トリガー取得メソッド
-	std::vector<GameObject*> GetTriggerEnter(GameObject* obj);
-	std::vector<GameObject*> GetTriggerStay(GameObject* obj);
-	std::vector<GameObject*> GetTriggerExit(GameObject* obj);
+	std::vector<PhysicsBody*> GetTriggerEnter(PhysicsBody* obj);
+	std::vector<PhysicsBody*> GetTriggerStay(PhysicsBody* obj);
+	std::vector<PhysicsBody*> GetTriggerExit(PhysicsBody* obj);
 
 	// 更新
-	void PhysicsUpdate(float deltaTime);
-	void UpdateRigidBody();
-	void UpdateCollisions();
+	void PhysicsUpdate(Scene& scene, float deltaTime);
 
-	// レイキャスト
-	void RayCast(Ray& ray, float distance);
+
+private:
+
+	// 所属するエンジンコア
+	EngineCore* m_engineCore = nullptr;
+
+	// Bulletの物理演算ワールド
+	std::unique_ptr<btDiscreteDynamicsWorld> m_dynamicsWorld = nullptr;
+
+	// ブロードフェーズインターフェース
+	std::unique_ptr<btBroadphaseInterface> m_broadphase = nullptr;
+	// 衝突設定
+	std::unique_ptr<btDefaultCollisionConfiguration> m_collisionConfiguration = nullptr;
+	// 衝突ディスパッチャー
+	std::unique_ptr<btCollisionDispatcher> m_dispatcher = nullptr;
+	// 制約ソルバー
+	std::unique_ptr<btSequentialImpulseConstraintSolver> m_solver = nullptr;
+
+	// 衝突マップ（現在）
+	std::unordered_map<PhysicsBody*, std::vector<PhysicsBody*>> m_currentCollisions{};
+	// 衝突マップ（前回）
+	std::unordered_map<PhysicsBody*, std::vector<PhysicsBody*>> m_previousCollisions{};
+
+	// トリガーマップ（現在）
+	std::unordered_map<PhysicsBody*, std::vector<PhysicsBody*>> m_currentTriggers{};
+	// トリガーマップ（前回）
+	std::unordered_map<PhysicsBody*, std::vector<PhysicsBody*>> m_previousTriggers{};
+
+
+
+
+	// コライダーのオフセット適用
+	btTransform ApplyOffsets(const ColliderShape& colliderShape, Transform& tf, btCollisionShape*& shape);
+
+	void UpdatePhysicsBody(std::vector<PhysicsBody*>& physicsBodies);
+	void UpdateCollisions();
 };
 
 // DirectX座標系からBullet座標系への変換

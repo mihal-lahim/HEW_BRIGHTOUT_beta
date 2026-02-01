@@ -1,70 +1,51 @@
-#ifndef INPUTSYSTEM_H
-#define INPUTSYSTEM_H
 
+#ifndef INPUT_SYSTEM_H
+#define INPUT_SYSTEM_H
 
-#include <unordered_map>
-#include "InputDevice.h"
-#include "CommandSet.h"
-#include "Component.h"
-#include "debug_ostream.h"
+#include "Keyboard.h"
+#include "GamePad.h"
+#include <array>
 
+class EngineCore;
+class Scene;
 
-class InputSystem : public Component
+enum class InputDeviceType
 {
-private:
-	// 入力デバイス
-	InputDevice* m_InputDevice = nullptr;
-
-	// コマンドセット
-	CommandSet* m_CommandSet = nullptr;
-public:
-	// コンストラクタ・デストラクタ
-	InputSystem(InputDevice* inputDevice, CommandSet* commandSet = nullptr)
-		: m_InputDevice(inputDevice), m_CommandSet(commandSet)
-	{}
-	~InputSystem() = default;
-
-	// デバイス設定
-	void SetDevice(InputDevice* inputDevice) { m_InputDevice = inputDevice; }
-
-	// 入力デバイスの設定
-	void SetInputDevice(InputDevice* inputDevice) { m_InputDevice = inputDevice; }
-
-	// コマンドセットの設定
-	void SetCommandSet(CommandSet* commandSet) { m_CommandSet = commandSet; }
-
-	// 登録済みのコマンドかどうかを確認
-	template<CommandType COM>
-	bool IsRegistered() const { return m_CommandSet ? m_CommandSet->IsRegistered<COM>() : false; }
-
-	// コマンドの数値を取得
-	template<CommandType COM>
-	float GetValue() const;
-
-	// コマンドが発行されているかどうかを取得
-	template<CommandType COM>
-	bool IsIssued() const { return GetValue<COM>() != 0.0f; }
+	KEYBOARD,
+	GAMEPAD,
 };
 
-
-template<CommandType COM>
-inline float InputSystem::GetValue() const
+class InputSystem
 {
-	// コマンドセットが設定されていなければ0を返す
-	if (!m_CommandSet) return 0.0f;
+public:
+	InputSystem(EngineCore* engineCore)
+		: m_engineCore(engineCore)
+	{ Initialize(); }
+	~InputSystem() { Finalize(); }
 
-	// コマンド情報を取得
-	const auto* info = m_CommandSet->GetCommandInfo<COM>();
+	// 入力システムの初期化
+	void Initialize();
+	// 入力システムの更新
+	void Update();
+	// 入力システムの終了処理
+	void Finalize();
 
+	// キーボードデバイス取得
+	Keyboard& keyboard() { return m_keyboard; }
 
-	// 登録されていれば値を返す
-	if (info)
-		return m_InputDevice->GetInputValue(info->first, info->second);
+	// キーボードデバイス取得
+	GamePad& gamePad(int index = 0) { return m_gamePads.at(index); }
 
+private:
+	// 所属するエンジンコア
+	EngineCore* m_engineCore = nullptr;
 
+	// キーボードデバイス
+	Keyboard m_keyboard{};
 
-	// 未登録の場合は0を返す
-	return 0.0f;
-}
+	// ゲームパッドデバイス（最大4つまで対応）
+	std::array<GamePad, 4> m_gamePads{ GamePad(0), GamePad(1), GamePad(2), GamePad(3) };
+};
+
 
 #endif

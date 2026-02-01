@@ -1,9 +1,5 @@
 
 #include "Player.h"
-#include "DebugCounter.h"
-#include "debug_ostream.h"
-
-#include <iostream>
 
 using namespace DirectX;
 
@@ -14,20 +10,18 @@ void PlayerState_Human_Walk::Enter(Player& player)
 
 void PlayerState_Human_Walk::HandleInput(Player& player)
 {
-	hal::dout << "HumanWalk" << std::endl;
-
 	// 入力システム取得
-	const InputSystem* inputSystem = player.m_InputSystem;
+	InputHandler* inputHandler = player.inputHandler;
 
 	// ステートマシン取得
-	PlayerStateMachine* stateMachine = player.m_StateMachine;
+	PlayerStateMachine* stateMachine = player.stateMachine;
 
 	// 移動コンポーネント取得
-	PlayerMovement* movement = player.m_Movement;
+	PlayerMovement* movement = player.movement;
 
 	// 入力値取得
-	float inputX = inputSystem->GetValue<PlayerCommand_MoveX>();
-	float inputZ = inputSystem->GetValue<PlayerCommand_MoveZ>();
+	float inputX = inputHandler->GetValue<PlayerCommand_MoveX>();
+	float inputZ = inputHandler->GetValue<PlayerCommand_MoveZ>();
 
 	// 歩行処理
 	movement->Walk(inputX, inputZ);

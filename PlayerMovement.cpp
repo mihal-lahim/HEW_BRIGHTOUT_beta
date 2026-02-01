@@ -1,9 +1,9 @@
 #include "PlayerMovement.h"
+#include "PhysicsSystem.h"
 #include "player.h"
 #include "PowerLine.h"
 #include <algorithm>
 #include "Camera.h"
-#include "ObjectManager.h"
 #include "Ray.h"
 
 
@@ -32,14 +32,14 @@ bool PlayerMovement::IsOnGround() const
 void PlayerMovement::UpdateRayCast()
 {
 	// レイの始点を設定
-	Vector3 from = gameObject()->transform.Position;
+	Vector3 from = gameObject().transform().position();
 	from.y -= m_Ctx.RayCastOffset;
 
 	// レイの作成
 	m_GroundRay = Ray(from, { 0.0f, -1.0f, 0.0f });
 
 	// レイキャスト実行
-	m_GroundRay.RayCast(m_Ctx.RayLength);
+	physics().RayCast(m_GroundRay, m_Ctx.RayLength);
 }
 
 void PlayerMovement::ApplyGravity()
@@ -130,13 +130,13 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 	Vector3 halfVec = lineVec * 0.5f;
 
 	// 電線の中央位置を取得
-	Vector3 lineMidPos = powerLine->transform.Position;
+	Vector3 lineMidPos = powerLine->gameObject().transform().position();
 
 	// 開始位置を設定（内積の符号に基づく）
 	Vector3 startPos = dot >= 0.0f ? lineMidPos - halfVec : lineMidPos + halfVec;
 
 	// プレイヤーの現在位置を取得
-	Vector3 playerPos = gameObject()->transform.Position;
+	Vector3 playerPos = gameObject().transform().position();
 
 	// 開始位置からプレイヤー位置へのベクトルを取得
 	Vector3 toPlayerVec = playerPos - startPos;
@@ -203,10 +203,10 @@ void PlayerMovement::LineMove()
 
 	// 電線上の位置を取得
 	Vector3 newPos;
-	newPos.FromXMFLOAT3(m_PoleManager->GetPositionOnPowerLine(m_StartPole, m_DestPole, m_LineParam));
+	newPos = m_PoleManager->GetPositionOnPowerLine(m_StartPole, m_DestPole, m_LineParam);
 
 	// 速度ベクトルを計算
-	Vector3 currentPos = gameObject()->transform.Position;
+	Vector3 currentPos = gameObject().transform().position();
 	Vector3 velocityVec = newPos - currentPos;
 
 	// 速度ベクトルを設定
@@ -231,7 +231,7 @@ void PlayerMovement::PostUpdate()
 Vector3 ConvertToWorldFromInput(const Vector3& inputDir, const Camera* camera)
 {
 	// 入力方向ベクトルを回転させてワールド座標系に変換
-	return inputDir.Rotate(camera->transform.Rotation);
+	return inputDir.Rotate(camera->gameObject().transform().rotation());
 }
 
 Vector3 ConvertToXZPlane(const Vector3& worldDir)

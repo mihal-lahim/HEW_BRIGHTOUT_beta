@@ -31,14 +31,14 @@ void PlayerState::Enter(Player&)
 void PlayerState::HandleInput(Player& player)
 {
 	// 入力システム取得
-	const InputSystem* inputSystem = player.m_InputSystem;
+	InputHandler* inputHandler = player.inputHandler;
 
-	float inputX = inputSystem->GetValue<PlayerCommand_CameraMoveX>();
-	float inputY = inputSystem->GetValue<PlayerCommand_CameraMoveY>();
+	float inputX = inputHandler->GetValue<PlayerCommand_CameraMoveX>();
+	float inputY = inputHandler->GetValue<PlayerCommand_CameraMoveY>();
 
 	// カメラ回転処理
 	if (inputX != 0.0f || inputY != 0.0f)
-		player.m_Camera->Rotate(inputX, inputY);
+		player.camera->Rotate(inputX, inputY);
 }
 
 void PlayerState::Update(Player&)

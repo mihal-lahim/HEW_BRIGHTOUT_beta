@@ -5,24 +5,41 @@
 #include <vector>
 #include "Transform.h"
 #include "Object.h"
+#include "GameContext.h"
 
-
-class ObjectManager;
+class Scene;
 class Component;
 
-// ゲーム内のすべての静的オブジェクトの基底クラス
-class GameObject : public Object
+
+// ゲーム内のすべてのオブジェクトの基底クラス
+class GameObject final : public Object
 {
 public:
-	// 位置・回転・スケール情報
-	Transform transform;
+	GameObject() = default;
+	virtual ~GameObject() = default;
 
-	GameObject();
-    virtual ~GameObject() = default;
+	// Transformコンポーネントの取得メソッド
+	Transform& transform() const { return *m_transform; }
+
+	// オブジェクトのアクティブ状態を設定するメソッド
+	void SetActive(bool active);
+
+	// オブジェクトのアクティブ状態を取得するメッド
+	bool IsActiveSelf() const { return m_isActive; }
+
+	// オブジェクトが階層内でアクティブかどうかを取得するメソッド
+	bool IsActiveInHierarchy() const { return m_isActive; /*将来的に機能追加*/ }
+
+	// オブジェクトの破壊を許可するメソッド
+	void Destroy();
+
+	// 所属しているシーンの取得メソッド
+	Scene& scene() const { return *m_scene; }
+
 
 	// 所持しているコンポーネントの取得テンプレートメソッド
 	template<typename T>
-	 requires std::is_base_of<Component, T>::value
+		requires std::is_base_of<Component, T>::value
 	T* GetComponent() const;
 
 	// 所持しているコンポーネントの配列取得テンプレートメソッド
@@ -30,52 +47,35 @@ public:
 		requires std::is_base_of<Component, T>::value
 	std::vector<T*> GetComponents() const;
 
+
 	// コンポーネント追加テンプレートメソッド
 	template<typename T, typename... Args>
 		requires std::is_base_of<Component, T>::value
-	T* AddComponent(Args... args);
+	T* AddComponent(Args&&... args);
 
-	// 既存のコンポーネントを追加するメソッド
-	void RegisterComponent(Component* comp);
+private:
+	// 現在のゲームコンテキスト
+	GameContext m_gameContext{};
 
-	// オブジェクトのアクティブ状態を設定するメソッド
-	void SetActive(bool active) override;
+	// 所属しているシーン
+	Scene* m_scene = nullptr;
 
+	// 位置・回転・スケール情報
+	Transform* m_transform = nullptr;
 
-	friend class ObjectManager;
+	// オブジェクトのアクティブ状態
+	bool m_isActive = true;
+
+	// オブジェクトの破壊状態
+	bool m_isDestroyed = false;
+
+	// 所持しているコンポーネントの配列
+	std::vector<Component*> m_components;
+
+	friend class Scene;
+	friend class Component;
 };
 
-
-#include "ObjectManager.h"
-
-template<typename T>
-	requires std::is_base_of<Component, T>::value
-T* GameObject::GetComponent() const
-{
-	return objectManager()->template GetComponent<T>(*this);
-}
-
-template<typename T>
-	requires std::is_base_of<Component, T>::value
-inline std::vector<T*> GameObject::GetComponents() const
-{
-	return objectManager()->template GetComponents<T>(*this);
-}
-
-template<typename T, typename... Args>
-	requires std::is_base_of<Component, T>::value
-T* GameObject::AddComponent(Args... args)
-{
-	// コンポーネントを生成
-	T* comp = new T(std::forward<Args>(args)...);
-
-	// コンポーネントの所有ゲームオブジェクトを設定
-	comp->m_GameObject = this;
-
-	// オブジェクトマネージャーに登録
-	objectManager()->RegisterComponent(comp);
-
-	return comp;
-}
+#include "GameObject.inl"
 
 #endif

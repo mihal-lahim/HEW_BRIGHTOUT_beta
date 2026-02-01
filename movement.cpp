@@ -6,13 +6,13 @@ using namespace DirectX;
 void Movement::Start()
 {
 	// RigidBodyコンポーネントを取得
-	m_RigidBody = gameObject()->GetComponent<RigidBody>();
+	m_physicsBody = gameObject().GetComponent<PhysicsBody>();
 }
 
 
 Vector3 Movement::GetCurrentVelocity() const
 {
-	return m_RigidBody->GetVelocity();
+	return m_physicsBody->GetVelocity();
 }
 
 void Movement::RotateByMoveVec()
@@ -21,10 +21,9 @@ void Movement::RotateByMoveVec()
 	float yaw = atan2f(MoveVec.x, MoveVec.z);
 
 	// オーナーの回転を更新
-	gameObject()->transform.Rotation *= Quaternion::SetEulerY(yaw);
+	gameObject().transform().rotation() *= Quaternion::SetEulerY(yaw);
 }
 
-#include "debug_ostream.h"
 
 void Movement::PostUpdate()
 {
@@ -46,16 +45,16 @@ void Movement::PostUpdate()
 
 
 	// RigidBodyがアクティブな場合
-	if (m_RigidBody && m_RigidBody->IsActive())
+	if (m_physicsBody && m_physicsBody->IsEnable())
 	{
 		// RigidBodyに速度を設定
-		m_RigidBody->SetVelocity(newVelocity);
+		m_physicsBody->SetVelocity(newVelocity);
 	}
 	// RigidBodyがアクティブでない場合
 	else
 	{
 		// 位置を更新
-		gameObject()->transform.Position += newVelocity * (float)Time::DeltaTime();
+		gameObject().transform().position() += newVelocity * (float)Time::DeltaTime();
 	}
 
 	// 力量ベクトルと移動ベクトルをリセット

@@ -1,27 +1,24 @@
 #include "GameObject.h"
-#include "ObjectManager.h"
-
-
-GameObject::GameObject()
-{
-	objectManager()->RegisterGameObject(this);
-}
-
-void GameObject::RegisterComponent(Component* comp)
-{
-	comp->m_GameObject = this;
-	objectManager()->RegisterComponent(comp);
-}
+#include "GameContext.h"
+#include "Scene.h"
 
 void GameObject::SetActive(bool active)
 {
-	// 所持しているすべてのコンポーネントのアクティブ状態を設定
-	auto comps = objectManager()->GetAllComponents(*this);
+	for (auto* comp : m_components)
+	{
+		comp->SetEnable(active);
+	}
+	m_isActive = active;
+}
 
-	// コンポーネントのアクティブ状態を設定
-	for (auto comp : comps)
-		comp->SetActive(active);
+void GameObject::Destroy()
+{
+	if (!m_scene || m_isDestroyed) return;
 
-
-	Object::SetActive(active);
+	// 自身を所有しているシーンに破壊を依頼
+	m_scene->DestroyGameObject(this);
+	
+	// 所有しているコンポーネントもすべて破壊を許可
+	for (auto& comp : m_components)
+		comp->Destroy();
 }

@@ -1,6 +1,7 @@
 #include "PoleManager.h"
 #include "PowerLine.h"
 #include "Pole.h"
+#include "GameObject.h"
 
 using namespace DirectX;
 
@@ -10,11 +11,11 @@ PoleID PoleManager::RegisterPole(Pole* pole)
 	m_Poles.push_back(pole);
 	
 	// PoleManagerを電柱に設定
-	pole->SetOwner(this);
+	pole->m_PoleManager = this;
 
 	// 電柱IDを設定
 	PoleID id = (PoleID)(m_Poles.size() - 1);
-	pole->SetID(id);
+	pole->m_ID = id;
 
     return id;
 }
@@ -31,18 +32,18 @@ PowerLineID PoleManager::RegisterPowerLine(PowerLine* line)
 	pole2->SetPowerLine((PoleID)m_PowerLines.size() - 1);
 
 	// 電柱の座標を取得
-	Vector3 pos1 = pole1->transform.Position;
-	Vector3 pos2 = pole2->transform.Position;
+	Vector3 pos1 = pole1->gameObject().transform().position();
+	Vector3 pos2 = pole2->gameObject().transform().position();
 
 	// 電線の長さを設定（2点間の距離）
 	line->SetLength((pos2 - pos1).Length());
 
 	// PoleManagerを電線に設定
-	line->SetOwner(this);
+	line->m_PoleManager = this;
 
 	// 電線IDを設定
 	PowerLineID id = (PowerLineID)(m_PowerLines.size() - 1);
-	line->SetID(id);
+	line->m_ID = id;
 
 	return id;
 }
@@ -69,7 +70,7 @@ PowerLineID PoleManager::GetPowerLineID(PoleID start, PoleID dest) const
 	return -1;
 }
 
-DirectX::XMFLOAT3 PoleManager::GetPositionOnPowerLine(PoleID start, PoleID dest, float t) const
+Vector3 PoleManager::GetPositionOnPowerLine(PoleID start, PoleID dest, float t) const
 {
 	// 電柱の頂点位置を取得
 	Vector3 startVec = m_Poles.at(start)->GetTopPos();
@@ -78,7 +79,7 @@ DirectX::XMFLOAT3 PoleManager::GetPositionOnPowerLine(PoleID start, PoleID dest,
 	// 線形補間で電線上の位置を取得（start + (dest - start) * t）
 	Vector3 result = startVec + (destVec - startVec) * t;
 	
-	return result.ToXMFLOAT3();
+	return result;
 }
 
 PoleID PoleManager::GetDirectionalPole(PoleID from, const Vector3& direction) const

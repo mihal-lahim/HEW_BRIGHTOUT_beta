@@ -5,12 +5,14 @@
 ////////////////////////////////
 #ifndef DEBUG_CAMERA_H
 #define DEBUG_CAMERA_H
-#include "Camera.h"
+#include "Keyboard.h"
+#include "ScriptComponent.h"
 
-class DebugCamera : public Camera
+class DebugCamera : public ScriptComponent
 {
 public:
 	DebugCamera() = default;
+	~DebugCamera() = default;
 
 	//キー入力による更新
 	void Update() override;

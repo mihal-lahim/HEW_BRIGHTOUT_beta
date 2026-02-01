@@ -12,7 +12,7 @@
 using namespace DirectX;
 #include "direct3d.h"
 #include "shader.h"
-#include "debug_ostream.h"
+#include "DebugOstream.h"
 
 
 static constexpr int NUM_VERTEX = 4; // í∏ì_êî

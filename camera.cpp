@@ -1,14 +1,16 @@
 #include "Camera.h"
 #include "direct3d.h"
-#include "shader3d.h"
 #include "GameObject.h"
 
 using namespace DirectX;
 
-void Camera::SetMatrix() const
+
+DirectX::XMMATRIX Camera::GetViewMatrix() const
 {
+	Transform& tf = gameObject().transform();
+
 	// 回転行列を作成
-	XMMATRIX matRot = transform.Rotation.ToXMMATRIX();
+	XMMATRIX matRot = tf.rotation().ToXMMATRIX();
 
 	// 前方向ベクトルを計算
 	XMVECTOR forward = XMVector3TransformNormal(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), matRot);
@@ -17,7 +19,7 @@ void Camera::SetMatrix() const
 	XMVECTOR up = XMVector3TransformNormal(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), matRot);
 
 	// カメラ位置を設定
-	XMVECTOR eye = transform.Position.ToXMVECTOR();
+	XMVECTOR eye = tf.position().ToXMVECTOR();
 
 	// 注視点を計算
 	XMVECTOR target = XMVectorAdd(eye, forward);
@@ -25,11 +27,11 @@ void Camera::SetMatrix() const
 	// ビュー行列を作成
 	XMMATRIX view = XMMatrixLookAtLH(eye, target, up);
 
-	// シェーダにビュー行列を設定
-	Shader3d_SetViewMatrix(view);
+	return view;
+}
 
-
-
+DirectX::XMMATRIX Camera::GetProjectionMatrix() const
+{
 	// アスペクト比を計算
 	float aspect = ViewportWidth == -1.0f || ViewportHeight == -1.0f
 		? (float)Direct3D_GetBackBufferWidth() / (float)Direct3D_GetBackBufferHeight() : ViewportWidth / ViewportHeight;
@@ -37,6 +39,5 @@ void Camera::SetMatrix() const
 	// プロジェクション行列を作成
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(XMConvertToRadians(Fov), aspect, Near, Far);
 
-	// シェーダにプロジェクション行列を設定
-	Shader3d_SetProjectionMatrix(proj);
+	return proj;
 }

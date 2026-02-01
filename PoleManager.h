@@ -2,9 +2,9 @@
 #ifndef POLE_MANAGER_H
 #define POLE_MANAGER_H
 
-#include "GameObject.h"
-#include <DirectXMath.h>
+#include "ScriptComponent.h"
 #include <vector>
+#include "Vector3.h"
 
 class Pole;
 class PowerLine;
@@ -12,7 +12,7 @@ class PowerLine;
 typedef int PoleID;
 typedef int PowerLineID;
 
-class PoleManager : public GameObject
+class PoleManager : public ScriptComponent
 {
 private:
 	// 管理する電柱と電線のリスト

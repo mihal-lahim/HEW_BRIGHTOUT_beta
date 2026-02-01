@@ -12,17 +12,16 @@
 // http://go.microsoft.com/fwlink/?LinkId=248929
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //--------------------------------------------------------------------------------------
-#ifndef HAL_YOUHEI_KEYBOARD_H
-#define HAL_YOUHEI_KEYBOARD_H
-#pragma once
+#ifndef KEYBOARD_H
+#define KEYBOARD_H
 
 
 #include <windows.h>
-#include <memory>
+#include "InputDevice.h"
 
 
 // キー列挙
-typedef enum Keyboard_Keys_tag : unsigned char
+typedef enum KeyboardKeysTag : WORD
 {
     KK_NONE               = 0x0,
                             
@@ -200,8 +199,13 @@ typedef enum Keyboard_Keys_tag : unsigned char
                             
     KK_PA1                = 0xfd,
     KK_OEMCLEAR           = 0xfe,
-} Keyboard_Keys;
+} KeyboardKeys;
 
+
+struct temp
+{
+	int dummy : 8;
+};
 
 // キーボード状態構造体
 typedef struct Keyboard_State_tag
@@ -390,22 +394,22 @@ typedef struct Keyboard_State_tag
     bool Pa1 : 1;               // VK_PA1, 0xFD
     bool OemClear : 1;          // VK_OEM_CLEAR, 0xFE
     bool Reserved26 : 1;
-} Keyboard_State;
+} KeyboardState;
 
 
 // キーボードモジュールの初期化
 void Keyboard_Initialize(void);
 
 // キーボードの現在のキー毎の状態を取得する
-bool Keyboard_IsKeyDown(Keyboard_Keys key);
-bool Keyboard_IsKeyUp(Keyboard_Keys key);
+bool Keyboard_IsKeyDown(KeyboardKeys key);
+bool Keyboard_IsKeyUp(KeyboardKeys key);
 
 // キーボードの現在の状態を取得する
-const Keyboard_State* Keyboard_GetState(void);
+const KeyboardState* Keyboard_GetState(void);
 
 // キーボードの状態からキー毎の状態を取得する
-bool Keyboard_IsKeyDown(Keyboard_Keys key, const Keyboard_State* pState);
-bool Keyboard_IsKeyUp(Keyboard_Keys key, const Keyboard_State* pState);
+bool Keyboard_IsKeyDown(KeyboardKeys key, const KeyboardState* pState);
+bool Keyboard_IsKeyUp(KeyboardKeys key, const KeyboardState* pState);
 
 // キーボードの状態をリセットする
 void Keyboard_Reset(void);
@@ -414,25 +418,47 @@ void Keyboard_Reset(void);
 void Keyboard_ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam);
 
 
-//
-// For a Win32 desktop application, call this function from your Window Message Procedure
-//
-// LResult CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-// {
-//     switch (message)
-//     {
-//
-//     case WM_ACTIVATEAPP:
-//     case WM_KEYDOWN:
-//     case WM_SYSKEYDOWN:
-//     case WM_KEYUP:
-//     case WM_SYSKEYUP:
-//         Keyboard_ProcessMessage(message, wParam, lParam);
-//         break;
-//
-//     }
-// }
-//
 
 
-#endif // HAL_YOUHEI_KEYBOARD_H
+// Keyboardクラス（InputDeviceを継承）
+class Keyboard : public InputDevice
+{
+private:
+    // ヘルパ関数
+    void KeyDown(int key);
+    void KeyUp(int key);
+    bool IsKeyInState(KeyboardKeys key, const KeyboardState* pState) const;
+
+    // 前回と今回の状態
+    KeyboardState m_PrevState{};
+    KeyboardState m_CurState{};
+
+public:
+	// コンストラクタ・デストラクタ
+	Keyboard();
+	~Keyboard() = default;
+
+	// 毎フレーム呼ぶ
+	void InputUpdate();
+
+	// 入力値取得（親クラスからオーバーライド）
+	float GetInputValue(InputKey input, InputCondition inputCondition) override;
+
+	// ボタン状態
+	bool IsDown(KeyboardKeys key) const;
+	bool IsPressed(KeyboardKeys key) const;
+	bool IsReleased(KeyboardKeys key) const;
+
+	// 状態取得
+	const KeyboardState& GetCurrentState() const { return m_CurState; }
+	const KeyboardState& GetPreviousState() const { return m_PrevState; }
+
+	// リセット
+	void Reset();
+
+	// メッセージ処理（ウィンドウプロシージャから呼ぶ）
+	void ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam);
+};
+
+
+#endif

@@ -4,27 +4,13 @@
 #define RAY_H
 
 #include "Vector3.h"
-#include "GameManager.h"
 #include "PhysicsSystem.h"
 
 class PhysicsSystem;
+class PhysicsBody;
 
-class Ray
+struct Ray
 {
-private:
-	// レイの始点と終点
-	Vector3 m_From{};
-	Vector3 m_Direction{};
-
-	// ヒット情報リセットメソッド
-	void Reset()
-	{
-		IsHit = false;
-		HitPosition = Vector3{};
-		HitDistance = -1.0f;
-		HitNormal = Vector3{};
-		HitObject = nullptr;
-	}
 public:
 	// ヒットしたかどうか
 	bool IsHit = false;
@@ -39,7 +25,7 @@ public:
 	Vector3 HitNormal{};
 
 	// ヒットしたオブジェクト
-	GameObject* HitObject = nullptr;
+	PhysicsBody* HitObject = nullptr;
 
 
 	// コンストラクタ
@@ -50,8 +36,20 @@ public:
 
 	virtual ~Ray() = default;
 
-	// レイキャスト実行メソッド
-	void RayCast(float distance) { GameManager::GetPhysicsSystem().RayCast(*this, distance); }
+private:
+	// レイの始点と終点
+	Vector3 m_From{};
+	Vector3 m_Direction{};
+
+	// ヒット情報リセットメソッド
+	void Reset()
+	{
+		IsHit = false;
+		HitPosition = Vector3{};
+		HitDistance = -1.0f;
+		HitNormal = Vector3{};
+		HitObject = nullptr;
+	}
 
 	friend class PhysicsSystem;
 };

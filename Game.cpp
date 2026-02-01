@@ -1,24 +1,27 @@
 #include "Game.h"
-#include "Player.h"
-#include "PoleManager.h"
-#include "GameManager.h"
-#include "Camera.h"
-#include "CubeObject.h"
+#include "DynamicCubePrefab.h"
+#include "StaticCubePrefab.h"
+#include "CameraPrefab.h"
 
 using namespace DirectX;
 
 void Game::Initialize()
 {
-	// PoleManagerオブジェクトの生成
-	new PoleManager();
+	// カメラプレハブをインスタンス化
+	CameraPrefab cameraPrefab{};
+	GameObject* cameraObject = Instantiate(cameraPrefab);
+	cameraObject->transform().position() = { 0.0f, 2.0f, -5.0f };
 
-	// プレイヤーオブジェクトの生成
-	Player* player = new Player();
-	player->transform.Position = Vector3(10.0f, 10.0f, 0.0f);
+	// キュープレハブをインスタンス化
+	DynamicCubePrefab cubePrefab{};
+	for (int i = -5; i < 5; ++i)
+	{
+		GameObject* cubeObject = Instantiate(cubePrefab);
+		cubeObject->transform().position() = { static_cast<float>(i * 2), 5.0f, 0.0f };
+	}
 
-	// 床オブジェクトの生成
-	CubeObject* cube = new CubeObject();
-
-	cube->transform.Position = Vector3(0.0f, -20.0f, 0.0f);
-	cube->transform.Scale = Vector3(100.0f, 1.0f, 100.0f);
+	StaticCubePrefab staticCubePrefab{};
+	GameObject* groundObject = Instantiate(staticCubePrefab);
+	groundObject->transform().position() = { 0.0f, -1.0f, 0.0f };
+	groundObject->transform().scale() = { 20.0f, 1.0f, 20.0f };
 }

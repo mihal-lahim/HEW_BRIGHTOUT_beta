@@ -15,15 +15,15 @@
 #include "texture.h"
 #include "cube.h"
 #include "sprite.h"
-#include "debug_ostream.h"
-#include "debug_text.h"
+#include "DebugOstream.h"
+#include "DebugText.h"
 #include "keyboard.h"
 #include "mouse.h"
-#include "key_logger.h"
+#include "KeyLogger.h"
 #include "Audio.h"
-#include "GameManager.h"
 #include "Game.h"
 #include <sstream>
+#include "EngineCore.h"
 
 #include "light.h"
 
@@ -44,10 +44,6 @@ static constexpr char TITLE[] = "ƒQ[ƒ€ƒEƒBƒ“ƒhƒE";		//¶ã‚Ìƒ^ƒCƒgƒ‹ƒo[‚ÌƒeƒLƒ
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 
-
-
-void RenderTest();
-
 //=======================================
 // ƒƒCƒ“
 //=======================================
@@ -61,18 +57,18 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
 	//ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX‚Ì“o˜^
-	WNDCLASSEX wcex{};											// \‘¢‘Ì	{}‚ª‚ ‚é‚Æ–³‚¢‚Æ‚Å‚Íˆá‚¤@‚È‚¢ê‡‚Í‚²‚İ‚ª“ü‚Á‚Ä‚µ‚Ü‚¤@‚ ‚é‚Æ’†g‚ğ‰Šú‰»‚µ‚Ä‚­‚ê‚é@WNDCLASSEX wcex = {};‚Å‚à‚æ‚¢
+	WNDCLASSEX wcex{};
 	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.lpfnWndProc = WndProc;									// ƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒ‚Æ‚¢‚¤‚à‚Ì‚ğ“o˜^‚µ‚È‚¢‚Æ‚¢‚¯‚È‚¢(ŠÖ”ƒ|ƒCƒ“ƒ^)
+	wcex.lpfnWndProc = WndProc;
 	wcex.hInstance = hInstance;
-	wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);			// ‚Ç‚ñ‚ÈƒAƒCƒRƒ“‚É‚·‚é‚©‚ğŒˆ‚ß‚Ä‚¢‚é
-	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);				// ƒJ[ƒ\ƒ‹‚ÌŠG‚ğ•Ï‚¦‚½‚è‚·‚éêŠ
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);			// ƒEƒBƒ“ƒhƒE‚ªo—ˆ‚½‚Ì”wŒi‚ğ•Ï‚¦‚é‚±‚Æ‚ª‚Å‚«‚é
-	wcex.lpszMenuName = nullptr;								// ƒƒjƒ…[‚Íì‚ç‚È‚¢@–{—ˆ‚Í‚¢‚ç‚È‚¢ã‚Å‰Šú‰»‚µ‚Ä‚¢‚é‚½‚ß
-	wcex.lpszClassName = WINDOW_CLASS;							// ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX–¼‚ÅWINDOW_CLASS‚ğˆø‚«o‚·
-	wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);	// ƒXƒ‚[ƒ‹ƒAƒCƒRƒ“‚ğ“o˜^‚Å‚«‚é
+	wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
+	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wcex.lpszMenuName = nullptr;
+	wcex.lpszClassName = WINDOW_CLASS;
+	wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
 
-	RegisterClassEx(&wcex);										// Register‚Í“o˜^‚Æ‚¢‚¤ˆÓ–¡ wcex‚Ì–¼‘O‚Å“o˜^
+	RegisterClassEx(&wcex);
 
 	constexpr int window_Width = 1920;
 	constexpr int window_Height = 1080;
@@ -99,18 +95,18 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	int window_y = std::max((desktop_height - window_height) / 2, 0);
 
 	//ƒƒCƒ“ƒEƒBƒ“ƒhƒE‚Ìì¬
-	HWND hWnd = CreateWindow(	//hWnd‚Í•Ô‚è’l@ƒnƒ“ƒhƒ‹@¯•Êq
-		WINDOW_CLASS,
-		TITLE,								  	//"‚ ‚¢‚¤‚¦‚¨"‚Å‚à—Ç‚¢
-		WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME,	//ƒEƒBƒ“ƒhƒEƒXƒ^ƒCƒ‹‚ğ•Ï‚¦‚ç‚ê‚éƒtƒ‰ƒO
-		//window_style,						  	//ƒtƒ‰ƒO‚ğŠÇ—‚µ‚ÄAÅ‘å‰»‚³‚¹‚È‚¢‚æ‚¤‚É‚Å‚«‚é
-		window_x,				  				//ƒEƒBƒ“ƒhƒE‚Ì‰ŠúÀ•WX‚ğŒˆ‚ß‚é@CW_USEDEFAULT‚Í“K“–‚ÈˆÊ’u‚Éİ’è‚µ‚Ä‚­‚ê‚é
-		window_y,							  	//ƒEƒBƒ“ƒhƒE‚Ì‰ŠúÀ•WY‚ğŒˆ‚ß‚é
-		window_width,						  	//ƒEƒBƒ“ƒhƒE‚Ì•
-		window_height,			  			  	//ƒEƒBƒ“ƒhƒE‚Ì‚‚³
-		nullptr,	  						  	//e‚ÌƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹‚ğì‚é‚Æ‚«@nullptr‚Íe‚ª‚¢‚È‚¢‚½‚ß“ü‚ê‚Ä‚¢‚é
-		nullptr,	  						  	//ƒƒjƒ…[
-		hInstance,
+	HWND hWnd = CreateWindowEx(
+		0, 
+		WINDOW_CLASS, 
+		TITLE,
+		window_style,
+		window_x, 
+		window_y,
+		window_width, 
+		window_height,
+		nullptr, 
+		nullptr, 
+		hInstance, 
 		nullptr
 	);
 
@@ -160,10 +156,10 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 		}
 	}
 
-	Shader3d_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
+	ShowWindow(hWnd, nCmdShow);	//ƒEƒBƒ“ƒhƒE•\¦
+	UpdateWindow(hWnd);			//ƒEƒBƒ“ƒhƒE‚Ì•`‰æ‚ÌXV
 
-	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
+	Shader3d_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
 
 	/*
 	hal::DebugText dt(Direct3D_GetDevice(), Direct3D_GetContext(),
@@ -186,34 +182,20 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 
 	Light_SetAmbient({ 0.2f,0.1f,0.1f,1.0f });
 
-
-	// ƒV[ƒ“‚Ì•ÏX@Å‰‚ÌƒV[ƒ“‚ğƒZƒbƒg
-	GameManager::ChangeScene<Game>();
+	EngineCore engineCore{};
+	engineCore.GetGameContext().sceneSystem->ChangeScene<Game>();
 
 	//ƒQ[ƒ€ƒ‹[ƒv
-	MSG msg;
+	MSG msg{};
 	do {
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))// ƒEƒBƒ“ƒhƒEƒƒbƒZ[ƒW‚ª—ˆ‚Ä‚¢‚½‚ç
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		else// ƒQ[ƒ€‚Ìˆ—
-		{
-
-			// ƒ}ƒEƒX
-			Mouse_State ms{};
-			Mouse_GetState(&ms);
 
 
-			// ƒL[ƒ{[ƒh
-			KeyLogger_Update();
-
-
-			// ƒV[ƒ“‚ÌXV
-			GameManager::GetCurrentScene()->Update();
-
-			//RenderTest();
+		engineCore.Update();
 
 			/*
 #if defined (DEBUG) || defined(_DEBUG)
@@ -225,8 +207,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 				dt.Clear();	// FPS‚ÌƒNƒŠƒA
 #endif
 */
-		}
-	} while (msg.message != WM_QUIT);
+		} while (msg.message != WM_QUIT);
 
 	// I—¹ˆ—
 	Light_Finalize();
@@ -295,49 +276,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 }
-
-void RenderTest()
-{
-	// ƒoƒbƒNƒoƒbƒtƒ@‚ÌƒNƒŠƒA
-	Direct3D_Clear();
-
-	Direct3D_SetDepthTest(true); // ƒfƒvƒXƒeƒXƒg—LŒø
-
-	// ƒrƒ…[ƒ|[ƒg‚Ìİ’èi’Ç‰Áj
-	SetViewport(0);
-
-	// ƒJƒƒ‰‚Ìİ’è
-	XMMATRIX view, projection;
-	
-	// ƒrƒ…[s—ñ‚Ìì¬
-	XMVECTOR eye = XMVectorSet(0.0f, 5.0f, -10.0f, 0.0f);     // ƒJƒƒ‰‚ÌˆÊ’u
-	XMVECTOR focus = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);     // ’‹“_
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);        // ã•ûŒüƒxƒNƒgƒ‹
-	view = XMMatrixLookAtLH(eye, focus, up);
-
-	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚Ìì¬
-	float fov = XMConvertToRadians(60.0f);                     // ‹–ìŠpi60“xj
-	float aspect = (float)Direct3D_GetBackBufferWidth() / (float)Direct3D_GetBackBufferHeight();
-	float nearZ = 0.1f;
-	float farZ = 1000.0f;
-	projection = XMMatrixPerspectiveFovLH(fov, aspect, nearZ, farZ);
-
-
-	// ƒrƒ…[s—ñ‚ÆƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚Ìİ’è
-	Shader3d_SetViewMatrix(view);
-	Shader3d_SetProjectionMatrix(projection);
-
-
-	// ƒ[ƒ‹ƒhs—ñ‚Ìì¬iŒ´“_‚É”z’uj
-	XMMATRIX world = XMMatrixIdentity();
-
-	// —§•û‘Ì‚Ì•`‰æiƒeƒNƒXƒ`ƒƒID -1‚ğg—pj
-	Cube_Draw(-1, world);
-
-	// ƒoƒbƒNƒoƒbƒtƒ@‚Ì•\¦
-	Direct3D_Present();
-}
-
 
 
 

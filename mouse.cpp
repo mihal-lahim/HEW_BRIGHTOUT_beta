@@ -12,7 +12,7 @@
 // http://go.microsoft.com/fwlink/?LinkId=248929
 // http://go.microsoft.com/fwlink/?LinkID=615561
 //--------------------------------------------------------------------------------------
-#include "mouse.h"
+#include "Mouse.h"
 
 #include <windowsx.h>
 #include <assert.h>

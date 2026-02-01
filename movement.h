@@ -5,14 +5,14 @@
 
 #include <DirectXMath.h>
 #include "GameObject.h"
-#include "Component.h"
-#include "RigidBody.h"
+#include "ScriptComponent.h"
+#include "PhysicsBody.h"
 
-class Movement : public Component
+class Movement : public ScriptComponent
 {
 private:
-	// 移動適用用のRigidBodyポインタ
-	RigidBody* m_RigidBody = nullptr;
+	// 移動適用用のPhysicsBodyポインタ
+	PhysicsBody* m_physicsBody = nullptr;
 public:
 
 	// 移動ベクトル（毎フレームリセット）
