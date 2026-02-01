@@ -11,7 +11,7 @@
 
 
 #include "Component.h"
-#include "GameObject.h"
+#include <DirectXMath.h>
 
 
 class Camera : public Component

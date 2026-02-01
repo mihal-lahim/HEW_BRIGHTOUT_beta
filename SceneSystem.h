@@ -4,27 +4,23 @@
 
 #include "Scene.h"
 #include <type_traits>
-#include <memory>
 #include <stack>
+#include <memory>
 
 class EngineCore;
 
 class SceneSystem final
 {
-private:
-	// エンジンコアポインタ
-	EngineCore* m_engineCore = nullptr;
-
-	// 現在のシーンポインタ
-	std::unique_ptr<Scene> m_currentScene{};
-
-	// シーンスタック
-	std::stack<std::unique_ptr<Scene>> m_sceneStack{};
 public:
 	SceneSystem(EngineCore* engineCore)
 		: m_engineCore(engineCore)
-	{ Initialize(); }
-	~SceneSystem() { Finalize(); }
+	{ 
+		Initialize();
+	}
+	~SceneSystem() 
+	{ 
+		Finalize();
+	}
 
 	// エンジンコア取得メソッド
 	EngineCore* const engineCore() const { return m_engineCore; }
@@ -38,7 +34,7 @@ public:
 
 
 	// 現在のシーン取得メソッド
-	Scene* const currentScene() const { return m_currentScene.get(); }
+	Scene& currentScene() { return *m_currentScene.get(); }
 
 	// シーン変更テンプレートメソッド
 	template<typename T>
@@ -54,6 +50,18 @@ public:
 	template<typename T>
 		requires std::is_base_of<Scene, T>::value
 	void PopScene();
+
+private:
+	// エンジンコアポインタ
+	EngineCore* m_engineCore = nullptr;
+
+	// 現在のシーン
+	std::unique_ptr<Scene> m_currentScene{};
+
+	// シーンスタック
+	std::stack<std::unique_ptr<Scene>> m_sceneStack{};
 };
+
+#include "SceneSystem.inl"
 
 #endif

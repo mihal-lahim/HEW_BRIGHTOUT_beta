@@ -2,9 +2,10 @@
 #include "Time.h"
 #include "GameContext.h"
 #include "PhysicsSystem.h"
-#include "RenderingSystem.h"
 #include "ScriptComponent.h"
-#include "RigidBody.h"
+#include "Prefab.h"
+#include "GameObject.h"
+
 
 void Scene::AddPendingGameObjectsProcess()
 {
@@ -13,6 +14,7 @@ void Scene::AddPendingGameObjectsProcess()
 	{
 		auto* obj = m_pendingAddGameObjects.front();
 		static_cast<ObjectPool<GameObject>*>(m_gameObjects.get())->Register(obj);
+		obj->m_gameContext = m_gameContext;
 		m_pendingAddGameObjects.pop();
 	}
 }
@@ -26,7 +28,7 @@ void Scene::AddPendingComponentsProcess()
 		auto* compPool = static_cast<ObjectPool<Component>*>(m_components.at(pending.TypeID).get());
 		auto* comp = static_cast<Component*>(pending.ObjectPtr);
 		compPool->Register(comp);
-		comp->ContextInitialize();
+		comp->InitializeByContext();
 		m_pendingAddComponents.pop();
 	}
 }
@@ -40,9 +42,7 @@ void Scene::AddPendingScriptComponentsProcess()
 		auto* scriptCompPool = static_cast<ObjectPool<ScriptComponent>*>(m_scriptComponents.at(pending.TypeID).get());
 		auto* scriptComp = static_cast<ScriptComponent*>(pending.ObjectPtr);
 		scriptCompPool->Register(scriptComp);
-		scriptComp->ContextInitialize();
 		scriptComp->Awake();
-		m_preStartScriptComponents.push({ pending.ObjectPtr->m_allocationID, pending.TypeID });
 		m_pendingAddScriptComponents.pop();
 	}
 }
@@ -73,6 +73,7 @@ void Scene::DestroyPendingComponentsProcess()
 		Component* comp = compPool->Get(pending.AllocationID);
 		if (comp)
 		{
+			comp->FinalizeByContext();
 			compPool->Destroy(pending.AllocationID);
 		}
 		m_pendingDestroyComponents.pop();
@@ -98,20 +99,6 @@ void Scene::DestroyPendingScriptComponentsProcess()
 
 void Scene::Start()
 {
-	// スクリプトコンポーネントのStart呼び出し
-	while (!m_preStartScriptComponents.empty())
-	{
-		const auto& desc = m_preStartScriptComponents.front();
-		auto* scriptCompPool = static_cast<ObjectPool<ScriptComponent>*>(m_scriptComponents.at(desc.TypeID).get());
-		ScriptComponent* scriptComp = scriptCompPool->Get(desc.AllocationID);
-		scriptComp->Start();
-		m_preStartScriptComponents.pop();
-	}
-}
-
-void Scene::PreUpdate()
-{
-	// スクリプトコンポーネントのPreUpdate呼び出し
 	for (auto& poolBase : m_scriptComponents)
 	{
 		auto* scriptCompPool = static_cast<ObjectPool<ScriptComponent>*>(poolBase.get());
@@ -119,7 +106,26 @@ void Scene::PreUpdate()
 		for (size_t i = 0; i < scriptCompPool->Size(); ++i)
 		{
 			ScriptComponent* scriptComp = scriptCompPool->Get(static_cast<uint32_t>(i));
-			if (scriptComp && scriptComp->IsActive())
+			if (scriptComp && scriptComp->IsEnable() && !scriptComp->m_hasStarted)
+			{
+				scriptComp->Start();
+				scriptComp->m_hasStarted = true;
+			}
+		}
+	}
+}
+
+void Scene::PreUpdate()
+{
+	// スクリプトコンポーネントをPreUpdate呼び出し
+	for (auto& poolBase : m_scriptComponents)
+	{
+		auto* scriptCompPool = static_cast<ObjectPool<ScriptComponent>*>(poolBase.get());
+		// プール内のすべてのスクリプトコンポーネントを更新
+		for (size_t i = 0; i < scriptCompPool->Size(); ++i)
+		{
+			ScriptComponent* scriptComp = scriptCompPool->Get(static_cast<uint32_t>(i));
+			if (scriptComp && scriptComp->IsEnable())
 			{
 				scriptComp->PreUpdate();
 			}
@@ -129,7 +135,7 @@ void Scene::PreUpdate()
 
 void Scene::Update()
 {
-	// スクリプトコンポーネントのUpdate呼び出し
+	// スクリプトコンポーネントをUpdate呼び出し
 	for (auto& poolBase : m_scriptComponents)
 	{
 		auto* scriptCompPool = static_cast<ObjectPool<ScriptComponent>*>(poolBase.get());
@@ -137,7 +143,7 @@ void Scene::Update()
 		for (size_t i = 0; i < scriptCompPool->Size(); ++i)
 		{
 			ScriptComponent* scriptComp = scriptCompPool->Get(static_cast<uint32_t>(i));
-			if (scriptComp && scriptComp->IsActive())
+			if (scriptComp && scriptComp->IsEnable())
 			{
 				scriptComp->Update();
 			}
@@ -147,7 +153,7 @@ void Scene::Update()
 
 void Scene::PostUpdate()
 {
-	// スクリプトコンポーネントのPostUpdate呼び出し
+	// スクリプトコンポーネントをPostUpdate呼び出し
 	for (auto& poolBase : m_scriptComponents)
 	{
 		auto* scriptCompPool = static_cast<ObjectPool<ScriptComponent>*>(poolBase.get());
@@ -155,7 +161,7 @@ void Scene::PostUpdate()
 		for (size_t i = 0; i < scriptCompPool->Size(); ++i)
 		{
 			ScriptComponent* scriptComp = scriptCompPool->Get(static_cast<uint32_t>(i));
-			if (scriptComp && scriptComp->IsActive())
+			if (scriptComp && scriptComp->IsEnable())
 			{
 				scriptComp->PostUpdate();
 			}
@@ -171,23 +177,98 @@ void Scene::UpdateScene()
 	while (Time::HasFixedStep())
 	{
 		Time::ConsumeFixedStep();
-		auto rigidbodies = GetComponents<RigidBody>();
-		m_gameContext->physicsSystem->PhysicsUpdate(*this, (float)Time::FixedDeltaTime());
+		m_gameContext.physicsSystem->PhysicsUpdate(*this, (float)Time::FixedDeltaTime());
 	}
 
 	// シーンの更新サイクルを実行
 	Cycle();
 }
 
+void Scene::Enable()
+{
+	auto* gameObjectPool = static_cast<ObjectPool<GameObject>*>(m_gameObjects.get());
+	if (!gameObjectPool) return;
+
+	// プール内のすべてのゲームオブジェクトを有効化
+	for (size_t i = 0; i < gameObjectPool->Size(); ++i)
+	{
+		GameObject* gameObject = gameObjectPool->Get(static_cast<uint32_t>(i));
+		if (gameObject)
+		{
+			for (auto* component : gameObject->m_components)
+			{
+				component->OnEnable();
+			}
+		}
+	}
+}
+
+void Scene::Disable()
+{
+	auto* gameObjectPool = static_cast<ObjectPool<GameObject>*>(m_gameObjects.get());
+	if (!gameObjectPool) return;
+
+	// プール内のすべてのゲームオブジェクトを無効化
+	for (size_t i = 0; i < gameObjectPool->Size(); ++i)
+	{
+		GameObject* gameObject = gameObjectPool->Get(static_cast<uint32_t>(i));
+		if (gameObject)
+		{
+			for (auto* component : gameObject->m_components)
+			{
+				component->OnDisable();
+			}
+		}
+	}
+}
+
 GameObject* Scene::CreateGameObject()
 {
-	GameObject* obj = new GameObject();
-	m_pendingAddGameObjects.push(obj);
+	// 新しいゲームオブジェクトを作成
+	GameObject* newGameObject = new GameObject();
+	newGameObject->m_scene = this;
+	newGameObject->m_transform = CreateComponent<Transform>();
+	// 作成保留キューに追加
+	m_pendingAddGameObjects.push(newGameObject);
 
-	return obj;
+	if (!m_gameObjects)
+	{
+		m_gameObjects = std::make_unique<ObjectPool<GameObject>>();
+	}
+	return newGameObject;
 }
+
+GameObject* Scene::Instantiate(const Prefab& prefab)
+{
+	// 新しいゲームオブジェクトを作成
+	GameObject* newGameObject = CreateGameObject();
+	prefab.Instantiate(*newGameObject);
+	return newGameObject;
+}
+
 
 void Scene::DestroyGameObject(GameObject* gameObject)
 {
 	m_pendingDestroyGameObjects.push(gameObject->m_allocationID);
+}
+
+void Scene::DestroyComponent(Component* component)
+{
+	if (!component) return;
+
+	// コンポーネントプールの型IDを取得
+	uint32_t typeID = component->m_typeID;
+
+	// 破棄保留リストに追加
+	DestroyPending pending{ component->m_allocationID, typeID };
+
+	// スクリプトコンポーネントかどうかで振り分け
+	if (m_scriptComponentTypeIDs.find(typeID) != m_scriptComponentTypeIDs.end())
+	{
+		m_pendingDestroyScriptComponents.push(pending);
+	}
+	else
+	{
+		m_pendingDestroyComponents.push(pending);
+	}
 }

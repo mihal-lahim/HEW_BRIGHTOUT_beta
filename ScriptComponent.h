@@ -14,6 +14,11 @@ public:
 	virtual void Update() {};
 	virtual void PostUpdate() {};
 	virtual void OnDestroy() {};
+private:
+	// スタート済みフラグ
+	bool m_hasStarted = false;
+
+	friend class Scene;
 };
 
 

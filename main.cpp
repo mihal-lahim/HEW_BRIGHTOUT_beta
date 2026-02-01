@@ -21,9 +21,9 @@
 #include "mouse.h"
 #include "KeyLogger.h"
 #include "Audio.h"
-#include "GameManager.h"
 #include "Game.h"
 #include <sstream>
+#include "EngineCore.h"
 
 #include "light.h"
 
@@ -57,18 +57,18 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
 	//ウィンドウクラスの登録
-	WNDCLASSEX wcex{};											// 構造体	{}があると無いとでは違う　ない場合はごみが入ってしまう　あると中身を初期化してくれる　WNDCLASSEX wcex = {};でもよい
+	WNDCLASSEX wcex{};
 	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.lpfnWndProc = WndProc;									// ウィンドウプロシージャというものを登録しないといけない(関数ポインタ)
+	wcex.lpfnWndProc = WndProc;
 	wcex.hInstance = hInstance;
-	wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);			// どんなアイコンにするかを決めている
-	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);				// カーソルの絵を変えたりする場所
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);			// ウィンドウが出来た時の背景を変えることができる
-	wcex.lpszMenuName = nullptr;								// メニューは作らない　本来はいらない上で初期化しているため
-	wcex.lpszClassName = WINDOW_CLASS;							// ウィンドウクラス名でWINDOW_CLASSを引き出す
-	wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);	// スモールアイコンを登録できる
+	wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
+	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wcex.lpszMenuName = nullptr;
+	wcex.lpszClassName = WINDOW_CLASS;
+	wcex.hIconSm = LoadIcon(wcex.hInstance, IDI_APPLICATION);
 
-	RegisterClassEx(&wcex);										// Registerは登録という意味 wcexの名前で登録
+	RegisterClassEx(&wcex);
 
 	constexpr int window_Width = 1920;
 	constexpr int window_Height = 1080;
@@ -95,18 +95,18 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	int window_y = std::max((desktop_height - window_height) / 2, 0);
 
 	//メインウィンドウの作成
-	HWND hWnd = CreateWindow(	//hWndは返り値　ハンドル　識別子
-		WINDOW_CLASS,
-		TITLE,								  	//"あいうえお"でも良い
-		WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME,	//ウィンドウスタイルを変えられるフラグ
-		//window_style,						  	//フラグを管理して、最大化させないようにできる
-		window_x,				  				//ウィンドウの初期座標Xを決める　CW_USEDEFAULTは適当な位置に設定してくれる
-		window_y,							  	//ウィンドウの初期座標Yを決める
-		window_width,						  	//ウィンドウの幅
-		window_height,			  			  	//ウィンドウの高さ
-		nullptr,	  						  	//親のウィンドウハンドルを作るとき　nullptrは親がいないため入れている
-		nullptr,	  						  	//メニュー
-		hInstance,
+	HWND hWnd = CreateWindowEx(
+		0, 
+		WINDOW_CLASS, 
+		TITLE,
+		window_style,
+		window_x, 
+		window_y,
+		window_width, 
+		window_height,
+		nullptr, 
+		nullptr, 
+		hInstance, 
 		nullptr
 	);
 
@@ -156,10 +156,10 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 		}
 	}
 
-	Shader3d_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
+	ShowWindow(hWnd, nCmdShow);	//ウィンドウ表示
+	UpdateWindow(hWnd);			//ウィンドウの描画の更新
 
-	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
+	Shader3d_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
 
 	/*
 	hal::DebugText dt(Direct3D_GetDevice(), Direct3D_GetContext(),
@@ -182,33 +182,20 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 
 	Light_SetAmbient({ 0.2f,0.1f,0.1f,1.0f });
 
-
-	// シーンの変更　最初のシーンをセット
-	GameManager::ChangeScene<Game>();
+	EngineCore engineCore{};
+	engineCore.GetGameContext().sceneSystem->ChangeScene<Game>();
 
 	//ゲームループ
-	MSG msg;
+	MSG msg{};
 	do {
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))// ウィンドウメッセージが来ていたら
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		else// ゲームの処理
-		{
-
-			// マウス
-			Mouse_State ms{};
-			Mouse_GetState(&ms);
 
 
-			// キーボード
-			KeyLogger_Update();
-
-
-			// シーンの更新
-			GameManager::GetCurrentScene()->Update();
-
+		engineCore.Update();
 
 			/*
 #if defined (DEBUG) || defined(_DEBUG)
@@ -220,8 +207,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 				dt.Clear();	// FPSのクリア
 #endif
 */
-		}
-	} while (msg.message != WM_QUIT);
+		} while (msg.message != WM_QUIT);
 
 	// 終了処理
 	Light_Finalize();

@@ -6,6 +6,7 @@
 #ifndef ENGINE_CORE_H
 #define ENGINE_CORE_H
 
+#include "WindowSystem.h"
 #include "SceneSystem.h"
 #include "PhysicsSystem.h"
 #include "RenderingSystem.h"
@@ -17,6 +18,9 @@ struct GameContext;
 class EngineCore
 {
 private:
+	// ウィンドウシステムポインタ
+	std::unique_ptr<WindowSystem> m_windowSystem = nullptr;
+
 	// シーンシステムポインタ
 	std::unique_ptr<SceneSystem> m_sceneSystem = nullptr;
 
@@ -31,6 +35,15 @@ private:
 
 public:
 	
+	EngineCore()
+	{
+		Initialize();
+	}
+	~EngineCore()
+	{
+		Finalize();
+	}
+
 	// 現在のゲームコンテキスト取得メソッド
 	GameContext& GetGameContext();
 
@@ -43,5 +56,6 @@ public:
 	// エンジンコアの終了処理
 	void Finalize();
 };
+
 
 #endif

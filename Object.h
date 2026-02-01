@@ -5,9 +5,6 @@
 #include <typeindex>
 #include <cstdint>
 
-template<typename T>
-	requires std::is_base_of<Object, T>::value
-class ObjectPool;
 
 class Object
 {
@@ -26,6 +23,7 @@ public:
 	template<typename T>
 		requires std::is_base_of<Object, T>::value
 	friend class ObjectPool;
+
 	friend class Scene;
 };
 

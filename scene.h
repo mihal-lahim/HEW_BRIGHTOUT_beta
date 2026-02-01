@@ -9,18 +9,78 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "GameObject.h"
 #include "Component.h"
 #include "ObjectPool.h"
+#include "GameContext.h"
+#include <unordered_set>
 #include <queue>
 
-
-struct GameContext;
+class GameObject;
 class SceneSystem;
+class Prefab;
 
 class Scene
 {
+public:
+	Scene() = default;
+	virtual ~Scene() = default;
+
+	// シーン有効化・無効化メソッド
+	void Enable();
+	void Disable();
+
+	// シーン初期化・更新・終了メソッド
+	virtual void Initialize() {};
+	virtual void Finalize() {};
+
+	// ゲームオブジェクト作成メソッド
+	GameObject* CreateGameObject();
+
+	// プレハブからゲームオブジェクトを作成するメソッド
+	GameObject* Instantiate(const Prefab& prefab);
+
+	// シーン更新メソッド
+	void UpdateScene();
+
+	// シーンシステム取得メソッド
+	SceneSystem& sceneSystem() const { return *m_sceneSystem; }
+
+	// コンポーネント作成テンプレートメソッド
+	template<typename T, typename... Args>
+		requires std::is_base_of<Component, T>::value
+	T* CreateComponent(Args&&... args);
+
+
+	// コンポーネントの配列を受け取るテンプレートメソッド
+	template<typename T>
+		requires std::is_base_of<Component, T>::value
+	std::vector<T*> GetComponents() const;
+
+
+	// ゲームオブジェクト破棄メソッド
+	void DestroyGameObject(GameObject* gameObject);
+
+	// コンポーネント破棄メソッド
+	void DestroyComponent(Component* component);
+
 private:
+	// 現在のゲームコンテキスト
+	GameContext m_gameContext{};
+
+	// 作成保留情報構造体
+	struct AddPending
+	{
+		Object* ObjectPtr = nullptr;
+		uint32_t TypeID = 0;
+	};
+
+	// 破棄保留情報構造体
+	struct DestroyPending
+	{
+		uint32_t AllocationID = 0;
+		uint32_t TypeID = 0;
+	};
+
 	// 所属するシーンシステムポインタ
 	SceneSystem* m_sceneSystem = nullptr;
 
@@ -31,12 +91,6 @@ private:
 	// シーン内のスクリプトコンポーネント配列
 	std::vector<std::unique_ptr<ObjectPoolBase>> m_scriptComponents;
 
-	// 作成保留情報構造体
-	struct AddPending
-	{
-		Object* ObjectPtr = nullptr;
-		uint32_t TypeID = 0;
-	};
 
 	// 作成保留中のゲームオブジェクトキュー
 	std::queue<GameObject*> m_pendingAddGameObjects;
@@ -45,12 +99,6 @@ private:
 	// 作成保留中のスクリプトコンポーネントキュー
 	std::queue<AddPending> m_pendingAddScriptComponents;
 
-	// 破棄保留情報構造体
-	struct DestroyPending
-	{
-		uint32_t AllocationID = 0;
-		uint32_t TypeID = 0;
-	};
 
 	// 破棄保留中のゲームオブジェクトキュー
 	std::queue<uint32_t> m_pendingDestroyGameObjects;
@@ -59,16 +107,10 @@ private:
 	// 破棄保留中のスクリプトコンポーネントキュー
 	std::queue<DestroyPending> m_pendingDestroyScriptComponents;
 
-	// スタート前情報構造体
-	struct PreStart
-	{
-		uint32_t AllocationID = 0;
-		uint32_t TypeID = 0;
-	};
 
+	// 登録されているスクリプトコンポーネント型IDセット
+	std::unordered_set<uint32_t> m_scriptComponentTypeIDs;
 
-	// スタート前のスクリプトコンポーネントキュー
-	std::queue<PreStart> m_preStartScriptComponents;
 
 	// 保留中のゲームオブジェクト追加処理メソッド
 	void AddPendingGameObjectsProcess();
@@ -98,56 +140,23 @@ private:
 	// シーン更新処理メソッド
 	void Cycle()
 	{
-		DestroyPendingComponentsProcess();
-		DestroyPendingScriptComponentsProcess();
-		DestroyPendingGameObjectsProcess();
+		Start();
+		PreUpdate();
+		Update();
+		PostUpdate();
 
 		AddPendingGameObjectsProcess();
 		AddPendingScriptComponentsProcess();
 		AddPendingComponentsProcess();
 
-		Start();
-		PreUpdate();
-		Update();
-		PostUpdate();
+		DestroyPendingComponentsProcess();
+		DestroyPendingScriptComponentsProcess();
+		DestroyPendingGameObjectsProcess();
 	}
-public:
 
-	Scene() = default;
-	virtual ~Scene() = default;
-
-	// シーン初期化・更新・終了メソッド
-	virtual void Initialize() {};
-	void UpdateScene();
-	virtual void Finalize() {};
-
-
-	// シーンシステム取得メソッド
-	SceneSystem& sceneSystem() const { return *m_sceneSystem; }
-
-	// ゲームオブジェクトメソッド
-	GameObject* CreateGameObject();
-
-	// コンポーネント作成テンプレートメソッド
-	template<typename T, typename... Args>
-		requires std::is_base_of<Component, T>::value
-	T* CreateComponent(Args... args);
-
-
-
-	// コンポーネントの配列を受け取るテンプレートメソッド
-	template<typename T>
-		requires std::is_base_of<Component, T>::value
-	std::vector<T*> GetComponents() const;
-
-	// ゲームオブジェクト破棄メソッド
-	void DestroyGameObject(GameObject* gameObject);
-
-	// コンポーネント破棄メソッド
-	template<typename T>
-		requires std::is_base_of<Component, T>::value
-	void DestroyComponent(T* component);
+	friend class SceneSystem;
 };
 
+#include "Scene.inl"
 
 #endif

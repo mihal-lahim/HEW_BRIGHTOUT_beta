@@ -2,11 +2,11 @@
 #define PLAYER_MOVEMENT_H
 
 #include <DirectXMath.h>
-#include "movement.h"
+#include "Movement.h"
 #include "PoleManager.h"
 #include "Ray.h"
 
-class Ray;
+
 class Player;
 class Camera;
 
@@ -57,7 +57,6 @@ private:
 
 	// 地面判定用レイキャスト
 	Ray m_GroundRay{ {},{} };
-
 
 
 	// 電柱

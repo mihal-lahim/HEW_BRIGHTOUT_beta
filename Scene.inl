@@ -1,32 +1,54 @@
+#ifndef SCENE_INL
+#define SCENE_INL
 
-#ifndef GAME_OBJECT_INL
-#define GAME_OBJECT_INL
 
+#include "GameObject.h"
 #include "Scene.h"
 #include "ScriptComponent.h"
 
 
 template<typename T, typename... Args>
 	requires std::is_base_of<Component, T>::value
-T* Scene::CreateComponent(Args... args)
+T* Scene::CreateComponent(Args&&... args)
 {
 	// 新しいコンポーネントを作成
-	T* newComponent = new T(args...);
+	T* newComponent = new T(std::forward<Args>(args)...);
 
 	// コンポーネントプールの型IDを取得
 	uint32_t typeID = Component::GetTypeID<T>();
 
-	// 遅延構造体の作成保留リストに追加
-	AddPending pending{};
-	pending.ObjectPtr = newComponent;
-	pending.TypeID = static_cast<uint32_t>(typeID);
+	// 破棄保留リストに追加
+	AddPending pending{ newComponent, typeID };
+
+	newComponent->m_typeID = typeID;
 
 	if constexpr (std::is_base_of<ScriptComponent, T>::value)
 	{
+		// スクリプトコンポーネント用プールの確保
+		if (m_scriptComponents.size() <= typeID)
+		{
+			m_scriptComponents.resize(typeID + 1);
+		}
+		if (!m_scriptComponents.at(typeID))
+		{
+			m_scriptComponents.at(typeID) = std::make_unique<ObjectPool<T>>();
+		}
+
+		m_scriptComponentTypeIDs.insert(typeID);
 		m_pendingAddScriptComponents.push(pending);
 	}
 	else
 	{
+		// 通常コンポーネント用プールの確保
+		if (m_components.size() <= typeID)
+		{
+			m_components.resize(typeID + 1);
+		}
+		if (!m_components.at(typeID))
+		{
+			m_components.at(typeID) = std::make_unique<ObjectPool<T>>();
+		}
+
 		m_pendingAddComponents.push(pending);
 	}
 
@@ -49,15 +71,18 @@ std::vector<T*> Scene::GetComponents() const
 		{
 			return result;
 		}
+
 		// オブジェクトプールからスクリプトコンポーネントを取得
 		auto pool = static_cast<ObjectPool<T>*>(m_scriptComponents.at(typeID).get());
 
 		// プール内のすべてのオブジェクトを収集
-		for (uint32_t i = 0;; i++)
+		for (size_t i = 0; i < pool->Size(); ++i)
 		{
-			T* comp = pool->Get(i);
-			if (comp == nullptr) break;
-			result.push_back(comp);
+			auto* comp = pool->Get(static_cast<uint32_t>(i));
+			if (comp)
+			{
+				result.push_back(static_cast<T*>(comp));
+			}
 		}
 		return result;
 	}
@@ -73,38 +98,18 @@ std::vector<T*> Scene::GetComponents() const
 		auto pool = static_cast<ObjectPool<T>*>(m_components.at(typeID).get());
 
 		// プール内のすべてのオブジェクトを収集
-		for (uint32_t i = 0;; i++)
+		for (size_t i = 0; i < pool->Size(); ++i)
 		{
-			T* comp = pool->Get(i);
-			if (comp == nullptr) break;
-			result.push_back(comp);
+			auto* comp = pool->Get(static_cast<uint32_t>(i));
+			if (comp)
+			{
+				result.push_back(static_cast<T*>(comp));
+			}
 		}
 		return result;
 	}
 
 	return result;
-}
-
-template<typename T>
-	requires std::is_base_of<Component, T>::value
-void Scene::DestroyComponent(T* component)
-{
-	// コンポーネントプールの型IDを取得
-	uint32_t typeID = Component::GetTypeID<T>();
-
-	// 破棄保留リストに追加
-	DestroyPending pending{};
-	pending.AllocationID = component->m_allocationID;
-	pending.TypeID = typeID;
-
-	if constexpr (std::is_base_of<ScriptComponent, T>::value)
-	{
-		m_pendingDestroyScriptComponents.push(pending);
-	}
-	else
-	{
-		m_pendingDestroyComponents.push(pending);
-	}
 }
 
 

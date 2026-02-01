@@ -1,10 +1,11 @@
 /////////////////////////////////////////
-//XinputController.h[コントローラー制御]
+//GamePad.h[コントローラー制御]
 //Author: hiroshi kasiwagi
 //Date: 2025/11/26
 /////////////////////////////////////////
-#ifndef XINPUT_CONTROLLER_H
-#define XINPUT_CONTROLLER_H
+
+#ifndef GAMEPAD_H
+#define GAMEPAD_H
 
 #include <windows.h>
 #include <Xinput.h>
@@ -12,7 +13,7 @@
 
 #pragma comment(lib, "Xinput.lib")
 
-enum XBOXButton : WORD {
+enum GamePadButton : WORD {
     BUTTON_A          = XINPUT_GAMEPAD_A,
     BUTTON_B          = XINPUT_GAMEPAD_B,
     BUTTON_X          = XINPUT_GAMEPAD_X,
@@ -37,23 +38,23 @@ enum XBOXButton : WORD {
 };
 
 struct StickState {
-    float x; // -1.0f ~ 1.0f
-    float y; // -1.0f ~ 1.0f
-	float length; // スティックの倒れ具合 (0.0f ~ 1.0f)
-    bool isOutside; // デッドゾーン外かどうか
+    float X; // -1.0f ~ 1.0f
+    float Y; // -1.0f ~ 1.0f
+	float Length; // スティックの倒れ具合 (0.0f ~ 1.0f)
+    bool IsOutside; // デッドゾーン外かどうか
 };
 
 struct TriggerState {
-    float value; // 0.0f ~ 1.0f
-    bool isDowned; // 閾値を超えたかどうか
+    float Value; // 0.0f ~ 1.0f
+    bool IsDowned; // 閾値を超えたかどうか
 };
 
-class XinputController : public InputDevice
+class GamePad : public InputDevice
 {
 public:
 	// コンストラクタ・デストラクタ
-    XinputController(int controllerNumber = 0);
-	~XinputController() = default;
+    GamePad(int controllerNumber = 0);
+	~GamePad() = default;
     
     // 毎フレーム呼ぶ
     void InputUpdate();
@@ -62,9 +63,9 @@ public:
 	float GetInputValue(InputKey input, InputCondition inputCondition) override;
     
     // ボタン状態
-    bool IsDown(XBOXButton btn) const;
-    bool IsPressed(XBOXButton btn) const;
-    bool IsReleased(XBOXButton btn) const;
+    bool IsDown(GamePadButton btn) const;
+    bool IsPressed(GamePadButton btn) const;
+    bool IsReleased(GamePadButton btn) const;
     
     // スティック (-1.0f ~ 1.0f)
     StickState GetLeftStick() const;
@@ -75,36 +76,36 @@ public:
     TriggerState GetRightTrigger() const;
 
 	// 接続状態取得
-	bool IsConnected() const { return m_IsConnected; }
+	bool IsConnected() const { return m_isConnected; }
 
 private:
 	// ヘルパ関数
-	float GetButtonValue(XBOXButton btn, InputCondition inputCondition) const;
-	float GetTriggerValue(XBOXButton btn, InputCondition inputCondition) const;
-	float GetStickValue(XBOXButton btn, InputCondition inputCondition) const;
+	float GetButtonValue(GamePadButton btn, InputCondition inputCondition) const;
+	float GetTriggerValue(GamePadButton btn, InputCondition inputCondition) const;
+	float GetStickValue(GamePadButton btn, InputCondition inputCondition) const;
 
 	// コントローラー番号
-    int m_ControllerNumber;
+    int m_controllerNumber;
 
 	// 前回と今回の状態
-    XINPUT_STATE m_PrevState;
-    XINPUT_STATE m_CurState;
+    XINPUT_STATE m_prevState;
+    XINPUT_STATE m_curState;
 
 	// 前回のスティックとトリガーの状態（デッドゾーン判定後）
-	mutable StickState m_PrevLeftStick = {};
-	mutable StickState m_PrevRightStick = {};
-	mutable TriggerState m_PrevLeftTrigger = {};
-	mutable TriggerState m_PrevRightTrigger = {};
+	mutable StickState m_prevLeftStick = {};
+	mutable StickState m_prevRightStick = {};
+	mutable TriggerState m_prevLeftTrigger = {};
+	mutable TriggerState m_prevRightTrigger = {};
 
 	// 接続状態
-    bool m_IsConnected = false;
+    bool m_isConnected = false;
 
 	// スティックのデッドゾーン
-	const float m_LeftStickDeadZone = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
-	const float m_RightStickDeadZone = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+	const float m_leftStickDeadZone = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+	const float m_rightStickDeadZone = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
 
 	// トリガーの反応閾値
-	const float m_TriggerThreshold = XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
+    const float m_triggerThreshold = XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
 };
 
 

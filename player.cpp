@@ -1,10 +1,11 @@
 
 #include "Player.h"
 #include "MeshRenderer.h"
-#include "Collider.h"
-#include "RigidBody.h"
+#include "InputSystem.h"
 #include "model.h"
-#include "GameManager.h"
+#include "Camera.h"
+#include "PhysicsBody.h"
+#include "ColliderShape.h"
 
 using namespace DirectX;
 
@@ -21,44 +22,51 @@ Player::~Player()
 void Player::Awake()
 {
 	// TPSCamera作成
-	camera = new TPSCamera(this);
 
-
-	// Controller設定
-	auto* controller = AddComponent<XinputController>();
 
 	// プレイヤー用コマンドセット作成
-	auto* commandSet = AddComponent<PlayerCommandSet>();
+	auto* commandSet = gameObject().AddComponent<PlayerCommandSet>();
 
 	// InputSystem設定
-	inputSystem = AddComponent<InputSystem>(controller, commandSet);
+	inputHandler = gameObject().AddComponent<InputHandler>(&input().gamePad(), commandSet);
 
 
 
 	// Healthコンポーネント設定
-	AddComponent<Health>(100.0f);
+	gameObject().AddComponent<Health>(100.0f);
+
+
+	auto* temp = gameObject().AddComponent<Camera>();
 
 	// PlayerMovementコンポーネント設定
-	movement = AddComponent<PlayerMovement>(camera);
+	movement = gameObject().AddComponent<PlayerMovement>(temp);
 
 	// PlayerMorphSystemコンポーネント設定
-	morphSystem = AddComponent<PlayerMorphSystem>();
+	morphSystem = gameObject().AddComponent<PlayerMorphSystem>();
 
 
 	// PlayerStateMachineコンポーネント設定
-	stateMachine = AddComponent<PlayerStateMachine>();
+	stateMachine = gameObject().AddComponent<PlayerStateMachine>();
 
 
 	// MeshRenderer設定
-	meshRenderer = AddComponent<MeshRenderer>();
+	meshRenderer = gameObject().AddComponent<MeshRenderer>();
 
 
-	// コライダー設定
-	auto* collider = AddComponent<Collider>(ColliderType::CAPSULE, Vector3{ 0.5f, 1.0f, 0.0f });
+	// ColliderShape設定
+	CapsuleColliderDesc shapeDesc{};
+	shapeDesc.Radius = 0.5f;
+	shapeDesc.Height = 1.8f;
+	CapsuleColliderShape shape{ shapeDesc };
 
-	// RigidBody設定
-	rigidBody = AddComponent<RigidBody>(1.0f, Vector3{ 1.0f, 1.0f, 1.0f });
-	rigidBody->AddCollider(collider);
+
+	// PhysicsBody設定
+	PhysicsBodyDesc bodyDesc{};
+	bodyDesc.Mass = 1.0f;
+	bodyDesc.Type = BodyType::DYNAMIC;
+	bodyDesc.FixedRotation = { 1.0f, 0.0f, 1.0f };
+	physicsBody = gameObject().AddComponent<PhysicsBody>(bodyDesc);
+	physicsBody->AddShape(shape);
 }
 
 void Player::Start()

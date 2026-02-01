@@ -11,17 +11,17 @@ void PlayerState_Human_MidAir::HandleInput(Player& player)
 {
 
 	// 入力システム取得
-	const InputSystem* inputSystem = player.inputSystem;
+	InputHandler* inputHandler = player.inputHandler;
 
 	// 移動コンポーネント取得
 	PlayerMovement* movement = player.movement;
 
 	// 入力値取得
-	float inputX = inputSystem->GetValue<PlayerCommand_MoveX>();
-	float inputZ = inputSystem->GetValue<PlayerCommand_MoveZ>();
+	float inputX = inputHandler->GetValue<PlayerCommand_MoveX>();
+	float inputZ = inputHandler->GetValue<PlayerCommand_MoveZ>();
 
 	// 電気ジャンプ処理
-	if (inputSystem->IsIssued<PlayerCommand_Jump>())
+	if (inputHandler->IsIssued<PlayerCommand_Jump>())
 		movement->ElectricJump(inputX, inputZ);
 
 

@@ -4,11 +4,11 @@
 #define POWER_LINE_H
 
 #include <DirectXMath.h>
-#include "GameObject.h"
+#include "ScriptComponent.h"
 #include "PoleManager.h"
 #include <utility>
 
-class PowerLine : public GameObject
+class PowerLine : public ScriptComponent
 {
 private:
 	// ìdê¸ID

@@ -4,6 +4,7 @@
 
 
 class Camera;
+class Scene;
 class MeshRenderer;
 class EngineCore;
 

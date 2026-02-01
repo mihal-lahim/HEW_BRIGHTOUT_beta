@@ -3,12 +3,13 @@
 #define POLE_H
 
 #include <DirectXMath.h>
-#include "GameObject.h"
+#include "ScriptComponent.h"
 #include <vector>
 #include "PoleManager.h"
+#include "GameObject.h"
 
 
-class Pole : public GameObject
+class Pole : public ScriptComponent
 {
 private:
 	// 電柱ID
@@ -33,7 +34,8 @@ public:
 	void SetPowerLine(PowerLineID lineID) { m_ConnectedLines.push_back(lineID); }
 
 	// 電柱の頂点位置取得メソッド
-	Vector3 GetTopPos() const { return Vector3{ transform.Position.x , transform.Position.y + m_Height, transform.Position.z }; }
+	Vector3 GetTopPos() const 
+	{ return Vector3{ gameObject().transform().position().x , gameObject().transform().position().y + m_Height, gameObject().transform().position().z}; }
 
 	// 接続されている電線リスト取得メソッド
 	std::vector<PowerLineID> GetLines() const { return m_ConnectedLines; }

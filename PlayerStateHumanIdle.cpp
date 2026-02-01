@@ -12,14 +12,14 @@ void PlayerState_Human_Idle::HandleInput(Player& player)
 {
 
 	// 入力システム取得
-	const InputSystem* inputSystem = player.inputSystem;
+	InputHandler* inputHandler = player.inputHandler;
 
 	// ステートマシン取得
 	PlayerStateMachine* stateMachine = player.stateMachine;
 
 	// 移動コマンドが発行されたら歩行状態へ遷移
-	if (inputSystem->IsIssued<PlayerCommand_MoveX>()
-		|| inputSystem->IsIssued<PlayerCommand_MoveZ>())
+	if (inputHandler->IsIssued<PlayerCommand_MoveX>()
+		|| inputHandler->IsIssued<PlayerCommand_MoveZ>())
 	{
 		stateMachine->ChangeState(&PlayerStates::HumanWalk, player);
 		return;

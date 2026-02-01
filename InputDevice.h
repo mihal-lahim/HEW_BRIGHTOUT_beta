@@ -17,7 +17,7 @@ enum class InputCondition
 
 typedef WORD InputKey;
 
-class InputDevice : public Component
+class InputDevice
 {
 public:
 	InputDevice() = default;

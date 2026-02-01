@@ -1,10 +1,12 @@
 #include "EngineCore.h"
 #include "GameContext.h"
 
+
 GameContext& EngineCore::GetGameContext()
 {
 	static GameContext gameContext{};
 
+	gameContext.windowSystem = m_windowSystem.get();
 	gameContext.sceneSystem = m_sceneSystem.get();
 	gameContext.physicsSystem = m_physicsSystem.get();
 
@@ -16,6 +18,7 @@ GameContext& EngineCore::GetGameContext()
 
 void EngineCore::Initialize()
 {
+	m_windowSystem = std::make_unique<WindowSystem>(this);
 	m_sceneSystem = std::make_unique<SceneSystem>(this);
 	m_physicsSystem = std::make_unique<PhysicsSystem>(this);
 
@@ -29,11 +32,12 @@ void EngineCore::Update()
 
 	m_sceneSystem->Update();
 
-	m_renderingSystem->Render();
+	m_renderingSystem->Render(m_sceneSystem->currentScene());
 }
 
 void EngineCore::Finalize()
 {
+	m_windowSystem.reset();
 	m_sceneSystem.reset();
 	m_physicsSystem.reset();
 

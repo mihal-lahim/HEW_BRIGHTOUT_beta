@@ -24,18 +24,6 @@ private:
 	// オブジェクトのプール
 	std::vector<std::unique_ptr<T>> m_pool;
 public:
-	// オブジェクトを作成してプールに追加
-	template<typename... Args>
-	T* Create(Args... args)
-	{
-		// 新しいオブジェクトを作成し、プールに追加
-		auto newObj = std::make_unique<T>(std::forward<Args>(args...));
-		T * objPtr = newObj.get();
-		// オブジェクトのallocationIDを設定
-		objPtr->m_allocationID = static_cast<uint32_t>(m_pool.size());
-		m_pool.push_back(std::move(newObj));
-		return objPtr;
-	}
 
 	// 既存のオブジェクトをプールに登録
 	void Register(T* obj)

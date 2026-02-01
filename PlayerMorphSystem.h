@@ -2,12 +2,12 @@
 #ifndef PLAYER_MORPHSYSTEM_H
 #define PLAYER_MORPHSYSTEM_H
 
-#include "Component.h"
+#include "ScriptComponent.h"
 #include "PoleManager.h"
 
 class Player;
 
-class PlayerMorphSystem : public Component
+class PlayerMorphSystem : public ScriptComponent
 {
 private:
 	// PoleManagerÇ÷ÇÃéQè∆

@@ -134,6 +134,15 @@
     <Filter Include="HeaderFile\OS">
       <UniqueIdentifier>{432a01f2-9a61-4d5a-95d3-39d69f32b0fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SorceFile\OS">
+      <UniqueIdentifier>{0b802805-8b36-4f1f-ae40-156ba6cb321a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HeaderFile\Prefab">
+      <UniqueIdentifier>{7e1b3767-5359-4705-8479-87903ed7be58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HeaderFile\Prefab\Base">
+      <UniqueIdentifier>{07209d3e-138d-4c57-8709-7a7483794c3d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -238,9 +247,6 @@
     <ClCompile Include="DebugCamera.cpp">
       <Filter>SorceFile\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="RigidBody.cpp">
-      <Filter>SorceFile\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="MeshRenderer.cpp">
       <Filter>SorceFile\ScriptComponent</Filter>
     </ClCompile>
@@ -249,15 +255,6 @@
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>SorceFile\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectManager.cpp">
-      <Filter>SorceFile\LifeCycle</Filter>
-    </ClCompile>
-    <ClCompile Include="CubeObject.cpp">
-      <Filter>SorceFile\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Collider.cpp">
-      <Filter>SorceFile\Physics</Filter>
     </ClCompile>
     <ClCompile Include="Quaternion.cpp">
       <Filter>SorceFile\Math</Filter>
@@ -286,7 +283,7 @@
     <ClCompile Include="KeyLogger.cpp">
       <Filter>SorceFile\Input</Filter>
     </ClCompile>
-    <ClCompile Include="XinputController.cpp">
+    <ClCompile Include="GamePad.cpp">
       <Filter>SorceFile\Input</Filter>
     </ClCompile>
     <ClCompile Include="TPSCamera.cpp">
@@ -294,12 +291,6 @@
     </ClCompile>
     <ClCompile Include="RenderingSystem.cpp">
       <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>SorceFile\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="GameManager.cpp">
-      <Filter>SorceFile\LifeCycle</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>SorceFile\GameObject\Base</Filter>
@@ -309,6 +300,21 @@
     </ClCompile>
     <ClCompile Include="EngineCore.cpp">
       <Filter>SorceFile\LifeCycle</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>SorceFile\OS</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowSystem.cpp">
+      <Filter>SorceFile\OS</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsBody.cpp">
+      <Filter>SorceFile\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>SorceFile\Scene\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem.cpp">
+      <Filter>SorceFile\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -417,12 +423,6 @@
     <ClInclude Include="PhysicsSystem.h">
       <Filter>HeaderFile\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Collider.h">
-      <Filter>HeaderFile\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="RigidBody.h">
-      <Filter>HeaderFile\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>HeaderFile\ScriptComponent</Filter>
     </ClInclude>
@@ -441,17 +441,11 @@
     <ClInclude Include="Time.h">
       <Filter>HeaderFile\LifeCycle</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectManager.h">
-      <Filter>HeaderFile\LifeCycle</Filter>
-    </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>HeaderFile\LifeCycle</Filter>
     </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>HeaderFile\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="CubeObject.h">
-      <Filter>HeaderFile\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="InputSystem.h">
       <Filter>HeaderFile\Input</Filter>
@@ -492,16 +486,13 @@
     <ClInclude Include="Camera.h">
       <Filter>HeaderFile\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="TPSCamera.h">
-      <Filter>HeaderFile\GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="CommandSet.h">
       <Filter>HeaderFile\Input</Filter>
     </ClInclude>
     <ClInclude Include="Light.h">
       <Filter>HeaderFile\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="XinputController.h">
+    <ClInclude Include="GamePad.h">
       <Filter>HeaderFile\Input</Filter>
     </ClInclude>
     <ClInclude Include="InputDevice.h">
@@ -540,6 +531,36 @@
     <ClInclude Include="Window.h">
       <Filter>HeaderFile\OS</Filter>
     </ClInclude>
+    <ClInclude Include="PhysicsBody.h">
+      <Filter>HeaderFile\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="ColliderShape.h">
+      <Filter>HeaderFile\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="UniqueQueue.h">
+      <Filter>HeaderFile\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Prefab.h">
+      <Filter>HeaderFile\Prefab\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="UniqueVector.h">
+      <Filter>HeaderFile\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="TPSCamera.h">
+      <Filter>HeaderFile\ScriptComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraPrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicCubePrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticCubePrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="CubePrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader2d.hlsl">
@@ -568,5 +589,6 @@
     <None Include="SceneSystem.inl">
       <Filter>inlFile\Scene</Filter>
     </None>
+    <None Include=".github\copilot-instructions.md" />
   </ItemGroup>
 </Project>

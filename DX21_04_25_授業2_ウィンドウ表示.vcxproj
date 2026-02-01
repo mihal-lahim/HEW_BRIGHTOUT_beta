@@ -169,25 +169,26 @@ for %%F in ("$(TargetDir)*.cso") do (
   <ItemGroup>
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="EngineCore.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="PhysicsBody.cpp" />
     <ClCompile Include="PoleManager.cpp" />
     <ClCompile Include="SceneSystem.cpp" />
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Vector4.cpp" />
-    <ClCompile Include="XinputController.cpp" />
+    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="WindowSystem.cpp" />
+    <ClCompile Include="GamePad.cpp" />
     <ClCompile Include="cube.cpp" />
-    <ClCompile Include="CubeObject.cpp" />
     <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="DebugOstream.cpp" />
     <ClCompile Include="DebugText.cpp" />
     <ClCompile Include="direct3d.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="game_effect.cpp" />
     <ClCompile Include="Health.cpp" />
     <ClCompile Include="Keyboard.cpp" />
@@ -198,7 +199,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="model.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Movement.cpp" />
-    <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerMorphSystem.cpp" />
@@ -215,7 +215,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="PowerLine.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="RenderingSystem.cpp" />
-    <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shader3d.cpp" />
@@ -229,25 +228,32 @@ for %%F in ("$(TargetDir)*.cso") do (
   <ItemGroup>
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Collider.h" />
+    <ClInclude Include="CameraPrefab.h" />
+    <ClInclude Include="ColliderShape.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandSet.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="CubePrefab.h" />
+    <ClInclude Include="StaticCubePrefab.h" />
+    <ClInclude Include="DynamicCubePrefab.h" />
     <ClInclude Include="DebugCounter.h" />
     <ClInclude Include="GameContext.h" />
     <ClInclude Include="InputSystem.h" />
     <ClInclude Include="ObjectPool.h" />
+    <ClInclude Include="PhysicsBody.h" />
+    <ClInclude Include="Prefab.h" />
     <ClInclude Include="SceneSystem.h" />
     <ClInclude Include="ScriptComponent.h" />
     <ClInclude Include="ScriptComponentSystem.h" />
+    <ClInclude Include="UniqueQueue.h" />
+    <ClInclude Include="UniqueVector.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowSystem.h" />
-    <ClInclude Include="XinputController.h" />
+    <ClInclude Include="GamePad.h" />
     <ClInclude Include="cube.h" />
-    <ClInclude Include="CubeObject.h" />
     <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="DebugConsole.h" />
     <ClInclude Include="DebugOstream.h" />
@@ -269,7 +275,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Movement.h" />
     <ClInclude Include="Object.h" />
-    <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerCommand.h" />
@@ -290,7 +295,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RenderingSystem.h" />
-    <ClInclude Include="RigidBody.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="EngineCore.h" />
     <ClInclude Include="shader.h" />
@@ -335,6 +339,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include=".github\copilot-instructions.md" />
     <None Include="Component.inl" />
     <None Include="GameObject.inl" />
     <None Include="Scene.inl" />

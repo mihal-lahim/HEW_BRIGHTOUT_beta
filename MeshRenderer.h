@@ -3,7 +3,6 @@
 #define MESHRENDERER_H
 
 #include "Component.h"
-#include "GameManager.h"
 
 struct MODEL;
 
@@ -17,8 +16,8 @@ private:
 	int m_TextureIndex = -1;
 public:
 
-	MeshRenderer() { GameManager::GetRenderSystem().RegisterMeshRenderer(this); }
-	virtual ~MeshRenderer() { GameManager::GetRenderSystem().UnregisterMeshRenderer(this); }
+	MeshRenderer() = default;
+	virtual ~MeshRenderer() = default;
 
 	// MODELÉ|ÉCÉìÉ^ê›íË
 	void SetModel(MODEL* model) { m_Model = model; }

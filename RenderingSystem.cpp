@@ -34,7 +34,7 @@ void RenderingSystem::Render(const Scene& scene)
     // —Dæ“x‡‚É•`‰æ
     for (auto& camera : cameras)
     {
-        if (camera->IsActive() == false) continue;
+        if (camera->IsEnable() == false) continue;
 
         // ƒJƒƒ‰s—ñ‚ğİ’è
 		XMMATRIX view = camera->GetViewMatrix();
@@ -46,7 +46,7 @@ void RenderingSystem::Render(const Scene& scene)
         // ƒƒbƒVƒ…ƒŒƒ“ƒ_ƒ‰[‚ğ•`‰æ
         for (auto* meshRenderer : meshRenderers)
         {
-            if (meshRenderer->IsActive())
+            if (meshRenderer->IsEnable())
                 meshRenderer->Render();
         }
     }

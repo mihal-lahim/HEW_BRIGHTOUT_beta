@@ -5,6 +5,7 @@
 #include <vector>
 #include "Transform.h"
 #include "Object.h"
+#include "GameContext.h"
 
 class Scene;
 class Component;
@@ -13,28 +14,15 @@ class Component;
 // ゲーム内のすべてのオブジェクトの基底クラス
 class GameObject final : public Object
 {
-private:
-	// 所属しているシーン
-	Scene* m_scene = nullptr;
-
-	// 位置・回転・スケール情報
-	Transform* m_transform = nullptr;
-
-	// オブジェクトのアクティブ状態
-	bool m_isActive = true;
-
-	// 所持しているコンポーネントの配列
-	std::vector<Component*> m_components;
 public:
-
 	GameObject() = default;
-    virtual ~GameObject() = default;
+	virtual ~GameObject() = default;
 
 	// Transformコンポーネントの取得メソッド
 	Transform& transform() const { return *m_transform; }
 
 	// オブジェクトのアクティブ状態を設定するメソッド
-	void SetActive(bool active) { m_isActive = active; }
+	void SetActive(bool active);
 
 	// オブジェクトのアクティブ状態を取得するメッド
 	bool IsActiveSelf() const { return m_isActive; }
@@ -63,10 +51,31 @@ public:
 	// コンポーネント追加テンプレートメソッド
 	template<typename T, typename... Args>
 		requires std::is_base_of<Component, T>::value
-	T* AddComponent(Args... args);
+	T* AddComponent(Args&&... args);
 
+private:
+	// 現在のゲームコンテキスト
+	GameContext m_gameContext{};
+
+	// 所属しているシーン
+	Scene* m_scene = nullptr;
+
+	// 位置・回転・スケール情報
+	Transform* m_transform = nullptr;
+
+	// オブジェクトのアクティブ状態
+	bool m_isActive = true;
+
+	// オブジェクトの破壊状態
+	bool m_isDestroyed = false;
+
+	// 所持しているコンポーネントの配列
+	std::vector<Component*> m_components;
 
 	friend class Scene;
+	friend class Component;
 };
+
+#include "GameObject.inl"
 
 #endif

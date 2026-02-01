@@ -24,7 +24,7 @@ void TPSCamera::Rotate(float inputX, float inputY)
 void TPSCamera::Update()
 {
 	// 注視対象の位置を取得
-	Vector3 targetPos = m_Target->transform.Position;
+	Vector3 targetPos = m_Target->transform().position();
 	targetPos.y += m_Ctx.Height;
 
 	// ラジアンに変換
@@ -40,7 +40,7 @@ void TPSCamera::Update()
 
 	// カメラ位置を更新
 	Vector3 cameraPos = targetPos + offset;
-	transform.Position = cameraPos;
+	gameObject().transform().position() = cameraPos;
 
 	// カメラの回転を更新（ターゲットを向く）
 	Vector3 forward = (targetPos - cameraPos).Normalize();
@@ -55,5 +55,5 @@ void TPSCamera::Update()
 	rotMat.r[2] = XMVectorSet(forward.x, forward.y, forward.z, 0.0f);
 	rotMat.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 
-	transform.Rotation.FromXMMATRIX(rotMat);
+	gameObject().transform().rotation().FromXMMATRIX(rotMat);
 }

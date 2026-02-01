@@ -4,7 +4,7 @@
 void PlayerState_Human::Enter(Player& player)
 {
 	// 剛体を有効化
-	player.rigidBody->SetActive(true);
+	player.physicsBody->SetEnable(true);
 
 	// モデルを人間形態に設定
 	player.meshRenderer->SetModel(player.humanModel);
@@ -17,7 +17,7 @@ void PlayerState_Human::HandleInput(Player& player)
 	//hal::dout << "Human" << std::endl;
 
 	// 入力システム取得
-	const InputSystem* inputSystem = player.inputSystem;
+	InputHandler* inputHandler = player.inputHandler;
 
 	// 移動コンポーネント取得
 	PlayerMovement* movement = player.movement;
@@ -29,7 +29,7 @@ void PlayerState_Human::HandleInput(Player& player)
 	PlayerStateMachine* stateMachine = player.stateMachine;
 
 	// 変身処理
-	if (inputSystem->IsIssued<PlayerCommand_Morph>() && morphSystem->CanMorph())
+	if (inputHandler->IsIssued<PlayerCommand_Morph>() && morphSystem->CanMorph())
 	{
 		// 最寄りの電線IDを取得
 		PowerLineID nearestLine = morphSystem->GetNearestPowerLineID();

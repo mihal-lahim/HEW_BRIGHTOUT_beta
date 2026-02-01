@@ -3,7 +3,7 @@
 void PlayerState_Electric::Enter(Player& player)
 {
 	// 剛体を無効化
-	player.rigidBody->SetActive(false);
+	player.physicsBody->SetEnable(false);
 
 	// モデルを電気形態に設定
 	player.meshRenderer->SetModel(player.electricModel);
@@ -24,7 +24,7 @@ void PlayerState_Electric::HandleInput(Player& player)
 {
 
 	// 入力システム取得
-	const InputSystem* inputSystem = player.inputSystem;
+	InputHandler* inputHandler = player.inputHandler;
 
 	// 移動コンポーネント取得
 	PlayerMovement* movement = player.movement;
@@ -33,12 +33,12 @@ void PlayerState_Electric::HandleInput(Player& player)
 	PlayerStateMachine* stateMachine = player.stateMachine;
 
 	// ジャンプコマンドが発行されたら射出・変身処理
-	if (inputSystem->IsIssued<PlayerCommand_Jump>())
+	if (inputHandler->IsIssued<PlayerCommand_Jump>())
 	{
 		// 電線から射出
 		movement->Eject(
-			inputSystem->GetValue<PlayerCommand_MoveX>(),
-			inputSystem->GetValue<PlayerCommand_MoveZ>());
+			inputHandler->GetValue<PlayerCommand_MoveX>(),
+			inputHandler->GetValue<PlayerCommand_MoveZ>());
 
 		// 人間形態へ変身
 		stateMachine->ChangeState(&PlayerStates::HumanMidAir, player);
@@ -46,13 +46,13 @@ void PlayerState_Electric::HandleInput(Player& player)
 	}
 
 	// 移動コマンドが発行されたら方向転換処理
-	if (inputSystem->IsIssued<PlayerCommand_MoveX>()
-		|| inputSystem->IsIssued<PlayerCommand_MoveZ>())
+	if (inputHandler->IsIssued<PlayerCommand_MoveX>()
+		|| inputHandler->IsIssued<PlayerCommand_MoveZ>())
 	{
 		// 電線上方向指定処理
 		movement->Turn(
-			inputSystem->GetValue<PlayerCommand_MoveX>(),
-			inputSystem->GetValue<PlayerCommand_MoveZ>());
+			inputHandler->GetValue<PlayerCommand_MoveX>(),
+			inputHandler->GetValue<PlayerCommand_MoveZ>());
 	}
 
 	PlayerState::HandleInput(player);

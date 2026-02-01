@@ -1,9 +1,9 @@
 #ifndef TPS_CAMERA_H
 #define TPS_CAMERA_H
 
-#include "Component.h"
+
 #include <DirectXMath.h>
-#include "Camera.h"
+#include "ScriptComponent.h"
 
 // TPSカメラ設定構造体
 struct TPSCameraCtx
@@ -18,7 +18,7 @@ struct TPSCameraCtx
 };
 
 
-class TPSCamera : public Camera
+class TPSCamera : public ScriptComponent
 {
 private:
 	GameObject* m_Target = nullptr; // 注視対象オブジェクト

@@ -6,13 +6,13 @@
 void MeshRenderer::Render()
 {
 	// トランスフォーム取得
-	const Transform& tf = gameObject()->transform;
+	Transform& tf = gameObject().transform();
 
 	// ワールド行列計算
 	DirectX::XMMATRIX mtxWorld =
-		DirectX::XMMatrixScaling(tf.Scale.x, tf.Scale.y, tf.Scale.z) *
-		tf.Rotation.ToXMMATRIX() *
-		DirectX::XMMatrixTranslation(tf.Position.x, tf.Position.y, tf.Position.z);
+		DirectX::XMMatrixScaling(tf.scale().x, tf.scale().y, tf.scale().z) *
+		tf.rotation().ToXMMATRIX() *
+		DirectX::XMMatrixTranslation(tf.position().x, tf.position().y, tf.position().z);
 
 	// モデルが設定されている場合
 	if (m_Model)

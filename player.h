@@ -6,11 +6,11 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "ScriptComponent.h"
 #include "GameObject.h"
-#include "InputSystem.h"
+#include "InputHandler.h"
 #include "PlayerState.h"
-#include "ObjectManager.h"
-#include "XInputController.h"
+#include "GamePad.h"
 #include "TPSCamera.h"
 #include "Health.h"
 #include "PlayerMovement.h"
@@ -45,14 +45,14 @@ struct PlayerStates
 
 
 
-class Player : public GameObject
+class Player : public ScriptComponent
 {
 public:
 	// 状態管理
 	PlayerStateMachine* stateMachine = nullptr;
 
 	// 入力システム
-	InputSystem* inputSystem = nullptr;
+	InputHandler* inputHandler = nullptr;
 
 	// 移動コンポーネント
 	PlayerMovement* movement = nullptr;
@@ -67,7 +67,7 @@ public:
 	Health* health = nullptr;
 
 	// 剛体
-	RigidBody* rigidBody = nullptr;
+	PhysicsBody* physicsBody = nullptr;
 
 	// メッシュレンダラー
 	MeshRenderer* meshRenderer = nullptr;

@@ -2,9 +2,18 @@
 #include "GameContext.h"
 #include "Scene.h"
 
+void GameObject::SetActive(bool active)
+{
+	for (auto* comp : m_components)
+	{
+		comp->SetEnable(active);
+	}
+	m_isActive = active;
+}
+
 void GameObject::Destroy()
 {
-	if (!m_scene) return;
+	if (!m_scene || m_isDestroyed) return;
 
 	// 自身を所有しているシーンに破壊を依頼
 	m_scene->DestroyGameObject(this);

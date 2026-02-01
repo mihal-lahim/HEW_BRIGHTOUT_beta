@@ -1,6 +1,7 @@
 #include "PoleManager.h"
 #include "PowerLine.h"
 #include "Pole.h"
+#include "GameObject.h"
 
 using namespace DirectX;
 
@@ -31,8 +32,8 @@ PowerLineID PoleManager::RegisterPowerLine(PowerLine* line)
 	pole2->SetPowerLine((PoleID)m_PowerLines.size() - 1);
 
 	// 電柱の座標を取得
-	Vector3 pos1 = pole1->transform.Position;
-	Vector3 pos2 = pole2->transform.Position;
+	Vector3 pos1 = pole1->gameObject().transform().position();
+	Vector3 pos2 = pole2->gameObject().transform().position();
 
 	// 電線の長さを設定（2点間の距離）
 	line->SetLength((pos2 - pos1).Length());

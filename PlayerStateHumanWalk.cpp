@@ -11,7 +11,7 @@ void PlayerState_Human_Walk::Enter(Player& player)
 void PlayerState_Human_Walk::HandleInput(Player& player)
 {
 	// 入力システム取得
-	const InputSystem* inputSystem = player.inputSystem;
+	InputHandler* inputHandler = player.inputHandler;
 
 	// ステートマシン取得
 	PlayerStateMachine* stateMachine = player.stateMachine;
@@ -20,8 +20,8 @@ void PlayerState_Human_Walk::HandleInput(Player& player)
 	PlayerMovement* movement = player.movement;
 
 	// 入力値取得
-	float inputX = inputSystem->GetValue<PlayerCommand_MoveX>();
-	float inputZ = inputSystem->GetValue<PlayerCommand_MoveZ>();
+	float inputX = inputHandler->GetValue<PlayerCommand_MoveX>();
+	float inputZ = inputHandler->GetValue<PlayerCommand_MoveZ>();
 
 	// 歩行処理
 	movement->Walk(inputX, inputZ);
