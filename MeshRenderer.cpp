@@ -25,9 +25,17 @@ void MeshRenderer::Render(GraphicsDevice& device)
 	else if(m_mesh)
 	{
 		// ƒƒbƒVƒ…•`‰æ
-		Shader3d_Begin();
-		Shader3d_SetWorldMatrix(mtxWorld);
-		Shader3d_SetMaterialDiffuse({ 1.0f, 1.0f, 1.0f, 1.0f });
+		if (!m_vertexShader || !m_materialInstance)
+		{
+			return;
+		}
+
+		PerObjectCB::CBData objectData{};
+		DirectX::XMStoreFloat4x4(&objectData.WorldMatrix, DirectX::XMMatrixTranspose(mtxWorld));
+		m_vertexShader->UpdatePerObjectCB(device, objectData);
+		m_vertexShader->Bind(device);
+
+		m_materialInstance->Apply(device);
 
 		if (m_texture)
 		{

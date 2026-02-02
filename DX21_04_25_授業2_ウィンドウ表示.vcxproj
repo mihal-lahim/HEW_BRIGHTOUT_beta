@@ -182,6 +182,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceSystem.cpp" />
     <ClCompile Include="SceneSystem.cpp" />
+    <ClCompile Include="SpriteRenderer.cpp" />
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Vector4.cpp" />
@@ -233,6 +234,7 @@ for %%F in ("$(TargetDir)*.cso") do (
   <ItemGroup>
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Billboard.h" />
+    <ClInclude Include="BillboardPrefab.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraPrefab.h" />
     <ClInclude Include="ColliderShape.h" />
@@ -257,6 +259,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="SceneSystem.h" />
     <ClInclude Include="ScriptComponent.h" />
     <ClInclude Include="ScriptComponentSystem.h" />
+    <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="TPSCameraPrefab.h" />
     <ClInclude Include="UniqueQueue.h" />
     <ClInclude Include="UniqueVector.h" />

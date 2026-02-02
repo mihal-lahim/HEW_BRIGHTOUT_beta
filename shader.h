@@ -61,6 +61,14 @@ class VertexShader : public Shader
 {
 public:
 	virtual ~VertexShader() = default;
+	ICBData* CreateMaterialCB() override
+	{
+		return nullptr;
+	}
+
+	void UpdateMaterialCB(GraphicsDevice&, const ICBData*) override
+	{
+	}
 protected:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
@@ -146,6 +154,16 @@ public:
 	{
 		DirectX::XMFLOAT4 Color;
 	};
+
+	ICBData* CreateMaterialCB() override
+	{
+		return new CBData<PerMaterialCB>;
+	}
+
+	void UpdateMaterialCB(GraphicsDevice& device, const ICBData* data) override
+	{
+		m_materialCB->UpdateBuffer(device, data->Get());
+	}
 	virtual void CreateBuffers(GraphicsDevice& device) override;
 	virtual void Bind(GraphicsDevice& device) override;
 private:

@@ -1,6 +1,7 @@
 #include "Billboard.h"
 #include <DirectXMath.h>
 #include "GameObject.h"
+#include "InputSystem.h"
 
 using namespace DirectX;
 
@@ -12,6 +13,7 @@ void Billboard::Awake()
 void Billboard::Update()
 {
 	if (!m_mainCamera) return;
+
 	// ©g‚ÌTransformæ“¾
 	Transform& myTransform = gameObject().transform();
 	// ƒJƒƒ‰‚ÌTransformæ“¾

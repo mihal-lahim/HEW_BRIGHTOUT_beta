@@ -51,12 +51,12 @@ protected:
 class PerFrameCB : public ConstantBuffer
 {
 public:
-	struct CBData : public ICBData
+	struct CBData
 	{
 		DirectX::XMFLOAT4 AmbientColor = {};
+		DirectX::XMFLOAT4 DirectionalColor = {};
 		DirectX::XMFLOAT3 DirectionalVec = {};
 		const float padding0 = 0.0f; // 16バイトアライメントのためのパディング
-		DirectX::XMFLOAT4 DirectionalColor = {};
 	};
 	PerFrameCB()
 		: ConstantBuffer(UsageType::DEFAULT)
@@ -70,7 +70,7 @@ public:
 class PerCameraCB : public ConstantBuffer
 {
 public:
-	struct CBData : public ICBData
+	struct CBData
 	{
 		DirectX::XMFLOAT4X4 ViewMatrix = {};
 		DirectX::XMFLOAT4X4 ProjectionMatrix = {};
@@ -89,7 +89,7 @@ public:
 class PerObjectCB : public ConstantBuffer
 {
 public:
-	struct CBData : public ICBData
+	struct CBData
 	{
 		DirectX::XMFLOAT4X4 WorldMatrix = {};
 	};

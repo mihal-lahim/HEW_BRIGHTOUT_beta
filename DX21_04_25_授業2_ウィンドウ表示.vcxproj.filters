@@ -340,6 +340,9 @@
     <ClCompile Include="ConstantBuffer.cpp">
       <Filter>SorceFile\Resource</Filter>
     </ClCompile>
+    <ClCompile Include="SpriteRenderer.cpp">
+      <Filter>SorceFile\Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemTimer.h">
@@ -605,6 +608,12 @@
     </ClInclude>
     <ClInclude Include="ConstantBuffer.h">
       <Filter>HeaderFile\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteRenderer.h">
+      <Filter>HeaderFile\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="BillboardPrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

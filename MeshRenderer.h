@@ -5,6 +5,7 @@
 #include "Component.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "Material.h"
 #include <memory>
 
 class Texture;
@@ -36,13 +37,24 @@ public:
 	}
 
 	// シェーダー設定
-	void SetVertexShader(Shader* vertexShader)
+	void SetVertexShader(VertexShader3D* vertexShader)
 	{
 		m_vertexShader = vertexShader;
 	}
-	void SetPixelShader(Shader* pixelShader)
+
+	VertexShader3D* GetVertexShader() const
 	{
-		m_pixelShader = pixelShader;
+		return m_vertexShader;
+	}
+
+	void SetMaterialInstance(MaterialInstance3D* materialInstance)
+	{
+		m_materialInstance = materialInstance;
+	}
+
+	MaterialInstance3D* GetMaterialInstance() const
+	{
+		return m_materialInstance;
 	}
 
 	// 描画処理
@@ -57,14 +69,11 @@ private:
 	// テクスチャへのポインタ（nullptrの場合テクスチャ未設定）
 	Texture* m_texture = nullptr;
 
-	// 頂点シェーダーとピクセルシェーダー
-	Shader* m_vertexShader = nullptr;
-	Shader* m_pixelShader = nullptr;
+	// 頂点シェーダー
+	VertexShader3D* m_vertexShader = nullptr;
 
-	// 定数バッファ
-	std::unique_ptr<ICB> m_vertexCB;
-	std::unique_ptr<ICB> m_pixelCB;
-
+	// マテリアル
+	MaterialInstance3D* m_materialInstance = nullptr;
 };
 
 
