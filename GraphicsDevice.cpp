@@ -16,7 +16,7 @@ GraphicsDevice& GetGraphicsDevice()
 
 bool GraphicsDevice::Initialize(HWND hWnd)
 {
-	//デバイス、スワップチェーン、コンテキスト生成
+	//デバイス、スワップチェイン、コンテキスト生成
 	DXGI_SWAP_CHAIN_DESC swapChainDesc{};
 	swapChainDesc.Windowed = TRUE;
 	swapChainDesc.BufferCount = 2;
@@ -41,7 +41,7 @@ bool GraphicsDevice::Initialize(HWND hWnd)
 
 	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
 
-	// デバイスとスワップチェインの生成
+	// デバイスとスワップチェインの作成
 	HRESULT hr = D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
@@ -72,13 +72,12 @@ bool GraphicsDevice::Initialize(HWND hWnd)
 
 void GraphicsDevice::Finalize()
 {
-	ReleaseBackBuffers();
-
 	m_swapChain.Reset();
 	m_deviceContext.Reset();
 	m_device.Reset();
 
 	m_blendStateMultiply.Reset();
+	m_blendStateOpaque.Reset();
 	m_blendStateAdd.Reset();
 	m_depthStencilStateDepthDisable.Reset();
 	m_depthStencilStateDepthEnable.Reset();
@@ -125,6 +124,9 @@ void GraphicsDevice::SetAlphaBlend(AlphaBlendMode blend)
 	case BLEND_TRANSPARENT:
 		blendState = m_blendStateMultiply.Get();
 		break;
+	case BLEND_OPAQUE:
+		blendState = m_blendStateOpaque.Get();
+		break;
 	case BLEND_ADD:
 		blendState = m_blendStateAdd.Get();
 		break;
@@ -153,15 +155,15 @@ bool GraphicsDevice::CreateBackBuffers()
 		return false;
 	}
 
-	// バックバッファのレンダーターゲットビューの生成
+	// バックバッファのレンダーターゲットビューの作成
 	hr = m_device->CreateRenderTargetView(backBufferPointer.Get(), nullptr, m_renderTargetView.GetAddressOf());
 	if (FAILED(hr)) {
 		return false;
 	}
-	// バックバッファの状態（情報）を取得
+	// バックバッファの情報（幅）取得
 	backBufferPointer->GetDesc(&m_backBufferDesc);
 
-	// デプスステンシルビューの生成
+	// デプスステンシルビューの作成
 	D3D11_TEXTURE2D_DESC depthStencilDesc{};
 	depthStencilDesc.Width = m_backBufferDesc.Width;
 	depthStencilDesc.Height = m_backBufferDesc.Height;
@@ -189,7 +191,7 @@ bool GraphicsDevice::CreateBackBuffers()
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 	depthStencilViewDesc.Flags = 0;
 
-	// デプスステンシルビューの生成
+	// デプスステンシルビューの作成
 	hr = m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), &depthStencilViewDesc, m_depthStencilView.GetAddressOf());
 
 	if (FAILED(hr)) {
@@ -226,29 +228,32 @@ bool GraphicsDevice::CreateBackBuffers()
 	bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-	// ブレンドステートの生成
+	// ブレンドステートの作成
 	m_device->CreateBlendState(&bd, m_blendStateMultiply.GetAddressOf());
 
-	// 加算合成用ブレンドステートの生成
+	// 加算用ブレンドステートの作成
 	bd.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
-
-	// ブレンドステートの生成
 	m_device->CreateBlendState(&bd, m_blendStateAdd.GetAddressOf());
 
-	// 初期状態は透明度合成
+	// 不透明用ブレンドステートの作成
+	D3D11_BLEND_DESC bdOpaque = bd;
+	bdOpaque.RenderTarget[0].BlendEnable = FALSE;
+	m_device->CreateBlendState(&bdOpaque, m_blendStateOpaque.GetAddressOf());
+
+	// 初期状態は透過
 	SetAlphaBlend(BLEND_TRANSPARENT);
 
-	// デプスステンシルステートの生成
+	// デプスステンシルステートの作成
 	D3D11_DEPTH_STENCIL_DESC dsd = {};
 	dsd.DepthFunc = D3D11_COMPARISON_LESS;
 	dsd.StencilEnable = FALSE;
 	dsd.DepthEnable = FALSE;
 	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 
-	// 深度テスト無効ステートの生成
+	// 深度テスト無効ステートの作成
 	m_device->CreateDepthStencilState(&dsd, m_depthStencilStateDepthDisable.GetAddressOf());
 
-	// 深度テスト有効ステートの生成
+	// 深度テスト有効ステートの作成
 	dsd.DepthEnable = TRUE;
 	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	m_device->CreateDepthStencilState(&dsd, m_depthStencilStateDepthEnable.GetAddressOf());
@@ -258,11 +263,4 @@ bool GraphicsDevice::CreateBackBuffers()
 	SetDepthTest(false);
 
 	return true;
-}
-
-void GraphicsDevice::ReleaseBackBuffers()
-{
-	m_renderTargetView.Reset();
-	m_depthStencilBuffer.Reset();
-	m_depthStencilView.Reset();
 }

@@ -7,6 +7,7 @@
 #include <wrl/client.h>
 #include <vector>
 #include "GraphicsDevice.h"
+#include "Resource.h"
 
 // 頂点構造体
 struct Vertex3d
@@ -17,20 +18,14 @@ struct Vertex3d
 	DirectX::XMFLOAT2 texcoord; // テクスチャ座標
 };
 
-class Mesh
+class Mesh : public Resource
 {
 public:
 	Mesh() = default;
 	virtual ~Mesh() = default;
 
 	// GPUバッファの作成
-	void CreateBuffers(GraphicsDevice* device);
-	// GPUバッファの解放
-	void ReleaseBuffers()
-	{
-		m_vertexBuffer.Reset();
-		m_indexBuffer.Reset();
-	}
+	void Initialize(GraphicsDevice& device) override;
 
 	// 頂点データとインデックスデータの追加
 	void AddVertex(const Vertex3d& vertex)
@@ -43,7 +38,7 @@ public:
 	}
 
 	// 一時的にMeshがやることになっている描画処理
-	void Render(GraphicsDevice* device);
+	void Render(GraphicsDevice& device);
 
 	// GPUバッファの取得
 	ID3D11Buffer* const GetVertexBuffer() const { return m_vertexBuffer.Get(); }

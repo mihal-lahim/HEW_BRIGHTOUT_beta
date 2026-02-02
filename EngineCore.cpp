@@ -14,6 +14,7 @@ GameContext& EngineCore::GetGameContext()
 
 	gameContext.inputSystem = m_inputSystem.get();
 	gameContext.renderingSystem = m_renderingSystem.get();
+	gameContext.resourceSystem = m_resourceSystem.get();
 
 	return gameContext;
 }
@@ -26,6 +27,7 @@ void EngineCore::Initialize()
 
 	m_inputSystem = std::make_unique<InputSystem>(this);
 	m_renderingSystem = std::make_unique<RenderingSystem>(this);
+	m_resourceSystem = std::make_unique<ResourceSystem>(this);
 }
 
 void EngineCore::Update()
@@ -60,4 +62,5 @@ void EngineCore::Finalize()
 
 	m_inputSystem.reset();
 	m_renderingSystem.reset();
+	m_resourceSystem.reset();
 }

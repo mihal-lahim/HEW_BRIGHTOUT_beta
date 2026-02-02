@@ -8,21 +8,9 @@
 
 using namespace DirectX;
 
-CubeMesh RenderingSystem::cubeMesh{};
-PlaneMesh RenderingSystem::planeMesh{};
-SphereMesh RenderingSystem::sphereMesh{};
-CapsuleMesh RenderingSystem::capsuleMesh{};
-CylinderMesh RenderingSystem::cylinderMesh{};
-
 void RenderingSystem::SetDevice(GraphicsDevice* device)
 {
 	m_graphicsDevice = device;
-    
-	cubeMesh.CreateBuffers(m_graphicsDevice);
-    planeMesh.CreateBuffers(m_graphicsDevice);
-    sphereMesh.CreateBuffers(m_graphicsDevice);
-    capsuleMesh.CreateBuffers(m_graphicsDevice);
-	cylinderMesh.CreateBuffers(m_graphicsDevice);
 }
 
 void RenderingSystem::Initialize()
@@ -60,12 +48,16 @@ void RenderingSystem::Render(const Scene& scene)
 		Shader3d_SetViewMatrix(view);
 		Shader3d_SetProjectionMatrix(projection);
 
+		GetGraphicsDevice().SetAlphaBlend(GraphicsDevice::BLEND_OPAQUE);
+
         // メッシュレンダラーを描画
         for (auto* meshRenderer : meshRenderers)
         {
             if (meshRenderer->IsEnable())
-                meshRenderer->Render(m_graphicsDevice);
+                meshRenderer->Render(*m_graphicsDevice);
         }
+
+		GetGraphicsDevice().SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);
     }
 
 	GetGraphicsDevice().Present();

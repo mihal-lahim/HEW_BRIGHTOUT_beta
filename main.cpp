@@ -124,9 +124,9 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 		XMVECTOR dirVec = XMVectorSet(-1.0f, -1.5f, 1.0f, 0.0f);
 		XMStoreFloat3(&direction, dirVec);
 	}
-	Light_SetDiffuse({ 0.7f,0.7f,0.7f }, direction);
+	Light_SetDiffuse({ 0.3f,0.28f,0.28f }, direction);
 
-	Light_SetAmbient({ 0.2f,0.1f,0.1f,1.0f });
+	Light_SetAmbient({ 0.55f,0.55f,0.55f,1.0f });
 
 
 	engineCore.GetGameContext().sceneSystem->ChangeScene<Game>();

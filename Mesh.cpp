@@ -12,7 +12,8 @@ namespace
 	constexpr float kPi = 3.14159265358979323846f;
 }
 
-void Mesh::CreateBuffers(GraphicsDevice* device)
+
+void Mesh::Initialize(GraphicsDevice& device)
 {
 	// 頂点バッファ生成
 	D3D11_BUFFER_DESC bd = {};
@@ -24,7 +25,7 @@ void Mesh::CreateBuffers(GraphicsDevice* device)
 	D3D11_SUBRESOURCE_DATA sd{};
 	sd.pSysMem = m_vertices.data();
 
-	HRESULT result_v = device->GetDevice()->CreateBuffer(&bd, &sd, m_vertexBuffer.GetAddressOf());
+	HRESULT result_v = device.GetDevice()->CreateBuffer(&bd, &sd, m_vertexBuffer.GetAddressOf());
 	if (FAILED(result_v)) {
 		throw std::runtime_error("頂点バッファの作成に失敗しました");
 	}
@@ -33,15 +34,15 @@ void Mesh::CreateBuffers(GraphicsDevice* device)
 	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	// インデックスバッファへ流し込むデータの設定
 	sd.pSysMem = m_indices.data();
-	HRESULT result_i = device->GetDevice()->CreateBuffer(&bd, &sd, m_indexBuffer.GetAddressOf());
+	HRESULT result_i = device.GetDevice()->CreateBuffer(&bd, &sd, m_indexBuffer.GetAddressOf());
 	if (FAILED(result_i)) {
 		throw std::runtime_error("インデックスバッファの作成に失敗しました");
 	}
 }
 
-void Mesh::Render(GraphicsDevice* device)
+void Mesh::Render(GraphicsDevice& device)
 {
-	ID3D11DeviceContext* context = device->GetDeviceContext();
+	ID3D11DeviceContext* context = device.GetDeviceContext();
 	// 頂点バッファの設定
 	UINT stride = sizeof(Vertex3d);
 	UINT offset = 0;

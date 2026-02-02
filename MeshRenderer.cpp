@@ -2,10 +2,10 @@
 #include "model.h"
 #include "GameObject.h"
 #include "cube.h"
-#include "texture.h"
+#include "Texture.h"
 #include "shader3d.h"
 
-void MeshRenderer::Render(GraphicsDevice* device)
+void MeshRenderer::Render(GraphicsDevice& device)
 {
 	// トランスフォーム取得
 	Transform& tf = gameObject().transform();
@@ -29,11 +29,15 @@ void MeshRenderer::Render(GraphicsDevice* device)
 		Shader3d_SetWorldMatrix(mtxWorld);
 		Shader3d_SetMaterialDiffuse({ 1.0f, 1.0f, 1.0f, 1.0f });
 
-		Texture_SetTexture(m_textureIndex);
+		if (m_texture)
+		{
+			device.SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);
+			m_texture->BindResource(device);
+		}
 		m_mesh->Render(device);
 	}
 	else
 	{
-		Cube_Draw(m_textureIndex, mtxWorld);
+		Cube_Draw(-1, mtxWorld);
 	}
 }

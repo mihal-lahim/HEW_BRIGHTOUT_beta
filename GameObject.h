@@ -6,6 +6,7 @@
 #include "Transform.h"
 #include "Object.h"
 #include "GameContext.h"
+#include <string>
 
 class Scene;
 class Component;
@@ -33,11 +34,35 @@ public:
 	// オブジェクトの破壊を許可するメソッド
 	void Destroy();
 
+	// タグの設定メソッド
+	void SetTag(const std::string& tag) { m_tag = tag; }
+
+	// タグの比較メソッド
+	bool CompareTag(const std::string& tag) const { return m_tag == tag; }
+
 	// 所属しているシーンの取得メソッド
 	Scene& scene() const { return *m_scene; }
 
 	// ゲームオブジェクトを生成するメソッド
 	GameObject* CreateGameObject();
+
+	// システムを取得するメソッド
+	SceneSystem& sceneSystem() const;
+
+	// ウィンドウシステムを取得するメソッド
+	WindowSystem& window() const;
+
+	// 物理システムを取得するメソッド
+	PhysicsSystem& physics() const;
+
+	// 入力システムを取得するメソッド
+	InputSystem& input() const;
+
+	// レンダリングシステムを取得するメソッド
+	RenderingSystem& rendering() const;
+
+	// リソースシステムを取得するメソッド
+	ResourceSystem& resource() const;
 
 	// 所持しているコンポーネントの取得テンプレートメソッド
 	template<typename T>
@@ -70,6 +95,9 @@ private:
 
 	// オブジェクトの破壊状態
 	bool m_isDestroyed = false;
+
+	// タグ情報
+	std::string m_tag = "None";
 
 	// 所持しているコンポーネントの配列
 	std::vector<Component*> m_components;

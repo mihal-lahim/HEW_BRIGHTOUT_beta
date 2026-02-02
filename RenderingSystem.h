@@ -21,6 +21,7 @@ public:
 
 	// グラフィックスデバイス設定メソッド
 	void SetDevice(GraphicsDevice* device);
+	GraphicsDevice& GetGraphicsDevice() { return *m_graphicsDevice; }
 
 	void Initialize();
 	void Finalize();
@@ -28,13 +29,6 @@ public:
 	// 描画メソッド
 	void Render(const Scene& scene);
 
-
-	// プリミティブメッシュ（今はとりあえずRenderingSystemに持たせておく）
-	static CubeMesh cubeMesh;
-	static PlaneMesh planeMesh;
-	static SphereMesh sphereMesh;
-	static CapsuleMesh capsuleMesh;
-	static CylinderMesh cylinderMesh;
 private:
 	// 所属するエンジンコア
 	EngineCore* m_engineCore = nullptr;
