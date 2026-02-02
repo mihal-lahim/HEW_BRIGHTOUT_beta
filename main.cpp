@@ -9,7 +9,7 @@
 #include<Windows.h>
 #include <algorithm>
 #include "SystemTimer.h"
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include "shader.h"
 #include "shader3d.h"
 #include "texture.h"
@@ -75,10 +75,10 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	UpdateWindow(window->GetHWND());			//ウィンドウの描画の更新
 
 	// Direct3Dの初期化
-	if (!Direct3D_Initialize(window->GetHWND()))
+	if (!GetGraphicsDevice().Initialize(window->GetHWND()))
 	{
 		PostQuitMessage(0);//メッセージを表示
-		Direct3D_Finalize();
+		GetGraphicsDevice().Finalize();
 		Sprite_Finalize();
 
 		return 0;//初期化に失敗したので終了
@@ -86,31 +86,31 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	else
 	{
 		
-		if (!Shader_Initialize(Direct3D_GetDevice(), Direct3D_GetContext()))
+		if (!Shader_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext()))
 		{
 			PostQuitMessage(0);//メッセージを表示
 		}
 		else
 		{
-			Texture_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
+			Texture_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext());
 
 			//スプライトの初期化
-			Sprite_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
+			Sprite_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext());
 
 			// キューブの初期化
-			Cube_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
+			Cube_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext());
 		}
 	}
 
 	ShowWindow(window->GetHWND(), nCmdShow);	//ウィンドウ表示
 	UpdateWindow(window->GetHWND());			//ウィンドウの描画の更新
 
-	Shader3d_Initialize(Direct3D_GetDevice(), Direct3D_GetContext());
+	Shader3d_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext());
 
 	/*
-	hal::DebugText dt(Direct3D_GetDevice(), Direct3D_GetContext(),
+	hal::DebugText dt(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext(),
 		L"texture/consolab_ascii_512.png",
-		Direct3D_GetBackBufferWidth(), Direct3D_GetBackBufferHeight(),
+		GetGraphicsDevice().GetBackBufferWidth(), GetGraphicsDevice().GetBackBufferHeight(),
 		0.0f, 0.0f,
 		0, 0,
 		0.0f, 0.0f
@@ -164,7 +164,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	Sprite_Finalize();      // スプライトの終了処理
 	Texture_Finalize();     // テクスチャの終了処理
 	Shader_Finalize();      // シェーダーの終了処理
-	Direct3D_Finalize();    // Direct3Dの終了処理
+	GetGraphicsDevice().Finalize();    // Direct3Dの終了処理
 
 
 	CoUninitialize();

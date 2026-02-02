@@ -2,7 +2,7 @@
 #include "player.h"
 #include "shader3d.h"
 #include <DirectXMath.h>
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include <cmath>
 #include <algorithm>
 #include "GameObject.h"

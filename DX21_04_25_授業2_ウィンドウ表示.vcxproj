@@ -172,6 +172,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="EngineCore.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GraphicsDevice.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="PhysicsBody.cpp" />
     <ClCompile Include="PoleManager.cpp" />
@@ -186,7 +187,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="DebugOstream.cpp" />
     <ClCompile Include="DebugText.cpp" />
-    <ClCompile Include="direct3d.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="game_effect.cpp" />
@@ -235,6 +235,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Component.h" />
     <ClInclude Include="CubePrefab.h" />
     <ClInclude Include="DebugCameraPrefab.h" />
+    <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="StaticCubePrefab.h" />
     <ClInclude Include="DynamicCubePrefab.h" />
     <ClInclude Include="DebugCounter.h" />
@@ -259,7 +260,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="DebugConsole.h" />
     <ClInclude Include="DebugOstream.h" />
     <ClInclude Include="DebugText.h" />
-    <ClInclude Include="direct3d.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />

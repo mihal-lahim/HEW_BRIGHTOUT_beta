@@ -1,7 +1,7 @@
 #include "RenderingSystem.h"
 #include "Camera.h"
 #include "MeshRenderer.h"
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include "shader3d.h"
 #include "Scene.h"
 #include <algorithm>
@@ -18,10 +18,10 @@ void RenderingSystem::Finalize()
 
 void RenderingSystem::Render(const Scene& scene)
 {
-    Direct3D_Clear();
-    SetViewport(0);
+	GetGraphicsDevice().Clear();
+	GetGraphicsDevice().SetViewport(0);
 
-	Direct3D_SetDepthTest(true);
+	GetGraphicsDevice().SetDepthTest(true);
 
 	// シーンからカメラとメッシュレンダラーを取得
 	auto cameras = scene.GetComponents<Camera>();
@@ -51,5 +51,5 @@ void RenderingSystem::Render(const Scene& scene)
         }
     }
 
-    Direct3D_Present();
+	GetGraphicsDevice().Present();
 }

@@ -10,6 +10,7 @@
 #define LIGHT_H
 
 #include <DirectXMath.h>
+#include "GraphicsDevice.h"
 
 
 void Light_Initialize();

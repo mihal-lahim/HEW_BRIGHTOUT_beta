@@ -1,5 +1,5 @@
 #include "light.h"
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 
 using namespace DirectX;
 
@@ -8,7 +8,7 @@ static ID3D11Buffer* g_pPSConstantBuffer1;
 
 void Light_Initialize()
 {
-	auto pDevice = Direct3D_GetDevice();
+	auto pDevice = GetGraphicsDevice().GetDevice();
 
 	// ピクセルシェーダーのライティング用定数バッファの作成
 	D3D11_BUFFER_DESC buffer_desc{};
@@ -30,8 +30,8 @@ void Light_Finalize()
 void Light_SetAmbient(const XMFLOAT4& color)
 {
 	// 定数バッファにambienにカラーをセット
-	Direct3D_GetContext()->UpdateSubresource(g_pPSConstantBuffer0, 0, nullptr, &color, 0, 0);
-	Direct3D_GetContext()->PSSetConstantBuffers(0, 1, &g_pPSConstantBuffer0);
+	GetGraphicsDevice().GetDeviceContext()->UpdateSubresource(g_pPSConstantBuffer0, 0, nullptr, &color, 0, 0);
+	GetGraphicsDevice().GetDeviceContext()->PSSetConstantBuffers(0, 1, &g_pPSConstantBuffer0);
 }
 
 void Light_SetDiffuse(const XMFLOAT3& color, const XMFLOAT3& direction)
@@ -41,13 +41,13 @@ void Light_SetDiffuse(const XMFLOAT3& color, const XMFLOAT3& direction)
 	light.direction = XMFLOAT4(direction.x, direction.y, direction.z, 0.0f);
 
 	// 定数バッファにdiffuseセット
-	Direct3D_GetContext()->UpdateSubresource(g_pPSConstantBuffer1, 0, nullptr, &light, 0, 0);
-	Direct3D_GetContext()->PSSetConstantBuffers(1, 1, &g_pPSConstantBuffer1);
+	GetGraphicsDevice().GetDeviceContext()->UpdateSubresource(g_pPSConstantBuffer1, 0, nullptr, &light, 0, 0);
+	GetGraphicsDevice().GetDeviceContext()->PSSetConstantBuffers(1, 1, &g_pPSConstantBuffer1);
 }
 
 void Light_SetDiffuse(const DiffuseLight& light)
 {
 	// 定数バッファにdiffuseセット
-	Direct3D_GetContext()->UpdateSubresource(g_pPSConstantBuffer1, 0, nullptr, &light, 0, 0);
-	Direct3D_GetContext()->PSSetConstantBuffers(1, 1, &g_pPSConstantBuffer1);
+	GetGraphicsDevice().GetDeviceContext()->UpdateSubresource(g_pPSConstantBuffer1, 0, nullptr, &light, 0, 0);
+	GetGraphicsDevice().GetDeviceContext()->PSSetConstantBuffers(1, 1, &g_pPSConstantBuffer1);
 }

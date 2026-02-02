@@ -10,7 +10,7 @@
 using namespace DirectX;
 #include "texture.h"
 #include "sprite.h"
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 
 struct Effect
 {
@@ -60,7 +60,7 @@ void Effect_Update(double elapsed_time)
 
 void Effect_Draw()
 {
-	Direct3D_SetAlphaBlend(BLEND_ADD);// â¡éZçáê¨
+	GetGraphicsDevice().SetAlphaBlend(GraphicsDevice::BLEND_ADD);// â¡éZçáê¨
 
 	for (int i = 0; i < g_EffectCount; i++)
 	{
@@ -81,7 +81,7 @@ void Effect_Draw()
 			color);
 	}
 
-	Direct3D_SetAlphaBlend(BLEND_TRANSPARENT);// å≥Ç…ñﬂÇ∑
+	GetGraphicsDevice().SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);// å≥Ç…ñﬂÇ∑
 }
 
 void Effect_Create(const DirectX::XMFLOAT2& position, float size, double lifeTime, const DirectX::XMFLOAT4& color)

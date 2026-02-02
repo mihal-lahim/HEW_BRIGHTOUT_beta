@@ -8,7 +8,7 @@
 #include "UI_house.h"
 #include "house.h"
 #include "debug_text.h"
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include <cstdio>
 #include <algorithm>
 #include <sstream>
@@ -29,10 +29,10 @@ void UIHouse::Initialize()
 {
     // デバッグテキスト初期化
     if (!m_debugText) {
-        ID3D11Device* pDevice = Direct3D_GetDevice();
-        ID3D11DeviceContext* pContext = Direct3D_GetContext();
-        UINT width = Direct3D_GetBackBufferWidth();
-        UINT height = Direct3D_GetBackBufferHeight();
+		ID3D11Device* pDevice = GetGraphicsDevice().GetDevice();
+		ID3D11DeviceContext* pContext = GetGraphicsDevice().GetDeviceContext();
+		UINT width = GetGraphicsDevice().GetBackBufferWidth();
+		UINT height = GetGraphicsDevice().GetBackBufferHeight();
         
         // 画面右上に表示（スクリーン座標）
         float offsetX = width - 420.0f;

@@ -1,6 +1,6 @@
 #include "texture.h"
 #include <string>
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include "DirectXTex.h"
 #include <sstream>
 #include <Windows.h>

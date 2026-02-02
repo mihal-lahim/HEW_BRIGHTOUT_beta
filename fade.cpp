@@ -11,7 +11,7 @@
 #include "sprite.h"
 #include "texture.h"
 using namespace DirectX;
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 
 static FadeState g_FadeState = FADE_STATE_NONE;
 static double g_FadeTime = 0.0f;
@@ -73,8 +73,8 @@ void Fade_Draw()
 	}
 
 	Sprite_Draw(g_TexId, 0.0f, 0.0f,
-		static_cast<float>(Direct3D_GetBackBufferWidth()),
-		static_cast<float>(Direct3D_GetBackBufferHeight()),
+		static_cast<float>(GetGraphicsDevice().GetBackBufferWidth()),
+		static_cast<float>(GetGraphicsDevice().GetBackBufferHeight()),
 		0, 0, 8, 8,
 		g_FadeColor);
 }
