@@ -41,6 +41,7 @@ public:
 	// デバイスとコンテキストの取得
 	ID3D11Device* const GetDevice() const { return m_device.Get(); }
 	ID3D11DeviceContext* const GetDeviceContext() const { return m_deviceContext.Get(); }
+	ID3D11SamplerState* const GetSamplerState() const { return m_samplerState.Get(); }
 private:
 
 	// バックバッファの作成
@@ -68,6 +69,9 @@ private:
 	// デプスステンシルステート
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilStateDepthDisable;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilStateDepthEnable;
+
+	// サンプラーステート
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
 
 	// ビューポート
 	D3D11_VIEWPORT m_viewport[2]{};

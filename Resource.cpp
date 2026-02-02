@@ -12,14 +12,20 @@ Resource::~Resource()
 Resource* Resource::operator=(const Resource* resource)
 {
 	m_resourceSystem = resource->m_resourceSystem;
-	m_filePath = resource->m_filePath;
-	m_resourceSystem->Load(this);
+	m_resourceKey = resource->m_resourceKey;
+	if (m_resourceSystem)
+	{
+		m_resourceSystem->Load(this);
+	}
 	return this;
 }
 
 Resource::Resource(const Resource* resource)
 {
 	m_resourceSystem = resource->m_resourceSystem;
-	m_filePath = resource->m_filePath;
-	m_resourceSystem->Load(this);
+	m_resourceKey = resource->m_resourceKey;
+	if (m_resourceSystem)
+	{
+		m_resourceSystem->Load(this);
+	}
 }

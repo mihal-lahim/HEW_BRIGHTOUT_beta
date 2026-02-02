@@ -76,6 +76,7 @@ void GraphicsDevice::Finalize()
 	m_deviceContext.Reset();
 	m_device.Reset();
 
+	m_samplerState.Reset();
 	m_blendStateMultiply.Reset();
 	m_blendStateOpaque.Reset();
 	m_blendStateAdd.Reset();
@@ -261,6 +262,22 @@ bool GraphicsDevice::CreateBackBuffers()
 	// 初期状態は深度テスト無効
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilStateDepthDisable.Get(), NULL);
 	SetDepthTest(false);
+
+	D3D11_SAMPLER_DESC samplerDesc{};
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.MipLODBias = 0;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	hr = m_device->CreateSamplerState(&samplerDesc, m_samplerState.GetAddressOf());
+	if (FAILED(hr)) {
+		return false;
+	}
 
 	return true;
 }

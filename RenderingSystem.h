@@ -3,12 +3,10 @@
 #define RENDERING_SYSTEM_H
 
 #include "GraphicsDevice.h"
-#include "Mesh.h"
-#include <memory>
+
 
 class Camera;
 class Scene;
-class MeshRenderer;
 class EngineCore;
 
 class RenderingSystem

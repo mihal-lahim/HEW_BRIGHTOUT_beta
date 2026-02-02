@@ -2,7 +2,6 @@
 #include "EngineCore.h"
 #include "GameContext.h"
 #include "RenderingSystem.h"
-#include "Texture.h"
 
 ResourceSystem::~ResourceSystem()
 {
@@ -14,27 +13,6 @@ ResourceSystem::~ResourceSystem()
 		}
 	}
 	m_resourceMap.clear();
-}
-
-Texture* ResourceSystem::LoadTexture(const std::wstring& key)
-{
-	// 既に読み込まれている場合は参照カウントを増やして返す
-	if (m_resourceMap.count(key))
-	{
-		m_resourceMap[key].RefCount++;
-		return static_cast<Texture*>(m_resourceMap[key].Resource.get());
-	}
-	auto& device = GetGraphicsDevice();
-	auto resource = std::make_unique<Texture>();
-	resource->m_filePath = key;
-	resource->m_resourceSystem = this;
-	resource->Initialize(device);
-	Texture* ptr = resource.get();
-	ResourceContainer container;
-	container.RefCount = 1;
-	container.Resource = std::move(resource);
-	m_resourceMap[key] = std::move(container);
-	return ptr;
 }
 
 GraphicsDevice& ResourceSystem::GetGraphicsDevice()
@@ -49,7 +27,13 @@ void ResourceSystem::Unload(Resource* resource)
 	{
 		return;
 	}
-	auto it = m_resourceMap.find(resource->m_filePath);
+	size_t resourceKey = resource->m_resourceKey;
+	if (resourceKey == 0)
+	{
+		resourceKey = typeid(*resource).hash_code();
+		resource->m_resourceKey = resourceKey;
+	}
+	auto it = m_resourceMap.find(resourceKey);
 	if (it != m_resourceMap.end())
 	{
 		it->second.RefCount--;

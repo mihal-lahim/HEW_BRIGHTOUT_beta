@@ -1,7 +1,7 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
-#include <string>
+#include <cstddef>
 
 class ResourceSystem;
 class GraphicsDevice;
@@ -13,7 +13,7 @@ public:
 	virtual ~Resource();
 
 	// リソース初期化メソッド
-	virtual void Initialize(GraphicsDevice& device) = 0;
+	virtual void CreateBuffers(GraphicsDevice& device) = 0;
 
 	// コピー代入演算子
 	Resource* operator=(const Resource* resource);
@@ -23,8 +23,9 @@ public:
 protected:
 	// リソースシステム
 	ResourceSystem* m_resourceSystem = nullptr;
-	// ファイルパス
-	std::wstring m_filePath;
+
+	// リソースキー
+	size_t m_resourceKey = 0;
 
 	friend class ResourceSystem;
 };

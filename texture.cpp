@@ -144,7 +144,7 @@ const unsigned int& Texture_GetHeight(int texture_id)
 }
 
 
-void Texture::Initialize(GraphicsDevice& device)
+void Texture::CreateBuffers(GraphicsDevice& device)
 {
 	TexMetadata metadata{};
 	ScratchImage image{};

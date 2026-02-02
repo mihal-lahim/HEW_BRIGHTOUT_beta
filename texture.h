@@ -11,6 +11,7 @@
 #define TEXTURE_H
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include <string>
 
 
 
@@ -44,11 +45,15 @@ public:
 	Texture() = default;
 	virtual ~Texture() = default;
 	// リソース初期化メソッド
-	virtual void Initialize(GraphicsDevice& device) override;
+	virtual void CreateBuffers(GraphicsDevice& device) override;
 
 	// グラフィックスパイプラインにリソースをバインドするメソッド
 	void BindResource(GraphicsDevice& device);
+
+	void SetFilePath(const std::wstring& filePath) { m_filePath = filePath; }
 private:
+	std::wstring m_filePath;
+
 	// テクスチャの幅と高さ
 	unsigned int m_width = 0;
 	unsigned int m_height = 0;

@@ -7,62 +7,58 @@
 
 template<typename T>
 	requires std::is_base_of_v<Resource, T>
-inline T* ResourceSystem::LoadPrimitiveMesh(const std::wstring& key)
+inline T* ResourceSystem::Load()
 {
-	if (m_resourceMap.count(key))
+	size_t resourceKey = typeid(T).hash_code();
+	auto it = m_resourceMap.find(resourceKey);
+	if (it != m_resourceMap.end())
 	{
-		m_resourceMap[key].RefCount++;
-		return static_cast<T*>(m_resourceMap[key].Resource.get());
+		it->second.RefCount++;
+		return static_cast<T*>(it->second.Resource.get());
 	}
 
 	auto& device = GetGraphicsDevice();
 
 	auto resource = std::make_unique<T>();
-	resource->m_filePath = key;
+	resource->m_resourceKey = resourceKey;
 	resource->m_resourceSystem = this;
-	resource->Initialize(device);
+	resource->CreateBuffers(device);
 	T* ptr = resource.get();
 	ResourceContainer container;
 	container.RefCount = 1;
 	container.Resource = std::move(resource);
-	m_resourceMap[key] = std::move(container);
+	m_resourceMap[resourceKey] = std::move(container);
 	return ptr;
 }
 
-template<>
-inline CubeMesh* ResourceSystem::Load()
+template<typename T>
+	requires std::is_base_of_v<Resource, T>
+inline T* ResourceSystem::Load(const std::wstring& filePath)
 {
-	return LoadPrimitiveMesh<CubeMesh>(L"CubeMesh");
-}
+	size_t resourceKey = std::hash<std::wstring>{}(filePath);
+	auto it = m_resourceMap.find(resourceKey);
+	if (it != m_resourceMap.end())
+	{
+		it->second.RefCount++;
+		return static_cast<T*>(it->second.Resource.get());
+	}
 
-template<>
-inline PlaneMesh* ResourceSystem::Load()
-{
-	return LoadPrimitiveMesh<PlaneMesh>(L"PlaneMesh");
-}
+	auto& device = GetGraphicsDevice();
 
-template<>
-inline SphereMesh* ResourceSystem::Load()
-{
-	return LoadPrimitiveMesh<SphereMesh>(L"SphereMesh");
-}
-
-template<>
-inline CapsuleMesh* ResourceSystem::Load()
-{
-	return LoadPrimitiveMesh<CapsuleMesh>(L"CapsuleMesh");
-}
-
-template<>
-inline CylinderMesh* ResourceSystem::Load()
-{
-	return LoadPrimitiveMesh<CylinderMesh>(L"CylinderMesh");
-}
-
-template<>
-inline Texture* ResourceSystem::Load(const std::wstring& filePath)
-{
-	return LoadTexture(filePath);
+	auto resource = std::make_unique<T>();
+	if constexpr (std::is_same_v<T, Texture>)
+	{
+		resource->SetFilePath(filePath);
+	}
+	resource->m_resourceKey = resourceKey;
+	resource->m_resourceSystem = this;
+	resource->CreateBuffers(device);
+	T* ptr = resource.get();
+	ResourceContainer container;
+	container.RefCount = 1;
+	container.Resource = std::move(resource);
+	m_resourceMap[resourceKey] = std::move(container);
+	return ptr;
 }
 
 inline Resource* ResourceSystem::Load(Resource* resource)
@@ -71,7 +67,13 @@ inline Resource* ResourceSystem::Load(Resource* resource)
 	{
 		return nullptr;
 	}
-	auto it = m_resourceMap.find(resource->m_filePath);
+	size_t resourceKey = resource->m_resourceKey;
+	if (resourceKey == 0)
+	{
+		resourceKey = typeid(*resource).hash_code();
+		resource->m_resourceKey = resourceKey;
+	}
+	auto it = m_resourceMap.find(resourceKey);
 	if (it != m_resourceMap.end())
 	{
 		it->second.RefCount++;
@@ -82,7 +84,7 @@ inline Resource* ResourceSystem::Load(Resource* resource)
 		ResourceContainer container;
 		container.RefCount = 1;
 		container.Resource.reset(resource);
-		m_resourceMap[resource->m_filePath] = std::move(container);
+		m_resourceMap[resourceKey] = std::move(container);
 		return resource;
 	}
 }

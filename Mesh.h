@@ -25,7 +25,7 @@ public:
 	virtual ~Mesh() = default;
 
 	// GPUバッファの作成
-	void Initialize(GraphicsDevice& device) override;
+	void CreateBuffers(GraphicsDevice& device) override;
 
 	// 頂点データとインデックスデータの追加
 	void AddVertex(const Vertex3d& vertex)

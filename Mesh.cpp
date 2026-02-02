@@ -13,7 +13,7 @@ namespace
 }
 
 
-void Mesh::Initialize(GraphicsDevice& device)
+void Mesh::CreateBuffers(GraphicsDevice& device)
 {
 	// 頂点バッファ生成
 	D3D11_BUFFER_DESC bd = {};

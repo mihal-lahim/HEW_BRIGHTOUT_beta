@@ -171,6 +171,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="EngineCore.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
@@ -220,7 +221,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="RenderingSystem.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="shader.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="shader3d.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="sprite_anim.cpp" />
@@ -238,8 +239,10 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandSet.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DebugCameraPrefab.h" />
     <ClInclude Include="GraphicsDevice.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="PlayerPrefab.h" />
     <ClInclude Include="PrimitivePrefab.h" />
     <ClInclude Include="CollisionPrefab.h" />
@@ -306,7 +309,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="RenderingSystem.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="EngineCore.h" />
-    <ClInclude Include="shader.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="shader3d.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="sprite_anim.h" />
@@ -318,7 +321,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="WICTextureLoader11.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="PixelShader2d.hlsl">
+    <FxCompile Include="SpritePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
@@ -326,13 +329,13 @@ for %%F in ("$(TargetDir)*.cso") do (
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="PixelShader3d.hlsl">
+    <FxCompile Include="MeshPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="VertexShader2d.hlsl">
+    <FxCompile Include="SpriteVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
@@ -340,7 +343,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="VertexShader3d.hlsl">
+    <FxCompile Include="MeshVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>

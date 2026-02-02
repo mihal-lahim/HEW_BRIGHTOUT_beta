@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "MeshRenderer.h"
 #include "GraphicsDevice.h"
+#include "EngineCore.h"
 #include "shader3d.h"
 #include "Scene.h"
 #include <algorithm>
