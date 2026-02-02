@@ -57,7 +57,7 @@ void Player::Awake()
 	CapsuleColliderDesc shapeDesc{};
 	shapeDesc.Radius = 0.5f;
 	shapeDesc.Height = 1.8f;
-	CapsuleColliderShape shape{ shapeDesc };
+	gameObject().AddComponent<ColliderShape>(shapeDesc);
 
 
 	// PhysicsBodyê›íË
@@ -66,7 +66,6 @@ void Player::Awake()
 	bodyDesc.Type = BodyType::DYNAMIC;
 	bodyDesc.FixedRotation = { 1.0f, 0.0f, 1.0f };
 	physicsBody = gameObject().AddComponent<PhysicsBody>(bodyDesc);
-	physicsBody->AddShape(shape);
 }
 
 void Player::Start()

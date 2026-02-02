@@ -39,9 +39,6 @@ private:
 	// エンジンコアへのポインタ
 	EngineCore* m_engineCore = nullptr;
 
-	// 管理しているウィンドウ
-	std::unique_ptr<Window> m_window;
-
 	// ウィンドウメッセージハンドラのマップ
 	std::unordered_map<UINT, std::vector<WindowMessageHandler>> m_handlers;
 };

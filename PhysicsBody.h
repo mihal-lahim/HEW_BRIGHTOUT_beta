@@ -7,7 +7,6 @@
 #include <memory>
 #include "btBulletDynamicsCommon.h"
 #include "Vector3.h"
-#include "ColliderShape.h"
 
 
 // ボディタイプのenum
@@ -47,9 +46,6 @@ public:
 
 	// 速度を取得するメソッド
 	Vector3 GetVelocity() const;
-
-	// コライダー形状を登録するメソッド
-	void AddShape(const ColliderShape& colliderShape) { m_colliderShapes.push_back(colliderShape); }
 
 	// オブジェクトのアクティブ状態を設定するメソッド
 	void OnEnable() override;
@@ -96,9 +92,6 @@ private:
 
 	// 固定される回転軸（1で固定、0で自由）
 	Vector3 m_fixedRotation{ 0.0f, 0.0f, 0.0f };
-
-	// 登録されたコライダー形状の配列
-	std::vector<ColliderShape> m_colliderShapes{};
 
 	friend class PhysicsSystem;
 };

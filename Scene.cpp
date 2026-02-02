@@ -102,6 +102,9 @@ void Scene::Start()
 	for (auto& poolBase : m_scriptComponents)
 	{
 		auto* scriptCompPool = static_cast<ObjectPool<ScriptComponent>*>(poolBase.get());
+
+		if (!scriptCompPool) continue;
+
 		// プール内のすべてのスクリプトコンポーネントを更新
 		for (size_t i = 0; i < scriptCompPool->Size(); ++i)
 		{
@@ -121,6 +124,9 @@ void Scene::PreUpdate()
 	for (auto& poolBase : m_scriptComponents)
 	{
 		auto* scriptCompPool = static_cast<ObjectPool<ScriptComponent>*>(poolBase.get());
+
+		if (!scriptCompPool) continue;
+
 		// プール内のすべてのスクリプトコンポーネントを更新
 		for (size_t i = 0; i < scriptCompPool->Size(); ++i)
 		{
@@ -139,6 +145,9 @@ void Scene::Update()
 	for (auto& poolBase : m_scriptComponents)
 	{
 		auto* scriptCompPool = static_cast<ObjectPool<ScriptComponent>*>(poolBase.get());
+
+		if (!scriptCompPool) continue;
+
 		// プール内のすべてのスクリプトコンポーネントを更新
 		for (size_t i = 0; i < scriptCompPool->Size(); ++i)
 		{
@@ -157,6 +166,9 @@ void Scene::PostUpdate()
 	for (auto& poolBase : m_scriptComponents)
 	{
 		auto* scriptCompPool = static_cast<ObjectPool<ScriptComponent>*>(poolBase.get());
+
+		if (!scriptCompPool) continue;
+
 		// プール内のすべてのスクリプトコンポーネントを更新
 		for (size_t i = 0; i < scriptCompPool->Size(); ++i)
 		{

@@ -9,8 +9,7 @@
 #include <memory>
 #include "UniqueQueue.h"
 
-
-struct ColliderShape;
+class ColliderShape;
 class PhysicsBody;
 struct Ray;
 class Scene;

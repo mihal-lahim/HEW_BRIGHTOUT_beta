@@ -1,14 +1,14 @@
 #include "Game.h"
 #include "DynamicCubePrefab.h"
 #include "StaticCubePrefab.h"
-#include "CameraPrefab.h"
+#include "DebugCameraPrefab.h"
 
 using namespace DirectX;
 
 void Game::Initialize()
 {
 	// カメラプレハブをインスタンス化
-	CameraPrefab cameraPrefab{};
+	DebugCameraPrefab cameraPrefab{};
 	GameObject* cameraObject = Instantiate(cameraPrefab);
 	cameraObject->transform().position() = { 0.0f, 2.0f, -5.0f };
 

@@ -4,13 +4,11 @@
 void WindowSystem::Initialize()
 {
 	m_handlers.clear();
-	m_window.reset();
 }
 
 void WindowSystem::Finalize()
 {
 	m_handlers.clear();
-	m_window.reset();
 }
 
 void WindowSystem::ProcessMessage(Window* window, UINT msg, WPARAM wp, LPARAM lp)
@@ -28,6 +26,5 @@ void WindowSystem::ProcessMessage(Window* window, UINT msg, WPARAM wp, LPARAM lp
 
 void WindowSystem::RegisterWindow(Window* window)
 {
-	m_window.reset(window);
-	m_window->m_windowSystem = this;
+	window->m_windowSystem = this;
 }

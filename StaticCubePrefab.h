@@ -13,12 +13,11 @@ class StaticCubePrefab : public CubePrefab
 	void Instantiate(GameObject& gameObject) const override
 	{
 		BoxColliderDesc boxDesc{};
-		BoxColliderShape shape(boxDesc);
+		gameObject.AddComponent<ColliderShape>(boxDesc);
 
 		PhysicsBodyDesc bodyDesc{};
 		bodyDesc.Type = BodyType::STATIC;
-		PhysicsBody* physicsBody = gameObject.AddComponent<PhysicsBody>(bodyDesc);
-		physicsBody->AddShape(shape);
+		gameObject.AddComponent<PhysicsBody>(bodyDesc);
 
 		CubePrefab::Instantiate(gameObject);
 	}

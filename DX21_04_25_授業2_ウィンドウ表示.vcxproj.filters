@@ -561,6 +561,9 @@
     <ClInclude Include="CubePrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
     </ClInclude>
+    <ClInclude Include="DebugCameraPrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader2d.hlsl">

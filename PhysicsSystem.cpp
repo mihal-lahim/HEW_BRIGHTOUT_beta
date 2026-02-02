@@ -112,10 +112,10 @@ void PhysicsSystem::UnregisterPhysicsBody(PhysicsBody* physicsBody)
 void PhysicsSystem::InitializePhysicsBody(PhysicsBody* physicsBody)
 {
 	// コライダー形状取得
-	auto colliderShapes = physicsBody->m_colliderShapes;
+	auto colliderShapes = physicsBody->gameObject().GetComponents<ColliderShape>();
 	if (colliderShapes.empty())
 	{
-		throw std::runtime_error("PhysicsBody requires at least one ColliderShape.");
+		throw std::runtime_error("PhysicsBodyには最低一つのColliderShapeが必要です。");
 	}
 
 	// コンパウンドシェイプ作成
@@ -130,14 +130,14 @@ void PhysicsSystem::InitializePhysicsBody(PhysicsBody* physicsBody)
 		btCollisionShape* shape = nullptr;
 
 		// オフセット適用
-		btTransform bttf = ApplyOffsets(colliderShape, physicsBody->gameObject().transform(), shape);
+		btTransform bttf = ApplyOffsets(*colliderShape, physicsBody->gameObject().transform(), shape);
 
 		// コンパウンドシェイプに追加
 		compoundShapePtr->addChildShape(bttf, shape);
 
 		// マテリアル合成
-		combinedFriction *= colliderShape.Friction;
-		combinedRestitution = std::max(combinedRestitution, colliderShape.Restitution);
+		combinedFriction *= colliderShape->Friction;
+		combinedRestitution = std::max(combinedRestitution, colliderShape->Restitution);
 	}
 
 	physicsBody->m_collisionShape = std::move(compoundShape);
