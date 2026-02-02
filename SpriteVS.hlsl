@@ -1,13 +1,9 @@
-
-//float4x4 mtx; // 4x4の行列
-//float4 position;
-
-cbuffer VS_CONSTANT_BUFFER0 : register(b0) // 定数バッファ
+cbuffer PER_CAMERA : register(b0)
 {
     float4x4 proj;
 };
 
-cbuffer VS_CONSTANT_BUFFER1 : register(b1) // 定数バッファ
+cbuffer PER_OBJECT : register(b1)
 {
     float4x4 world;
 };
@@ -29,17 +25,12 @@ struct VS_OUT
 VS_OUT main(VS_INPUT vsin)
 {
     VS_OUT vsout;
-    // 行列
+    
     float4x4 mtx = mul(world,proj);
-    vsout.posH = mul(vsin.posL, mtx); // mul 行列の乗算
+    vsout.posH = mul(vsin.posL, mtx);
     
     vsout.color = vsin.color;
     vsout.uv = vsin.uv;
     
     return vsout;
 }
-// floatで戻る
-//
-// これは、頂点シェーダーの出力を定義するための構造体です
-// セマンティクス　→ : POSITION 　また(POSITION0)ゼロでもよい
-// 座標変換が終わったものを上げる →　: SV_POSITION

@@ -3,13 +3,17 @@
 #define RENDERING_SYSTEM_H
 
 #include "GraphicsDevice.h"
-#include "Mesh.h"
+#include "Material.h"
 #include <memory>
+
 
 class Camera;
 class Scene;
-class MeshRenderer;
 class EngineCore;
+class PixelShader3D;
+class VertexShader3D;
+class PixelShader2D;
+class VertexShader2D;
 
 class RenderingSystem
 {
@@ -21,6 +25,7 @@ public:
 
 	// グラフィックスデバイス設定メソッド
 	void SetDevice(GraphicsDevice* device);
+	GraphicsDevice& GetGraphicsDevice() { return *m_graphicsDevice; }
 
 	void Initialize();
 	void Finalize();
@@ -28,19 +33,19 @@ public:
 	// 描画メソッド
 	void Render(const Scene& scene);
 
-
-	// プリミティブメッシュ（今はとりあえずRenderingSystemに持たせておく）
-	static CubeMesh cubeMesh;
-	static PlaneMesh planeMesh;
-	static SphereMesh sphereMesh;
-	static CapsuleMesh capsuleMesh;
-	static CylinderMesh cylinderMesh;
 private:
 	// 所属するエンジンコア
 	EngineCore* m_engineCore = nullptr;
 
 	// グラフィックスデバイス
 	GraphicsDevice* m_graphicsDevice = nullptr;
+
+	VertexShader3D* m_defaultVertexShader = nullptr;
+	PixelShader3D* m_defaultPixelShader = nullptr;
+	std::unique_ptr<MaterialInstance3D> m_defaultMaterialInstance;
+	VertexShader2D* m_defaultSpriteVertexShader = nullptr;
+	PixelShader2D* m_defaultSpritePixelShader = nullptr;
+	std::unique_ptr<MaterialInstance2D> m_defaultSpriteMaterialInstance;
 };
 
 

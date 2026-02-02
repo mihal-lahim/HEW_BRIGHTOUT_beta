@@ -27,3 +27,33 @@ GameObject* GameObject::CreateGameObject()
 {
 	return m_scene->CreateGameObject();
 }
+
+SceneSystem& GameObject::sceneSystem() const
+{
+	return m_scene->sceneSystem();
+}
+
+WindowSystem& GameObject::window() const
+{
+	return m_scene->window();
+}
+
+PhysicsSystem& GameObject::physics() const
+{
+	return m_scene->physics();
+}
+
+InputSystem& GameObject::input() const
+{
+	return m_scene->input();
+}
+
+RenderingSystem& GameObject::rendering() const
+{
+	return m_scene->rendering();
+}
+
+ResourceSystem& GameObject::resource() const
+{
+	return m_scene->resource();
+}

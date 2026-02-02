@@ -30,6 +30,7 @@ public:
 	enum AlphaBlendMode
 	{
 		BLEND_TRANSPARENT,
+		BLEND_OPAQUE,
 		BLEND_ADD,
 		BLEND_MAX
 	};
@@ -40,11 +41,11 @@ public:
 	// デバイスとコンテキストの取得
 	ID3D11Device* const GetDevice() const { return m_device.Get(); }
 	ID3D11DeviceContext* const GetDeviceContext() const { return m_deviceContext.Get(); }
+	ID3D11SamplerState* const GetSamplerState() const { return m_samplerState.Get(); }
 private:
 
 	// バックバッファの作成
 	bool CreateBackBuffers();
-	void ReleaseBackBuffers();
 
 	// Direct3Dデバイスとデバイスコンテキスト
 	Microsoft::WRL::ComPtr<ID3D11Device> m_device;
@@ -62,16 +63,20 @@ private:
 
 	// ブレンドステート
 	Microsoft::WRL::ComPtr<ID3D11BlendState> m_blendStateMultiply;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> m_blendStateOpaque;
 	Microsoft::WRL::ComPtr<ID3D11BlendState> m_blendStateAdd;
 
 	// デプスステンシルステート
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilStateDepthDisable;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilStateDepthEnable;
 
+	// サンプラーステート
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
+
 	// ビューポート
 	D3D11_VIEWPORT m_viewport[2]{};
 
-	// バックバッファの説明
+	// バックバッファの情報
 	D3D11_TEXTURE2D_DESC m_backBufferDesc{};
 };
 

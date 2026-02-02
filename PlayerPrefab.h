@@ -18,17 +18,19 @@ public:
 	{
 		// Playerコンポーネント作成
 		auto* player = gameObject.AddComponent<Player>();
+		gameObject.SetTag("Player");
 
 		// TPSCamera作成
 		GameObject* cameraObject = gameObject.CreateGameObject();
 		auto* cam = cameraObject->AddComponent<Camera>();
 		player->camera = cameraObject->AddComponent<TPSCamera>(&gameObject);
+		cameraObject->SetTag("MainCamera");
 
 		// プレイヤー用コマンドセット作成
 		auto* commandSet = gameObject.AddComponent<PlayerCommandSet>();
 
 		// InputSystem設定
-		player->inputHandler = gameObject.AddComponent<InputHandler>(&player->input().gamePad(), commandSet);
+		player->inputHandler = gameObject.AddComponent<InputHandler>(&gameObject.input().gamePad(), commandSet);
 
 
 
@@ -49,6 +51,12 @@ public:
 
 		// MeshRenderer設定
 		player->meshRenderer = gameObject.AddComponent<MeshRenderer>();
+		player->meshRenderer->SetTexture(
+			gameObject.resource().Load<Texture>(L"texture/white.png")
+		);
+		player->meshRenderer->SetMesh(
+			gameObject.resource().Load<CubeMesh>()
+		);
 
 
 		// ColliderShape設定

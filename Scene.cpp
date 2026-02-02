@@ -2,10 +2,39 @@
 #include "Time.h"
 #include "GameContext.h"
 #include "PhysicsSystem.h"
+#include "InputSystem.h"
+#include "RenderingSystem.h"
+#include "ResourceSystem.h"
+#include "WindowSystem.h"
 #include "ScriptComponent.h"
 #include "Prefab.h"
 #include "GameObject.h"
 
+
+WindowSystem& Scene::window() const
+{
+	return *m_gameContext.windowSystem;
+}
+
+PhysicsSystem& Scene::physics() const
+{
+	return *m_gameContext.physicsSystem;
+}
+
+InputSystem& Scene::input() const
+{
+	return *m_gameContext.inputSystem;
+}
+
+RenderingSystem& Scene::rendering() const
+{
+	return *m_gameContext.renderingSystem;
+}
+
+ResourceSystem& Scene::resource() const
+{
+	return *m_gameContext.resourceSystem;
+}
 
 void Scene::AddPendingGameObjectsProcess()
 {
@@ -258,6 +287,39 @@ GameObject* Scene::Instantiate(Prefab& prefab)
 	return newGameObject;
 }
 
+
+GameObject* Scene::GetGameObjectByTag(const std::string& tag) const
+{
+	auto* gameObjectPool = static_cast<ObjectPool<GameObject>*>(m_gameObjects.get());
+	if (!gameObjectPool) return nullptr;
+	// プール内のすべてのゲームオブジェクトを検索
+	for (size_t i = 0; i < gameObjectPool->Size(); ++i)
+	{
+		GameObject* gameObject = gameObjectPool->Get(static_cast<uint32_t>(i));
+		if (gameObject && gameObject->CompareTag(tag))
+		{
+			return gameObject;
+		}
+	}
+	return nullptr;
+}
+
+std::vector<GameObject*> Scene::GetGameObjectsByTag(const std::string& tag) const
+{
+	std::vector<GameObject*> result;
+	auto* gameObjectPool = static_cast<ObjectPool<GameObject>*>(m_gameObjects.get());
+	if (!gameObjectPool) return result;
+	// プール内のすべてのゲームオブジェクトを検索
+	for (size_t i = 0; i < gameObjectPool->Size(); ++i)
+	{
+		GameObject* gameObject = gameObjectPool->Get(static_cast<uint32_t>(i));
+		if (gameObject && gameObject->CompareTag(tag))
+		{
+			result.push_back(gameObject);
+		}
+	}
+	return result;
+}
 
 void Scene::DestroyGameObject(GameObject* gameObject)
 {

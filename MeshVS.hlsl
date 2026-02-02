@@ -1,18 +1,13 @@
-cbuffer VS_CONSTANT_BUFFER0 : register(b0)
-{
-    float4x4 world;
-}
-
-cbuffer VS_CONSTANT_BUFFER1 : register(b1)
+cbuffer PER_CAMERA : register(b1)
 {
     float4x4 view;
-}
-
-cbuffer VS_CONSTANT_BUFFER2 : register(b2)
-{
     float4x4 proj;
 }
 
+cbuffer PER_OBJECT : register(b0)
+{
+    float4x4 world;
+}
 
 struct VS_INPUT
 {
@@ -42,11 +37,7 @@ VS_OUTPUT main(VS_INPUT vsin)
     // ワールド空間の法線を作る
     // 1.ローカルライトとローカル法線でのライティング（あやしい）
     // 2.ワールド変換行列の転地逆行列でワールド法線を作る（あやしい？）
-    
     vsout.normalW = mul(float4(vsin.normalL, 0.0f), world).xyz;
-    
-    //float3x3 normalMatrix = (float3x3) transpose(inverse(world));
-    //vsout.normalW = mul(vsin.normalL, normalMatrix);
     
     vsout.color = vsin.color;
     vsout.uv = vsin.uv;

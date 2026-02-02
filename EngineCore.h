@@ -11,6 +11,7 @@
 #include "PhysicsSystem.h"
 #include "RenderingSystem.h"
 #include "InputSystem.h"
+#include "ResourceSystem.h"
 #include <memory>
 
 struct GameContext;
@@ -33,6 +34,8 @@ private:
 	// レンダリングシステムポインタ
 	std::unique_ptr<RenderingSystem> m_renderingSystem = nullptr;
 
+	// リソースシステムポインタ
+	std::unique_ptr<ResourceSystem> m_resourceSystem = nullptr;
 public:
 	
 	EngineCore()

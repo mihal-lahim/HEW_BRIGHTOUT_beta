@@ -3,12 +3,16 @@
 
 
 #include "Object.h"
+#include <string>
+#include <vector>
 
 class ObjectManager;
 class GameObject;
 class PhysicsSystem;
 class SceneSystem;
 class InputSystem;
+class ResourceSystem;
+class WindowSystem;
 class Prefab;
 
 class Component : public Object
@@ -45,6 +49,15 @@ public:
 		requires std::is_base_of<Component, T>::value
 	static uint32_t GetTypeID();
 
+	// タグでゲームオブジェクトを検索するメソッド
+	GameObject* GetGameObjectByTag(const std::string& tag);
+
+	// タグでゲームオブジェクトを検索するメソッド
+	std::vector<GameObject*> GetGameObjectsByTag(const std::string& tag);
+
+	// ウィンドウシステムの取得メソッド
+	WindowSystem& window();
+
 	// 物理システムの取得メソッド
 	PhysicsSystem& physics();
 
@@ -53,6 +66,9 @@ public:
 
 	// 入力システムの取得メソッド
 	InputSystem& input();
+
+	// リソースシステムの取得メソッド
+	ResourceSystem& resource();
 
 
 	// ゲームコンテキストを使った初期化メソッド

@@ -12,6 +12,9 @@ using namespace DirectX;
 #include "DebugOstream.h"
 #include "GraphicsDevice.h"
 #include <fstream>
+#include <vector>
+#include "Shader.h"
+#include "ResourceSystem.h"
 
 static ID3D11VertexShader* g_pVertexShader = nullptr;
 static ID3D11InputLayout* g_pInputLayout = nullptr;
@@ -20,13 +23,77 @@ static ID3D11Buffer* g_pVSConstantBuffer0 = nullptr;// proj
 static ID3D11Buffer* g_pVSConstantBuffer1 = nullptr;// world
 
 static ID3D11PixelShader* g_pPixelShader = nullptr;
-static ID3D11SamplerState* g_pSamplerState = nullptr;
 static ID3D11Buffer* g_pPSConstantBuffer = nullptr;
 
 
 // 注意！初期化で外部から設定されるもの。Release不要。
 static ID3D11Device* g_pDevice = nullptr;
 static ID3D11DeviceContext* g_pContext = nullptr;
+
+namespace
+{
+	bool ReadCompiledShader(const char* path, std::vector<unsigned char>& data)
+	{
+		std::ifstream stream(path, std::ios::binary);
+		if (!stream) {
+			return false;
+		}
+		stream.seekg(0, std::ios::end);
+		std::streamsize size = stream.tellg();
+		stream.seekg(0, std::ios::beg);
+		data.resize(static_cast<size_t>(size));
+		if (!stream.read(reinterpret_cast<char*>(data.data()), size)) {
+			return false;
+		}
+		return true;
+	}
+
+	class SpriteMaterialCB : public ConstantBuffer
+	{
+	public:
+		struct CBData
+		{
+			DirectX::XMFLOAT4 Color = {};
+		};
+		SpriteMaterialCB()
+			: ConstantBuffer(UsageType::DEFAULT)
+		{
+		}
+		void CreateBuffers(GraphicsDevice& device) override
+		{
+			ConstantBuffer::CreateBuffers(&device, m_usageType, sizeof(CBData));
+		}
+		void UpdateBuffer(GraphicsDevice& device, const void* data) override
+		{
+			ConstantBuffer::UpdateBuffer(&device, m_usageType, data, sizeof(CBData));
+			ID3D11Buffer* buffer = m_constantBuffer.Get();
+			device.GetDeviceContext()->PSSetConstantBuffers(0, 1, &buffer);
+		}
+	};
+
+	class MeshMaterialCB : public ConstantBuffer
+	{
+	public:
+		struct CBData
+		{
+			DirectX::XMFLOAT4 Color = {};
+		};
+		MeshMaterialCB()
+			: ConstantBuffer(UsageType::DEFAULT)
+		{
+		}
+		void CreateBuffers(GraphicsDevice& device) override
+		{
+			ConstantBuffer::CreateBuffers(&device, m_usageType, sizeof(CBData));
+		}
+		void UpdateBuffer(GraphicsDevice& device, const void* data) override
+		{
+			ConstantBuffer::UpdateBuffer(&device, m_usageType, data, sizeof(CBData));
+			ID3D11Buffer* buffer = m_constantBuffer.Get();
+			device.GetDeviceContext()->PSSetConstantBuffers(1, 1, &buffer);
+		}
+	};
+}
 
 
 bool Shader_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -134,38 +201,11 @@ bool Shader_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	g_pDevice->CreateBuffer(&buffer_desc, nullptr, &g_pPSConstantBuffer);
 
 
-	// サンプラーステート設定
-	D3D11_SAMPLER_DESC sampler_desc{};
-	//sampler_desc.Filter = D3D11_FILTER_ANISOTROPIC;
-	sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;//ドット
-	//sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	//sampler_desc.Filter = D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
-
-
-	sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-
-	////ボーダーを使う場合 D3D11_TEXTURE_ADDRESS_BORDER
-	//sampler_desc.BorderColor[0] = 1.0f;
-	//sampler_desc.BorderColor[1] = 1.0f;
-	//sampler_desc.BorderColor[2] = 0.0f;
-	//sampler_desc.BorderColor[3] = 0.0f;
-
-	sampler_desc.MipLODBias = 0;
-	sampler_desc.MaxAnisotropy = 1;
-	sampler_desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	sampler_desc.MinLOD = 0;
-	sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
-
-	g_pDevice->CreateSamplerState(&sampler_desc, &g_pSamplerState);
-
 	return true;
 }
 
 void Shader_Finalize()
 {
-	SAFE_RELEASE(g_pSamplerState);
 	SAFE_RELEASE(g_pPSConstantBuffer);
 	SAFE_RELEASE(g_pPixelShader);
 
@@ -223,6 +263,195 @@ void Shader_Begin()
 	g_pContext->PSSetConstantBuffers(0, 1, &g_pPSConstantBuffer);
 
 	// サンプラーステートをピクセルシェーダーに設定
-	g_pContext->PSSetSamplers(0, 1, &g_pSamplerState);
+	ID3D11SamplerState* samplerState = GetGraphicsDevice().GetSamplerState();
+	g_pContext->PSSetSamplers(0, 1, &samplerState);
 
 }
+
+void SpriteVS::CreateBuffers(GraphicsDevice& device)
+{
+	if (!m_resourceSystem)
+	{
+		return;
+	}
+	std::vector<unsigned char> data;
+	if (!ReadCompiledShader("SpriteVS.cso", data))
+	{
+		MessageBox(nullptr, "SpriteVSの読み込みに失敗しました", "エラー", MB_OK);
+		return;
+	}
+
+	HRESULT hr = device.GetDevice()->CreateVertexShader(data.data(), data.size(), nullptr, m_vertexShader.GetAddressOf());
+	if (FAILED(hr))
+	{
+		MessageBox(nullptr, "SpriteVSの作成に失敗しました", "エラー", MB_OK);
+		return;
+	}
+
+	D3D11_INPUT_ELEMENT_DESC layout[] = {
+		{ "POSITION" , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR"    , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD" , 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	hr = device.GetDevice()->CreateInputLayout(layout, ARRAYSIZE(layout), data.data(), data.size(), m_inputLayout.GetAddressOf());
+	if (FAILED(hr))
+	{
+		MessageBox(nullptr, "SpriteVSの入力レイアウト作成に失敗しました", "エラー", MB_OK);
+		return;
+	}
+
+	m_perCameraCB = m_resourceSystem->Load<PerCameraCB>();
+	m_perObjectCB = m_resourceSystem->Load<PerObjectCB>();
+}
+
+void SpriteVS::Bind(GraphicsDevice& device)
+{
+	auto* context = device.GetDeviceContext();
+	context->IASetInputLayout(m_inputLayout.Get());
+	context->VSSetShader(m_vertexShader.Get(), nullptr, 0);
+	if (m_perCameraCB)
+	{
+		ID3D11Buffer* buffer = m_perCameraCB->GetBuffer();
+		context->VSSetConstantBuffers(0, 1, &buffer);
+	}
+	if (m_perObjectCB)
+	{
+		ID3D11Buffer* buffer = m_perObjectCB->GetBuffer();
+		context->VSSetConstantBuffers(1, 1, &buffer);
+	}
+}
+
+void SpritePS::CreateBuffers(GraphicsDevice& device)
+{
+	if (!m_resourceSystem)
+	{
+		return;
+	}
+	std::vector<unsigned char> data;
+	if (!ReadCompiledShader("SpritePS.cso", data))
+	{
+		MessageBox(nullptr, "SpritePSの読み込みに失敗しました", "エラー", MB_OK);
+		return;
+	}
+
+	HRESULT hr = device.GetDevice()->CreatePixelShader(data.data(), data.size(), nullptr, m_pixelShader.GetAddressOf());
+	if (FAILED(hr))
+	{
+		MessageBox(nullptr, "SpritePSの作成に失敗しました", "エラー", MB_OK);
+		return;
+	}
+
+	m_materialCB = m_resourceSystem->Load<SpriteMaterialCB>();
+}
+
+void SpritePS::Bind(GraphicsDevice& device)
+{
+	auto* context = device.GetDeviceContext();
+	context->PSSetShader(m_pixelShader.Get(), nullptr, 0);
+	if (m_materialCB)
+	{
+		ID3D11Buffer* buffer = m_materialCB->GetBuffer();
+		context->PSSetConstantBuffers(0, 1, &buffer);
+	}
+	ID3D11SamplerState* samplerState = device.GetSamplerState();
+	context->PSSetSamplers(0, 1, &samplerState);
+}
+
+void MeshVS::CreateBuffers(GraphicsDevice& device)
+{
+	if (!m_resourceSystem)
+	{
+		return;
+	}
+	std::vector<unsigned char> data;
+	if (!ReadCompiledShader("MeshVS.cso", data))
+	{
+		MessageBox(nullptr, "MeshVSの読み込みに失敗しました", "エラー", MB_OK);
+		return;
+	}
+
+	HRESULT hr = device.GetDevice()->CreateVertexShader(data.data(), data.size(), nullptr, m_vertexShader.GetAddressOf());
+	if (FAILED(hr))
+	{
+		MessageBox(nullptr, "MeshVSの作成に失敗しました", "エラー", MB_OK);
+		return;
+	}
+
+	D3D11_INPUT_ELEMENT_DESC layout[] = {
+		{ "POSITION" , 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR"    , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL"   , 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD" , 0, DXGI_FORMAT_R32G32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	hr = device.GetDevice()->CreateInputLayout(layout, ARRAYSIZE(layout), data.data(), data.size(), m_inputLayout.GetAddressOf());
+	if (FAILED(hr))
+	{
+		MessageBox(nullptr, "MeshVSの入力レイアウト作成に失敗しました", "エラー", MB_OK);
+		return;
+	}
+
+	m_perCameraCB = m_resourceSystem->Load<PerCameraCB>();
+	m_perObjectCB = m_resourceSystem->Load<PerObjectCB>();
+}
+
+void MeshVS::Bind(GraphicsDevice& device)
+{
+	auto* context = device.GetDeviceContext();
+	context->IASetInputLayout(m_inputLayout.Get());
+	context->VSSetShader(m_vertexShader.Get(), nullptr, 0);
+	if (m_perObjectCB)
+	{
+		ID3D11Buffer* buffer = m_perObjectCB->GetBuffer();
+		context->VSSetConstantBuffers(0, 1, &buffer);
+	}
+	if (m_perCameraCB)
+	{
+		ID3D11Buffer* buffer = m_perCameraCB->GetBuffer();
+		context->VSSetConstantBuffers(1, 1, &buffer);
+	}
+}
+
+void MeshPS::CreateBuffers(GraphicsDevice& device)
+{
+	if (!m_resourceSystem)
+	{
+		return;
+	}
+	std::vector<unsigned char> data;
+	if (!ReadCompiledShader("MeshPS.cso", data))
+	{
+		MessageBox(nullptr, "MeshPSの読み込みに失敗しました", "エラー", MB_OK);
+		return;
+	}
+
+	HRESULT hr = device.GetDevice()->CreatePixelShader(data.data(), data.size(), nullptr, m_pixelShader.GetAddressOf());
+	if (FAILED(hr))
+	{
+		MessageBox(nullptr, "MeshPSの作成に失敗しました", "エラー", MB_OK);
+		return;
+	}
+
+	m_perFrameCB = m_resourceSystem->Load<PerFrameCB>();
+	m_materialCB = m_resourceSystem->Load<MeshMaterialCB>();
+}
+
+void MeshPS::Bind(GraphicsDevice& device)
+{
+	auto* context = device.GetDeviceContext();
+	context->PSSetShader(m_pixelShader.Get(), nullptr, 0);
+	if (m_perFrameCB)
+	{
+		ID3D11Buffer* buffer = m_perFrameCB->GetBuffer();
+		context->PSSetConstantBuffers(0, 1, &buffer);
+	}
+	if (m_materialCB)
+	{
+		ID3D11Buffer* buffer = m_materialCB->GetBuffer();
+		context->PSSetConstantBuffers(1, 1, &buffer);
+	}
+	ID3D11SamplerState* samplerState = device.GetSamplerState();
+	context->PSSetSamplers(0, 1, &samplerState);
+}
+

@@ -45,6 +45,21 @@ public:
 	// シーンシステム取得メソッド
 	SceneSystem& sceneSystem() const { return *m_sceneSystem; }
 
+	// ウィンドウシステム取得メソッド
+	WindowSystem& window() const;
+
+	// 物理システム取得メソッド
+	PhysicsSystem& physics() const;
+
+	// 入力システム取得メソッド
+	InputSystem& input() const;
+
+	// レンダリングシステム取得メソッド
+	RenderingSystem& rendering() const;
+
+	// リソースシステム取得メソッド
+	ResourceSystem& resource() const;
+
 	// コンポーネント作成テンプレートメソッド
 	template<typename T, typename... Args>
 		requires std::is_base_of<Component, T>::value
@@ -55,6 +70,12 @@ public:
 	template<typename T>
 		requires std::is_base_of<Component, T>::value
 	std::vector<T*> GetComponents() const;
+
+	// タグでゲームオブジェクトを検索するメソッド
+	GameObject* GetGameObjectByTag(const std::string& tag) const;
+
+	// タグでゲームオブジェクトを検索するメソッド
+	std::vector<GameObject*> GetGameObjectsByTag(const std::string& tag) const;
 
 
 	// ゲームオブジェクト破棄メソッド

@@ -143,6 +143,15 @@
     <Filter Include="HeaderFile\Prefab\Base">
       <UniqueIdentifier>{07209d3e-138d-4c57-8709-7a7483794c3d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HeaderFile\Resource">
+      <UniqueIdentifier>{b86bf006-f75e-448f-b8d2-8407f2061e0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inlFile\Resource">
+      <UniqueIdentifier>{4ea4a34f-e614-4c50-987e-73e10995729c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SorceFile\Resource">
+      <UniqueIdentifier>{f650b9e1-c623-4ddc-9930-35743198f40a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -205,9 +214,6 @@
     <ClCompile Include="sprite_anim.cpp">
       <Filter>SorceFile\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="texture.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="Audio.cpp">
       <Filter>SorceFile\Audio</Filter>
     </ClCompile>
@@ -220,7 +226,7 @@
     <ClCompile Include="shader3d.cpp">
       <Filter>SorceFile\Direct3D</Filter>
     </ClCompile>
-    <ClCompile Include="shader.cpp">
+    <ClCompile Include="Shader.cpp">
       <Filter>SorceFile\Direct3D</Filter>
     </ClCompile>
     <ClCompile Include="PlayerStateHuman.cpp">
@@ -316,14 +322,29 @@
     <ClCompile Include="GraphicsDevice.cpp">
       <Filter>SorceFile\Direct3D</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceSystem.cpp">
+      <Filter>SorceFile\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource.cpp">
+      <Filter>SorceFile\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>SorceFile\Resource</Filter>
+    </ClCompile>
     <ClCompile Include="Mesh.cpp">
+      <Filter>SorceFile\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Billboard.cpp">
       <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffer.cpp">
+      <Filter>SorceFile\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteRenderer.cpp">
+      <Filter>SorceFile\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="texture.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
     <ClInclude Include="SystemTimer.h">
       <Filter>HeaderFile</Filter>
     </ClInclude>
@@ -402,7 +423,7 @@
     <ClInclude Include="shader3d.h">
       <Filter>HeaderFile\Direct3D</Filter>
     </ClInclude>
-    <ClInclude Include="shader.h">
+    <ClInclude Include="Shader.h">
       <Filter>HeaderFile\Direct3D</Filter>
     </ClInclude>
     <ClInclude Include="command.h">
@@ -431,12 +452,6 @@
     </ClInclude>
     <ClInclude Include="Ray.h">
       <Filter>HeaderFile\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshRenderer.h">
-      <Filter>HeaderFile\ScriptComponent</Filter>
     </ClInclude>
     <ClInclude Include="Time.h">
       <Filter>HeaderFile\LifeCycle</Filter>
@@ -570,18 +585,48 @@
     <ClInclude Include="TPSCameraPrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
     </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>HeaderFile\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceSystem.h">
+      <Filter>HeaderFile\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>HeaderFile\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>HeaderFile\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshRenderer.h">
+      <Filter>HeaderFile\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Billboard.h">
+      <Filter>HeaderFile\ScriptComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>HeaderFile\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>HeaderFile\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteRenderer.h">
+      <Filter>HeaderFile\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="BillboardPrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="VertexShader2d.hlsl">
+    <FxCompile Include="SpriteVS.hlsl">
       <Filter>ShaderFile</Filter>
     </FxCompile>
-    <FxCompile Include="PixelShader2d.hlsl">
+    <FxCompile Include="SpritePS.hlsl">
       <Filter>ShaderFile</Filter>
     </FxCompile>
-    <FxCompile Include="VertexShader3d.hlsl">
+    <FxCompile Include="MeshVS.hlsl">
       <Filter>ShaderFile</Filter>
     </FxCompile>
-    <FxCompile Include="PixelShader3d.hlsl">
+    <FxCompile Include="MeshPS.hlsl">
       <Filter>ShaderFile</Filter>
     </FxCompile>
   </ItemGroup>
@@ -599,5 +644,8 @@
       <Filter>inlFile\Scene</Filter>
     </None>
     <None Include=".github\copilot-instructions.md" />
+    <None Include="ResourceSystem.inl">
+      <Filter>inlFile\Resource</Filter>
+    </None>
   </ItemGroup>
 </Project>

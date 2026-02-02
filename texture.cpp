@@ -2,12 +2,13 @@
 #include <string>
 #include "GraphicsDevice.h"
 #include "DirectXTex.h"
+#include <stdexcept>
 #include <sstream>
 #include <Windows.h>
 using namespace DirectX;
 static constexpr int TEXTURE_MAX =1024;//テクスチャの最大数
 
-struct Texture
+struct texture
 {
 	std::wstring filename;//実ファイルパス
 	unsigned int width;
@@ -16,7 +17,7 @@ struct Texture
 	ID3D11ShaderResourceView* pTexture = nullptr;
 };
 
-static Texture g_Textures[TEXTURE_MAX];
+static texture g_Textures[TEXTURE_MAX];
 
 // デバイス参照
 static ID3D11Device* g_pDevice = nullptr;
@@ -108,7 +109,7 @@ int Texture_Load(const wchar_t* pFileName, bool bMipMap)
 
 void Texture_AllRelease()
 {
-	for (Texture& t : g_Textures)
+	for (texture& t : g_Textures)
 	{
 		SAFE_RELEASE(t.pTexture);
 	}
@@ -140,4 +141,41 @@ const unsigned int& Texture_GetWidth(int texture_id)
 const unsigned int& Texture_GetHeight(int texture_id)
 {
 	return g_Textures[texture_id].height;
+}
+
+
+void Texture::CreateBuffers(GraphicsDevice& device)
+{
+	TexMetadata metadata{};
+	ScratchImage image{};
+
+	HRESULT hr = LoadFromWICFile(m_filePath.c_str(), WIC_FLAGS_NONE, &metadata, image);
+	if (FAILED(hr)) 
+	{
+		throw std::runtime_error("テクスチャの読み込みに失敗しました");
+		return;
+	}
+
+	m_width = (unsigned int)metadata.width;
+	m_height = (unsigned int)metadata.height;
+
+	ScratchImage mipChain{};
+	GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), TEX_FILTER_DEFAULT, 0, mipChain);
+
+	image = std::move(mipChain);
+	metadata = image.GetMetadata();
+
+	hr = CreateShaderResourceView(device.GetDevice(), image.GetImages(), image.GetImageCount(), metadata, &m_shaderResourceView);
+
+	if (FAILED(hr))
+	{
+		throw std::runtime_error("テクスチャの読み込みに失敗しました");
+		return;
+	}
+}
+
+void Texture::BindResource(GraphicsDevice& device)
+{
+	ID3D11ShaderResourceView* srv = m_shaderResourceView.Get();
+	device.GetDeviceContext()->PSSetShaderResources(0, 1, &srv);
 }

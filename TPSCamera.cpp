@@ -18,7 +18,7 @@ void TPSCamera::Rotate(float inputX, float inputY)
 
 	// 垂直回転角度を更新（-89度～89度の範囲に制限）
 	m_angleY -= inputY * m_ctx.SensitivityY;
-	m_angleY = std::clamp(m_angleY, -89.0f, 89.0f);
+	m_angleY = std::clamp(m_angleY, -85.0f, 85.0f);
 }
 
 void TPSCamera::Update()

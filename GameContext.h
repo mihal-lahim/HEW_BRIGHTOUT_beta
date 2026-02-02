@@ -8,6 +8,7 @@ class PhysicsSystem;
 
 class InputSystem;
 class RenderingSystem;
+class ResourceSystem;
 
 // ゲーム全体のコンテキスト情報を保持する構造体
 struct GameContext
@@ -18,6 +19,7 @@ struct GameContext
 
 	InputSystem* inputSystem = nullptr;
 	RenderingSystem* renderingSystem = nullptr;
+	ResourceSystem* resourceSystem = nullptr;
 };
 
 

@@ -4,7 +4,8 @@
 #include "Prefab.h"
 #include "MeshRenderer.h"
 #include "GameObject.h"
-#include "RenderingSystem.h"
+#include "ResourceSystem.h"
+#include "Texture.h"
 
 class PrimitivePrefab : public Prefab
 {
@@ -25,8 +26,8 @@ public:
 
 	Mesh* MeshPtr = nullptr;
 
-	// テクスチャインデックス
-	int TextureIndex = -1;
+	// テクスチャ
+	Texture* TexturePtr = nullptr;
 
 	void Instantiate(GameObject& gameObject) override
 	{
@@ -35,25 +36,25 @@ public:
 		switch (Type)
 		{
 		case PrimitivePrefab::PrimitiveType::Cube:
-			MeshPtr = &RenderingSystem::cubeMesh;
+			MeshPtr = renderer->resource().Load<CubeMesh>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Sphere:
-			MeshPtr = &RenderingSystem::sphereMesh;
+			MeshPtr = renderer->resource().Load<SphereMesh>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Plane:
-			MeshPtr = &RenderingSystem::planeMesh;
+			MeshPtr = renderer->resource().Load<PlaneMesh>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Capsule:
-			MeshPtr = &RenderingSystem::capsuleMesh;
+			MeshPtr = renderer->resource().Load<CapsuleMesh>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Cylinder:
-			MeshPtr = &RenderingSystem::cylinderMesh;
+			MeshPtr = renderer->resource().Load<CylinderMesh>();
 			break;
 		default:
 			break;
 		}
 		renderer->SetMesh(MeshPtr);
-		renderer->SetTextureIndex(TextureIndex);
+		renderer->SetTexture(TexturePtr);
 	}
 };
 
