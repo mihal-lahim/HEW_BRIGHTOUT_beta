@@ -19,12 +19,7 @@ LRESULT Window::WindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 		window = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	}
 
-	// メッセージの処理
-	if (window)
-	{
-		return window->ProcessMessage(msg, wp, lp);
-	}
-
+	// 終了メッセージの処理
 	if (WM_DESTROY == msg)
 	{
 		PostQuitMessage(0);
@@ -34,6 +29,19 @@ LRESULT Window::WindowProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 	{
 		DestroyWindow(hWnd);
 		return 0;
+	}
+	else if (WM_KEYDOWN)
+	{
+		if (wp == VK_ESCAPE)
+		{
+			SendMessage(hWnd, WM_CLOSE, 0, 0);
+		}
+	}
+
+	// メッセージの処理
+	if (window)
+	{
+		return window->ProcessMessage(msg, wp, lp);
 	}
 
 	// デフォルトのメッセージ処理
@@ -126,6 +134,9 @@ Window::~Window()
 
 LRESULT Window::ProcessMessage(UINT msg, WPARAM wp, LPARAM lp)
 {
-	m_windowSystem->ProcessMessage(this, msg, wp, lp);
+	if (m_windowSystem)
+	{
+		m_windowSystem->ProcessMessage(this, msg, wp, lp);
+	}
 	return DefWindowProc(m_hWnd, msg, wp, lp);
 }

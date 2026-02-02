@@ -10,6 +10,7 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 #include <DirectXMath.h>
+#include "GraphicsDevice.h"
 
 #include "DirectXTex.h"
 using namespace DirectX;

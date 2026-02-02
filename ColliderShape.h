@@ -3,6 +3,7 @@
 
 #include "Vector3.h"
 #include "Quaternion.h"
+#include "Component.h"
 
 class PhysicsBody;
 
@@ -23,9 +24,40 @@ struct ColliderShapeDesc
 	float Friction = 0.0f;
 	float Restitution = 0.0f;
 };
-// コライダー形状コンポーネントクラス
-struct ColliderShape
+
+// ボックスコライダー形状設定構造体
+struct BoxColliderDesc : public ColliderShapeDesc
 {
+	float SizeX = 1.0f;
+	float SizeY = 1.0f;
+	float SizeZ = 1.0f;
+};
+
+// スフィアコライダー形状設定構造体
+struct SphereColliderDesc : public ColliderShapeDesc
+{
+	float Radius = 1.0f;
+};
+
+// カプセルコライダー形状設定構造体
+struct CapsuleColliderDesc : public ColliderShapeDesc
+{
+	float Radius = 0.5f;
+	float Height = 1.0f;
+};
+
+// シリンダーコライダー形状設定構造体
+struct CylinderColliderDesc : public ColliderShapeDesc
+{
+	float Radius = 0.5f;
+	float Height = 1.0f;
+};
+
+
+// コライダー形状コンポーネントクラス
+class ColliderShape : public Component
+{
+public:
 	virtual ~ColliderShape() = default;
 
 	// コライダー形状の種類
@@ -46,86 +78,48 @@ struct ColliderShape
 	const float Friction = 0.0f;
 	const float Restitution = 0.0f;
 
-protected:
-	// 継承クラス用コンストラクタ
-	ColliderShape(ShapeType type, const Vector3& size, const ColliderShapeDesc& desc)
-		: Type(type), Size(size), OffsetPos(desc.OffsetPos), OffsetRot(desc.OffsetRot),
-		  Friction(desc.Friction), Restitution(desc.Restitution)
-	{}
+
+	ColliderShape(const BoxColliderDesc& desc)
+		: Type(ShapeType::BOX),
+		Size(Vector3(desc.SizeX, desc.SizeY, desc.SizeZ)),
+		OffsetPos(desc.OffsetPos),
+		OffsetRot(desc.OffsetRot),
+		Friction(desc.Friction),
+		Restitution(desc.Restitution)
+	{
+	}
+
+	ColliderShape(const SphereColliderDesc& desc)
+		: Type(ShapeType::SPHERE),
+		Size(Vector3(desc.Radius, 0.0f, 0.0f)),
+		OffsetPos(desc.OffsetPos),
+		OffsetRot(desc.OffsetRot),
+		Friction(desc.Friction),
+		Restitution(desc.Restitution)
+	{
+	}
+
+	ColliderShape(const CapsuleColliderDesc& desc)
+		: Type(ShapeType::CAPSULE),
+		Size(Vector3(desc.Radius, desc.Height, 0.0f)),
+		OffsetPos(desc.OffsetPos),
+		OffsetRot(desc.OffsetRot),
+		Friction(desc.Friction),
+		Restitution(desc.Restitution)
+	{
+	}
+
+	ColliderShape(const CylinderColliderDesc& desc)
+		: Type(ShapeType::CYLINDER),
+		Size(Vector3(desc.Radius, desc.Height, 0.0f)),
+		OffsetPos(desc.OffsetPos),
+		OffsetRot(desc.OffsetRot),
+		Friction(desc.Friction),
+		Restitution(desc.Restitution)
+	{
+	}
 
 	friend class PhysicsSystem;
-};
-
-
-
-
-
-// ボックスコライダー形状設定構造体
-struct BoxColliderDesc : public ColliderShapeDesc
-{
-	float SizeX = 1.0f;
-	float SizeY = 1.0f;
-	float SizeZ = 1.0f;
-};
-// ボックスコライダー形状コンポーネントクラス
-struct BoxColliderShape : public ColliderShape
-{
-	BoxColliderShape(const BoxColliderDesc& desc)
-		: ColliderShape(ShapeType::BOX, Vector3(desc.SizeX, desc.SizeY, desc.SizeZ), desc)
-	{}
-};
-
-
-
-
-
-
-// スフィアコライダー形状設定構造体
-struct SphereColliderDesc : public ColliderShapeDesc
-{
-	float Radius = 1.0f;
-};
-// スフィアコライダー形状コンポーネントクラス
-struct SphereColliderShape : public ColliderShape
-{
-	SphereColliderShape(const SphereColliderDesc& desc)
-		: ColliderShape(ShapeType::SPHERE, Vector3(desc.Radius, 0.0f, 0.0f), desc)
-	{}
-};
-
-
-
-
-
-// カプセルコライダー形状設定構造体
-struct CapsuleColliderDesc : public ColliderShapeDesc
-{
-	float Radius = 0.5f;
-	float Height = 1.0f;
-};
-// カプセルコライダー形状コンポーネントクラス
-struct CapsuleColliderShape : public ColliderShape
-{
-	CapsuleColliderShape(const CapsuleColliderDesc& desc)
-		: ColliderShape(ShapeType::CAPSULE, Vector3(desc.Radius, desc.Height, 0.0f), desc)
-	{}
-};
-
-
-
-
-// シリンダーコライダー形状設定構造体
-struct CylinderColliderDesc : public ColliderShapeDesc
-{
-	float Radius = 0.5f;
-	float Height = 1.0f;
-};
-// シリンダーコライダー形状コンポーネントクラス
-struct CylinderColliderShape : public ColliderShape
-{
-	CylinderColliderShape(const CylinderColliderDesc& desc)
-		: ColliderShape(ShapeType::CYLINDER, Vector3(desc.Radius, desc.Height, 0.0f), desc)
-	{}
 };
 
 

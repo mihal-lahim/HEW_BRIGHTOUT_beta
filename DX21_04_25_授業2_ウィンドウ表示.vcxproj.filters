@@ -223,9 +223,6 @@
     <ClCompile Include="shader.cpp">
       <Filter>SorceFile\Direct3D</Filter>
     </ClCompile>
-    <ClCompile Include="direct3d.cpp">
-      <Filter>SorceFile\Direct3D</Filter>
-    </ClCompile>
     <ClCompile Include="PlayerStateHuman.cpp">
       <Filter>SorceFile\Player\State</Filter>
     </ClCompile>
@@ -316,6 +313,9 @@
     <ClCompile Include="InputSystem.cpp">
       <Filter>SorceFile\Input</Filter>
     </ClCompile>
+    <ClCompile Include="GraphicsDevice.cpp">
+      <Filter>SorceFile\Direct3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="texture.h">
@@ -395,9 +395,6 @@
     </ClInclude>
     <ClInclude Include="Audio.h">
       <Filter>HeaderFile\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="direct3d.h">
-      <Filter>HeaderFile\Direct3D</Filter>
     </ClInclude>
     <ClInclude Include="shader3d.h">
       <Filter>HeaderFile\Direct3D</Filter>
@@ -560,6 +557,12 @@
     </ClInclude>
     <ClInclude Include="CubePrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugCameraPrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDevice.h">
+      <Filter>HeaderFile\Direct3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

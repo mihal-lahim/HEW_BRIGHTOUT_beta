@@ -1,5 +1,5 @@
 
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include "model.h"
 using namespace DirectX;
 #include "WICTextureLoader11.h"
@@ -18,6 +18,15 @@ struct Vertex3d
 
 static unsigned int g_WhiteTexId;
 
+static ID3D11Device* g_pDevice = nullptr;
+static ID3D11DeviceContext* g_pContext = nullptr;
+
+
+void ModelInitialize(GraphicsDevice* device)
+{
+	g_pDevice = device->GetDevice();
+	g_pContext = device->GetDeviceContext();
+}
 
 MODEL* ModelLoad(const char* FileName, float scale)
 {
@@ -59,7 +68,7 @@ MODEL* ModelLoad(const char* FileName, float scale)
 			D3D11_SUBRESOURCE_DATA sd{};
 			sd.pSysMem = vertex;
 
-			Direct3D_GetDevice()->CreateBuffer(&bd, &sd, &model->VertexBuffer[m]);
+			g_pDevice->CreateBuffer(&bd, &sd, &model->VertexBuffer[m]);
 
 
 
@@ -91,7 +100,7 @@ MODEL* ModelLoad(const char* FileName, float scale)
 			D3D11_SUBRESOURCE_DATA sd{};
 			sd.pSysMem = index;
 
-			Direct3D_GetDevice()->CreateBuffer(&bd, &sd, &model->IndexBuffer[m]);
+			g_pDevice->CreateBuffer(&bd, &sd, &model->IndexBuffer[m]);
 
 
 
@@ -111,7 +120,7 @@ MODEL* ModelLoad(const char* FileName, float scale)
 		TexMetadata metadata;
 		ScratchImage image;
 		LoadFromWICMemory((const void*)aitexture->pcData, aitexture->mWidth, WIC_FLAGS_NONE, &metadata, image);
-		CreateShaderResourceView(Direct3D_GetDevice(), image.GetImages(), image.GetImageCount(), metadata, &texture);
+		CreateShaderResourceView(g_pDevice, image.GetImages(), image.GetImageCount(), metadata, &texture);
 		assert(texture);
 
 		model->Texture[aitexture->mFilename.data] = texture;
@@ -161,11 +170,11 @@ void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld)
 		// 頂点バッファを描画パイプラインに設定
 		UINT stride = sizeof(Vertex3d);
 		UINT offset = 0;
-		Direct3D_GetContext()->IASetVertexBuffers(0, 1, &model->VertexBuffer[ModelNum], &stride, &offset);
+		g_pContext->IASetVertexBuffers(0, 1, &model->VertexBuffer[ModelNum], &stride, &offset);
 
 
 		// 頂点インデックスを描画パイプラインに設定
-		Direct3D_GetContext()->IASetIndexBuffer(model->IndexBuffer[ModelNum], DXGI_FORMAT_R32_UINT, 0);
+		g_pContext->IASetIndexBuffer(model->IndexBuffer[ModelNum], DXGI_FORMAT_R32_UINT, 0);
 
 
 
@@ -173,7 +182,7 @@ void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld)
 
 
 		// プリミティブトポロジ設定
-		Direct3D_GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		g_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// テクスチャの設定
 		aiString texture;
@@ -183,7 +192,7 @@ void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld)
 		if (texture.length != 0)
 		{
 			//テクスチャの設定
-			Direct3D_GetContext()->PSSetShaderResources(0, 1, &model->Texture.at(texture.data));
+			g_pContext->PSSetShaderResources(0, 1, &model->Texture.at(texture.data));
 			Shader3d_SetMaterialDiffuse({ 1.0f, 1.0f, 1.0f, 1.0f });
 		}
 		else
@@ -195,6 +204,6 @@ void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld)
 		}
 
 		// ポリゴン描画命令発行
-		Direct3D_GetContext()->DrawIndexed(model->AiScene->mMeshes[ModelNum]->mNumFaces * 3, 0, 0);
+		g_pContext->DrawIndexed(model->AiScene->mMeshes[ModelNum]->mNumFaces * 3, 0, 0);
 	}
 }

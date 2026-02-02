@@ -8,7 +8,7 @@
 #include "UI_Timer.h"
 #include "texture.h"
 #include "sprite.h"
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include <cmath>
 #include <algorithm>
 

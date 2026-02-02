@@ -9,7 +9,7 @@
 #include "player.h"
 #include "texture.h"
 #include "sprite.h"
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include <algorithm>
 
 extern Player* g_player; // defined in game.cpp

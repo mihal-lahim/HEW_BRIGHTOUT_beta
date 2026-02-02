@@ -11,6 +11,7 @@
 
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include "GraphicsDevice.h"
 
 bool Shader_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 void Shader_Finalize();

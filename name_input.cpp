@@ -3,7 +3,7 @@
 #include "texture.h"
 #include "sprite.h"
 #include "fade.h"
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include "math.h"
 #include "scene.h"
 #include "controller.h"
@@ -118,12 +118,12 @@ void NameInput_Update(double)
 
 void NameInput_Draw()
 {
-    Direct3D_SetDepthTest(false);
-    Direct3D_SetAlphaBlend(BLEND_TRANSPARENT);
-    SetViewport(0);
+    GetGraphicsDevice().SetDepthTest(false);
+    GetGraphicsDevice().SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);
+    GetGraphicsDevice().SetViewport(0);
 
-    float screenW = (float)Direct3D_GetBackBufferWidth();
-    float screenH = (float)Direct3D_GetBackBufferHeight();
+    float screenW = static_cast<float>(GetGraphicsDevice().GetBackBufferWidth());
+    float screenH = static_cast<float>(GetGraphicsDevice().GetBackBufferHeight());
 
     if (g_ShowKeyboard && g_TexKeyboardId >= 0)
     {
@@ -195,5 +195,5 @@ void NameInput_Draw()
         }
     }
 
-    Direct3D_SetDepthTest(true);
+    GetGraphicsDevice().SetDepthTest(true);
 }

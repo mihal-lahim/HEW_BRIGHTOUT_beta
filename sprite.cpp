@@ -10,7 +10,7 @@
 #include <DirectXMath.h>
 #include "DirectXTex.h"
 using namespace DirectX;
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include "shader.h"
 #include "sprite.h"
 #include "texture.h"
@@ -78,8 +78,8 @@ void Sprite_Draw(int texid, float x, float y, float w,float h, int tx, int ty, i
 	Vertex* v = (Vertex*)msr.pData;
 
 	// 頂点情報を書き込み
-	const float SCREEN_WIDTH = (float)Direct3D_GetBackBufferWidth();
-	const float SCREEN_HEIGHT = (float)Direct3D_GetBackBufferHeight();
+	const float SCREEN_WIDTH = static_cast<float>(GetGraphicsDevice().GetBackBufferWidth());
+	const float SCREEN_HEIGHT = static_cast<float>(GetGraphicsDevice().GetBackBufferHeight());
 
 	/*constexpr float W = 512.0f;
 	constexpr float H = 512.0f;*/
@@ -159,8 +159,8 @@ void Sprite_Draw(int texid, float x, float y, float w, float h, int tx, int ty, 
 	Vertex* v = (Vertex*)msr.pData;
 
 	// 頂点情報を書き込み
-	const float SCREEN_WIDTH = (float)Direct3D_GetBackBufferWidth();
-	const float SCREEN_HEIGHT = (float)Direct3D_GetBackBufferHeight();
+	const float SCREEN_WIDTH = static_cast<float>(GetGraphicsDevice().GetBackBufferWidth());
+	const float SCREEN_HEIGHT = static_cast<float>(GetGraphicsDevice().GetBackBufferHeight());
 
 
 	v[0].position = { x,     y,     0.0f };
@@ -238,8 +238,8 @@ void Sprite_Draw(int texid, float x, float y,float zoom,XMFLOAT4 color)
 	Vertex* v = (Vertex*)msr.pData;
 
 	// 頂点情報を書き込み
-	const float SCREEN_WIDTH = (float)Direct3D_GetBackBufferWidth();
-	const float SCREEN_HEIGHT = (float)Direct3D_GetBackBufferHeight();
+	const float SCREEN_WIDTH = static_cast<float>(GetGraphicsDevice().GetBackBufferWidth());
+	const float SCREEN_HEIGHT = static_cast<float>(GetGraphicsDevice().GetBackBufferHeight());
 
 	//テクスチャ全体の幅と高さ
 	float tsw = (float)Texture_GetWidth(texid);
@@ -355,8 +355,8 @@ void Sprite_DrawZ(
 	Shader_SetWorldMatrix(rot * trans);
 
 	// プロジェクション：UI用に near=0, far=1 にする（深度精度を安定）
-	const float SCREEN_W = (float)Direct3D_GetBackBufferWidth();
-	const float SCREEN_H = (float)Direct3D_GetBackBufferHeight();
+	const float SCREEN_W = static_cast<float>(GetGraphicsDevice().GetBackBufferWidth());
+	const float SCREEN_H = static_cast<float>(GetGraphicsDevice().GetBackBufferHeight());
 	Shader_SetProjectionMatrix(
 		XMMatrixOrthographicOffCenterLH(
 			0.0f, SCREEN_W,

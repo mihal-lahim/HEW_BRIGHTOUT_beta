@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include "GameObject.h"
 
 using namespace DirectX;
@@ -34,7 +34,8 @@ DirectX::XMMATRIX Camera::GetProjectionMatrix() const
 {
 	// アスペクト比を計算
 	float aspect = ViewportWidth == -1.0f || ViewportHeight == -1.0f
-		? (float)Direct3D_GetBackBufferWidth() / (float)Direct3D_GetBackBufferHeight() : ViewportWidth / ViewportHeight;
+		? static_cast<float>(GetGraphicsDevice().GetBackBufferWidth()) / static_cast<float>(GetGraphicsDevice().GetBackBufferHeight())
+		: ViewportWidth / ViewportHeight;
 
 	// プロジェクション行列を作成
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(XMConvertToRadians(Fov), aspect, Near, Far);

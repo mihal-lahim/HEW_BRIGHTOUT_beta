@@ -10,7 +10,7 @@
 #include <DirectXMath.h>
 #include "DirectXTex.h"
 using namespace DirectX;
-#include "direct3d.h"
+#include "GraphicsDevice.h"
 #include "shader.h"
 #include "DebugOstream.h"
 
@@ -87,8 +87,8 @@ void Polygon_Draw(void)
 	Vertex* v = (Vertex*)msr.pData;
 
 	// 頂点情報を書き込み
-	const float SCREEN_WIDTH = (float)Direct3D_GetBackBufferWidth();
-	const float SCREEN_HEIGHT = (float)Direct3D_GetBackBufferHeight();
+	const float SCREEN_WIDTH = static_cast<float>(GetGraphicsDevice().GetBackBufferWidth());
+	const float SCREEN_HEIGHT = static_cast<float>(GetGraphicsDevice().GetBackBufferHeight());
 
 
 	// コサインなどを使った場合

@@ -9,10 +9,10 @@
 
 #include <directXMath.h>
 #include <iostream>
-#include "direct3d.h"
 #include "cube.h"
 #include "shader3d.h"
 #include "texture.h"
+#include "GraphicsDevice.h"
 
 
 using namespace DirectX;
