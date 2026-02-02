@@ -127,6 +127,7 @@ void PhysicsSystem::InitializePhysicsBody(PhysicsBody* physicsBody)
 
 	for (auto colliderShape : colliderShapes)
 	{
+
 		btCollisionShape* shape = nullptr;
 
 		// オフセット適用
@@ -226,7 +227,7 @@ void PhysicsSystem::InitializePhysicsBody(PhysicsBody* physicsBody)
 void PhysicsSystem::PhysicsUpdate(Scene& scene, float deltaTime)
 {
 	// 物理演算ステップ
-	m_dynamicsWorld->stepSimulation(deltaTime);
+	m_dynamicsWorld->stepSimulation(deltaTime, 1);
 	// シーン内の剛体取得
 	std::vector<PhysicsBody*> physicsBodies = scene.GetComponents<PhysicsBody>();
 	UpdatePhysicsBody(physicsBodies);

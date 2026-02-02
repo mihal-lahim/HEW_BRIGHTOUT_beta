@@ -14,7 +14,6 @@ void Scene::AddPendingGameObjectsProcess()
 	{
 		auto* obj = m_pendingAddGameObjects.front();
 		static_cast<ObjectPool<GameObject>*>(m_gameObjects.get())->Register(obj);
-		obj->m_gameContext = m_gameContext;
 		m_pendingAddGameObjects.pop();
 	}
 }
@@ -240,6 +239,7 @@ GameObject* Scene::CreateGameObject()
 	GameObject* newGameObject = new GameObject();
 	newGameObject->m_scene = this;
 	newGameObject->m_transform = CreateComponent<Transform>();
+	newGameObject->m_gameContext = m_gameContext;
 	// 作成保留キューに追加
 	m_pendingAddGameObjects.push(newGameObject);
 
@@ -250,7 +250,7 @@ GameObject* Scene::CreateGameObject()
 	return newGameObject;
 }
 
-GameObject* Scene::Instantiate(const Prefab& prefab)
+GameObject* Scene::Instantiate(Prefab& prefab)
 {
 	// 新しいゲームオブジェクトを作成
 	GameObject* newGameObject = CreateGameObject();

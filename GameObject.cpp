@@ -22,3 +22,8 @@ void GameObject::Destroy()
 	for (auto& comp : m_components)
 		comp->Destroy();
 }
+
+GameObject* GameObject::CreateGameObject()
+{
+	return m_scene->CreateGameObject();
+}

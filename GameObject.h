@@ -36,6 +36,8 @@ public:
 	// 所属しているシーンの取得メソッド
 	Scene& scene() const { return *m_scene; }
 
+	// ゲームオブジェクトを生成するメソッド
+	GameObject* CreateGameObject();
 
 	// 所持しているコンポーネントの取得テンプレートメソッド
 	template<typename T>

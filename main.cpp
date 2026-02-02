@@ -21,6 +21,10 @@
 #include "Game.h"
 #include "EngineCore.h"
 #include "Window.h"
+#include "Model.h"
+#include "DebugText.h"
+#include "Time.h"
+#include <sstream>
 
 #include "light.h"
 
@@ -51,9 +55,6 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	desc.CenterScreen = true;
 	desc.Fullscreen = false;
 	Window* window = new Window(desc, hInstance);
-
-	// ウィンドウをウィンドウシステムに登録
-	engineCore.GetGameContext().windowSystem->RegisterWindow(window);
 
 
 	// システムタイマーの初期化
@@ -106,16 +107,15 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	UpdateWindow(window->GetHWND());			//ウィンドウの描画の更新
 
 	Shader3d_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext());
+	
+	ModelInitialize(&GetGraphicsDevice());
 
-	/*
-	hal::DebugText dt(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext(),
-		L"texture/consolab_ascii_512.png",
-		GetGraphicsDevice().GetBackBufferWidth(), GetGraphicsDevice().GetBackBufferHeight(),
-		0.0f, 0.0f,
-		0, 0,
-		0.0f, 0.0f
-	);
-	*/
+	GameContext ctx = engineCore.GetGameContext();
+
+	// ウィンドウをウィンドウシステムに登録
+	ctx.windowSystem->RegisterWindow(window);
+	ctx.renderingSystem->SetDevice(&GetGraphicsDevice());
+
 
 	Light_Initialize();
 
@@ -143,16 +143,8 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 
 		engineCore.Update();
 
-			/*
-#if defined (DEBUG) || defined(_DEBUG)
-				// FPSを表示する
-				std::stringstream ss;
-				ss << "fps:" << fps << std::endl;
-				dt.SetText(ss.str().c_str());
-				dt.Draw();	// FPSの描画
-				dt.Clear();	// FPSのクリア
-#endif
-*/
+
+
 		} while (msg.message != WM_QUIT);
 
 	// 終了処理

@@ -24,6 +24,7 @@ public:
 	unsigned int GetBackBufferWidth() const;
 	unsigned int GetBackBufferHeight() const;
 
+
 	void SetViewport(int n);
 
 	enum AlphaBlendMode

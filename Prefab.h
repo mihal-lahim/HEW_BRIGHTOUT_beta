@@ -11,7 +11,7 @@ public:
 	Prefab() = default;
 	virtual ~Prefab() = default;
 	// インスタンス化メソッド
-	virtual void Instantiate(GameObject& gameObject) const = 0;
+	virtual void Instantiate(GameObject& gameObject) = 0;
 };
 
 

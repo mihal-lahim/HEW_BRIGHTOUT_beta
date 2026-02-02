@@ -7,7 +7,7 @@
 
 class CameraPrefab : public Prefab
 {
-	void Instantiate(GameObject& gameObject) const override
+	void Instantiate(GameObject& gameObject) override
 	{
 		gameObject.AddComponent<Camera>();
 	}

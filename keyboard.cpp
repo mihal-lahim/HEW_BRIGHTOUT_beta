@@ -158,15 +158,17 @@ void Keyboard_ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam)
 // Keyboardクラスの実装
 
 Keyboard::Keyboard()
-	: m_PrevState({}),
-	  m_CurState({})
+    : m_PrevState({}),
+      m_CurState({}),
+      m_NextState({})
 {
 }
 
 void Keyboard::InputUpdate()
 {
-	// 前回の状態を保存
-	m_PrevState = m_CurState;
+    // 前回の状態を保存
+    m_PrevState = m_CurState;
+    m_CurState = m_NextState;
 }
 
 float Keyboard::GetInputValue(InputKey input, InputCondition inputCondition)
@@ -208,6 +210,7 @@ void Keyboard::Reset()
 {
 	ZeroMemory(&m_PrevState, sizeof(KeyboardState));
 	ZeroMemory(&m_CurState, sizeof(KeyboardState));
+	ZeroMemory(&m_NextState, sizeof(KeyboardState));
 }
 
 void Keyboard::ProcessMessage(UINT message, WPARAM wParam, LPARAM lParam)
@@ -269,7 +272,7 @@ void Keyboard::KeyDown(int key)
 {
 	if (key < 0 || key > 0xfe) { return; }
 
-	unsigned int* p = (unsigned int*)&m_CurState;
+	unsigned int* p = (unsigned int*)&m_NextState;
 	unsigned int bf = 1u << (key & 0x1f);
 	p[(key >> 5)] |= bf;
 }
@@ -278,7 +281,7 @@ void Keyboard::KeyUp(int key)
 {
 	if (key < 0 || key > 0xfe) { return; }
 
-	unsigned int* p = (unsigned int*)&m_CurState;
+	unsigned int* p = (unsigned int*)&m_NextState;
 	unsigned int bf = 1u << (key & 0x1f);
 	p[(key >> 5)] &= ~bf;
 }

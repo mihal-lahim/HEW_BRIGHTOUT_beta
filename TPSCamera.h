@@ -4,6 +4,7 @@
 
 #include <DirectXMath.h>
 #include "ScriptComponent.h"
+#include "GameObject.h"
 
 // TPSカメラ設定構造体
 struct TPSCameraCtx
@@ -13,35 +14,33 @@ struct TPSCameraCtx
     float SensitivityX = 0.5f; // 水平回転感度
 	float SensitivityY = 0.5f; // 垂直（高さ）調整感度
 	float FollowSpeed = 3.0f; // 自動追従の速度
-	float MinDistance = 2.0f; // プレイヤーとの最小距離
-	float MaxDistance = 15.0f; // プレイヤーとの最大距離
+	float Distance = 10.0f;
 };
 
 
 class TPSCamera : public ScriptComponent
 {
-private:
-	GameObject* m_Target = nullptr; // 注視対象オブジェクト
-
-	TPSCameraCtx m_Ctx; // カメラ設定値
-
-	float Distance = 10.0f;
-
-	float m_AngleX = 0.0f; // 水平回転角度
-	float m_AngleY = 0.0f; // 垂直（高さ）調整角度
-
-	DirectX::XMFLOAT3 m_Dest = {}; // 目標位置
-
 public:
-    TPSCamera(GameObject* target, TPSCameraCtx ctx = {})
-		: m_Target(target), m_Ctx(ctx)
-	{}
+	TPSCamera(GameObject* target, TPSCameraCtx ctx = {})
+		: m_target(target), m_ctx(ctx)
+	{
+	}
 
 	// カメラ回転処理
 	void Rotate(float inputX, float inputY);
 
 	// TPSカメラ更新処理
-    void Update() override;
+	void Update() override;
+
+private:
+	GameObject* m_target = nullptr; // 注視対象オブジェクト
+
+	TPSCameraCtx m_ctx; // カメラ設定値
+
+	float m_angleX = 0.0f; // 水平回転角度
+	float m_angleY = 0.0f; // 垂直（高さ）調整角度
+
+	Vector3 m_Dest = {}; // 目標位置
 };
 
 #endif

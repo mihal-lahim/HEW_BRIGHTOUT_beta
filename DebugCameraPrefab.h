@@ -12,7 +12,7 @@ public:
 	virtual ~DebugCameraPrefab() = default;
 
 	// インスタンス化メソッド
-	virtual void Instantiate(GameObject& gameObject) const override
+	virtual void Instantiate(GameObject& gameObject) override
 	{
 		// DebugCameraコンポーネントを追加
 		gameObject.AddComponent<DebugCamera>();
