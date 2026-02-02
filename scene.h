@@ -37,7 +37,7 @@ public:
 	GameObject* CreateGameObject();
 
 	// プレハブからゲームオブジェクトを作成するメソッド
-	GameObject* Instantiate(const Prefab& prefab);
+	GameObject* Instantiate(Prefab& prefab);
 
 	// シーン更新メソッド
 	void UpdateScene();

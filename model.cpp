@@ -6,15 +6,7 @@ using namespace DirectX;
 #include "DirectXTex.h"
 #include "shader3d.h"
 #include "texture.h"
-
-// 頂点構造体
-struct Vertex3d
-{
-	XMFLOAT3 position; // 頂点座標
-	XMFLOAT4 color;    // カラー
-	XMFLOAT3 normal;   // 法線ベクトル
-	XMFLOAT2 texcoord; // テクスチャ座標
-};
+#include "Mesh.h"
 
 static unsigned int g_WhiteTexId;
 

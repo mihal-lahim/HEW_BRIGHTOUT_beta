@@ -13,6 +13,7 @@
 #include "shader3d.h"
 #include "texture.h"
 #include "GraphicsDevice.h"
+#include "Mesh.h"
 
 
 using namespace DirectX;
@@ -30,16 +31,6 @@ static ID3D11Buffer* g_pIndexBuffer = nullptr; // インデックスバッファ
 static ID3D11Device* g_pDevice = nullptr;
 static ID3D11DeviceContext* g_pContext = nullptr;
 
-
-
-// 頂点構造体
-struct Vertex3d
-{
-	XMFLOAT3 position; // 頂点座標
-	XMFLOAT4 color;    // カラー
-	XMFLOAT3 normal;   // 法線ベクトル
-	XMFLOAT2 texcoord; // テクスチャ座標
-};
 
 
 static Vertex3d g_CubeVertex[]

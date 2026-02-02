@@ -31,7 +31,7 @@ GameObject* Component::CreateGameObject()
 	return m_gameObject->m_gameContext.sceneSystem->currentScene().CreateGameObject();
 }
 
-GameObject* Component::Instantiate(const Prefab& prefab)
+GameObject* Component::Instantiate(Prefab& prefab)
 {
 	return m_gameObject->m_gameContext.sceneSystem->currentScene().Instantiate(prefab);
 }

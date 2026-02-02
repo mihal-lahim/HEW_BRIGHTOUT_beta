@@ -8,6 +8,23 @@
 
 using namespace DirectX;
 
+CubeMesh RenderingSystem::cubeMesh{};
+PlaneMesh RenderingSystem::planeMesh{};
+SphereMesh RenderingSystem::sphereMesh{};
+CapsuleMesh RenderingSystem::capsuleMesh{};
+CylinderMesh RenderingSystem::cylinderMesh{};
+
+void RenderingSystem::SetDevice(GraphicsDevice* device)
+{
+	m_graphicsDevice = device;
+    
+	cubeMesh.CreateBuffers(m_graphicsDevice);
+    planeMesh.CreateBuffers(m_graphicsDevice);
+    sphereMesh.CreateBuffers(m_graphicsDevice);
+    capsuleMesh.CreateBuffers(m_graphicsDevice);
+	cylinderMesh.CreateBuffers(m_graphicsDevice);
+}
+
 void RenderingSystem::Initialize()
 {
 }
@@ -47,7 +64,7 @@ void RenderingSystem::Render(const Scene& scene)
         for (auto* meshRenderer : meshRenderers)
         {
             if (meshRenderer->IsEnable())
-                meshRenderer->Render();
+                meshRenderer->Render(m_graphicsDevice);
         }
     }
 

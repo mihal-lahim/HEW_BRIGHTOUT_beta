@@ -432,6 +432,7 @@ private:
     // 前回と今回の状態
     KeyboardState m_PrevState{};
     KeyboardState m_CurState{};
+    KeyboardState m_NextState{};
 
 public:
 	// コンストラクタ・デストラクタ

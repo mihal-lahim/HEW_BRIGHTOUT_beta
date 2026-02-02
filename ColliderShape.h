@@ -21,7 +21,7 @@ struct ColliderShapeDesc
 {
 	Vector3 OffsetPos{ 0.0f, 0.0f, 0.0f };
 	Quaternion OffsetRot{ Quaternion::Identity() };
-	float Friction = 0.0f;
+	float Friction = 0.5f;
 	float Restitution = 0.0f;
 };
 

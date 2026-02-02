@@ -23,7 +23,7 @@ struct PlayerMoveCtx
 	// ジャンプ力
 	float JumpForce = 20.0f;
 	// 電気ジャンプ力
-	float ElectricJumpForce = 30.0f;
+	float ElectricJumpForce = 20.0f;
 
 	// 電線上移動速度
 	float LineMoveSpeed = 0.0f;
@@ -45,39 +45,7 @@ struct PlayerMoveCtx
 // プレイヤー移動クラス
 class PlayerMovement : public Movement
 {
-private:
-	// 移動設定値
-	PlayerMoveCtx m_Ctx;
-
-	// カメラ
-	Camera* m_Camera = nullptr;
-
-	// PoleManager
-	PoleManager* m_PoleManager = nullptr;
-
-	// 地面判定用レイキャスト
-	Ray m_GroundRay{ {},{} };
-
-
-	// 電柱
-	PoleID m_StartPole = -1;
-	PoleID m_DestPole = -1;
-
-	// 電線ID
-	PowerLineID m_LineID = -1;
-
-	// 電線上の位置パラメータ
-	float m_LineParam = 0.0f;
-
-	// 最後の入力方向
-	Vector3 m_LastInputDir{};
-
-
-
-	// 入力方向を保存
-	Vector3 SetInputDir(float inputX, float inputZ);
 public:
-
 	// 地面判定処理
 	bool IsOnGround() const;
 
@@ -117,10 +85,42 @@ public:
 	// コンストラクタ
 	PlayerMovement(Camera* camera, PlayerMoveCtx moveCtx = {})
 		: m_Camera(camera), m_Ctx(moveCtx)
-	{}
+	{
+	}
 
 	// 更新処理
 	void PostUpdate() override;
+private:
+	// 移動設定値
+	PlayerMoveCtx m_Ctx;
+
+	// カメラ
+	Camera* m_Camera = nullptr;
+
+	// PoleManager
+	PoleManager* m_PoleManager = nullptr;
+
+	// 地面判定用レイキャスト
+	Ray m_GroundRay{ {},{} };
+
+
+	// 電柱
+	PoleID m_StartPole = -1;
+	PoleID m_DestPole = -1;
+
+	// 電線ID
+	PowerLineID m_LineID = -1;
+
+	// 電線上の位置パラメータ
+	float m_LineParam = 0.0f;
+
+	// 最後の入力方向
+	Vector3 m_LastInputDir{};
+
+
+
+	// 入力方向を保存
+	Vector3 SetInputDir(float inputX, float inputZ);
 };
 
 // 入力方向をワールド座標系に変換する関数

@@ -8,7 +8,7 @@ void PhysicsBody::ApplyForce(const Vector3& force)
 	// 剛体をアクティブ化
 	m_rigidBody->activate(true);
 	// Bullet座標系に変換
-	btVector3 btForce(force.x, force.y, force.z);
+	btVector3 btForce = ToBulletPosition(force);
 	// 力を加える
 	m_rigidBody->applyCentralForce(btForce);
 }
@@ -20,7 +20,7 @@ void PhysicsBody::ApplyImpulse(const Vector3& impulse)
 	// 剛体をアクティブ化
 	m_rigidBody->activate(true);
 	// Bullet座標系に変換
-	btVector3 btImpulse(impulse.x, impulse.y, impulse.z);
+	btVector3 btImpulse = ToBulletPosition(impulse);
 	// インパルスを加える
 	m_rigidBody->applyCentralImpulse(btImpulse);
 }
@@ -32,7 +32,7 @@ void PhysicsBody::SetVelocity(const Vector3& velocity)
 	// 剛体をアクティブ化
 	m_rigidBody->activate(true);
 	// Bullet座標系に変換
-	btVector3 btVelocity(velocity.x, velocity.y, velocity.z);
+	btVector3 btVelocity = ToBulletPosition(velocity);
 	// 速度を設定
 	m_rigidBody->setLinearVelocity(btVelocity);
 }
@@ -43,8 +43,8 @@ Vector3 PhysicsBody::GetVelocity() const
 
 	// 速度取得
 	btVector3 btVelocity = m_rigidBody->getLinearVelocity();
-	// 独自座標系に変換して返す
-	return Vector3(btVelocity.getX(), btVelocity.getY(), btVelocity.getZ());
+	// DirectX座標系に変換して返す
+	return ToDirectXPosition(btVelocity);
 }
 
 

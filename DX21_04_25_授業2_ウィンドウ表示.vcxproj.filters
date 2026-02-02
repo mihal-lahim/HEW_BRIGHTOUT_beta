@@ -316,6 +316,9 @@
     <ClCompile Include="GraphicsDevice.cpp">
       <Filter>SorceFile\Direct3D</Filter>
     </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="texture.h">
@@ -549,20 +552,23 @@
     <ClInclude Include="CameraPrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
     </ClInclude>
-    <ClInclude Include="DynamicCubePrefab.h">
-      <Filter>HeaderFile\Prefab</Filter>
-    </ClInclude>
-    <ClInclude Include="StaticCubePrefab.h">
-      <Filter>HeaderFile\Prefab</Filter>
-    </ClInclude>
-    <ClInclude Include="CubePrefab.h">
-      <Filter>HeaderFile\Prefab</Filter>
-    </ClInclude>
     <ClInclude Include="DebugCameraPrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsDevice.h">
       <Filter>HeaderFile\Direct3D</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionPrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimitivePrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerPrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="TPSCameraPrefab.h">
+      <Filter>HeaderFile\Prefab</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

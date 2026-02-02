@@ -38,7 +38,7 @@ public:
 	GameObject* CreateGameObject();
 
 	// プレファブからゲームオブジェクトを生成するテンプレートメソッド
-	GameObject* Instantiate(const Prefab& prefab);
+	GameObject* Instantiate(Prefab& prefab);
 
 	// コンポーネントの型IDを取得するテンプレートメソッド
 	template<typename T>
