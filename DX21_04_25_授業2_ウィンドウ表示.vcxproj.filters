@@ -647,5 +647,6 @@
     <None Include="ResourceSystem.inl">
       <Filter>inlFile\Resource</Filter>
     </None>
+    <None Include="gitignore .gitignore" />
   </ItemGroup>
 </Project>
