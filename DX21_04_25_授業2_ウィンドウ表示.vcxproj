@@ -95,13 +95,21 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+<<<<<<< HEAD
       <AdditionalIncludeDirectories>..\Library\bullet3\src</AdditionalIncludeDirectories>
+=======
+      <AdditionalIncludeDirectories>$(SolutionDir)Library\bullet3\src</AdditionalIncludeDirectories>
+>>>>>>> 61af5d4a310774add1534cae04cabff289e5e74b
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>BulletCollision_Debug.lib;BulletDynamics_Debug.lib;LinearMath_Debug.lib;user32.lib;ole32.lib</AdditionalDependencies>
+<<<<<<< HEAD
       <AdditionalLibraryDirectories>..\Library\bullet3\build\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+=======
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\bullet3\build\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+>>>>>>> 61af5d4a310774add1534cae04cabff289e5e74b
     </Link>
     <PostBuildEvent>
       <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
@@ -119,7 +127,11 @@ for %%F in ("$(TargetDir)*.cso") do (
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
+<<<<<<< HEAD
       <AdditionalIncludeDirectories>..\Library\bullet3\src</AdditionalIncludeDirectories>
+=======
+      <AdditionalIncludeDirectories>$(SolutionDir)Library\bullet3\src</AdditionalIncludeDirectories>
+>>>>>>> 61af5d4a310774add1534cae04cabff289e5e74b
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -127,7 +139,11 @@ for %%F in ("$(TargetDir)*.cso") do (
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>BulletCollision_Debug.lib;BulletDynamics_Debug.lib;LinearMath_Debug.lib;user32.lib;ole32.lib</AdditionalDependencies>
+<<<<<<< HEAD
       <AdditionalLibraryDirectories>..\Library\bullet3\build\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+=======
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\bullet3\build\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+>>>>>>> 61af5d4a310774add1534cae04cabff289e5e74b
     </Link>
     <PostBuildEvent>
       <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
@@ -143,7 +159,11 @@ for %%F in ("$(TargetDir)*.cso") do (
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+<<<<<<< HEAD
       <AdditionalIncludeDirectories>..\Library\bullet3\src</AdditionalIncludeDirectories>
+=======
+      <AdditionalIncludeDirectories>$(SolutionDir)Library\bullet3\src</AdditionalIncludeDirectories>
+>>>>>>> 61af5d4a310774add1534cae04cabff289e5e74b
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -152,7 +172,11 @@ for %%F in ("$(TargetDir)*.cso") do (
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>BulletCollision_Debug.lib;BulletDynamics_Debug.lib;LinearMath_Debug.lib;user32.lib;ole32.lib</AdditionalDependencies>
+<<<<<<< HEAD
       <AdditionalLibraryDirectories>..\Library\bullet3\build\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+=======
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\bullet3\build\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+>>>>>>> 61af5d4a310774add1534cae04cabff289e5e74b
     </Link>
     <PostBuildEvent>
       <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
@@ -170,7 +194,11 @@ for %%F in ("$(TargetDir)*.cso") do (
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+<<<<<<< HEAD
       <AdditionalIncludeDirectories>..\Library\bullet3\src</AdditionalIncludeDirectories>
+=======
+      <AdditionalIncludeDirectories>$(SolutionDir)Library\bullet3\src</AdditionalIncludeDirectories>
+>>>>>>> 61af5d4a310774add1534cae04cabff289e5e74b
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -181,7 +209,11 @@ for %%F in ("$(TargetDir)*.cso") do (
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>BulletCollision_Debug.lib;BulletDynamics_Debug.lib;LinearMath_Debug.lib;user32.lib;ole32.lib</AdditionalDependencies>
+<<<<<<< HEAD
       <AdditionalLibraryDirectories>..\Library\bullet3\build\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+=======
+      <AdditionalLibraryDirectories>$(SolutionDir)Library\bullet3\build\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+>>>>>>> 61af5d4a310774add1534cae04cabff289e5e74b
     </Link>
     <PostBuildEvent>
       <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
