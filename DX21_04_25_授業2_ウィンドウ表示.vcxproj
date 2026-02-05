@@ -342,6 +342,16 @@ for %%F in ("$(TargetDir)*.cso") do (
     <None Include=".github\copilot-instructions.md" />
     <None Include="Component.inl" />
     <None Include="ConstantBuffer.inl" />
+    <None Include="context\Component.md" />
+    <None Include="context\GameObject.md" />
+    <None Include="context\Math.md" />
+    <None Include="context\Physics.md" />
+    <None Include="context\Player.md" />
+    <None Include="context\Prefab.md" />
+    <None Include="context\Scene.md" />
+    <None Include="context\ScriptComponent.md" />
+    <None Include="context\System.md" />
+    <None Include="context\Time.md" />
     <None Include="GameObject.inl" />
     <None Include="Material.inl" />
     <None Include="Mesh.inl" />

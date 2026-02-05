@@ -71,11 +71,9 @@ public:
 	ResourceSystem& resource();
 
 
-	// ゲームコンテキストを使った初期化メソッド
+	// コンポーネントの初期化・終了処理用仮想メソッド
 	virtual void InitializeByContext() {};
-	// ゲームコンテキストを使った終了メソッド
 	virtual void FinalizeByContext() {};
-
 
 private:
 	// 所有しているゲームオブジェクト

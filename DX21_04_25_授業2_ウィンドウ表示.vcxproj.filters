@@ -152,6 +152,9 @@
     <Filter Include="SorceFile\Resource">
       <UniqueIdentifier>{f650b9e1-c623-4ddc-9930-35743198f40a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Context">
+      <UniqueIdentifier>{3ab2d589-0847-413c-bc17-bed187c64455}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -598,7 +601,6 @@
     <None Include="SceneSystem.inl">
       <Filter>inlFile\Scene</Filter>
     </None>
-    <None Include=".github\copilot-instructions.md" />
     <None Include="ResourceSystem.inl">
       <Filter>inlFile\Resource</Filter>
     </None>
@@ -611,5 +613,34 @@
     <None Include="Mesh.inl">
       <Filter>inlFile\Resource</Filter>
     </None>
+    <None Include="context\GameObject.md">
+      <Filter>Context</Filter>
+    </None>
+    <None Include="context\Component.md">
+      <Filter>Context</Filter>
+    </None>
+    <None Include="context\Prefab.md">
+      <Filter>Context</Filter>
+    </None>
+    <None Include="context\Scene.md">
+      <Filter>Context</Filter>
+    </None>
+    <None Include="context\ScriptComponent.md">
+      <Filter>Context</Filter>
+    </None>
+    <None Include=".github\copilot-instructions.md" />
+    <None Include="context\Math.md">
+      <Filter>Context</Filter>
+    </None>
+    <None Include="context\System.md">
+      <Filter>Context</Filter>
+    </None>
+    <None Include="context\Time.md">
+      <Filter>Context</Filter>
+    </None>
+    <None Include="context\Physics.md">
+      <Filter>Context</Filter>
+    </None>
+    <None Include="context\Player.md" />
   </ItemGroup>
 </Project>
