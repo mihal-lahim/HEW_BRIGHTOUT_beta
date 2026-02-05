@@ -12,9 +12,6 @@ public:
 	Resource() = default;
 	virtual ~Resource();
 
-	// リソース初期化メソッド
-	virtual void CreateBuffers(GraphicsDevice& device) = 0;
-
 	// コピー代入演算子
 	Resource* operator=(const Resource* resource);
 	// コピーコンストラクタ

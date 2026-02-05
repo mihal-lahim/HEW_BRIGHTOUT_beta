@@ -7,6 +7,7 @@
 #include "ColliderShape.h"
 #include "PhysicsBody.h"
 #include "Camera.h"
+#include "Texture.h"
 
 class PlayerPrefab : public Prefab
 {
@@ -51,12 +52,6 @@ public:
 
 		// MeshRendererê›íË
 		player->meshRenderer = gameObject.AddComponent<MeshRenderer>();
-		player->meshRenderer->SetTexture(
-			gameObject.resource().Load<Texture>(L"texture/white.png")
-		);
-		player->meshRenderer->SetMesh(
-			gameObject.resource().Load<CubeMesh>()
-		);
 
 
 		// ColliderShapeê›íË

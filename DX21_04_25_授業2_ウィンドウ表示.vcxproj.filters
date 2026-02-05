@@ -163,12 +163,6 @@
     <ClCompile Include="WICTextureLoader11.cpp">
       <Filter>SorceFile</Filter>
     </ClCompile>
-    <ClCompile Include="fade.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="game_effect.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
     <ClCompile Include="PowerLine.cpp">
       <Filter>SorceFile\Electric</Filter>
     </ClCompile>
@@ -199,34 +193,16 @@
     <ClCompile Include="keyboard.cpp">
       <Filter>SorceFile\Input</Filter>
     </ClCompile>
-    <ClCompile Include="cube.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="model.cpp">
       <Filter>SorceFile\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="mouse.cpp">
       <Filter>SorceFile\Input</Filter>
     </ClCompile>
-    <ClCompile Include="sprite.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="sprite_anim.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="Audio.cpp">
       <Filter>SorceFile\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="polygon.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="shader3d.cpp">
-      <Filter>SorceFile\Direct3D</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
       <Filter>SorceFile\Direct3D</Filter>
     </ClCompile>
     <ClCompile Include="PlayerStateHuman.cpp">
@@ -337,11 +313,11 @@
     <ClCompile Include="Billboard.cpp">
       <Filter>SorceFile</Filter>
     </ClCompile>
-    <ClCompile Include="ConstantBuffer.cpp">
-      <Filter>SorceFile\Resource</Filter>
-    </ClCompile>
     <ClCompile Include="SpriteRenderer.cpp">
       <Filter>SorceFile\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>SorceFile\Resource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -349,12 +325,6 @@
       <Filter>HeaderFile</Filter>
     </ClInclude>
     <ClInclude Include="WICTextureLoader11.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="fade.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="game_effect.h">
       <Filter>HeaderFile</Filter>
     </ClInclude>
     <ClInclude Include="PowerLine.h">
@@ -405,25 +375,10 @@
     <ClInclude Include="model.h">
       <Filter>HeaderFile\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="cube.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="sprite.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="sprite_anim.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="polygon.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="Audio.h">
       <Filter>HeaderFile\Audio</Filter>
     </ClInclude>
     <ClInclude Include="shader3d.h">
-      <Filter>HeaderFile\Direct3D</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
       <Filter>HeaderFile\Direct3D</Filter>
     </ClInclude>
     <ClInclude Include="command.h">
@@ -503,9 +458,6 @@
     </ClInclude>
     <ClInclude Include="CommandSet.h">
       <Filter>HeaderFile\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>HeaderFile\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="GamePad.h">
       <Filter>HeaderFile\Input</Filter>
@@ -603,9 +555,6 @@
     <ClInclude Include="Billboard.h">
       <Filter>HeaderFile\ScriptComponent</Filter>
     </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="ConstantBuffer.h">
       <Filter>HeaderFile\Resource</Filter>
     </ClInclude>
@@ -614,6 +563,12 @@
     </ClInclude>
     <ClInclude Include="BillboardPrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>HeaderFile\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>HeaderFile\Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -645,6 +600,15 @@
     </None>
     <None Include=".github\copilot-instructions.md" />
     <None Include="ResourceSystem.inl">
+      <Filter>inlFile\Resource</Filter>
+    </None>
+    <None Include="Material.inl">
+      <Filter>inlFile\Resource</Filter>
+    </None>
+    <None Include="ConstantBuffer.inl">
+      <Filter>inlFile\Resource</Filter>
+    </None>
+    <None Include="Mesh.inl">
       <Filter>inlFile\Resource</Filter>
     </None>
   </ItemGroup>

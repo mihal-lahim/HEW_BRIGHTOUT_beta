@@ -3,29 +3,34 @@
 #define RENDERING_SYSTEM_H
 
 #include "GraphicsDevice.h"
-#include "Material.h"
-#include <memory>
 
-
-class Camera;
-class Scene;
 class EngineCore;
-class PixelShader3D;
-class VertexShader3D;
-class PixelShader2D;
-class VertexShader2D;
+class Scene;
 
 class RenderingSystem
 {
 public:
 	RenderingSystem(EngineCore* engineCore)
 		: m_engineCore(engineCore)
-	{ Initialize(); }
-	~RenderingSystem() { Finalize(); }
+	{ 
+		Initialize();
+	}
+	~RenderingSystem() 
+	{ 
+		Finalize();
+	}
 
 	// グラフィックスデバイス設定メソッド
-	void SetDevice(GraphicsDevice* device);
-	GraphicsDevice& GetGraphicsDevice() { return *m_graphicsDevice; }
+	void SetGraphicsDevice(GraphicsDevice* graphicsDevice) 
+	{ 
+		m_graphicsDevice = graphicsDevice; 
+	}
+
+	// グラフィックスデバイス取得メソッド
+	GraphicsDevice& GetGraphicsDevice() 
+	{ 
+		return *m_graphicsDevice;
+	}
 
 	void Initialize();
 	void Finalize();
@@ -39,13 +44,6 @@ private:
 
 	// グラフィックスデバイス
 	GraphicsDevice* m_graphicsDevice = nullptr;
-
-	VertexShader3D* m_defaultVertexShader = nullptr;
-	PixelShader3D* m_defaultPixelShader = nullptr;
-	std::unique_ptr<MaterialInstance3D> m_defaultMaterialInstance;
-	VertexShader2D* m_defaultSpriteVertexShader = nullptr;
-	PixelShader2D* m_defaultSpritePixelShader = nullptr;
-	std::unique_ptr<MaterialInstance2D> m_defaultSpriteMaterialInstance;
 };
 
 

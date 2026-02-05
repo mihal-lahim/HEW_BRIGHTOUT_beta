@@ -2,101 +2,67 @@
 #define MATERIAL_H
 
 #include "Shader.h"
+#include "Resource.h"
 #include <memory>
+#include <type_traits>
+#include "Texture.h"
 
-
-class MaterialInstance2D
+// シェーダーの組み合わせテンプレートクラス
+template<typename VS, typename PS>
+	requires std::is_base_of_v<VertexShader, VS>&& std::is_base_of_v<PixelShader, PS>
+class ShaderT
 {
 public:
-	PixelShader2D* PixelShader = nullptr;
+	// シェーダー本体
+	VS* vs = nullptr;
+	PS* ps = nullptr;
 
-	std::unique_ptr<ICBData> MaterialCBData;
-
-	void SetColor(const DirectX::XMFLOAT4& color)
-	{
-		auto* data = static_cast<CBData<SpritePS::PerMaterialCB>*>(MaterialCBData.get());
-		data->data.Color = color;
-	}
-
-	void Apply(GraphicsDevice& device)
-	{
-		PixelShader->UpdateMaterialCB(device, MaterialCBData.get());
-		PixelShader->Bind(device);
-	}
-
+	// バインド
+	void Bind(GraphicsDevice& device);
 };
 
 
-class MaterialInstance3D
+// 基底マテリアルクラス
+class Material : public Resource
 {
 public:
-	PixelShader3D* PixelShader = nullptr;
-
-	std::unique_ptr<ICBData> MaterialCBData;
-
-	void SetColor(const DirectX::XMFLOAT4& color)
-	{
-		if (!MaterialCBData)
-		{
-			return;
-		}
-		auto* data = static_cast<CBData<MeshPS::PerMaterialCB>*>(MaterialCBData.get());
-		data->data.Color = color;
-	}
-
-	void Apply(GraphicsDevice& device)
-	{
-		if (!PixelShader)
-		{
-			return;
-		}
-		if (MaterialCBData)
-		{
-			PixelShader->UpdateMaterialCB(device, MaterialCBData.get());
-		}
-		PixelShader->Bind(device);
-	}
+	virtual ~Material() = default;
 };
 
 
-class Material2D
+// マテリアルの内部実装
+template<typename VS, typename PS>
+	requires std::is_base_of_v<VertexShader, VS>&& std::is_base_of_v<PixelShader, PS>
+class MaterialImpl : public Material
 {
 public:
-	PixelShader2D* PixelShader = nullptr;
+	// マテリアル用定数バッファの型定義
+	using CBType = typename PS::PerMaterialCB;
 
-	DirectX::XMFLOAT4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	// マテリアルデータ
+	CBType property = {};
 
-	virtual MaterialInstance2D* Instantiate() const
-	{
-		auto* instance = new MaterialInstance2D();
-		instance->PixelShader = PixelShader;
+	// テクスチャ
+	Texture* texture = nullptr;
 
-		instance->MaterialCBData.reset((PixelShader->CreateMaterialCB()));
+	// バッファの作成、更新、バインド
+	bool CreateBuffer(GraphicsDevice& device);
+	void UpdateBuffer(GraphicsDevice& device);
+	void Bind(GraphicsDevice& device);
 
-		instance->SetColor(Color);
-
-		return instance;
-	}
+private:
+	// シェーダーの組み合わせ
+	ShaderT<VS, PS> shader = {};
+	// 定数バッファ
+	ConstantBuffer<CBType>* cb = nullptr;
 };
 
-class Material3D
-{
-public:
-	PixelShader3D* PixelShader = nullptr;
+// 2D用マテリアルと3D用マテリアルのエイリアス
+using Material2D = MaterialImpl<SpriteVS, SpritePS>;
+using Material3D = MaterialImpl<MeshVS, MeshPS>;
 
-	DirectX::XMFLOAT4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	virtual MaterialInstance3D* Instantiate() const
-	{
-		auto* instance = new MaterialInstance3D();
-		instance->PixelShader = PixelShader;
-		instance->MaterialCBData.reset(PixelShader->CreateMaterialCB());
 
-		instance->SetColor(Color);
-
-		return instance;
-	}
-};
-
+#include "Material.inl"
 
 #endif

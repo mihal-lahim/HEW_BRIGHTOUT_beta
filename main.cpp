@@ -13,8 +13,6 @@
 #include "shader.h"
 #include "shader3d.h"
 #include "texture.h"
-#include "cube.h"
-#include "sprite.h"
 #include "mouse.h"
 #include "KeyLogger.h"
 #include "Audio.h"
@@ -25,8 +23,6 @@
 #include "DebugText.h"
 #include "Time.h"
 #include <sstream>
-
-#include "light.h"
 
 
 using namespace DirectX;
@@ -80,27 +76,8 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	{
 		PostQuitMessage(0);//メッセージを表示
 		GetGraphicsDevice().Finalize();
-		Sprite_Finalize();
 
 		return 0;//初期化に失敗したので終了
-	}
-	else
-	{
-		
-		if (!Shader_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext()))
-		{
-			PostQuitMessage(0);//メッセージを表示
-		}
-		else
-		{
-			Texture_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext());
-
-			//スプライトの初期化
-			Sprite_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext());
-
-			// キューブの初期化
-			Cube_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext());
-		}
 	}
 
 	ShowWindow(window->GetHWND(), nCmdShow);	//ウィンドウ表示
@@ -114,7 +91,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 
 	// ウィンドウをウィンドウシステムに登録
 	ctx.windowSystem->RegisterWindow(window);
-	ctx.renderingSystem->SetDevice(&GetGraphicsDevice());
+	ctx.renderingSystem->SetGraphicsDevice(&GetGraphicsDevice());
 
 
 	engineCore.GetGameContext().sceneSystem->ChangeScene<Game>();
@@ -139,10 +116,6 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	UninitAudio();          // オーディオの終了処理
 	Mouse_Finalize();       // マウスの終了処理
 	Shader3d_Finalize();    // シェーダー3dの終了処理
-	Cube_Finalize();        // キューブの終了処理
-	Sprite_Finalize();      // スプライトの終了処理
-	Texture_Finalize();     // テクスチャの終了処理
-	Shader_Finalize();      // シェーダーの終了処理
 	GetGraphicsDevice().Finalize();    // Direct3Dの終了処理
 
 

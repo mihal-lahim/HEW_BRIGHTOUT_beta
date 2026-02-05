@@ -13,13 +13,13 @@
 - Follow naming conventions
 
 ## Project-Specific Rules
-- PhysicsSystem ‚Ì“o˜^/“o˜^‰ðœ‚ÍŠO•”‚©‚ç `Add`/`Remove` ŠÖ”Œo—R‚Ås‚¤•ûjB
-- Bullet ƒIƒuƒWƒFƒNƒg‚ÌŠ—L/‰ð•ú‚Í Component ‘¤‚Ås‚¤•ûjB
-- EngineCore‚ªŠeSystem‚ðŽ‚¿A‚»‚ê‚ÌŽQÆ‚ð‹l‚ß‡‚í‚¹‚½GameContext‚ð’ñ‹Ÿ‚·‚éB
-- System‚ÍƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÅEngineCore‚ÌŽQÆ‚ðŽó‚¯Žæ‚éB
-- System‚ÍEngineCore‚ð’Ê‚¶‚ÄGameContext‚ðŽæ“¾‚µA‘¼‚ÌSystem‚ÉƒAƒNƒZƒX‚·‚éB
-- Scene‚ÍGameObject‚ÆComponent‚ÌŠÇ—‚ðs‚¤B
-- Component‚É‚ÍSystemŠÇ—‚ÌComponent‚Æƒ†[ƒU[’è‹`‚ÌScriptComponent‚ª‚ ‚éB
-- SystemˆË‘¶‚ÌComponent‚ÍSystem‚ªScene‚©‚ç`GetComponents`‚µAXV‚ðs‚¤B
-- GameObject‚ÍComponent‚ðŽ‚¿A’Ç‰Á/íœ/Žæ“¾‚ÌŠÖ”‚ð’ñ‹Ÿ‚·‚éB
-- Prefab‚ÍGameObject‚Ìƒeƒ“ƒvƒŒ[ƒg‚Æ‚µ‚Ä‹@”\‚µAƒCƒ“ƒXƒ^ƒ“ƒX‰»‚ª‰Â”\B
+- PhysicsSystem ï¿½Ì“oï¿½^/ï¿½oï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½ÍŠOï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ `Add`/`Remove` ï¿½Öï¿½ï¿½oï¿½Rï¿½Åsï¿½ï¿½ï¿½ï¿½ï¿½jï¿½B
+- Bullet ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½Ìï¿½ï¿½L/ï¿½ï¿½ï¿½ï¿½ï¿½ Component ï¿½ï¿½ï¿½Åsï¿½ï¿½ï¿½ï¿½ï¿½jï¿½B
+- EngineCoreï¿½ï¿½ï¿½eSystemï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ÌŽQï¿½Æ‚ï¿½ï¿½lï¿½ßï¿½ï¿½í‚¹ï¿½ï¿½GameContextï¿½ï¿½ñ‹Ÿ‚ï¿½ï¿½ï¿½B
+- Systemï¿½ÍƒRï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^ï¿½ï¿½EngineCoreï¿½ÌŽQï¿½Æ‚ï¿½ï¿½ó‚¯Žï¿½ï¿½B
+- Systemï¿½ï¿½EngineCoreï¿½ï¿½Ê‚ï¿½ï¿½ï¿½GameContextï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½Systemï¿½ÉƒAï¿½Nï¿½Zï¿½Xï¿½ï¿½ï¿½ï¿½B
+- Sceneï¿½ï¿½GameObjectï¿½ï¿½Componentï¿½ÌŠÇ—ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½B
+- Componentï¿½É‚ï¿½Systemï¿½Ç—ï¿½ï¿½ï¿½Componentï¿½Æƒï¿½ï¿½[ï¿½Uï¿½[ï¿½ï¿½`ï¿½ï¿½ScriptComponentï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+- Systemï¿½Ë‘ï¿½ï¿½ï¿½Componentï¿½ï¿½Systemï¿½ï¿½Sceneï¿½ï¿½ï¿½ï¿½`GetComponents`ï¿½ï¿½ï¿½Aï¿½Xï¿½Vï¿½ï¿½ï¿½sï¿½ï¿½ï¿½B
+- GameObjectï¿½ï¿½Componentï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½Ç‰ï¿½/ï¿½íœ/ï¿½æ“¾ï¿½ÌŠÖï¿½ï¿½ï¿½ñ‹Ÿ‚ï¿½ï¿½ï¿½B
+- Prefabï¿½ï¿½GameObjectï¿½Ìƒeï¿½ï¿½ï¿½vï¿½ï¿½ï¿½[ï¿½gï¿½Æ‚ï¿½ï¿½Ä‹@ï¿½\ï¿½ï¿½ï¿½Aï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½Â”\ï¿½B

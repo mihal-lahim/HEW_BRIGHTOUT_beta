@@ -6,6 +6,8 @@
 #include "GameObject.h"
 #include "ResourceSystem.h"
 #include "Texture.h"
+#include "Mesh.h"
+#include "shader.h"
 
 class PrimitivePrefab : public Prefab
 {
@@ -21,41 +23,43 @@ public:
 		Cylinder
 	};
 
-	// プリミティブタイプ
-	PrimitiveType Type = PrimitiveType::Cube;
-
-	Mesh* MeshPtr = nullptr;
-
-	// テクスチャ
-	Texture* TexturePtr = nullptr;
+	// メッシュレンダラーとマテリアル
+	MeshRenderer* meshRenderer = nullptr;
+	Material3D* material = nullptr;
 
 	void Instantiate(GameObject& gameObject) override
 	{
-		auto* renderer = gameObject.AddComponent<MeshRenderer>();
+		meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
-		switch (Type)
+		Mesh* mesh = nullptr;
+
+		switch (type)
 		{
 		case PrimitivePrefab::PrimitiveType::Cube:
-			MeshPtr = renderer->resource().Load<CubeMesh>();
+			mesh = gameObject.resource().Load<CubeMesh<MeshVS>>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Sphere:
-			MeshPtr = renderer->resource().Load<SphereMesh>();
+			mesh = gameObject.resource().Load<SphereMesh<MeshVS>>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Plane:
-			MeshPtr = renderer->resource().Load<PlaneMesh>();
+			mesh = gameObject.resource().Load<PlaneMesh<MeshVS>>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Capsule:
-			MeshPtr = renderer->resource().Load<CapsuleMesh>();
+			mesh = gameObject.resource().Load<CapsuleMesh<MeshVS>>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Cylinder:
-			MeshPtr = renderer->resource().Load<CylinderMesh>();
+			mesh = gameObject.resource().Load<CylinderMesh<MeshVS>>();
 			break;
 		default:
 			break;
 		}
-		renderer->SetMesh(MeshPtr);
-		renderer->SetTexture(TexturePtr);
+
+		meshRenderer->mesh = mesh;
 	}
+
+protected:
+	// プリミティブタイプ
+	PrimitiveType type = PrimitiveType::Cube;
 };
 
 
@@ -66,7 +70,7 @@ public:
 
 	void Instantiate(GameObject& gameObject) override
 	{
-		Type = PrimitiveType::Cube;
+		type = PrimitiveType::Cube;
 		PrimitivePrefab::Instantiate(gameObject);
 	}
 };
@@ -77,7 +81,7 @@ public:
 	virtual ~SpherePrefab() = default;
 	void Instantiate(GameObject& gameObject) override
 	{
-		Type = PrimitiveType::Sphere;
+		type = PrimitiveType::Sphere;
 		PrimitivePrefab::Instantiate(gameObject);
 	}
 };
@@ -88,7 +92,7 @@ public:
 	virtual ~PlanePrefab() = default;
 	void Instantiate(GameObject& gameObject) override
 	{
-		Type = PrimitiveType::Plane;
+		type = PrimitiveType::Plane;
 		PrimitivePrefab::Instantiate(gameObject);
 	}
 };
@@ -99,7 +103,7 @@ public:
 	virtual ~CapsulePrefab() = default;
 	void Instantiate(GameObject& gameObject) override
 	{
-		Type = PrimitiveType::Capsule;
+		type = PrimitiveType::Capsule;
 		PrimitivePrefab::Instantiate(gameObject);
 	}
 };
@@ -110,7 +114,7 @@ public:
 	virtual ~CylinderPrefab() = default;
 	void Instantiate(GameObject& gameObject) override
 	{
-		Type = PrimitiveType::Cylinder;
+		type = PrimitiveType::Cylinder;
 		PrimitivePrefab::Instantiate(gameObject);
 	}
 };

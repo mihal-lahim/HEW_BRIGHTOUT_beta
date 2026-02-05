@@ -28,7 +28,7 @@ GameObject* GameObject::CreateGameObject()
 	return m_scene->CreateGameObject();
 }
 
-SceneSystem& GameObject::sceneSystem() const
+SceneSystem& GameObject::scene() const
 {
 	return m_scene->sceneSystem();
 }
