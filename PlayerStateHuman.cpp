@@ -7,7 +7,7 @@ void PlayerState_Human::Enter(Player& player)
 	player.physicsBody->SetEnable(true);
 
 	// ƒ‚ƒfƒ‹‚ðlŠÔŒ`‘Ô‚ÉÝ’è
-	player.meshRenderer->SetModel(player.humanModel);
+	//player.meshRenderer->SetModel(player.humanModel);
 
 	PlayerState::Enter(player);
 }

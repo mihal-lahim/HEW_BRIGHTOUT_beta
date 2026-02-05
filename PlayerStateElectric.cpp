@@ -6,7 +6,7 @@ void PlayerState_Electric::Enter(Player& player)
 	player.physicsBody->SetEnable(false);
 
 	// モデルを電気形態に設定
-	player.meshRenderer->SetModel(player.electricModel);
+	//player.meshRenderer->SetModel(player.electricModel);
 
 	// 移動コンポーネント取得
 	PlayerMovement* movement = player.movement;

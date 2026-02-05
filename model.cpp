@@ -13,6 +13,14 @@ static unsigned int g_WhiteTexId;
 static ID3D11Device* g_pDevice = nullptr;
 static ID3D11DeviceContext* g_pContext = nullptr;
 
+struct Vertex3d
+{
+	XMFLOAT3 position;
+	XMFLOAT4 color;
+	XMFLOAT3 normal;
+	XMFLOAT2 uv;
+};
+
 
 void ModelInitialize(GraphicsDevice* device)
 {
@@ -48,7 +56,7 @@ MODEL* ModelLoad(const char* FileName, float scale)
 				vertex[v].position = XMFLOAT3(mesh->mVertices[v].x * scale, mesh->mVertices[v].y * scale, mesh->mVertices[v].z * scale);
 				vertex[v].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 				vertex[v].normal = XMFLOAT3(mesh->mNormals[v].x, -mesh->mNormals[v].z, mesh->mNormals[v].y);
-				vertex[v].texcoord = XMFLOAT2(mesh->mTextureCoords[0][v].x, mesh->mTextureCoords[0][v].y);
+				vertex[v].uv = XMFLOAT2(mesh->mTextureCoords[0][v].x, mesh->mTextureCoords[0][v].y);
 			}
 
 			D3D11_BUFFER_DESC bd{};
@@ -119,7 +127,7 @@ MODEL* ModelLoad(const char* FileName, float scale)
 	}
 
 
-	g_WhiteTexId = Texture_Load(L"white.png"); // サーフェスカラー用
+	//g_WhiteTexId = Texture_Load(L"white.png"); // サーフェスカラー用
 
 	return model;
 }
@@ -189,7 +197,7 @@ void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld)
 		}
 		else
 		{
-			Texture_SetTexture(g_WhiteTexId);
+			//Texture_SetTexture(g_WhiteTexId);
 			aiColor3D diffuse;
 			aimaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
 			Shader3d_SetMaterialDiffuse({ diffuse.r, diffuse.g, diffuse.b, 1.0f });

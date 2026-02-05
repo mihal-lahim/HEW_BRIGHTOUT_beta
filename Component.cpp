@@ -23,27 +23,27 @@ void Component::Destroy()
 	if (!m_gameObject) return;
 
 	// 自身を所有しているシーンに破壊を依頼
-	m_gameObject->scene().DestroyComponent(this);
+	m_gameObject->scene().currentScene().DestroyComponent(this);
 }
 
 GameObject* Component::CreateGameObject()
 {
-	return m_gameObject->scene().CreateGameObject();
+	return m_gameObject->scene().currentScene().CreateGameObject();
 }
 
 GameObject* Component::Instantiate(Prefab& prefab)
 {
-	return m_gameObject->scene().Instantiate(prefab);
+	return m_gameObject->scene().currentScene().Instantiate(prefab);
 }
 
 GameObject* Component::GetGameObjectByTag(const std::string& tag)
 {
-	return m_gameObject->scene().GetGameObjectByTag(tag);
+	return m_gameObject->scene().currentScene().GetGameObjectByTag(tag);
 }
 
 std::vector<GameObject*> Component::GetGameObjectsByTag(const std::string& tag)
 {
-	return m_gameObject->scene().GetGameObjectsByTag(tag);
+	return m_gameObject->scene().currentScene().GetGameObjectsByTag(tag);
 }
 
 WindowSystem& Component::window()
@@ -58,7 +58,7 @@ PhysicsSystem& Component::physics()
 
 SceneSystem& Component::scene()
 {
-	return m_gameObject->sceneSystem();
+	return m_gameObject->scene();
 }
 
 InputSystem& Component::input()

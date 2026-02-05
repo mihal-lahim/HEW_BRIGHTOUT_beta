@@ -2,6 +2,7 @@
 #include "CollisionPrefab.h"
 #include "PlayerPrefab.h"
 #include "GameObject.h"
+#include "Texture.h"
 
 using namespace DirectX;
 

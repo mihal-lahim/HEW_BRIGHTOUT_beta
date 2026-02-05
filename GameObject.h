@@ -41,13 +41,13 @@ public:
 	bool CompareTag(const std::string& tag) const { return m_tag == tag; }
 
 	// 所属しているシーンの取得メソッド
-	Scene& scene() const { return *m_scene; }
+	//Scene& scene() const { return *m_scene; }
 
 	// ゲームオブジェクトを生成するメソッド
 	GameObject* CreateGameObject();
 
 	// システムを取得するメソッド
-	SceneSystem& sceneSystem() const;
+	SceneSystem& scene() const;
 
 	// ウィンドウシステムを取得するメソッド
 	WindowSystem& window() const;

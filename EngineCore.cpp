@@ -32,17 +32,17 @@ void EngineCore::Initialize()
 
 void EngineCore::Update()
 {
-	static double acumulatedTime = 0.0f;
+	static double accumulatedTime = 0.0f;
 	static float fps = 0.0f;
 	static int frameCount = 0;
 
-	acumulatedTime += Time::DeltaTime();
+	accumulatedTime += Time::DeltaTime();
 
-	if (acumulatedTime >= 1.0f)
+	if (accumulatedTime >= 1.0f)
 	{
-		fps = frameCount / (float)acumulatedTime;
+		fps = frameCount / (float)accumulatedTime;
 		frameCount = 0;
-		acumulatedTime -= 1.0f;
+		accumulatedTime -= 1.0f;
 		hal::dout << "FPS: " << fps << std::endl;
 	}
 	frameCount++;

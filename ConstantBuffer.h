@@ -4,102 +4,47 @@
 #include "Resource.h"
 #include <wrl/client.h>
 #include <d3d11.h>
-#include <DirectXMath.h>
 
-class ICBData
+
+// シェーダーステージ種別(前方宣言)
+enum class ShaderType;
+
+// 定数バッファの使用方法(前方宣言)
+enum class CBUsageType;
+
+
+// 定数バッファの基底クラス
+class ConstantBufferBase : public Resource
 {
-public:
-	virtual ~ICBData() = default;
-	virtual const void* Get() const = 0;
 };
 
-template <typename T>
-class CBData : public ICBData
+// 定数バッファクラス
+template<typename T>
+class ConstantBuffer : public ConstantBufferBase
 {
 public:
-	T data;
-	virtual ~CBData() = default;
-	virtual const void* Get() const override { return &data; }
-};
-
-
-class ConstantBuffer : public Resource
-{
-public:
-	enum class UsageType
-	{
-		DEFAULT,
-		DYNAMIC,
-	};
-	ConstantBuffer(UsageType type)
-		: m_usageType(type)
-	{
-	}
+	ConstantBuffer() = default;
 	virtual ~ConstantBuffer() = default;
-	virtual void CreateBuffers(GraphicsDevice& device) override = 0;
-	virtual void UpdateBuffer(GraphicsDevice& device, const void* data) = 0;
-	virtual ID3D11Buffer* GetBuffer() const { return m_constantBuffer.Get(); }
+
+	// バッファの作成と更新、バインド
+	virtual bool CreateBuffer(GraphicsDevice& device);
+	virtual void UpdateBuffer(GraphicsDevice& device, const T& data);
+	void Bind(GraphicsDevice& device, ShaderType type, UINT slot);
+
+	// バッファの取得
+	virtual ID3D11Buffer* GetBuffer() const 
+	{ 
+		return m_constantBuffer.Get();
+	}
+
 protected:
-	UsageType m_usageType = UsageType::DEFAULT;
+	// 定数バッファの使用方法
+	CBUsageType m_usageType = T::USAGE_TYPE;
+
+	// 定数バッファ本体
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_constantBuffer = nullptr;
-
-
-	void CreateBuffers(GraphicsDevice* device, UsageType type, int size);
-	void UpdateBuffer(GraphicsDevice* device, UsageType type, const void* data, int size);
 };
 
-class PerFrameCB : public ConstantBuffer
-{
-public:
-	struct CBData
-	{
-		DirectX::XMFLOAT4 AmbientColor = {};
-		DirectX::XMFLOAT4 DirectionalColor = {};
-		DirectX::XMFLOAT3 DirectionalVec = {};
-		const float padding0 = 0.0f; // 16バイトアライメントのためのパディング
-	};
-	PerFrameCB()
-		: ConstantBuffer(UsageType::DEFAULT)
-	{
-	}
-	virtual void CreateBuffers(GraphicsDevice& device) override;
-	virtual void UpdateBuffer(GraphicsDevice& device, const void* data) override;
-	virtual ~PerFrameCB() = default;
-};
-
-class PerCameraCB : public ConstantBuffer
-{
-public:
-	struct CBData
-	{
-		DirectX::XMFLOAT4X4 ViewMatrix = {};
-		DirectX::XMFLOAT4X4 ProjectionMatrix = {};
-		DirectX::XMFLOAT3 CameraPosition = {};
-		const float padding0 = 0.0f; // 16バイトアライメントのためのパディング
-	};
-	PerCameraCB()
-		: ConstantBuffer(UsageType::DYNAMIC)
-	{
-	}
-	virtual void CreateBuffers(GraphicsDevice& device) override;
-	virtual void UpdateBuffer(GraphicsDevice& device, const void* data) override;
-	virtual ~PerCameraCB() = default;
-};
-
-class PerObjectCB : public ConstantBuffer
-{
-public:
-	struct CBData
-	{
-		DirectX::XMFLOAT4X4 WorldMatrix = {};
-	};
-	PerObjectCB()
-		: ConstantBuffer(UsageType::DYNAMIC)
-	{
-	}
-	virtual void CreateBuffers(GraphicsDevice& device) override;
-	virtual void UpdateBuffer(GraphicsDevice& device, const void* data) override;
-	virtual ~PerObjectCB() = default;
-};
+#include "ConstantBuffer.inl"
 
 #endif

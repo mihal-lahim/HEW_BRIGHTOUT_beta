@@ -9,15 +9,8 @@
 #include "GraphicsDevice.h"
 #include "Resource.h"
 
-// 頂点構造体
-struct Vertex3d
-{
-	DirectX::XMFLOAT3 position; // 頂点座標
-	DirectX::XMFLOAT4 color;    // カラー
-	DirectX::XMFLOAT3 normal;   // 法線ベクトル
-	DirectX::XMFLOAT2 texcoord; // テクスチャ座標
-};
 
+// メッシュクラス(頂点タイプはテンプレート引数で指定)
 class Mesh : public Resource
 {
 public:
@@ -25,69 +18,92 @@ public:
 	virtual ~Mesh() = default;
 
 	// GPUバッファの作成
-	void CreateBuffers(GraphicsDevice& device) override;
-
-	// 頂点データとインデックスデータの追加
-	void AddVertex(const Vertex3d& vertex)
-	{
-		m_vertices.push_back(vertex);
-	}
-	void AddIndex(unsigned short index)
-	{
-		m_indices.push_back(index);
-	}
+	template<typename VA>
+	bool CreateBuffer(GraphicsDevice& device, const std::vector<VA>& vertexes, const std::vector<unsigned short>& indexes);
 
 	// 一時的にMeshがやることになっている描画処理
 	void Render(GraphicsDevice& device);
 
 	// GPUバッファの取得
-	ID3D11Buffer* const GetVertexBuffer() const { return m_vertexBuffer.Get(); }
-	ID3D11Buffer* const GetIndexBuffer() const { return m_indexBuffer.Get(); }
+	ID3D11Buffer* const GetVertexBuffer() const 
+	{ 
+		return m_vertexBuffer.Get();
+	}
+	ID3D11Buffer* const GetIndexBuffer() const 
+	{ 
+		return m_indexBuffer.Get();
+	}
 
-	// 頂点データとインデックスデータの取得
-	std::vector<Vertex3d>& GetVertices() { return m_vertices; }
-	std::vector<unsigned short>& GetIndices() { return m_indices; }
+protected:
+	// 頂点ストライド
+	UINT m_vertexStride = 0;
+
+	// 頂点数とインデックス数
+	UINT m_vertexCount = 0;
+	UINT m_indexCount = 0;
 
 private:
 	// 頂点バッファとインデックスバッファ
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer = {};
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer = {};
-
-	// 頂点データとインデックスデータの配列
-	std::vector<Vertex3d> m_vertices = {};
-	std::vector<unsigned short> m_indices = {};
 };
 
 
-class CubeMesh : public Mesh
+// プリミティブメッシュクラス
+class PrimitiveMesh : public Mesh
+{
+};
+
+template<typename VS>
+class CubeMesh : public PrimitiveMesh
 {
 public:
-	CubeMesh();
+	using VertexAttribute = typename VS::VertexAttribute;
+	template<typename VA>
+	static std::vector<VA> CreateVertexes();
+	static std::vector<unsigned short> CreateIndexes();
 };
 
-class PlaneMesh : public Mesh
+template<typename VS>
+class PlaneMesh : public PrimitiveMesh
 {
 public:
-	PlaneMesh();
+	using VertexAttribute = typename VS::VertexAttribute;
+	template<typename VA>
+	static std::vector<VA> CreateVertexes();
+	static std::vector<unsigned short> CreateIndexes();
 };
 
-class SphereMesh : public Mesh
+template<typename VS>
+class SphereMesh : public PrimitiveMesh
 {
 public:
-	SphereMesh();
+	using VertexAttribute = typename VS::VertexAttribute;
+	template<typename VA>
+	static std::vector<VA> CreateVertexes();
+	static std::vector<unsigned short> CreateIndexes();
 };
 
-class CapsuleMesh : public Mesh
+template<typename VS>
+class CapsuleMesh : public PrimitiveMesh
 {
 public:
-	CapsuleMesh();
+	using VertexAttribute = typename VS::VertexAttribute;
+	template<typename VA>
+	static std::vector<VA> CreateVertexes();
+	static std::vector<unsigned short> CreateIndexes();
 };
 
-class CylinderMesh : public Mesh
+template<typename VS>
+class CylinderMesh : public PrimitiveMesh
 {
 public:
-	CylinderMesh();
+	using VertexAttribute = typename VS::VertexAttribute;
+	template<typename VA>
+	static std::vector<VA> CreateVertexes();
+	static std::vector<unsigned short> CreateIndexes();
 };
 
+#include "Mesh.inl"
 
 #endif

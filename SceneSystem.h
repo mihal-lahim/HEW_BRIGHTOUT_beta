@@ -23,7 +23,10 @@ public:
 	}
 
 	// エンジンコア取得メソッド
-	EngineCore* const engineCore() const { return m_engineCore; }
+	EngineCore* const engineCore() const 
+	{ 
+		return m_engineCore;
+	}
 
 	// シーンシステムの初期化
 	void Initialize();
@@ -34,7 +37,10 @@ public:
 
 
 	// 現在のシーン取得メソッド
-	Scene& currentScene() { return *m_currentScene.get(); }
+	Scene& currentScene() 
+	{ 
+		return *m_currentScene.get();
+	}
 
 	// シーン変更テンプレートメソッド
 	template<typename T>

@@ -8,7 +8,6 @@
 ==============================================================================*/
 
 #include "fade.h"
-#include "sprite.h"
 #include "texture.h"
 using namespace DirectX;
 #include "GraphicsDevice.h"
