@@ -298,9 +298,6 @@
     <ClCompile Include="InputSystem.cpp">
       <Filter>SorceFile\Input</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsDevice.cpp">
-      <Filter>SorceFile\Direct3D</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceSystem.cpp">
       <Filter>SorceFile\Resource</Filter>
     </ClCompile>
@@ -310,16 +307,22 @@
     <ClCompile Include="Texture.cpp">
       <Filter>SorceFile\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>SorceFile\Resource</Filter>
-    </ClCompile>
     <ClCompile Include="Billboard.cpp">
       <Filter>SorceFile</Filter>
     </ClCompile>
     <ClCompile Include="SpriteRenderer.cpp">
       <Filter>SorceFile\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="GraphicsDevice.cpp">
+      <Filter>SorceFile\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffer.cpp">
+      <Filter>SorceFile\Rendering</Filter>
+    </ClCompile>
     <ClCompile Include="Shader.cpp">
+      <Filter>SorceFile\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
       <Filter>SorceFile\Resource</Filter>
     </ClCompile>
   </ItemGroup>
@@ -525,9 +528,6 @@
     <ClInclude Include="DebugCameraPrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsDevice.h">
-      <Filter>HeaderFile\Direct3D</Filter>
-    </ClInclude>
     <ClInclude Include="CollisionPrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
     </ClInclude>
@@ -546,9 +546,6 @@
     <ClInclude Include="ResourceSystem.h">
       <Filter>HeaderFile\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>HeaderFile\Resource</Filter>
-    </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>HeaderFile\Resource</Filter>
     </ClInclude>
@@ -558,19 +555,25 @@
     <ClInclude Include="Billboard.h">
       <Filter>HeaderFile\ScriptComponent</Filter>
     </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
-      <Filter>HeaderFile\Resource</Filter>
-    </ClInclude>
     <ClInclude Include="SpriteRenderer.h">
       <Filter>HeaderFile\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="BillboardPrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicsDevice.h">
+      <Filter>HeaderFile\Rendering</Filter>
+    </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>HeaderFile\Resource</Filter>
     </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>HeaderFile\Rendering</Filter>
+    </ClInclude>
     <ClInclude Include="Material.h">
+      <Filter>HeaderFile\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
       <Filter>HeaderFile\Resource</Filter>
     </ClInclude>
   </ItemGroup>
@@ -602,15 +605,6 @@
       <Filter>inlFile\Scene</Filter>
     </None>
     <None Include="ResourceSystem.inl">
-      <Filter>inlFile\Resource</Filter>
-    </None>
-    <None Include="Material.inl">
-      <Filter>inlFile\Resource</Filter>
-    </None>
-    <None Include="ConstantBuffer.inl">
-      <Filter>inlFile\Resource</Filter>
-    </None>
-    <None Include="Mesh.inl">
       <Filter>inlFile\Resource</Filter>
     </None>
     <None Include="context\GameObject.md">

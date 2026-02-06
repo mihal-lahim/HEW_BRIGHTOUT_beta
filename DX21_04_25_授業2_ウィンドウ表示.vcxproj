@@ -171,16 +171,18 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="EngineCore.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
     <ClCompile Include="InputSystem.cpp" />
-    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="PhysicsBody.cpp" />
     <ClCompile Include="PoleManager.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceSystem.cpp" />
     <ClCompile Include="SceneSystem.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SpriteRenderer.cpp" />
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
@@ -216,7 +218,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="RenderingSystem.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="shader3d.cpp" />
     <ClCompile Include="SystemTimer.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -237,6 +238,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="DebugCameraPrefab.h" />
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="Material.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="PlayerPrefab.h" />
     <ClInclude Include="PrimitivePrefab.h" />
     <ClInclude Include="CollisionPrefab.h" />
@@ -251,6 +253,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="SceneSystem.h" />
     <ClInclude Include="ScriptComponent.h" />
     <ClInclude Include="ScriptComponentSystem.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="TPSCameraPrefab.h" />
     <ClInclude Include="UniqueQueue.h" />
@@ -272,7 +275,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="InputDevice.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="KeyLogger.h" />
-    <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="Mouse.h" />
@@ -299,7 +301,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="RenderingSystem.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="EngineCore.h" />
-    <ClInclude Include="Shader.h" />
     <ClInclude Include="shader3d.h" />
     <ClInclude Include="SystemTimer.h" />
     <ClInclude Include="Texture.h" />
@@ -341,7 +342,6 @@ for %%F in ("$(TargetDir)*.cso") do (
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />
     <None Include="Component.inl" />
-    <None Include="ConstantBuffer.inl" />
     <None Include="context\Component.md" />
     <None Include="context\GameObject.md" />
     <None Include="context\Math.md" />
@@ -353,8 +353,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <None Include="context\System.md" />
     <None Include="context\Time.md" />
     <None Include="GameObject.inl" />
-    <None Include="Material.inl" />
-    <None Include="Mesh.inl" />
     <None Include="ResourceSystem.inl" />
     <None Include="Scene.inl" />
     <None Include="SceneSystem.inl" />

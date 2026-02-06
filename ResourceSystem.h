@@ -3,7 +3,6 @@
 
 #include "Resource.h"
 #include "Mesh.h"
-#include "ConstantBuffer.h"
 #include "Shader.h"
 #include "Material.h"
 #include "Texture.h"
@@ -26,25 +25,24 @@ public:
 	}
 	~ResourceSystem();
 
-	// リソース取得(型指定)(Shader、Material、ConstantBuffer、PrimitiveMesh)
-	template<typename T>
-		requires (std::is_base_of_v<Shader, T> || std::is_base_of_v<Material, T> || std::is_base_of_v<ConstantBufferBase, T> || std::is_base_of_v<PrimitiveMesh, T>)
-	T* Load();
-
-
-	// リソース取得(型指定かつファイルパス指定)(Texture、Model)
-	template<typename T>
-		requires (std::is_base_of_v<Texture, T>)
-	T* Load(const std::wstring& filePath);
-
-
-	// リソース取得(コピー用)
-	Resource* Load(Resource* resource);
-
-	// リソース解放
-	void Unload(Resource* resouce);
+	// リソース取得(型指定)
+	template<typename T, typename... Args>
+		requires std::is_base_of_v<Resource, T>
+	T* Load(Args&&... args);
 
 private:
+	// リソース取得の共通処理
+	template<typename T, typename Key, typename... Args>
+		requires std::is_base_of_v<Resource, T>
+	T* LoadInternal(const Key& resourceKey, Args&&... args);
+
+	// コピー用
+	Resource* Copy(Resource* resource);
+
+	// リソース解放(デストラクタ用)
+	void Unload(Resource* resouce);
+
+
 	// 既存リソースの存在確認
 	template<typename T, typename Key>
 		requires std::is_base_of_v<Resource, T>
@@ -52,11 +50,6 @@ private:
 
 	// ユニークなリソースキーの生成
 	size_t MakeUniqueResourceKey(size_t baseKey) const;
-
-	// リソース取得の共通処理
-	template<typename T, typename Key, typename... Args>
-		requires std::is_base_of_v<Resource, T>
-	T* LoadInternal(const Key& resourceKey, Args&&... args);
 
 	// リソースコンテナ構造体
 	struct ResourceContainer
@@ -73,6 +66,8 @@ private:
 
 	// リソースマップ
 	std::unordered_map<size_t, ResourceContainer> m_resourceMap;
+
+	friend class Resource;
 };
 
 #include "ResourceSystem.inl"

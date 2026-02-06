@@ -25,36 +25,35 @@ public:
 
 	// メッシュレンダラーとマテリアル
 	MeshRenderer* meshRenderer = nullptr;
-	Material3D* material = nullptr;
 
 	void Instantiate(GameObject& gameObject) override
 	{
 		meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
-		Mesh* mesh = nullptr;
+		//Mesh* mesh = nullptr;
 
 		switch (type)
 		{
 		case PrimitivePrefab::PrimitiveType::Cube:
-			mesh = gameObject.resource().Load<CubeMesh<MeshVS>>();
+			//mesh = gameObject.resource().Load<CubeMesh<MeshVS>>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Sphere:
-			mesh = gameObject.resource().Load<SphereMesh<MeshVS>>();
+			//mesh = gameObject.resource().Load<SphereMesh<MeshVS>>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Plane:
-			mesh = gameObject.resource().Load<PlaneMesh<MeshVS>>();
+			//mesh = gameObject.resource().Load<PlaneMesh<MeshVS>>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Capsule:
-			mesh = gameObject.resource().Load<CapsuleMesh<MeshVS>>();
+			//mesh = gameObject.resource().Load<CapsuleMesh<MeshVS>>();
 			break;
 		case PrimitivePrefab::PrimitiveType::Cylinder:
-			mesh = gameObject.resource().Load<CylinderMesh<MeshVS>>();
+			//mesh = gameObject.resource().Load<CylinderMesh<MeshVS>>();
 			break;
 		default:
 			break;
 		}
 
-		meshRenderer->mesh = mesh;
+		//meshRenderer->mesh = mesh;
 	}
 
 protected:

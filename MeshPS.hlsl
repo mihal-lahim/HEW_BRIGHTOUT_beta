@@ -5,9 +5,13 @@ cbuffer PER_FRAME : register(b0)
     float4 directional_light_vector;
 }
 
-cbuffer PER_MATERIAL : register(b1)
+// cbuffer PER_CAMERA : register(b1)
+
+// cbuffer PER_OBJECT : register(b2)
+
+cbuffer PER_MATERIAL : register(b3)
 {
-    float4 material_diffuse_color;
+    float4 diffuse_color;
 }
 
 struct PS_INPUT
@@ -24,7 +28,7 @@ SamplerState major_sampler;
 
 float4 main(PS_INPUT psin) : SV_TARGET
 {
-    float4 material = major_texture.Sample(major_sampler, psin.uv) * psin.color * material_diffuse_color;
+    float4 material = major_texture.Sample(major_sampler, psin.uv) * psin.color * diffuse_color;
     float3 ambient = material.rgb * ambient_light_color.rgb;
     
     // -1 ~ 1 -> 0 ~ 2 -> 0 ~ 1

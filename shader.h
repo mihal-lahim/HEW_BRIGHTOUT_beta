@@ -1,266 +1,108 @@
-/*==============================================================================
-
-   シェーダー [shader.h]
-														 Author : Rintarou Sumi
-														 Date   : 2025/05/15
---------------------------------------------------------------------------------
-
-==============================================================================*/
 #ifndef SHADER_H
-#define	SHADER_H
+#define SHADER_H
 
-#include <d3d11.h>
-#include <d3dcompiler.h>
-#include <DirectXMath.h>
-#include <wrl/client.h>
-#include "GraphicsDevice.h"
 #include "Resource.h"
-#include "ConstantBuffer.h"
+#include "GraphicsDevice.h"
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <d3d11.h>
+#include <wrl/client.h>
 
-
-// シェーダーステージ種別
-enum class ShaderType
-{
-	None,
-	Vertex,
-	Pixel,
-};
-
-// 定数バッファの使用方法
-enum class CBUsageType
-{
-	DEFAULT,
-	DYNAMIC,
-};
-
-// シェーダーの基底クラス
+// 基底シェーダークラス
 class Shader : public Resource
 {
-public:
-	// 毎フレーム用の定数バッファ構造体
-	struct PerFrameCB
-	{
-		static constexpr CBUsageType USAGE_TYPE = CBUsageType::DEFAULT;
+};
 
-		DirectX::XMFLOAT4 ambientColor = {};
-		DirectX::XMFLOAT3 directionalLightVector = {};
-		float padding = 0.0f;
-		DirectX::XMFLOAT4 directionalLightColor = {};
-	};
+// シェーダー数値タイプ列挙型
+enum class ShaderValueType
+{
+	None,
+	Float,
+	Float4,
+	Matrix4x4,
+};
 
-	// 毎カメラ用の定数バッファ構造体
-	struct PerCameraCB
-	{
-		static constexpr CBUsageType USAGE_TYPE = CBUsageType::DEFAULT;
+// 定数バッファの変数情報構造体
+struct ConstantBufferVariableInfo
+{
+	std::string name;
+	size_t offset = 0;
+	size_t size = 0;
+	ShaderValueType type = ShaderValueType::None;
+};
 
-		DirectX::XMMATRIX viewMatrix = {};
-		DirectX::XMMATRIX projectionMatrix = {};
-	};
+// 定数バッファ情報構造体
+struct ConstantBufferInfo
+{
+	size_t size = 0;
+	std::unordered_map<std::string, ConstantBufferVariableInfo> variables;
+};
 
-	// 毎オブジェクト用の定数バッファ構造体
-	struct PerObjectCB
-	{
-		static constexpr CBUsageType USAGE_TYPE = CBUsageType::DYNAMIC;
-
-		DirectX::XMMATRIX worldMatrix = {};
-	};
-
-
-	Shader(ShaderType type)
-		: m_type(type)
-	{
-	}
-	virtual ~Shader() = default;
-
-	// バッファの作成とバインド
-	virtual bool CreateBuffer(GraphicsDevice& device) = 0;
-	virtual void Bind(GraphicsDevice& device) = 0;
-protected:
-	// シェーダーステージ種別
-	ShaderType m_type = ShaderType::None;
-
-	// シェーダー本体
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
-
-	// コンパイル済みシェーダーファイルの読み込み
-	bool ReadCompiledShader(const char* path, Microsoft::WRL::ComPtr<ID3DBlob>& blob);
-
-	// シェーダーの作成
-	bool CreateShaderFromFile(GraphicsDevice& device, const char* path, Microsoft::WRL::ComPtr<ID3DBlob>* shaderBlob = nullptr);
+// シェーダーリフレクション情報構造体
+struct ShaderReflectionInfo
+{
+	std::unordered_map<std::string, ConstantBufferInfo> buffers;
+	std::unordered_map<std::string, ConstantBufferVariableInfo> constantBuffers;
 };
 
 
+// 入力要素情報構造体
+struct InputElementInfo
+{
+	std::string name;
+	UINT index;
+	DXGI_FORMAT format;
+	UINT offset;
+};
 
-// 頂点シェーダーの基底クラス
+// シェーダー入力レイアウト情報構造体
+struct ShaderInputLayoutInfo
+{
+	std::vector<InputElementInfo> elements;
+};
+
+
+// 頂点シェーダークラス
 class VertexShader : public Shader
 {
 public:
-	VertexShader()
-		: Shader(ShaderType::Vertex)
-	{
-	}
-	virtual ~VertexShader() = default;
+	// バッファの作成、バインド
+	bool CreateBuffer(GraphicsDevice& device, const std::string& filePath);
+	void Bind(GraphicsDevice& device);
 
-protected:
-	// 入力レイアウト
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
-
-	// 頂点入力要素のフォーマットを取得
-	DXGI_FORMAT GetInputElementFormat(const D3D11_SIGNATURE_PARAMETER_DESC& desc);
-
-	// 入力レイアウトの作成
-	bool CreateInputLayoutFromBlob(GraphicsDevice& device, ID3DBlob* blob, Microsoft::WRL::ComPtr<ID3D11InputLayout>& inputLayout);
-
-	// 頂点シェーダーと入力レイアウトの作成
-	bool CreateVertexShaderWithLayout(GraphicsDevice& device, const char* path);
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> vs = nullptr;
+	ShaderReflectionInfo reflectionInfo = {};
+	ShaderInputLayoutInfo inputLayoutInfo = {};
 };
 
-// ピクセルシェーダーの基底クラス
+// ピクセルシェーダークラス
 class PixelShader : public Shader
 {
 public:
-	PixelShader()
-		: Shader(ShaderType::Pixel)
-	{
-	}
-	virtual ~PixelShader() = default;
+	// バッファの作成、バインド
+	bool CreateBuffer(GraphicsDevice& device, const std::string& filePath);
+	void Bind(GraphicsDevice& device);
+
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> ps = nullptr;
+	ShaderReflectionInfo reflectionInfo = {};
 };
 
-// 2D用頂点シェーダーとピクセルシェーダーの基底クラス
-class VertexShader2D : public VertexShader
+
+// シェーダープログラムクラス
+class ShaderProgram : public Resource
 {
 public:
-	VertexShader2D()
-		: VertexShader()
-	{
-	}
-	virtual ~VertexShader2D() = default;
+	// バッファの作成、バインド
+	bool CreateBuffer(GraphicsDevice& device, const std::string& vsFilePath, const std::string& psFilePath);
+	void Bind(GraphicsDevice& device);
+
+	VertexShader* vertexShader = nullptr;
+	PixelShader* pixelShader = nullptr;
+
+	ShaderReflectionInfo mergedReflectionInfo = {};
+	ShaderInputLayoutInfo inputLayoutInfo = {};
 };
 
-class PixelShader2D : public PixelShader
-{
-public:
-	PixelShader2D()
-		: PixelShader()
-	{
-	}
-	virtual ~PixelShader2D() = default;
-};
-
-// 3D用頂点シェーダーとピクセルシェーダーの基底クラス
-class VertexShader3D : public VertexShader
-{
-public:
-	VertexShader3D()
-		: VertexShader()
-	{
-	}
-	virtual ~VertexShader3D() = default;
-};
-
-class PixelShader3D : public PixelShader
-{
-public:
-	PixelShader3D()
-		: PixelShader()
-	{
-	}
-	virtual ~PixelShader3D() = default;
-};
-
-// スプライト用頂点シェーダー(2D)
-class SpriteVS : public VertexShader2D
-{
-public:
-	struct VertexAttribute
-	{
-		DirectX::XMFLOAT2 position = {};
-		DirectX::XMFLOAT4 color = {};
-		DirectX::XMFLOAT2 uv = {};
-	};
-
-	SpriteVS()
-		: VertexShader2D()
-	{
-	}
-	virtual bool CreateBuffer(GraphicsDevice& device) override;
-	virtual void Bind(GraphicsDevice& device) override;
-};
-
-// スプライト用頂点シェーダー(2D)
-class SpritePS : public PixelShader2D
-{
-public:
-	SpritePS()
-		: PixelShader2D()
-	{
-	}
-	// マテリアル用定数バッファの構造体
-	struct PerMaterialCB
-	{
-		static constexpr CBUsageType USAGE_TYPE = CBUsageType::DYNAMIC;
-
-		DirectX::XMFLOAT4 color = {};
-	};
-
-
-	// Material用の設定データを作成
-	virtual PerMaterialCB* CreateMaterialCB()
-	{
-		return new PerMaterialCB;
-	}
-
-	// バッファの作成とバインド
-	virtual bool CreateBuffer(GraphicsDevice& device) override;
-	virtual void Bind(GraphicsDevice& device) override;
-};
-
-// メッシュ用頂点シェーダー(3D)
-class MeshVS : public VertexShader3D
-{
-public:
-	struct VertexAttribute
-	{
-		DirectX::XMFLOAT3 position = {};
-		DirectX::XMFLOAT4 color = {};
-		DirectX::XMFLOAT3 normal = {};
-		DirectX::XMFLOAT2 uv = {};
-	};
-
-	MeshVS()
-		: VertexShader3D()
-	{
-	}
-	// バッファの作成とバインド
-	virtual bool CreateBuffer(GraphicsDevice& device) override;
-	virtual void Bind(GraphicsDevice& device) override;
-};
-
-// メッシュ用ピクセルシェーダー(3D)
-class MeshPS : public PixelShader3D
-{
-public:
-	MeshPS()
-		: PixelShader3D()
-	{
-	}
-	struct PerMaterialCB
-	{
-		static constexpr CBUsageType USAGE_TYPE = CBUsageType::DYNAMIC;
-
-		DirectX::XMFLOAT4 color = {};
-	};
-
-	// Material用の設定データを作成
-	PerMaterialCB* CreateMaterialCB()
-	{
-		return new PerMaterialCB;
-	}
-
-	// バッファの作成とバインド
-	virtual bool CreateBuffer(GraphicsDevice& device) override;
-	virtual void Bind(GraphicsDevice& device) override;
-};
 
 #endif

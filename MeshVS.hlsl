@@ -1,13 +1,17 @@
+// cbuffer PER_FRAME : register(b0)
+
 cbuffer PER_CAMERA : register(b1)
 {
     float4x4 view;
     float4x4 proj;
 }
 
-cbuffer PER_OBJECT : register(b0)
+cbuffer PER_OBJECT : register(b2)
 {
     float4x4 world;
 }
+
+// cbuffer PER_MATERIAL : register(b3)
 
 struct VS_INPUT
 {
