@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #include <cstring>
 #include <debugapi.h>
 #include <d3d11shader.h>
@@ -10,7 +11,7 @@
 
 namespace
 {
-	constexpr const char* kDefaultEntryPoint = "main";
+	constexpr const char* defaultEntryPoint = "main";
 
 	std::wstring ToWideString(const std::string& value)
 	{
@@ -66,7 +67,7 @@ namespace
 			else
 			{
 				std::string message = "Shader compile failed: " + filePath + " (hr=" +
-					std::to_string(static_cast<long>(hr)) + ")\n";
+					std::to_string(static_cast<std::int32_t>(hr)) + ")\n";
 				OutputDebugStringA(message.c_str());
 			}
 			return false;
@@ -307,7 +308,7 @@ namespace
 bool VertexShader::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob;
-	if (!LoadShaderBlob(filePath, "vs_5_0", kDefaultEntryPoint, shaderBlob))
+	if (!LoadShaderBlob(filePath, "vs_5_0", defaultEntryPoint, shaderBlob))
 	{
 		return false;
 	}
@@ -342,7 +343,7 @@ void VertexShader::Bind(GraphicsDevice& device)
 bool PixelShader::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob;
-	if (!LoadShaderBlob(filePath, "ps_5_0", kDefaultEntryPoint, shaderBlob))
+	if (!LoadShaderBlob(filePath, "ps_5_0", defaultEntryPoint, shaderBlob))
 	{
 		return false;
 	}
