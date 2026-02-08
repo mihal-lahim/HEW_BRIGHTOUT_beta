@@ -259,7 +259,6 @@ bool GraphicsDevice::CreateBackBuffers()
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilStateDepthDisable.Get(), NULL);
 	SetDepthTest(false);
 
-	// ���X�^���C�U�[�X�e�[�g�̍쐬(�J���O����)
 	D3D11_RASTERIZER_DESC rasterizerDesc{};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.CullMode = D3D11_CULL_NONE;
