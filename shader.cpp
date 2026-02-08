@@ -6,6 +6,9 @@
 #include <cstdint>
 #include <cstring>
 #include <debugapi.h>
+#include <iomanip>
+#include <locale>
+#include <sstream>
 #include <d3d11shader.h>
 #include <d3dcompiler.h>
 
@@ -35,7 +38,7 @@ namespace
 
 		std::string extension = filePath.substr(dotPos);
 		std::transform(extension.begin(), extension.end(), extension.begin(),
-			[](unsigned char c) { return static_cast<char>(::tolower(c)); });
+			[](unsigned char c) { return std::tolower(static_cast<char>(c), std::locale::classic()); });
 
 		std::wstring hlslPath;
 		if (extension == ".cso")
@@ -66,9 +69,10 @@ namespace
 			}
 			else
 			{
-				std::string message = "Shader compile failed: " + filePath + " (hr=" +
-					std::to_string(static_cast<std::int32_t>(hr)) + ")\n";
-				OutputDebugStringA(message.c_str());
+				std::ostringstream message;
+				message << "Shader compile failed: " << filePath << " (hr=0x" << std::hex
+					<< std::uppercase << static_cast<std::uint32_t>(hr) << ")\n";
+				OutputDebugStringA(message.str().c_str());
 			}
 			return false;
 		}
