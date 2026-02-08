@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <cctype>
 #include <cstring>
+#include <debugapi.h>
 #include <d3d11shader.h>
 #include <d3dcompiler.h>
-#include <Windows.h>
 
 namespace
 {
