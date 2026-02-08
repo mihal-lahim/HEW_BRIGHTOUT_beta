@@ -11,7 +11,7 @@
 
 bool GraphicsDevice::Initialize(HWND hWnd)
 {
-	//ƒfƒoƒCƒXAƒXƒƒbƒvƒ`ƒFƒCƒ“AƒRƒ“ƒeƒLƒXƒg¶¬
+	//ï¿½fï¿½oï¿½Cï¿½Xï¿½Aï¿½Xï¿½ï¿½ï¿½bï¿½vï¿½`ï¿½Fï¿½Cï¿½ï¿½ï¿½Aï¿½Rï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½
 	DXGI_SWAP_CHAIN_DESC swapChainDesc{};
 	swapChainDesc.Windowed = TRUE;
 	swapChainDesc.BufferCount = 2;
@@ -36,7 +36,7 @@ bool GraphicsDevice::Initialize(HWND hWnd)
 
 	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
 
-	// ƒfƒoƒCƒX‚ÆƒXƒƒbƒvƒ`ƒFƒCƒ“‚Ìì¬
+	// ï¿½fï¿½oï¿½Cï¿½Xï¿½ÆƒXï¿½ï¿½ï¿½bï¿½vï¿½`ï¿½Fï¿½Cï¿½ï¿½ï¿½Ìì¬
 	HRESULT hr = D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
@@ -53,12 +53,12 @@ bool GraphicsDevice::Initialize(HWND hWnd)
 
 
 	if (FAILED(hr)) {
-		MessageBox(hWnd, "Direct3D‚Ì‰Šú‰»‚É¸”s‚µ‚Ü‚µ‚½", "ƒGƒ‰[", MB_OK);
+		MessageBox(hWnd, "Direct3Dï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Éï¿½ï¿½sï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½", "ï¿½Gï¿½ï¿½ï¿½[", MB_OK);
 		return false;
 	}
 
 	if (!CreateBackBuffers()) {
-		MessageBox(hWnd, "ƒoƒbƒNƒoƒbƒtƒ@‚Ìİ’è‚É¸”s‚µ‚Ü‚µ‚½", "ƒGƒ‰[", MB_OK);
+		MessageBox(hWnd, "ï¿½oï¿½bï¿½Nï¿½oï¿½bï¿½tï¿½@ï¿½Ìİ’ï¿½Éï¿½ï¿½sï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½", "ï¿½Gï¿½ï¿½ï¿½[", MB_OK);
 		return false;
 	}
 
@@ -77,6 +77,7 @@ void GraphicsDevice::Finalize()
 	m_blendStateAdd.Reset();
 	m_depthStencilStateDepthDisable.Reset();
 	m_depthStencilStateDepthEnable.Reset();
+	m_rasterizerStateCullNone.Reset();
 }
 
 void GraphicsDevice::Clear()
@@ -144,22 +145,22 @@ bool GraphicsDevice::CreateBackBuffers()
 {
 	HRESULT hr{};
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBufferPointer;
-	// ƒoƒbƒNƒoƒbƒtƒ@‚Ìæ“¾
+	// ï¿½oï¿½bï¿½Nï¿½oï¿½bï¿½tï¿½@ï¿½Ìæ“¾
 	hr = m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBufferPointer));
 
 	if (FAILED(hr)) {
 		return false;
 	}
 
-	// ƒoƒbƒNƒoƒbƒtƒ@‚ÌƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒrƒ…[‚Ìì¬
+	// ï¿½oï¿½bï¿½Nï¿½oï¿½bï¿½tï¿½@ï¿½Ìƒï¿½ï¿½ï¿½ï¿½_ï¿½[ï¿½^ï¿½[ï¿½Qï¿½bï¿½gï¿½rï¿½ï¿½ï¿½[ï¿½Ìì¬
 	hr = m_device->CreateRenderTargetView(backBufferPointer.Get(), nullptr, m_renderTargetView.GetAddressOf());
 	if (FAILED(hr)) {
 		return false;
 	}
-	// ƒoƒbƒNƒoƒbƒtƒ@‚Ìî•ñi•jæ“¾
+	// ï¿½oï¿½bï¿½Nï¿½oï¿½bï¿½tï¿½@ï¿½Ìï¿½ï¿½iï¿½ï¿½ï¿½jï¿½æ“¾
 	backBufferPointer->GetDesc(&m_backBufferDesc);
 
-	// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚Ìì¬
+	// ï¿½fï¿½vï¿½Xï¿½Xï¿½eï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½rï¿½ï¿½ï¿½[ï¿½Ìì¬
 	D3D11_TEXTURE2D_DESC depthStencilDesc{};
 	depthStencilDesc.Width = m_backBufferDesc.Width;
 	depthStencilDesc.Height = m_backBufferDesc.Height;
@@ -173,28 +174,28 @@ bool GraphicsDevice::CreateBackBuffers()
 	depthStencilDesc.CPUAccessFlags = 0;
 	depthStencilDesc.MiscFlags = 0;
 
-	// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚Ìì¬
+	// ï¿½fï¿½vï¿½Xï¿½Xï¿½eï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½oï¿½bï¿½tï¿½@ï¿½Ìì¬
 	hr = m_device->CreateTexture2D(&depthStencilDesc, nullptr, m_depthStencilBuffer.GetAddressOf());
 
 	if (FAILED(hr)) {
 		return false;
 	}
 
-	// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚Ìì¬
+	// ï¿½fï¿½vï¿½Xï¿½Xï¿½eï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½rï¿½ï¿½ï¿½[ï¿½Ìì¬
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc{};
 	depthStencilViewDesc.Format = depthStencilDesc.Format;
 	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 	depthStencilViewDesc.Flags = 0;
 
-	// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒrƒ…[‚Ìì¬
+	// ï¿½fï¿½vï¿½Xï¿½Xï¿½eï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½rï¿½ï¿½ï¿½[ï¿½Ìì¬
 	hr = m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), &depthStencilViewDesc, m_depthStencilView.GetAddressOf());
 
 	if (FAILED(hr)) {
 		return false;
 	}
 
-	// ƒrƒ…[ƒ|[ƒg‚Ìİ’è
+	// ï¿½rï¿½ï¿½ï¿½[ï¿½|ï¿½[ï¿½gï¿½Ìİ’ï¿½
 	m_viewport[0].TopLeftX = 0.0f;
 	m_viewport[0].TopLeftY = 0.0f;
 	m_viewport[0].Width = static_cast<FLOAT>(m_backBufferDesc.Width);
@@ -209,7 +210,7 @@ bool GraphicsDevice::CreateBackBuffers()
 	m_viewport[1].MinDepth = 0.0f;
 	m_viewport[1].MaxDepth = 1.0f;
 
-	// Å‰‚Íƒtƒ‹ƒTƒCƒYƒrƒ…[ƒ|[ƒg‚ğƒZƒbƒg
+	// ï¿½Åï¿½ï¿½Íƒtï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½rï¿½ï¿½ï¿½[ï¿½|ï¿½[ï¿½gï¿½ï¿½ï¿½Zï¿½bï¿½g
 	m_deviceContext->RSSetViewports(1, &m_viewport[0]);
 
 	D3D11_BLEND_DESC bd = {};
@@ -224,39 +225,51 @@ bool GraphicsDevice::CreateBackBuffers()
 	bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-	// ƒuƒŒƒ“ƒhƒXƒe[ƒg‚Ìì¬
+	// ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½hï¿½Xï¿½eï¿½[ï¿½gï¿½Ìì¬
 	m_device->CreateBlendState(&bd, m_blendStateMultiply.GetAddressOf());
 
-	// ‰ÁZ—pƒuƒŒƒ“ƒhƒXƒe[ƒg‚Ìì¬
+	// ï¿½ï¿½ï¿½Zï¿½pï¿½uï¿½ï¿½ï¿½ï¿½ï¿½hï¿½Xï¿½eï¿½[ï¿½gï¿½Ìì¬
 	bd.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
 	m_device->CreateBlendState(&bd, m_blendStateAdd.GetAddressOf());
 
-	// •s“§–¾—pƒuƒŒƒ“ƒhƒXƒe[ƒg‚Ìì¬
+	// ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½pï¿½uï¿½ï¿½ï¿½ï¿½ï¿½hï¿½Xï¿½eï¿½[ï¿½gï¿½Ìì¬
 	D3D11_BLEND_DESC bdOpaque = bd;
 	bdOpaque.RenderTarget[0].BlendEnable = FALSE;
 	m_device->CreateBlendState(&bdOpaque, m_blendStateOpaque.GetAddressOf());
 
-	// ‰Šúó‘Ô‚Í“§‰ß
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô‚Í“ï¿½ï¿½ï¿½
 	SetAlphaBlend(BLEND_TRANSPARENT);
 
-	// ƒfƒvƒXƒXƒeƒ“ƒVƒ‹ƒXƒe[ƒg‚Ìì¬
+	// ï¿½fï¿½vï¿½Xï¿½Xï¿½eï¿½ï¿½ï¿½Vï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½Ìì¬
 	D3D11_DEPTH_STENCIL_DESC dsd = {};
 		dsd.DepthFunc = D3D11_COMPARISON_LESS;
 		dsd.StencilEnable = FALSE;
 		dsd.DepthEnable = FALSE;
 		dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 
-	// [“xƒeƒXƒg–³ŒøƒXƒe[ƒg‚Ìì¬
+	// ï¿½[ï¿½xï¿½eï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½Ìì¬
 	m_device->CreateDepthStencilState(&dsd, m_depthStencilStateDepthDisable.GetAddressOf());
 
-	// [“xƒeƒXƒg—LŒøƒXƒe[ƒg‚Ìì¬
+	// ï¿½[ï¿½xï¿½eï¿½Xï¿½gï¿½Lï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½Ìì¬
 	dsd.DepthEnable = TRUE;
 	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	m_device->CreateDepthStencilState(&dsd, m_depthStencilStateDepthEnable.GetAddressOf());
 
-	// ‰Šúó‘Ô‚Í[“xƒeƒXƒg–³Œø
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô‚Í[ï¿½xï¿½eï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilStateDepthDisable.Get(), NULL);
 	SetDepthTest(false);
+
+	// ï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Cï¿½Uï¿½[ï¿½Xï¿½eï¿½[ï¿½gï¿½Ìì¬(ï¿½Jï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½)
+	D3D11_RASTERIZER_DESC rasterizerDesc{};
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.DepthClipEnable = TRUE;
+	hr = m_device->CreateRasterizerState(&rasterizerDesc, m_rasterizerStateCullNone.GetAddressOf());
+	if (FAILED(hr))
+	{
+		return false;
+	}
+	m_deviceContext->RSSetState(m_rasterizerStateCullNone.Get());
 
 	D3D11_SAMPLER_DESC samplerDesc{};
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
