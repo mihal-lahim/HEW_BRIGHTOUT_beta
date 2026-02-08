@@ -6,6 +6,7 @@
 #include <cstring>
 #include <d3d11shader.h>
 #include <d3dcompiler.h>
+#include <Windows.h>
 
 namespace
 {
@@ -53,7 +54,15 @@ namespace
 		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 		HRESULT hr = D3DCompileFromFile(hlslPath.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main",
 			target, flags, 0, blob.GetAddressOf(), errorBlob.GetAddressOf());
-		return SUCCEEDED(hr);
+		if (FAILED(hr))
+		{
+			if (errorBlob)
+			{
+				OutputDebugStringA(static_cast<const char*>(errorBlob->GetBufferPointer()));
+			}
+			return false;
+		}
+		return true;
 	}
 
 	bool CreateShaderReflection(ID3DBlob* blob, Microsoft::WRL::ComPtr<ID3D11ShaderReflection>& reflection)
