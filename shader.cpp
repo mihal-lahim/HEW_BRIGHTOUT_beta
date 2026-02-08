@@ -37,7 +37,7 @@ namespace
 
 		std::string extension = filePath.substr(dotPos);
 		std::transform(extension.begin(), extension.end(), extension.begin(),
-			[](unsigned char c) { return static_cast<char>(std::tolower(static_cast<unsigned char>(c))); });
+			[](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
 		std::wstring hlslPath;
 		if (extension == ".cso")
@@ -70,7 +70,7 @@ namespace
 			{
 				std::ostringstream message;
 				message << "Shader compile failed: " << filePath << " (hr=0x" << std::hex
-					<< std::uppercase << static_cast<unsigned long>(hr) << ")\n";
+					<< std::uppercase << static_cast<std::uint32_t>(hr) << ")\n";
 				OutputDebugStringA(message.str().c_str());
 			}
 			return false;
