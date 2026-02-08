@@ -2,6 +2,7 @@
 #include "ResourceSystem.h"
 #include "Shader.h"
 #include <algorithm>
+#include <cctype>
 #include <cstring>
 #include <d3d11shader.h>
 #include <d3dcompiler.h>
@@ -13,10 +14,46 @@ namespace
 		return std::wstring(value.begin(), value.end());
 	}
 
-	bool LoadShaderBlob(const std::string& filePath, Microsoft::WRL::ComPtr<ID3DBlob>& blob)
+	bool LoadShaderBlob(const std::string& filePath, const char* target, Microsoft::WRL::ComPtr<ID3DBlob>& blob)
 	{
 		auto widePath = ToWideString(filePath);
-		return SUCCEEDED(D3DReadFileToBlob(widePath.c_str(), blob.GetAddressOf()));
+		if (SUCCEEDED(D3DReadFileToBlob(widePath.c_str(), blob.GetAddressOf())))
+		{
+			return true;
+		}
+
+		auto dotPos = filePath.find_last_of('.');
+		if (dotPos == std::string::npos)
+		{
+			return false;
+		}
+
+		std::string extension = filePath.substr(dotPos);
+		std::transform(extension.begin(), extension.end(), extension.begin(),
+			[](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+		std::wstring hlslPath;
+		if (extension == ".cso")
+		{
+			hlslPath = ToWideString(filePath.substr(0, dotPos) + ".hlsl");
+		}
+		else if (extension == ".hlsl")
+		{
+			hlslPath = widePath;
+		}
+		else
+		{
+			return false;
+		}
+
+		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+#if defined(DEBUG) || defined(_DEBUG)
+		flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
+		HRESULT hr = D3DCompileFromFile(hlslPath.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main",
+			target, flags, 0, blob.GetAddressOf(), errorBlob.GetAddressOf());
+		return SUCCEEDED(hr);
 	}
 
 	bool CreateShaderReflection(ID3DBlob* blob, Microsoft::WRL::ComPtr<ID3D11ShaderReflection>& reflection)
@@ -252,7 +289,7 @@ namespace
 bool VertexShader::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob;
-	if (!LoadShaderBlob(filePath, shaderBlob))
+	if (!LoadShaderBlob(filePath, "vs_5_0", shaderBlob))
 	{
 		return false;
 	}
@@ -287,7 +324,7 @@ void VertexShader::Bind(GraphicsDevice& device)
 bool PixelShader::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob;
-	if (!LoadShaderBlob(filePath, shaderBlob))
+	if (!LoadShaderBlob(filePath, "ps_5_0", shaderBlob))
 	{
 		return false;
 	}
