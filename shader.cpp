@@ -31,7 +31,7 @@ namespace
 
 		std::string extension = filePath.substr(dotPos);
 		std::transform(extension.begin(), extension.end(), extension.begin(),
-			[](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+			[](unsigned char c) { return static_cast<char>(::tolower(c)); });
 
 		std::wstring hlslPath;
 		if (extension == ".cso")
