@@ -1,209 +1,623 @@
+#include "Model.h"
 
-#include "GraphicsDevice.h"
-#include "model.h"
-using namespace DirectX;
-#include "WICTextureLoader11.h"
 #include "DirectXTex.h"
-#include "shader3d.h"
-#include "texture.h"
-#include "Mesh.h"
+#include "Renderer.h"
+#include <DirectXMath.h>
+#include <filesystem>
+#include <functional>
+#include <unordered_set>
+#include <wrl/client.h>
 
-static unsigned int g_WhiteTexId;
+#include "assimp/postprocess.h"
+#include "assimp/Importer.hpp"
+#include "assimp/version.h"
 
-static ID3D11Device* g_pDevice = nullptr;
-static ID3D11DeviceContext* g_pContext = nullptr;
+using namespace DirectX;
 
-struct Vertex3d
+namespace
 {
-	XMFLOAT3 position;
-	XMFLOAT4 color;
-	XMFLOAT3 normal;
-	XMFLOAT2 uv;
-};
-
-
-void ModelInitialize(GraphicsDevice* device)
-{
-	g_pDevice = device->GetDevice();
-	g_pContext = device->GetDeviceContext();
-}
-
-MODEL* ModelLoad(const char* FileName, float scale)
-{
-	MODEL* model = new MODEL;
-
-
-	const std::string modelPath(FileName);
-
-	model->AiScene = aiImportFile(FileName, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_ConvertToLeftHanded);
-	assert(model->AiScene);
-
-	model->VertexBuffer = new ID3D11Buffer * [model->AiScene->mNumMeshes];
-	model->IndexBuffer = new ID3D11Buffer * [model->AiScene->mNumMeshes];
-
-
-	for (unsigned int m = 0; m < model->AiScene->mNumMeshes; m++)
+	DirectX::XMMATRIX ToMatrix(const aiMatrix4x4& matrix)
 	{
-		aiMesh* mesh = model->AiScene->mMeshes[m];
+		return DirectX::XMMATRIX(
+			matrix.a1, matrix.b1, matrix.c1, matrix.d1,
+			matrix.a2, matrix.b2, matrix.c2, matrix.d2,
+			matrix.a3, matrix.b3, matrix.c3, matrix.d3,
+			matrix.a4, matrix.b4, matrix.c4, matrix.d4
+		);
+	}
 
-		// 頂点バッファ生成
+	DirectX::XMMATRIX ConvertMatrix(const aiMatrix4x4& matrix)
+	{
+		const DirectX::XMMATRIX convert = DirectX::XMMatrixScaling(1.0f, 1.0f, -1.0f);
+		return convert * ToMatrix(matrix) * convert;
+	}
+
+	DirectX::XMFLOAT3 ConvertVector(const aiVector3D& value)
+	{
+		return { value.x, value.y, -value.z };
+	}
+
+	DirectX::XMFLOAT4 ConvertQuaternion(const aiQuaternion& value)
+	{
+		const DirectX::XMMATRIX convert = DirectX::XMMatrixScaling(1.0f, 1.0f, -1.0f);
+		const DirectX::XMVECTOR quat = DirectX::XMVectorSet(value.x, value.y, value.z, value.w);
+		const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationQuaternion(quat);
+		const DirectX::XMMATRIX converted = convert * rotation * convert;
+		const DirectX::XMVECTOR convertedQuat = DirectX::XMQuaternionRotationMatrix(converted);
+		DirectX::XMFLOAT4 result = {};
+		DirectX::XMStoreFloat4(&result, convertedQuat);
+		return result;
+	}
+
+	std::string MakeNodeName(const ModelNode& node, size_t)
+	{
+		return node.name;
+	}
+
+	std::vector<GameObject*> CreateNodeObjects(GameObject& root, const std::vector<ModelNode>& nodes)
+	{
+		std::vector<GameObject*> objects(nodes.size(), nullptr);
+
+		for (size_t i = 0; i < nodes.size(); ++i)
 		{
-			Vertex3d* vertex = new Vertex3d[mesh->mNumVertices]{};
-
-			for (unsigned int v = 0; v < mesh->mNumVertices; v++)
-			{
-
-				vertex[v].position = XMFLOAT3(mesh->mVertices[v].x * scale, mesh->mVertices[v].y * scale, mesh->mVertices[v].z * scale);
-				vertex[v].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-				vertex[v].normal = XMFLOAT3(mesh->mNormals[v].x, -mesh->mNormals[v].z, mesh->mNormals[v].y);
-				vertex[v].uv = XMFLOAT2(mesh->mTextureCoords[0][v].x, mesh->mTextureCoords[0][v].y);
-			}
-
-			D3D11_BUFFER_DESC bd{};
-			bd.Usage = D3D11_USAGE_DEFAULT;
-			bd.ByteWidth = sizeof(Vertex3d) * mesh->mNumVertices;
-			bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			bd.CPUAccessFlags = 0;
-
-			D3D11_SUBRESOURCE_DATA sd{};
-			sd.pSysMem = vertex;
-
-			g_pDevice->CreateBuffer(&bd, &sd, &model->VertexBuffer[m]);
-
-
-
-			delete[] vertex;
+			const auto& node = nodes[i];
+			GameObject* child = root.CreateGameObject();
+			child->SetName(MakeNodeName(node, i));
+			child->transform().SetLocalMatrix(node.localMatrix);
+			objects[i] = child;
 		}
 
-
-		// インデックスバッファ生成
+		for (size_t i = 0; i < nodes.size(); ++i)
 		{
-			unsigned int* index = new unsigned int[mesh->mNumFaces * 3];
-
-			for (unsigned int f = 0; f < mesh->mNumFaces; f++)
+			const auto& node = nodes[i];
+			if (node.parent >= 0 && node.parent < static_cast<int>(nodes.size()))
 			{
-				const aiFace* face = &mesh->mFaces[f];
-
-				assert(face->mNumIndices == 3);
-
-				index[f * 3 + 0] = face->mIndices[0];
-				index[f * 3 + 1] = face->mIndices[1];
-				index[f * 3 + 2] = face->mIndices[2];
+				objects[i]->SetParent(*objects[node.parent]);
 			}
-
-			D3D11_BUFFER_DESC bd{};
-			bd.Usage = D3D11_USAGE_DEFAULT;
-			bd.ByteWidth = sizeof(unsigned int) * mesh->mNumFaces * 3;
-			bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-			bd.CPUAccessFlags = 0;
-
-			D3D11_SUBRESOURCE_DATA sd{};
-			sd.pSysMem = index;
-
-			g_pDevice->CreateBuffer(&bd, &sd, &model->IndexBuffer[m]);
-
-
-
-			delete[] index;
+			else
+			{
+				objects[i]->SetParent(root);
+			}
 		}
+
+		return objects;
 	}
-
-
-
-	//テクスチャ読み込み
-	for (unsigned int i = 0; i < model->AiScene->mNumTextures; i++)
-	{
-		aiTexture* aitexture = model->AiScene->mTextures[i];
-
-
-		ID3D11ShaderResourceView* texture;
-		TexMetadata metadata;
-		ScratchImage image;
-		LoadFromWICMemory((const void*)aitexture->pcData, aitexture->mWidth, WIC_FLAGS_NONE, &metadata, image);
-		CreateShaderResourceView(g_pDevice, image.GetImages(), image.GetImageCount(), metadata, &texture);
-		assert(texture);
-
-		model->Texture[aitexture->mFilename.data] = texture;
-	}
-
-
-	//g_WhiteTexId = Texture_Load(L"white.png"); // サーフェスカラー用
-
-	return model;
 }
 
+#include "DebugOstream.h"
 
-
-
-void ModelRelease(MODEL* model)
+bool Model::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 {
-	for (unsigned int m = 0; m < model->AiScene->mNumMeshes; m++)
+
+
+	Assimp::Importer importer;
+
+	m_meshes.clear();
+	m_skinnedMeshes.clear();
+	m_textures.clear();
+	m_nodes.clear();
+	m_skeleton = {};
+	m_animationClips.clear();
+
+	m_baseDirectory = std::filesystem::path(filePath).parent_path();
+
+	const aiScene* scene = importer.ReadFile(
+		filePath,
+		aiProcess_GenNormals |
+		aiProcess_CalcTangentSpace |
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_ImproveCacheLocality |
+		aiProcess_LimitBoneWeights |
+		aiProcess_Triangulate
+	);
+
+	hal::dout << importer.GetErrorString() << std::endl;
+
+	if (!scene || !scene->mRootNode)
 	{
-		model->VertexBuffer[m]->Release();
-		model->IndexBuffer[m]->Release();
+		return false;
 	}
 
-	delete[] model->VertexBuffer;
-	delete[] model->IndexBuffer;
+	LoadSkeleton(scene);
+	ProcessNode(device, scene->mRootNode, scene, -1);
+	LoadTextures(device, scene);
+	LoadAnimationClips(scene);
 
-
-	for (std::pair<const std::string, ID3D11ShaderResourceView*> pair : model->Texture)
-	{
-		pair.second->Release();
-	}
-
-
-	aiReleaseImport(model->AiScene);
-
-
-	delete model;
+	return true;
 }
 
-void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld)
+int Model::ProcessNode(GraphicsDevice& device, aiNode* node, const aiScene* scene, int parentIndex)
 {
+	ModelNode modelNode = {};
+	modelNode.name = node->mName.C_Str();
+	modelNode.parent = parentIndex;
+	modelNode.localMatrix = ConvertMatrix(node->mTransformation);
 
-	// シェーダーを描画パイプラインに設定
-	Shader3d_Begin();
-
-	for (unsigned int ModelNum = 0; ModelNum < model->AiScene->mNumMeshes; ModelNum++)
+	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
 	{
-		// 頂点バッファを描画パイプラインに設定
-		UINT stride = sizeof(Vertex3d);
-		UINT offset = 0;
-		g_pContext->IASetVertexBuffers(0, 1, &model->VertexBuffer[ModelNum], &stride, &offset);
-
-
-		// 頂点インデックスを描画パイプラインに設定
-		g_pContext->IASetIndexBuffer(model->IndexBuffer[ModelNum], DXGI_FORMAT_R32_UINT, 0);
-
-
-
-		Shader3d_SetWorldMatrix(mtxWorld);
-
-
-		// プリミティブトポロジ設定
-		g_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// テクスチャの設定
-		aiString texture;
-		aiMaterial* aimaterial = model->AiScene->mMaterials[model->AiScene->mMeshes[ModelNum]->mMaterialIndex];
-		aimaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texture);
-
-		if (texture.length != 0)
+		aiMesh* aimesh = scene->mMeshes[node->mMeshes[i]];
+		if (aimesh->HasBones())
 		{
-			//テクスチャの設定
-			g_pContext->PSSetShaderResources(0, 1, &model->Texture.at(texture.data));
-			Shader3d_SetMaterialDiffuse({ 1.0f, 1.0f, 1.0f, 1.0f });
+			const int skinnedMeshIndex = LoadSkinnedMesh(device, aimesh, scene);
+			if (modelNode.skinnedMeshIndex < 0 && skinnedMeshIndex >= 0)
+			{
+				modelNode.skinnedMeshIndex = skinnedMeshIndex;
+			}
 		}
 		else
 		{
-			//Texture_SetTexture(g_WhiteTexId);
-			aiColor3D diffuse;
-			aimaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-			Shader3d_SetMaterialDiffuse({ diffuse.r, diffuse.g, diffuse.b, 1.0f });
+			const int meshIndex = LoadMesh(device, aimesh, scene);
+			if (modelNode.meshIndex < 0 && meshIndex >= 0)
+			{
+				modelNode.meshIndex = meshIndex;
+			}
+		}
+	}
+
+	const int nodeIndex = static_cast<int>(m_nodes.size());
+	m_nodes.push_back(std::move(modelNode));
+
+	for (unsigned int i = 0; i < node->mNumChildren; ++i)
+	{
+		const int childIndex = ProcessNode(device, node->mChildren[i], scene, nodeIndex);
+		m_nodes[nodeIndex].children.push_back(childIndex);
+	}
+
+	return nodeIndex;
+}
+
+int Model::LoadMesh(GraphicsDevice& device, aiMesh* aimesh, const aiScene*)
+{
+
+	std::vector<Mesh::VertexAttribute> vertexes = {};
+	vertexes.resize(aimesh->mNumVertices);
+
+	for (unsigned int i = 0; i < aimesh->mNumVertices; ++i)
+	{
+		auto& vertex = vertexes[i];
+		const aiVector3D& position = aimesh->mVertices[i];
+		vertex.position = ConvertVector(position);
+		vertex.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+		if (aimesh->HasNormals())
+		{
+			const aiVector3D& normal = aimesh->mNormals[i];
+			vertex.normal = ConvertVector(normal);
+		}
+		if (aimesh->HasTextureCoords(0))
+		{
+			const aiVector3D& uv = aimesh->mTextureCoords[0][i];
+			vertex.uv = { uv.x, uv.y };
+		}
+	}
+
+	std::vector<UINT> indexes = {};
+	indexes.reserve(aimesh->mNumFaces * 3);
+
+	for (unsigned int i = 0; i < aimesh->mNumFaces; ++i)
+	{
+		const aiFace& face = aimesh->mFaces[i];
+		for (unsigned int j = 0; j < face.mNumIndices; ++j)
+		{
+			indexes.push_back(static_cast<UINT>(face.mIndices[j]));
+		}
+	}
+
+	Mesh mesh = {};
+	if (mesh.CreateBuffer(device, vertexes, indexes))
+	{
+		const int meshIndex = static_cast<int>(m_meshes.size());
+		m_meshes.push_back(std::move(mesh));
+		return meshIndex;
+	}
+
+	return -1;
+}
+
+int Model::LoadSkinnedMesh(GraphicsDevice& device, aiMesh* aimesh, const aiScene* aiscene)
+{
+	(void)aiscene;
+
+	std::vector<SkinnedMesh::VertexAttribute> vertexes = {};
+	vertexes.resize(aimesh->mNumVertices);
+
+	for (unsigned int i = 0; i < aimesh->mNumVertices; ++i)
+	{
+		auto& vertex = vertexes[i];
+		const aiVector3D& position = aimesh->mVertices[i];
+		vertex.position = ConvertVector(position);
+		vertex.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+		if (aimesh->HasNormals())
+		{
+			const aiVector3D& normal = aimesh->mNormals[i];
+			vertex.normal = ConvertVector(normal);
+		}
+		if (aimesh->HasTextureCoords(0))
+		{
+			const aiVector3D& uv = aimesh->mTextureCoords[0][i];
+			vertex.uv = { uv.x, uv.y };
+		}
+	}
+
+	for (unsigned int i = 0; i < aimesh->mNumBones; ++i)
+	{
+		const aiBone* bone = aimesh->mBones[i];
+		const std::string boneName = bone->mName.C_Str();
+		int boneIndex = m_skeleton.FindBoneIndex(boneName);
+		if (boneIndex < 0)
+		{
+			Bone newBone = {};
+			newBone.name = boneName;
+			newBone.parentIndex = -1;
+			newBone.offsetMatrix = ConvertMatrix(bone->mOffsetMatrix);
+			newBone.bindPose = DirectX::XMMatrixIdentity();
+			m_skeleton.boneMap[newBone.name] = static_cast<int>(m_skeleton.bones.size());
+			m_skeleton.bones.push_back(std::move(newBone));
+			boneIndex = static_cast<int>(m_skeleton.bones.size()) - 1;
 		}
 
-		// ポリゴン描画命令発行
-		g_pContext->DrawIndexed(model->AiScene->mMeshes[ModelNum]->mNumFaces * 3, 0, 0);
+		for (unsigned int j = 0; j < bone->mNumWeights; ++j)
+		{
+			const aiVertexWeight& weight = bone->mWeights[j];
+			auto& vertex = vertexes[weight.mVertexId];
+			for (int k = 0; k < 4; ++k)
+			{
+				if (vertex.weight[k] == 0.0f)
+				{
+					vertex.bone[k] = static_cast<UINT>(boneIndex);
+					vertex.weight[k] = weight.mWeight;
+					break;
+				}
+			}
+		}
 	}
+
+	std::vector<UINT> indexes = {};
+	indexes.reserve(aimesh->mNumFaces * 3);
+
+	for (unsigned int i = 0; i < aimesh->mNumFaces; ++i)
+	{
+		const aiFace& face = aimesh->mFaces[i];
+		for (unsigned int j = 0; j < face.mNumIndices; ++j)
+		{
+			indexes.push_back(static_cast<UINT>(face.mIndices[j]));
+		}
+	}
+
+	SkinnedMesh mesh = {};
+	if (mesh.CreateBuffer(device, vertexes, indexes))
+	{
+		const int meshIndex = static_cast<int>(m_skinnedMeshes.size());
+		m_skinnedMeshes.push_back(std::move(mesh));
+		return meshIndex;
+	}
+
+	return -1;
+}
+
+void Model::LoadTextures(GraphicsDevice& device, const aiScene* scene)
+{
+	std::unordered_set<std::string> loadedTextures = {};
+
+	for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
+	{
+		aiMaterial* material = scene->mMaterials[i];
+		aiString path = {};
+
+		const aiTextureType textureTypes[] = { aiTextureType_BASE_COLOR, aiTextureType_DIFFUSE };
+		for (auto textureType : textureTypes)
+		{
+			const unsigned int textureCount = material->GetTextureCount(textureType);
+			for (unsigned int j = 0; j < textureCount; ++j)
+			{
+				if (material->GetTexture(textureType, j, &path) != AI_SUCCESS)
+				{
+					continue;
+				}
+
+				const std::string texturePath = path.C_Str();
+				if (!loadedTextures.insert(texturePath).second)
+				{
+					continue;
+				}
+
+				if (!texturePath.empty() && texturePath[0] == '*')
+				{
+					const aiTexture* embedded = scene->GetEmbeddedTexture(texturePath.c_str());
+					if (!embedded || embedded->mHeight != 0)
+					{
+						continue;
+					}
+
+					DirectX::ScratchImage image = {};
+					DirectX::TexMetadata metadata = {};
+					if (FAILED(DirectX::LoadFromWICMemory(
+						reinterpret_cast<const uint8_t*>(embedded->pcData),
+						static_cast<size_t>(embedded->mWidth),
+						DirectX::WIC_FLAGS_NONE,
+						&metadata,
+						image)))
+					{
+						continue;
+					}
+
+					Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv = nullptr;
+					if (FAILED(DirectX::CreateShaderResourceView(
+						device.GetDevice(),
+						image.GetImages(),
+						image.GetImageCount(),
+						metadata,
+						&srv)))
+					{
+						continue;
+					}
+
+					Texture texture = {};
+					texture.CreateFromLoaded(device, srv.Detach(), static_cast<UINT>(metadata.width), static_cast<UINT>(metadata.height));
+					m_textures.push_back(std::move(texture));
+				}
+				else
+				{
+					std::filesystem::path resolvedPath = std::filesystem::path(texturePath);
+					if (resolvedPath.is_relative())
+					{
+						resolvedPath = m_baseDirectory / resolvedPath;
+					}
+
+					Texture texture = {};
+					if (texture.CreateBuffer(device, resolvedPath.wstring()))
+					{
+						m_textures.push_back(std::move(texture));
+					}
+				}
+			}
+		}
+	}
+}
+
+void Model::LoadSkeleton(const aiScene* scene)
+{
+	std::unordered_set<std::string> boneNames = {};
+
+	for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
+	{
+		aiMesh* aimesh = scene->mMeshes[i];
+		for (unsigned int j = 0; j < aimesh->mNumBones; ++j)
+		{
+			boneNames.insert(aimesh->mBones[j]->mName.C_Str());
+		}
+	}
+
+	for (unsigned int i = 0; i < scene->mNumAnimations; ++i)
+	{
+		aiAnimation* animation = scene->mAnimations[i];
+		for (unsigned int j = 0; j < animation->mNumChannels; ++j)
+		{
+			boneNames.insert(animation->mChannels[j]->mNodeName.C_Str());
+		}
+	}
+
+	std::function<void(aiNode*, int)> buildSkeleton = [&](aiNode* node, int parentIndex)
+	{
+		const std::string nodeName = node->mName.C_Str();
+		int currentIndex = parentIndex;
+		if (boneNames.find(nodeName) != boneNames.end())
+		{
+			Bone bone = {};
+			bone.name = nodeName;
+			bone.parentIndex = parentIndex;
+			bone.offsetMatrix = DirectX::XMMatrixIdentity();
+			bone.bindPose = ConvertMatrix(node->mTransformation);
+			m_skeleton.boneMap[bone.name] = static_cast<int>(m_skeleton.bones.size());
+			m_skeleton.bones.push_back(std::move(bone));
+			currentIndex = static_cast<int>(m_skeleton.bones.size()) - 1;
+		}
+
+		for (unsigned int i = 0; i < node->mNumChildren; ++i)
+		{
+			buildSkeleton(node->mChildren[i], currentIndex);
+		}
+	};
+
+	buildSkeleton(scene->mRootNode, -1);
+
+	for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
+	{
+		aiMesh* aimesh = scene->mMeshes[i];
+		for (unsigned int j = 0; j < aimesh->mNumBones; ++j)
+		{
+			aiBone* bone = aimesh->mBones[j];
+			int index = m_skeleton.FindBoneIndex(bone->mName.C_Str());
+			if (index >= 0)
+			{
+				m_skeleton.bones[index].offsetMatrix = ConvertMatrix(bone->mOffsetMatrix);
+			}
+		}
+	}
+}
+
+void Model::LoadAnimationClips(const aiScene* scene)
+{
+	for (unsigned int i = 0; i < scene->mNumAnimations; ++i)
+	{
+		aiAnimation* animation = scene->mAnimations[i];
+		AnimationClip clip = {};
+		clip.name = animation->mName.C_Str();
+		clip.duration = static_cast<float>(animation->mDuration);
+		clip.ticksPerSecond = animation->mTicksPerSecond == 0.0 ? 25.0f : static_cast<float>(animation->mTicksPerSecond);
+		clip.boneTracks.resize(m_skeleton.bones.size());
+
+		for (unsigned int j = 0; j < animation->mNumChannels; ++j)
+		{
+			aiNodeAnim* channel = animation->mChannels[j];
+			const int boneIndex = m_skeleton.FindBoneIndex(channel->mNodeName.C_Str());
+			if (boneIndex < 0)
+			{
+				continue;
+			}
+
+			BoneKeyframes& keyframes = clip.boneTracks[boneIndex];
+
+			for (unsigned int k = 0; k < channel->mNumPositionKeys; ++k)
+			{
+				const aiVectorKey& key = channel->mPositionKeys[k];
+				keyframes.positionKeyframes.push_back({
+					static_cast<float>(key.mTime),
+					ConvertVector(key.mValue)
+				});
+			}
+
+			for (unsigned int k = 0; k < channel->mNumRotationKeys; ++k)
+			{
+				const aiQuatKey& key = channel->mRotationKeys[k];
+				keyframes.rotationKeyframes.push_back({
+					static_cast<float>(key.mTime),
+					ConvertQuaternion(key.mValue)
+				});
+			}
+
+			for (unsigned int k = 0; k < channel->mNumScalingKeys; ++k)
+			{
+				const aiVectorKey& key = channel->mScalingKeys[k];
+				keyframes.scaleKeyframes.push_back({
+					static_cast<float>(key.mTime),
+					ConvertVector(key.mValue)
+				});
+			}
+		}
+
+		m_animationClips.push_back(std::move(clip));
+	}
+}
+
+void ModelPrefab::Instantiate(GameObject& gameObject)
+{
+	Model* model = gameObject.resource().Load<Model>(m_filePath);
+	if (!model)
+	{
+		return;
+	}
+
+	const auto& nodes = model->GetModelNodes();
+	const auto& meshes = model->GetMeshes();
+	std::vector<GameObject*> nodeObjects = CreateNodeObjects(gameObject, nodes);
+
+	for (size_t i = 0; i < nodes.size(); ++i)
+	{
+		const auto& node = nodes[i];
+		if (node.meshIndex >= 0 && node.meshIndex < static_cast<int>(meshes.size()))
+		{
+			auto* renderer = nodeObjects[i]->AddComponent<MeshRenderer>();
+			renderer->mesh = &meshes[node.meshIndex];
+		}
+	}
+}
+
+void SkinnedModelPrefab::Instantiate(GameObject& gameObject)
+{
+	Model* model = gameObject.resource().Load<Model>(m_filePath);
+	if (!model)
+	{
+		return;
+	}
+
+	const auto& nodes = model->GetModelNodes();
+	const auto& meshes = model->GetMeshes();
+	const auto& skinnedMeshes = model->GetSkinnedMeshes();
+	std::vector<GameObject*> nodeObjects = CreateNodeObjects(gameObject, nodes);
+
+	const auto& skeleton = model->GetSkeleton();
+	std::vector<GameObject*> boneObjects(skeleton.bones.size(), nullptr);
+	std::vector<Transform*> boneTransforms = {};
+	boneTransforms.reserve(skeleton.bones.size());
+
+	for (size_t i = 0; i < skeleton.bones.size(); ++i)
+	{
+		const Bone& bone = skeleton.bones[i];
+		GameObject* boneObject = gameObject.CreateGameObject();
+		boneObject->SetName(bone.name);
+		boneObject->transform().SetLocalMatrix(bone.bindPose);
+		boneObjects[i] = boneObject;
+		boneTransforms.push_back(&boneObject->transform());
+	}
+
+	for (size_t i = 0; i < skeleton.bones.size(); ++i)
+	{
+		const Bone& bone = skeleton.bones[i];
+		if (bone.parentIndex >= 0 && bone.parentIndex < static_cast<int>(skeleton.bones.size()))
+		{
+			boneObjects[i]->SetParent(*boneObjects[bone.parentIndex]);
+		}
+		else
+		{
+			boneObjects[i]->SetParent(gameObject);
+		}
+	}
+
+	auto* animationController = gameObject.AddComponent<AnimationController>();
+	animationController->Setup(model, boneTransforms);
+
+	for (size_t i = 0; i < nodes.size(); ++i)
+	{
+		const auto& node = nodes[i];
+		if (node.meshIndex >= 0 && node.meshIndex < static_cast<int>(meshes.size()))
+		{
+			auto* renderer = nodeObjects[i]->AddComponent<MeshRenderer>();
+			renderer->mesh = &meshes[node.meshIndex];
+		}
+		if (node.skinnedMeshIndex >= 0 && node.skinnedMeshIndex < static_cast<int>(skinnedMeshes.size()))
+		{
+			auto* renderer = nodeObjects[i]->AddComponent<SkinnedMeshRenderer>();
+			renderer->mesh = &skinnedMeshes[node.skinnedMeshIndex];
+			renderer->animationController = animationController;
+			renderer->skeleton = &skeleton;
+		}
+	}
+}
+
+void CubePrefab::Instantiate(GameObject& gameObject)
+{
+	static Mesh cubeMesh = {};
+	static bool meshInitialized = false;
+
+	if (!meshInitialized)
+	{
+		auto& device = gameObject.rendering().GetGraphicsDevice();
+		std::vector<Mesh::VertexAttribute> vertexes = {
+			{ { -0.5f, -0.5f, -0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 1.0f } },
+			{ {  0.5f, -0.5f, -0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 1.0f } },
+			{ {  0.5f,  0.5f, -0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f } },
+			{ { -0.5f,  0.5f, -0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 0.0f } },
+			{ { -0.5f, -0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
+			{ {  0.5f, -0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
+			{ {  0.5f,  0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
+			{ { -0.5f,  0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } }
+		};
+
+		std::vector<UINT> indexes = {
+			0, 1, 2, 0, 2, 3,
+			4, 6, 5, 4, 7, 6,
+			4, 5, 1, 4, 1, 0,
+			3, 2, 6, 3, 6, 7,
+			1, 5, 6, 1, 6, 2,
+			4, 0, 3, 4, 3, 7
+		};
+
+		if (cubeMesh.CreateBuffer(device, vertexes, indexes))
+		{
+			meshInitialized = true;
+		}
+	}
+
+	auto* renderer = gameObject.AddComponent<MeshRenderer>();
+	renderer->mesh = &cubeMesh;
+}
+
+void SpherePrefab::Instantiate(GameObject& gameObject)
+{
+	Model* model = gameObject.resource().Load<Model>("model/Sphere.glb");
+
+	auto* renderer = gameObject.AddComponent<MeshRenderer>();
+	renderer->mesh = &model->GetMeshes()[0];
 }

@@ -1,23 +1,13 @@
 
 #include "Player.h"
-#include "MeshRenderer.h"
+#include "Renderer.h"
 #include "InputSystem.h"
-#include "model.h"
 #include "Camera.h"
 #include "PhysicsBody.h"
 #include "ColliderShape.h"
 
 using namespace DirectX;
 
-Player::Player()
-{
-	//m_HumanModel = ModelLoad("model/kirby.fbx");
-}
-
-Player::~Player()
-{
-	//ModelRelease(m_HumanModel);
-}
 
 void Player::Start()
 {

@@ -21,9 +21,6 @@
     <Filter Include="SorceFile\Rendering">
       <UniqueIdentifier>{18a09341-120d-405b-ab8f-d5032e1224c3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SorceFile\Direct3D">
-      <UniqueIdentifier>{67962c20-1d20-4e76-9e29-2f2776999a9d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="SorceFile\Audio">
       <UniqueIdentifier>{2dc27b41-2303-4fa3-befa-67f0b4314b69}</UniqueIdentifier>
     </Filter>
@@ -63,9 +60,6 @@
     </Filter>
     <Filter Include="HeaderFile\Debug">
       <UniqueIdentifier>{a9400362-d1ea-4d83-a596-b27313543114}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Direct3D">
-      <UniqueIdentifier>{5ff0dfc9-5ecf-474f-882f-f0a384d51955}</UniqueIdentifier>
     </Filter>
     <Filter Include="HeaderFile\Scene">
       <UniqueIdentifier>{a5f15219-e23b-464f-8cb7-62e2a42f35d3}</UniqueIdentifier>
@@ -196,17 +190,11 @@
     <ClCompile Include="keyboard.cpp">
       <Filter>SorceFile\Input</Filter>
     </ClCompile>
-    <ClCompile Include="model.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="mouse.cpp">
       <Filter>SorceFile\Input</Filter>
     </ClCompile>
     <ClCompile Include="Audio.cpp">
       <Filter>SorceFile\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="shader3d.cpp">
-      <Filter>SorceFile\Direct3D</Filter>
     </ClCompile>
     <ClCompile Include="PlayerStateHuman.cpp">
       <Filter>SorceFile\Player\State</Filter>
@@ -228,9 +216,6 @@
     </ClCompile>
     <ClCompile Include="DebugCamera.cpp">
       <Filter>SorceFile\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshRenderer.cpp">
-      <Filter>SorceFile\ScriptComponent</Filter>
     </ClCompile>
     <ClCompile Include="Component.cpp">
       <Filter>SorceFile\ScriptComponent</Filter>
@@ -261,9 +246,6 @@
     </ClCompile>
     <ClCompile Include="DebugText.cpp">
       <Filter>SorceFile\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="KeyLogger.cpp">
-      <Filter>SorceFile\Input</Filter>
     </ClCompile>
     <ClCompile Include="GamePad.cpp">
       <Filter>SorceFile\Input</Filter>
@@ -310,9 +292,6 @@
     <ClCompile Include="Billboard.cpp">
       <Filter>SorceFile</Filter>
     </ClCompile>
-    <ClCompile Include="SpriteRenderer.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="GraphicsDevice.cpp">
       <Filter>SorceFile\Rendering</Filter>
     </ClCompile>
@@ -324,6 +303,21 @@
     </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>SorceFile\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>SorceFile\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>SorceFile\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>SorceFile\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>SorceFile\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="StructuredBuffer.cpp">
+      <Filter>SorceFile\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -378,14 +372,8 @@
     <ClInclude Include="mouse.h">
       <Filter>HeaderFile\Input</Filter>
     </ClInclude>
-    <ClInclude Include="model.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="Audio.h">
       <Filter>HeaderFile\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="shader3d.h">
-      <Filter>HeaderFile\Direct3D</Filter>
     </ClInclude>
     <ClInclude Include="command.h">
       <Filter>HeaderFile\Input</Filter>
@@ -404,9 +392,6 @@
     </ClInclude>
     <ClInclude Include="PhysicsSystem.h">
       <Filter>HeaderFile\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>HeaderFile\ScriptComponent</Filter>
     </ClInclude>
     <ClInclude Include="DebugCamera.h">
       <Filter>HeaderFile\Debug</Filter>
@@ -455,9 +440,6 @@
     </ClInclude>
     <ClInclude Include="GameContext.h">
       <Filter>HeaderFile\LifeCycle</Filter>
-    </ClInclude>
-    <ClInclude Include="KeyLogger.h">
-      <Filter>HeaderFile\Input</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>HeaderFile\Rendering</Filter>
@@ -528,12 +510,6 @@
     <ClInclude Include="DebugCameraPrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionPrefab.h">
-      <Filter>HeaderFile\Prefab</Filter>
-    </ClInclude>
-    <ClInclude Include="PrimitivePrefab.h">
-      <Filter>HeaderFile\Prefab</Filter>
-    </ClInclude>
     <ClInclude Include="PlayerPrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
     </ClInclude>
@@ -549,14 +525,11 @@
     <ClInclude Include="Texture.h">
       <Filter>HeaderFile\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="MeshRenderer.h">
+    <ClInclude Include="Renderer.h">
       <Filter>HeaderFile\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Billboard.h">
       <Filter>HeaderFile\ScriptComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteRenderer.h">
-      <Filter>HeaderFile\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="BillboardPrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
@@ -576,6 +549,18 @@
     <ClInclude Include="Mesh.h">
       <Filter>HeaderFile\Resource</Filter>
     </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>HeaderFile\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>HeaderFile\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>HeaderFile\GameObject\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="StructuredBuffer.h">
+      <Filter>HeaderFile\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="SpriteVS.hlsl">
@@ -588,6 +573,9 @@
       <Filter>ShaderFile</Filter>
     </FxCompile>
     <FxCompile Include="MeshPS.hlsl">
+      <Filter>ShaderFile</Filter>
+    </FxCompile>
+    <FxCompile Include="SkinnedMeshVS.hlsl">
       <Filter>ShaderFile</Filter>
     </FxCompile>
   </ItemGroup>

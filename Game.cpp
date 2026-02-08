@@ -1,18 +1,18 @@
 #include "Game.h"
-#include "CollisionPrefab.h"
 #include "PlayerPrefab.h"
 #include "GameObject.h"
+#include "DebugCamera.h"
 #include "Texture.h"
 
 using namespace DirectX;
 
 void Game::Initialize()
 {
-	PlayerPrefab playerPrefab{};
-	GameObject* player = Instantiate(playerPrefab);
-	player->transform().position() = Vector3(0.0f, 1.0f, 0.0f);
+	CubePrefab cubePrefab{};
+	GameObject* cube = Instantiate(cubePrefab);
+	cube->transform().scale() = Vector3(0.5f, 0.5f, 0.5f);
 
-	StaticCubePrefab cubePrefab{};
-	GameObject* ground = Instantiate(cubePrefab);
-	ground->transform().scale() = Vector3(100.0f, 10.0f, 100.0f);
+	GameObject* camera = CreateGameObject();
+	camera->AddComponent<Camera>();
+	camera->transform().position() = Vector3(0.0f, 0.0f, -5.0f);
 }

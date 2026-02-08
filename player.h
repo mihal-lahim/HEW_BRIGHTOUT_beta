@@ -17,7 +17,7 @@
 #include "PlayerMorphsystem.h"
 #include "PlayerCommand.h"
 #include "PlayerCommandSet.h"
-#include "MeshRenderer.h"
+#include "Renderer.h"
 
 
 #include "PlayerState_Electric.h"
@@ -32,7 +32,6 @@ class PlayerMovement;
 class PlayerMorphSystem;
 class TPSCamera;
 class MeshRenderer;
-struct MODEL;
 
 // プレイヤーステート格納構造体
 struct PlayerStates
@@ -69,22 +68,8 @@ public:
 	// 剛体
 	PhysicsBody* physicsBody = nullptr;
 
-	// メッシュレンダラー
-	MeshRenderer* meshRenderer = nullptr;
-
-
-
-	// 人間モデル
-	MODEL* humanModel = nullptr;
-
-	// 電気モデル
-	MODEL* electricModel = nullptr;
-
-
-
-	// コンストラクタ
-	Player();
-	~Player();
+	// モデルオブジェクト
+	GameObject* modelObject = nullptr;
 
 
 	void Start() override;

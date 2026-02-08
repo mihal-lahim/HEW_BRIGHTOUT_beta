@@ -19,8 +19,8 @@ inline T* ResourceSystem::Load(Args&&... args)
 		size_t resourceKey = std::hash<std::wstring>{}(filePath);
 		return LoadInternal<T>(resourceKey, filePath);
 	}
-	// シェーダーの場合の特別処理
-	else if constexpr (std::is_base_of_v <Shader, T>)
+	// シェーダーとモデル場合の特別処理
+	else if constexpr (std::is_base_of_v <Shader, T> || std::is_base_of_v <Model, T>)
 	{
 		auto filePath = static_cast<std::string>(std::get<0>(std::forward_as_tuple(args...)));
 		size_t resourceKey = std::hash<std::string>{}(filePath);
@@ -40,11 +40,11 @@ inline T* ResourceSystem::Load(Args&&... args)
 		size_t resourceKey = typeid(T).hash_code();
 
 		// マテリアルの場合の特別処理
-		if constexpr (std::is_base_of_v<Material, T> && requires { typename T::CBType; })
+		if constexpr (std::is_base_of_v<Material, T>)
 		{
 			resourceKey ^= typeid(T).hash_code();
 			resourceKey = MakeUniqueResourceKey(resourceKey);
-			return LoadInternal<T>(resourceKey);
+			return LoadInternal<T>(resourceKey, std::forward<Args>(args)...);
 		}
 	}
 }
@@ -73,10 +73,7 @@ inline T* ResourceSystem::LoadInternal(const Key& resourceKey, Args&&... args)
 	{
 		result = resource->CreateBuffer(device, std::forward<Args>(args)...);
 	}
-	else if constexpr (requires { resource->template CreateBuffer<typename T::VertexAttribute>(device, std::forward<Args>(args)...); })
-	{
-		result = resource->template CreateBuffer<typename T::VertexAttribute>(device, std::forward<Args>(args)...);
-	}
+
 	if (!result)
 	{
 		MessageBox(NULL, "リソースの初期化に失敗しました。", "Error", MB_OK | MB_ICONERROR);

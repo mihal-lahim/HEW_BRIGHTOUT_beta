@@ -21,7 +21,7 @@ void ConstantBuffer::UpdateBuffer(GraphicsDevice& device, const void* data, UINT
 	D3D11_MAPPED_SUBRESOURCE mapped{};
 	device.GetDeviceContext()->Map(m_constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
 
-	_memccpy(mapped.pData, data, 0, size);
+	std::memcpy(mapped.pData, data, size);
 
 	device.GetDeviceContext()->Unmap(m_constantBuffer.Get(), 0);
 

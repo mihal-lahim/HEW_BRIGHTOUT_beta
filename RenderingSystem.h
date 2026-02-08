@@ -3,9 +3,17 @@
 #define RENDERING_SYSTEM_H
 
 #include "GraphicsDevice.h"
+#include "ConstantBuffer.h"
+#include <DirectXMath.h>
 
 class EngineCore;
 class Scene;
+class Texture;
+class MeshRenderer;
+class SkinnedMeshRenderer;
+class Transform;
+enum class RenderQueue;
+class Texture;
 
 class RenderingSystem
 {
@@ -24,6 +32,7 @@ public:
 	void SetGraphicsDevice(GraphicsDevice* graphicsDevice) 
 	{ 
 		m_graphicsDevice = graphicsDevice; 
+		Initialize();
 	}
 
 	// グラフィックスデバイス取得メソッド
@@ -39,6 +48,37 @@ public:
 	void Render(const Scene& scene);
 
 private:
+	struct PerFrameConstants
+	{
+		DirectX::XMFLOAT4 ambient_light_color = {};
+		DirectX::XMFLOAT4 directional_light_color = {};
+		DirectX::XMFLOAT4 directional_light_vector = {};
+	};
+
+	struct PerCameraConstants
+	{
+		DirectX::XMFLOAT4X4 view = {};
+		DirectX::XMFLOAT4X4 projection = {};
+	};
+
+	struct PerObjectConstants
+	{
+		DirectX::XMFLOAT4X4 world = {};
+	};
+
+	ConstantBuffer m_perFrameBuffer = {};
+	ConstantBuffer m_perCameraBuffer = {};
+	ConstantBuffer m_perObjectBuffer = {};
+	Texture* m_defaultTexture = nullptr;
+	bool m_buffersInitialized = false;
+
+	void UpdatePerFrame();
+	void UpdatePerCamera(const Scene& scene);
+	void UpdatePerObject(const Transform& transform);
+	void RenderMeshRenderer(MeshRenderer& renderer);
+	void RenderSkinnedMeshRenderer(SkinnedMeshRenderer& renderer);
+	void ApplyRenderQueue(RenderQueue queue);
+
 	// 所属するエンジンコア
 	EngineCore* m_engineCore = nullptr;
 

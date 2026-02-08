@@ -167,6 +167,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -177,13 +178,16 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="GraphicsDevice.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="PhysicsBody.cpp" />
     <ClCompile Include="PoleManager.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceSystem.cpp" />
     <ClCompile Include="SceneSystem.cpp" />
     <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="SpriteRenderer.cpp" />
+    <ClCompile Include="StructuredBuffer.cpp" />
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Vector4.cpp" />
@@ -196,10 +200,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Health.cpp" />
     <ClCompile Include="Keyboard.cpp" />
-    <ClCompile Include="KeyLogger.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MeshRenderer.cpp" />
-    <ClCompile Include="model.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Movement.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
@@ -218,13 +219,13 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="RenderingSystem.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="shader3d.cpp" />
     <ClCompile Include="SystemTimer.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TPSCamera.cpp" />
     <ClCompile Include="WICTextureLoader11.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Billboard.h" />
     <ClInclude Include="BillboardPrefab.h" />
@@ -239,9 +240,8 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="PlayerPrefab.h" />
-    <ClInclude Include="PrimitivePrefab.h" />
-    <ClInclude Include="CollisionPrefab.h" />
     <ClInclude Include="DebugCounter.h" />
     <ClInclude Include="GameContext.h" />
     <ClInclude Include="InputSystem.h" />
@@ -254,7 +254,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="ScriptComponent.h" />
     <ClInclude Include="ScriptComponentSystem.h" />
     <ClInclude Include="Shader.h" />
-    <ClInclude Include="SpriteRenderer.h" />
+    <ClInclude Include="StructuredBuffer.h" />
     <ClInclude Include="TPSCameraPrefab.h" />
     <ClInclude Include="UniqueQueue.h" />
     <ClInclude Include="UniqueVector.h" />
@@ -274,9 +274,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="InputHandler.h" />
     <ClInclude Include="InputDevice.h" />
     <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="KeyLogger.h" />
-    <ClInclude Include="MeshRenderer.h" />
-    <ClInclude Include="model.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Movement.h" />
     <ClInclude Include="Object.h" />
@@ -301,7 +299,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="RenderingSystem.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="EngineCore.h" />
-    <ClInclude Include="shader3d.h" />
     <ClInclude Include="SystemTimer.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Time.h" />
@@ -310,6 +307,12 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="WICTextureLoader11.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="SkinnedMeshVS.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="SpritePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>

@@ -22,17 +22,20 @@ public:
 	Texture() = default;
 	virtual ~Texture() = default;
 	// リソース初期化メソッド
-	virtual bool CreateBuffer(GraphicsDevice& device, const std::wstring& filePath);
+	bool CreateBuffer(GraphicsDevice& device, const std::wstring& filePath);
+
+	// ロード済みリソースから作成するメソッド
+	void CreateFromLoaded(GraphicsDevice& device, ID3D11ShaderResourceView* srv, UINT width, UINT height);
 
 	// グラフィックスパイプラインにリソースをバインドするメソッド
 	void Bind(GraphicsDevice& device);
 
 	// テクスチャの幅と高さを取得するメソッド
-	unsigned int GetWidth() const 
+	UINT GetWidth() const
 	{ 
 		return m_width;
 	}
-	unsigned int GetHeight() const 
+	UINT GetHeight() const
 	{ 
 		return m_height;
 	}
@@ -41,8 +44,8 @@ private:
 	std::wstring m_filePath = {};
 
 	// テクスチャの幅と高さ
-	unsigned int m_width = 0;
-	unsigned int m_height = 0;
+	UINT m_width = 0;
+	UINT m_height = 0;
 
 	// シェーダーリソースビュー
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_shaderResourceView = nullptr;

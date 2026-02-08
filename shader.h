@@ -7,11 +7,14 @@
 #include <unordered_map>
 #include <vector>
 #include <d3d11.h>
+#include <d3dcompiler.h>
 #include <wrl/client.h>
 
 // 基底シェーダークラス
 class Shader : public Resource
 {
+public:
+	virtual ~Shader() = default;
 };
 
 // シェーダー数値タイプ列挙型
@@ -71,9 +74,21 @@ public:
 	bool CreateBuffer(GraphicsDevice& device, const std::string& filePath);
 	void Bind(GraphicsDevice& device);
 
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> vs = nullptr;
+	ID3D11VertexShader* const GetVertexShader() const 
+	{ 
+		return m_vs.Get();
+	}
+	ID3DBlob* const GetShaderBlob() const
+	{
+		return m_shaderBlob.Get();
+	}
+
 	ShaderReflectionInfo reflectionInfo = {};
 	ShaderInputLayoutInfo inputLayoutInfo = {};
+
+private:
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vs = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> m_shaderBlob = nullptr;
 };
 
 // ピクセルシェーダークラス
@@ -84,8 +99,15 @@ public:
 	bool CreateBuffer(GraphicsDevice& device, const std::string& filePath);
 	void Bind(GraphicsDevice& device);
 
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> ps = nullptr;
+	ID3D11PixelShader* const GetPixelShader() const 
+	{ 
+		return m_ps.Get();
+	}
+
 	ShaderReflectionInfo reflectionInfo = {};
+
+private:
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_ps = nullptr;
 };
 
 
@@ -102,6 +124,9 @@ public:
 
 	ShaderReflectionInfo mergedReflectionInfo = {};
 	ShaderInputLayoutInfo inputLayoutInfo = {};
+
+private:
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout = nullptr;
 };
 
 

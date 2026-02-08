@@ -5,6 +5,7 @@
 #include "GraphicsDevice.h"
 #include "ConstantBuffer.h"
 #include "Shader.h"
+#include "Texture.h"
 #include <unordered_map>
 #include <string>
 #include <DirectXMath.h>
@@ -13,8 +14,14 @@
 class Material : public Resource
 {
 public:
+
+	Material()
+	{
+		SetColor({ 1.0f,1.0f,1.0f,1.0f });
+	}
+
 	// 使用シェーダープログラムの設定と定数バッファの作成
-	bool CreateBuffer(GraphicsDevice& device, ShaderProgram* shaderProgram);
+	bool CreateBuffer(GraphicsDevice& device, ShaderProgram* _shaderProgram);
 	// マテリアルの適用
 	void Apply(GraphicsDevice& device);
 	// 定数バッファのバインド
@@ -44,15 +51,17 @@ public:
 		SetFloat4("diffuse_color", color);
 	}
 
+	// テクスチャ
+	Texture* texture = nullptr;
+
+	// 使用シェーダープログラム
+	ShaderProgram* shaderProgram = nullptr;
 
 private:
 	// マテリアルパラメータ
 	std::unordered_map<std::string, float> m_floatParams;
 	std::unordered_map<std::string, DirectX::XMFLOAT4> m_float4Params;
 	std::unordered_map<std::string, DirectX::XMMATRIX> m_matrix4x4Params;
-
-	// 使用シェーダープログラム
-	ShaderProgram* m_shaderProgram = nullptr;
 
 	// マテリアル用定数バッファ
 	ConstantBuffer materialConstantBuffer = {};

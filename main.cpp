@@ -7,22 +7,11 @@
 
 #define WIN32_LEAN_AND_MEAN //古いウィンドウズのファイルを使わないように飛ばすため
 #include<Windows.h>
-#include <algorithm>
-#include "SystemTimer.h"
 #include "GraphicsDevice.h"
-#include "shader.h"
-#include "shader3d.h"
-#include "texture.h"
-#include "mouse.h"
-#include "KeyLogger.h"
-#include "Audio.h"
+#include "Mouse.h"
 #include "Game.h"
 #include "EngineCore.h"
 #include "Window.h"
-#include "Model.h"
-#include "DebugText.h"
-#include "Time.h"
-#include <sstream>
 
 
 using namespace DirectX;
@@ -50,51 +39,51 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	desc.Borderless = true;
 	desc.CenterScreen = true;
 	desc.Fullscreen = false;
-	Window* window = new Window(desc, hInstance);
-
-
-	// システムタイマーの初期化
-	SystemTimer_Initialize();
+	Window window = Window(desc, hInstance);
+	GraphicsDevice graphicsDevice = GraphicsDevice{};
 
 	// マウスの初期化
-	Mouse_Initialize(window->GetHWND());
+	Mouse_Initialize(window.GetHWND());
 
 	//マウスのカーソル
 	Mouse_SetVisible(false);
 
-	// キーロガーの初期化
-	KeyLogger_Initialize();
-
-	// オーディオの初期化
-	InitAudio();
-
-	ShowWindow(window->GetHWND(), nCmdShow);	//ウィンドウ表示
-	UpdateWindow(window->GetHWND());			//ウィンドウの描画の更新
+	ShowWindow(window.GetHWND(), nCmdShow);	//ウィンドウ表示
+	UpdateWindow(window.GetHWND());			//ウィンドウの描画の更新
 
 	// Direct3Dの初期化
-	if (!GetGraphicsDevice().Initialize(window->GetHWND()))
+	if (!graphicsDevice.Initialize(window.GetHWND()))
 	{
 		PostQuitMessage(0);//メッセージを表示
-		GetGraphicsDevice().Finalize();
+		graphicsDevice.Finalize();
 
 		return 0;//初期化に失敗したので終了
 	}
 
-	ShowWindow(window->GetHWND(), nCmdShow);	//ウィンドウ表示
-	UpdateWindow(window->GetHWND());			//ウィンドウの描画の更新
+	ShowWindow(window.GetHWND(), nCmdShow);	//ウィンドウ表示
+	UpdateWindow(window.GetHWND());			//ウィンドウの描画の更新
 
-	Shader3d_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext());
-	
-	ModelInitialize(&GetGraphicsDevice());
 
 	GameContext ctx = engineCore.GetGameContext();
 
 	// ウィンドウをウィンドウシステムに登録
-	ctx.windowSystem->RegisterWindow(window);
-	ctx.renderingSystem->SetGraphicsDevice(&GetGraphicsDevice());
+	ctx.windowSystem->RegisterWindow(&window);
+	ctx.renderingSystem->SetGraphicsDevice(&graphicsDevice);
 
 
+	// デフォルトシーン
 	engineCore.GetGameContext().sceneSystem->ChangeScene<Game>();
+
+
+
+	//engineCore.GetGameContext().sceneSystem->ChangeScene<Kageyama>();
+
+
+	//engineCore.GetGameContext().sceneSystem->ChangeScene<Kasiwagi>();
+
+
+	//engineCore.GetGameContext().sceneSystem->ChangeScene<Namioka>();
+
 
 	//ゲームループ
 	MSG msg{};
@@ -113,10 +102,8 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 		} while (msg.message != WM_QUIT);
 
 	// 終了処理
-	UninitAudio();          // オーディオの終了処理
 	Mouse_Finalize();       // マウスの終了処理
-	Shader3d_Finalize();    // シェーダー3dの終了処理
-	GetGraphicsDevice().Finalize();    // Direct3Dの終了処理
+	graphicsDevice.Finalize(); // Direct3Dの終了処理
 
 
 	CoUninitialize();

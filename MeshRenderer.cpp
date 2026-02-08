@@ -1,5 +1,0 @@
-#include "MeshRenderer.h"
-#include "model.h"
-#include "GameObject.h"
-#include "Texture.h"
-#include "shader3d.h"

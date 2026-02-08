@@ -30,11 +30,11 @@ DirectX::XMMATRIX Camera::GetViewMatrix() const
 	return view;
 }
 
-DirectX::XMMATRIX Camera::GetProjectionMatrix() const
+DirectX::XMMATRIX Camera::GetProjectionMatrix(float defaultWidth, float defaultHeight) const
 {
 	// アスペクト比を計算
 	float aspect = ViewportWidth == -1.0f || ViewportHeight == -1.0f
-		? static_cast<float>(GetGraphicsDevice().GetBackBufferWidth()) / static_cast<float>(GetGraphicsDevice().GetBackBufferHeight())
+		? defaultWidth / defaultHeight
 		: ViewportWidth / ViewportHeight;
 
 	// プロジェクション行列を作成

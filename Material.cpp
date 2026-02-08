@@ -22,14 +22,14 @@ namespace
 	}
 }
 
-bool Material::CreateBuffer(GraphicsDevice& device, ShaderProgram* shaderProgram)
+bool Material::CreateBuffer(GraphicsDevice& device, ShaderProgram* _shaderProgram)
 {
-	if (!shaderProgram)
+	if (!_shaderProgram)
 	{
 		return false;
 	}
 
-	m_shaderProgram = shaderProgram;
+	shaderProgram = _shaderProgram;
 	auto bufferIt = shaderProgram->mergedReflectionInfo.buffers.find("PER_MATERIAL");
 	if (bufferIt == shaderProgram->mergedReflectionInfo.buffers.end())
 	{
@@ -48,13 +48,13 @@ bool Material::CreateBuffer(GraphicsDevice& device, ShaderProgram* shaderProgram
 
 void Material::Apply(GraphicsDevice& device)
 {
-	if (!m_isDirty || !m_shaderProgram)
+	if (!m_isDirty || !shaderProgram)
 	{
 		return;
 	}
 
-	auto bufferIt = m_shaderProgram->mergedReflectionInfo.buffers.find("PER_MATERIAL");
-	if (bufferIt == m_shaderProgram->mergedReflectionInfo.buffers.end())
+	auto bufferIt = shaderProgram->mergedReflectionInfo.buffers.find("PER_MATERIAL");
+	if (bufferIt == shaderProgram->mergedReflectionInfo.buffers.end())
 	{
 		return;
 	}

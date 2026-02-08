@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "Material.h"
 #include "Texture.h"
+#include "Model.h"
 #include <memory>
 #include <string>
 #include <type_traits>

@@ -258,11 +258,13 @@ bool VertexShader::CreateBuffer(GraphicsDevice& device, const std::string& fileP
 	}
 
 	HRESULT hr = device.GetDevice()->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr,
-		vs.GetAddressOf());
+		m_vs.GetAddressOf());
 	if (FAILED(hr))
 	{
 		return false;
 	}
+
+	m_shaderBlob = shaderBlob;
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderReflection> reflection;
 	if (!CreateShaderReflection(shaderBlob.Get(), reflection))
@@ -279,7 +281,7 @@ bool VertexShader::CreateBuffer(GraphicsDevice& device, const std::string& fileP
 
 void VertexShader::Bind(GraphicsDevice& device)
 {
-	device.GetDeviceContext()->VSSetShader(vs.Get(), nullptr, 0);
+	device.GetDeviceContext()->VSSetShader(m_vs.Get(), nullptr, 0);
 }
 
 bool PixelShader::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
@@ -291,7 +293,7 @@ bool PixelShader::CreateBuffer(GraphicsDevice& device, const std::string& filePa
 	}
 
 	HRESULT hr = device.GetDevice()->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr,
-		ps.GetAddressOf());
+		m_ps.GetAddressOf());
 	if (FAILED(hr))
 	{
 		return false;
@@ -310,10 +312,10 @@ bool PixelShader::CreateBuffer(GraphicsDevice& device, const std::string& filePa
 
 void PixelShader::Bind(GraphicsDevice& device)
 {
-	device.GetDeviceContext()->PSSetShader(ps.Get(), nullptr, 0);
+	device.GetDeviceContext()->PSSetShader(m_ps.Get(), nullptr, 0);
 }
 
-bool ShaderProgram::CreateBuffer(GraphicsDevice&, const std::string& vsFilePath, const std::string& psFilePath)
+bool ShaderProgram::CreateBuffer(GraphicsDevice& device, const std::string& vsFilePath, const std::string& psFilePath)
 {
 	if (!m_resourceSystem)
 	{
@@ -331,11 +333,52 @@ bool ShaderProgram::CreateBuffer(GraphicsDevice&, const std::string& vsFilePath,
 	MergeShaderReflectionInfo(vertexShader->reflectionInfo, mergedReflectionInfo);
 	MergeShaderReflectionInfo(pixelShader->reflectionInfo, mergedReflectionInfo);
 	inputLayoutInfo = vertexShader->inputLayoutInfo;
+
+	m_inputLayout.Reset();
+	auto* shaderBlob = vertexShader->GetShaderBlob();
+	if (!shaderBlob || inputLayoutInfo.elements.empty())
+	{
+		return true;
+	}
+
+	std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements;
+	inputElements.reserve(inputLayoutInfo.elements.size());
+	std::vector<std::string> semanticNames;
+	semanticNames.reserve(inputLayoutInfo.elements.size());
+
+	for (const auto& element : inputLayoutInfo.elements)
+	{
+		semanticNames.push_back(element.name);
+		D3D11_INPUT_ELEMENT_DESC desc{};
+		desc.SemanticName = semanticNames.back().c_str();
+		desc.SemanticIndex = element.index;
+		desc.Format = element.format;
+		desc.InputSlot = 0;
+		desc.AlignedByteOffset = element.offset;
+		desc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		desc.InstanceDataStepRate = 0;
+		inputElements.push_back(desc);
+	}
+
+	HRESULT hr = device.GetDevice()->CreateInputLayout(
+		inputElements.data(),
+		static_cast<UINT>(inputElements.size()),
+		shaderBlob->GetBufferPointer(),
+		shaderBlob->GetBufferSize(),
+		m_inputLayout.GetAddressOf());
+	if (FAILED(hr))
+	{
+		return false;
+	}
 	return true;
 }
 
 void ShaderProgram::Bind(GraphicsDevice& device)
 {
+	if (m_inputLayout)
+	{
+		device.GetDeviceContext()->IASetInputLayout(m_inputLayout.Get());
+	}
 	if (vertexShader)
 	{
 		vertexShader->Bind(device);
