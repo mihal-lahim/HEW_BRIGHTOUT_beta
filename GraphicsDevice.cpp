@@ -266,6 +266,7 @@ bool GraphicsDevice::CreateBackBuffers()
 	hr = m_device->CreateRasterizerState(&rasterizerDesc, m_rasterizerStateCullNone.GetAddressOf());
 	if (FAILED(hr))
 	{
+		MessageBox(nullptr, "RasterizerState�̐ݒ�Ɏ��s���܂���", "�G���[", MB_OK);
 		return false;
 	}
 	m_deviceContext->RSSetState(m_rasterizerStateCullNone.Get());
