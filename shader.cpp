@@ -7,14 +7,13 @@
 #include <cstring>
 #include <debugapi.h>
 #include <iomanip>
-#include <locale>
 #include <sstream>
 #include <d3d11shader.h>
 #include <d3dcompiler.h>
 
 namespace
 {
-	constexpr const char* defaultEntryPoint = "main";
+	constexpr const char* kDefaultEntryPoint = "main";
 
 	std::wstring ToWideString(const std::string& value)
 	{
@@ -38,7 +37,7 @@ namespace
 
 		std::string extension = filePath.substr(dotPos);
 		std::transform(extension.begin(), extension.end(), extension.begin(),
-			[](unsigned char c) { return std::tolower(static_cast<char>(c), std::locale::classic()); });
+			[](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
 		std::wstring hlslPath;
 		if (extension == ".cso")
@@ -312,7 +311,7 @@ namespace
 bool VertexShader::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob;
-	if (!LoadShaderBlob(filePath, "vs_5_0", defaultEntryPoint, shaderBlob))
+	if (!LoadShaderBlob(filePath, "vs_5_0", kDefaultEntryPoint, shaderBlob))
 	{
 		return false;
 	}
@@ -347,7 +346,7 @@ void VertexShader::Bind(GraphicsDevice& device)
 bool PixelShader::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob;
-	if (!LoadShaderBlob(filePath, "ps_5_0", defaultEntryPoint, shaderBlob))
+	if (!LoadShaderBlob(filePath, "ps_5_0", kDefaultEntryPoint, shaderBlob))
 	{
 		return false;
 	}
