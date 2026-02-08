@@ -10,6 +10,7 @@
 ## Code Style
 - Use specific formatting rules
 - Follow naming conventions
+- 各`ConstantBuffer`に行列を登録する際は必ず転置（transpose）してから書き込む。
 
 ## Project-Specific Rules
 - PhysicsSystem �̓o�^/�o�^�����͊O������ `Add`/`Remove` �֐��o�R�ōs�����j�B

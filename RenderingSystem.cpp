@@ -11,6 +11,7 @@
 #include "Texture.h"
 #include <algorithm>
 #include <vector>
+#include <crtdbg.h>
 
 using namespace DirectX;
 
@@ -125,14 +126,16 @@ void RenderingSystem::Render(const Scene& scene)
 	}
 
 	m_graphicsDevice->Present();
+
+	_CrtCheckMemory();
 }
 
 void RenderingSystem::UpdatePerFrame()
 {
 	PerFrameConstants perFrame = {};
-	perFrame.ambient_light_color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	perFrame.directional_light_color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	perFrame.directional_light_vector = { 0.0f, 0.0f, 0.0f, 0.0f };
+	perFrame.ambient_light_color = { 0.5f, 0.5f, 0.5f, 1.0f };
+	perFrame.directional_light_color = { 0.5f, 0.5f, 0.5f, 1.0f };
+	perFrame.directional_light_vector = { 0.4f, -1.0f, 2.0f, 0.0f };
 
 	m_perFrameBuffer.UpdateBuffer(*m_graphicsDevice, &perFrame, sizeof(perFrame));
 	m_perFrameBuffer.BindVS(*m_graphicsDevice, 0);
@@ -159,8 +162,8 @@ void RenderingSystem::UpdatePerCamera(const Scene& scene)
 		}
 	}
 
-	XMStoreFloat4x4(&perCamera.view, view);
-	XMStoreFloat4x4(&perCamera.projection, projection);
+	XMStoreFloat4x4(&perCamera.view, XMMatrixTranspose(view));
+	XMStoreFloat4x4(&perCamera.projection, XMMatrixTranspose(projection));
 
 	m_perCameraBuffer.UpdateBuffer(*m_graphicsDevice, &perCamera, sizeof(perCamera));
 	m_perCameraBuffer.BindVS(*m_graphicsDevice, 1);
@@ -170,7 +173,7 @@ void RenderingSystem::UpdatePerCamera(const Scene& scene)
 void RenderingSystem::UpdatePerObject(const Transform& transform)
 {
 	PerObjectConstants perObject = {};
-	XMStoreFloat4x4(&perObject.world, transform.GetWorldMatrix());
+	XMStoreFloat4x4(&perObject.world, XMMatrixTranspose(transform.GetWorldMatrix()));
 
 	m_perObjectBuffer.UpdateBuffer(*m_graphicsDevice, &perObject, sizeof(perObject));
 	m_perObjectBuffer.BindVS(*m_graphicsDevice, 2);

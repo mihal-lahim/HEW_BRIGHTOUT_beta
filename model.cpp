@@ -103,12 +103,10 @@ bool Model::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 
 	const aiScene* scene = importer.ReadFile(
 		filePath,
-		aiProcess_GenNormals |
 		aiProcess_CalcTangentSpace |
 		aiProcess_JoinIdenticalVertices |
 		aiProcess_ImproveCacheLocality |
-		aiProcess_LimitBoneWeights |
-		aiProcess_Triangulate
+		aiProcess_LimitBoneWeights
 	);
 
 	hal::dout << importer.GetErrorString() << std::endl;
@@ -197,9 +195,15 @@ int Model::LoadMesh(GraphicsDevice& device, aiMesh* aimesh, const aiScene*)
 	for (unsigned int i = 0; i < aimesh->mNumFaces; ++i)
 	{
 		const aiFace& face = aimesh->mFaces[i];
-		for (unsigned int j = 0; j < face.mNumIndices; ++j)
+		if (face.mNumIndices >= 3)
 		{
-			indexes.push_back(static_cast<UINT>(face.mIndices[j]));
+			indexes.push_back(static_cast<UINT>(face.mIndices[0]));
+			indexes.push_back(static_cast<UINT>(face.mIndices[2]));
+			indexes.push_back(static_cast<UINT>(face.mIndices[1]));
+			for (unsigned int j = 3; j < face.mNumIndices; ++j)
+			{
+				indexes.push_back(static_cast<UINT>(face.mIndices[j]));
+			}
 		}
 	}
 
@@ -279,9 +283,15 @@ int Model::LoadSkinnedMesh(GraphicsDevice& device, aiMesh* aimesh, const aiScene
 	for (unsigned int i = 0; i < aimesh->mNumFaces; ++i)
 	{
 		const aiFace& face = aimesh->mFaces[i];
-		for (unsigned int j = 0; j < face.mNumIndices; ++j)
+		if (face.mNumIndices >= 3)
 		{
-			indexes.push_back(static_cast<UINT>(face.mIndices[j]));
+			indexes.push_back(static_cast<UINT>(face.mIndices[0]));
+			indexes.push_back(static_cast<UINT>(face.mIndices[2]));
+			indexes.push_back(static_cast<UINT>(face.mIndices[1]));
+			for (unsigned int j = 3; j < face.mNumIndices; ++j)
+			{
+				indexes.push_back(static_cast<UINT>(face.mIndices[j]));
+			}
 		}
 	}
 
@@ -578,40 +588,10 @@ void SkinnedModelPrefab::Instantiate(GameObject& gameObject)
 
 void CubePrefab::Instantiate(GameObject& gameObject)
 {
-	static Mesh cubeMesh = {};
-	static bool meshInitialized = false;
-
-	if (!meshInitialized)
-	{
-		auto& device = gameObject.rendering().GetGraphicsDevice();
-		std::vector<Mesh::VertexAttribute> vertexes = {
-			{ { -0.5f, -0.5f, -0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 1.0f } },
-			{ {  0.5f, -0.5f, -0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 1.0f } },
-			{ {  0.5f,  0.5f, -0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, -1.0f }, { 1.0f, 0.0f } },
-			{ { -0.5f,  0.5f, -0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, -1.0f }, { 0.0f, 0.0f } },
-			{ { -0.5f, -0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f } },
-			{ {  0.5f, -0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f } },
-			{ {  0.5f,  0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f } },
-			{ { -0.5f,  0.5f,  0.5f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } }
-		};
-
-		std::vector<UINT> indexes = {
-			0, 1, 2, 0, 2, 3,
-			4, 6, 5, 4, 7, 6,
-			4, 5, 1, 4, 1, 0,
-			3, 2, 6, 3, 6, 7,
-			1, 5, 6, 1, 6, 2,
-			4, 0, 3, 4, 3, 7
-		};
-
-		if (cubeMesh.CreateBuffer(device, vertexes, indexes))
-		{
-			meshInitialized = true;
-		}
-	}
+	Model* model = gameObject.resource().Load<Model>("model/Cube.glb");
 
 	auto* renderer = gameObject.AddComponent<MeshRenderer>();
-	renderer->mesh = &cubeMesh;
+	renderer->mesh = &model->GetMeshes()[0];
 }
 
 void SpherePrefab::Instantiate(GameObject& gameObject)

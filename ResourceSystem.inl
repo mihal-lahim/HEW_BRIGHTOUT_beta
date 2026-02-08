@@ -42,7 +42,6 @@ inline T* ResourceSystem::Load(Args&&... args)
 		// ƒ}ƒeƒŠƒAƒ‹‚Ìê‡‚Ì“Á•Êˆ—
 		if constexpr (std::is_base_of_v<Material, T>)
 		{
-			resourceKey ^= typeid(T).hash_code();
 			resourceKey = MakeUniqueResourceKey(resourceKey);
 			return LoadInternal<T>(resourceKey, std::forward<Args>(args)...);
 		}

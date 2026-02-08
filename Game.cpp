@@ -10,9 +10,10 @@ void Game::Initialize()
 {
 	CubePrefab cubePrefab{};
 	GameObject* cube = Instantiate(cubePrefab);
-	cube->transform().scale() = Vector3(0.5f, 0.5f, 0.5f);
+	cube->transform().scale() = Vector3(1.0f, 1.0f, 1.0f);
 
-	GameObject* camera = CreateGameObject();
-	camera->AddComponent<Camera>();
-	camera->transform().position() = Vector3(0.0f, 0.0f, -5.0f);
+	
+	PlayerPrefab playerPrefab{};
+	Instantiate(playerPrefab);
+	
 }

@@ -57,9 +57,10 @@ size_t ResourceSystem::MakeUniqueResourceKey(size_t baseKey) const
 	static constexpr size_t kruthmuller_constant = 0x9e3779b97f4a7c15ULL;
 
 	// ユニークなキーが見つかるまでループ
-	while (m_resourceMap.contains(baseKey))
+	while (m_resourceMap.contains(uniqueKey))
 	{
 		uniqueKey = baseKey ^ (counter * kruthmuller_constant);
+		++counter;
 	}
 
 	return uniqueKey;

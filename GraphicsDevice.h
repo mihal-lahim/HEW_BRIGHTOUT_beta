@@ -79,8 +79,6 @@ private:
 	// バックバッファの情報
 	D3D11_TEXTURE2D_DESC m_backBufferDesc{};
 
-	// ラスタライザーステート
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerStateCullNone;
 };
 
 

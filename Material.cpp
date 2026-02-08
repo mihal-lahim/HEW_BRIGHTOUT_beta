@@ -96,7 +96,7 @@ void Material::Apply(GraphicsDevice& device)
 			if (it != m_matrix4x4Params.end())
 			{
 				DirectX::XMFLOAT4X4 value{};
-				DirectX::XMStoreFloat4x4(&value, it->second);
+				DirectX::XMStoreFloat4x4(&value, DirectX::XMMatrixTranspose(it->second));
 				std::memcpy(dest, &value, sizeof(value));
 			}
 			break;
