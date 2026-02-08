@@ -10,12 +10,15 @@
 
 namespace
 {
+	constexpr const char* kDefaultEntryPoint = "main";
+
 	std::wstring ToWideString(const std::string& value)
 	{
 		return std::wstring(value.begin(), value.end());
 	}
 
-	bool LoadShaderBlob(const std::string& filePath, const char* target, Microsoft::WRL::ComPtr<ID3DBlob>& blob)
+	bool LoadShaderBlob(const std::string& filePath, const char* target, const char* entryPoint,
+		Microsoft::WRL::ComPtr<ID3DBlob>& blob)
 	{
 		auto widePath = ToWideString(filePath);
 		if (SUCCEEDED(D3DReadFileToBlob(widePath.c_str(), blob.GetAddressOf())))
@@ -31,7 +34,7 @@ namespace
 
 		std::string extension = filePath.substr(dotPos);
 		std::transform(extension.begin(), extension.end(), extension.begin(),
-			[](unsigned char c) { return static_cast<char>(::tolower(c)); });
+			[](unsigned char c) { return static_cast<char>(::tolower(static_cast<unsigned char>(c))); });
 
 		std::wstring hlslPath;
 		if (extension == ".cso")
@@ -52,7 +55,7 @@ namespace
 		flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 		Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
-		HRESULT hr = D3DCompileFromFile(hlslPath.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main",
+		HRESULT hr = D3DCompileFromFile(hlslPath.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, entryPoint,
 			target, flags, 0, blob.GetAddressOf(), errorBlob.GetAddressOf());
 		if (FAILED(hr))
 		{
@@ -298,7 +301,7 @@ namespace
 bool VertexShader::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob;
-	if (!LoadShaderBlob(filePath, "vs_5_0", shaderBlob))
+	if (!LoadShaderBlob(filePath, "vs_5_0", kDefaultEntryPoint, shaderBlob))
 	{
 		return false;
 	}
@@ -333,7 +336,7 @@ void VertexShader::Bind(GraphicsDevice& device)
 bool PixelShader::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob;
-	if (!LoadShaderBlob(filePath, "ps_5_0", shaderBlob))
+	if (!LoadShaderBlob(filePath, "ps_5_0", kDefaultEntryPoint, shaderBlob))
 	{
 		return false;
 	}
