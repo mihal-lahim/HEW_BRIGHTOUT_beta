@@ -18,8 +18,6 @@ void MeshRenderer::InitializeByContext()
 {
 	ShaderProgram* shader = resource().Load<ShaderProgram>("MeshVS.cso", "MeshPS.cso");
 	material = resource().Load<Material>(shader);
-
-	hal::dout << "shader =" << shader << " " << "PS,VS" << shader->pixelShader << "," << shader->vertexShader << std::endl;
 }
 
 void SkinnedMeshRenderer::Render(GraphicsDevice& device)

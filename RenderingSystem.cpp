@@ -11,7 +11,6 @@
 #include "Texture.h"
 #include <algorithm>
 #include <vector>
-#include <crtdbg.h>
 
 using namespace DirectX;
 
@@ -126,15 +125,13 @@ void RenderingSystem::Render(const Scene& scene)
 	}
 
 	m_graphicsDevice->Present();
-
-	_CrtCheckMemory();
 }
 
 void RenderingSystem::UpdatePerFrame()
 {
 	PerFrameConstants perFrame = {};
-	perFrame.ambient_light_color = { 0.5f, 0.5f, 0.5f, 1.0f };
-	perFrame.directional_light_color = { 0.5f, 0.5f, 0.5f, 1.0f };
+	perFrame.ambient_light_color = { 0.3f, 0.3f, 0.3f, 1.0f };
+	perFrame.directional_light_color = { 0.4f, 0.4f, 0.4f, 1.0f };
 	perFrame.directional_light_vector = { 0.4f, -1.0f, 2.0f, 0.0f };
 
 	m_perFrameBuffer.UpdateBuffer(*m_graphicsDevice, &perFrame, sizeof(perFrame));

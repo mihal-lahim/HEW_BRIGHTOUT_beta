@@ -6,6 +6,7 @@
 #include "Vector3.h"
 #include "Quaternion.h"
 #include "Component.h"
+#include "DebugOstream.h"
 
 
 class Transform : public Component
@@ -130,6 +131,7 @@ public:
 		m_localScale.FromXMVECTOR(scaleVec);
 		m_localRotation.FromXMVECTOR(rotationVec);
 		m_localPosition.FromXMVECTOR(translationVec);
+		hal::dout << "SetLocalMatrix called. Position: (" << m_localPosition.x << ", " << m_localPosition.y << ", " << m_localPosition.z << ")\n";
 		MarkDirty();
 	}
 

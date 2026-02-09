@@ -103,10 +103,9 @@ bool Model::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 
 	const aiScene* scene = importer.ReadFile(
 		filePath,
-		aiProcess_CalcTangentSpace |
 		aiProcess_JoinIdenticalVertices |
-		aiProcess_ImproveCacheLocality |
-		aiProcess_LimitBoneWeights
+		aiProcess_ImproveCacheLocality
+		// | aiProcess_PreTransformVertices
 	);
 
 	hal::dout << importer.GetErrorString() << std::endl;
@@ -588,16 +587,14 @@ void SkinnedModelPrefab::Instantiate(GameObject& gameObject)
 
 void CubePrefab::Instantiate(GameObject& gameObject)
 {
-	Model* model = gameObject.resource().Load<Model>("model/Cube.glb");
-
-	auto* renderer = gameObject.AddComponent<MeshRenderer>();
-	renderer->mesh = &model->GetMeshes()[0];
+	ModelPrefab cubePrefab("model/Cube.glb");
+	GameObject* cubeObject = gameObject.Instantiate(cubePrefab);
+	gameObject.SetChild(*cubeObject);
 }
 
 void SpherePrefab::Instantiate(GameObject& gameObject)
 {
-	Model* model = gameObject.resource().Load<Model>("model/Sphere.glb");
-
-	auto* renderer = gameObject.AddComponent<MeshRenderer>();
-	renderer->mesh = &model->GetMeshes()[0];
+	ModelPrefab cubePrefab("model/Sphere.glb");
+	GameObject* cubeObject = gameObject.Instantiate(cubePrefab);
+	gameObject.SetChild(*cubeObject);
 }

@@ -9,11 +9,25 @@ using namespace DirectX;
 void Game::Initialize()
 {
 	CubePrefab cubePrefab{};
-	GameObject* cube = Instantiate(cubePrefab);
-	cube->transform().scale() = Vector3(1.0f, 1.0f, 1.0f);
+	GameObject* floor = Instantiate(cubePrefab);
+	floor->transform().scale() = { 50.0f, 1.0f, 50.0f };
+	floor->transform().position() = { 0.0f, -1.0f, 0.0f };
+	BoxColliderDesc floorShapeDesc{};
+	floor->AddComponent<ColliderShape>(floorShapeDesc);
+	PhysicsBodyDesc floorBodyDesc{};
+	floorBodyDesc.Type = BodyType::STATIC;
+	floor->AddComponent<PhysicsBody>(floorBodyDesc);
 
-	
+
+	GameObject* hill = Instantiate(cubePrefab);
+	hill->transform().scale() = { 2.0f, 2.0f, 2.0f };
+	hill->transform().position() = { 0.0f, -0.5f, 3.0f };
+	hill->transform().rotation() = Quaternion::SetEulerX(45.0f);
+	hill->AddComponent<ColliderShape>(floorShapeDesc);
+	hill->AddComponent<PhysicsBody>(floorBodyDesc);
+
+
 	PlayerPrefab playerPrefab{};
-	Instantiate(playerPrefab);
+	Instantiate(playerPrefab)->transform().position() += Vector3(5.0f, 0.0f, 0.0f);
 	
 }
