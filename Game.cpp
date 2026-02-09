@@ -18,6 +18,8 @@ void Game::Initialize()
 	floorBodyDesc.Type = BodyType::STATIC;
 	floor->AddComponent<PhysicsBody>(floorBodyDesc);
 
+	//SkinnedModelPrefab playerModel("model/Player.glb");
+	//Instantiate(playerModel);
 
 	GameObject* hill = Instantiate(cubePrefab);
 	hill->transform().scale() = { 2.0f, 2.0f, 2.0f };
