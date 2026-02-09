@@ -268,6 +268,7 @@ GameObject* Scene::CreateGameObject()
 	GameObject* newGameObject = new GameObject();
 	newGameObject->m_scene = this;
 	newGameObject->m_transform = CreateComponent<Transform>();
+	newGameObject->m_transform->m_gameObject = newGameObject;
 	newGameObject->m_gameContext = m_gameContext;
 	// ì¬•Û—¯ƒLƒ…[‚É’Ç‰Á
 	m_pendingAddGameObjects.push(newGameObject);

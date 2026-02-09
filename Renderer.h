@@ -19,12 +19,19 @@ enum class RenderQueue
 	Transparent = 1
 };
 
+enum class RendererType
+{
+	Mesh,
+	Skinned
+};
+
 class Renderer : public Component
 {
 public:
 	virtual void Render(GraphicsDevice& device) = 0;
+	virtual RendererType GetRendererType() const = 0;
 	RenderQueue renderQueue = RenderQueue::Opaque;
-	Material* material = nullptr;
+	Material material = {};
 };
 
 class MeshRenderer : public Renderer
@@ -32,8 +39,7 @@ class MeshRenderer : public Renderer
 public:
 	// •`‰æˆ—
 	void Render(GraphicsDevice& device) override;
-
-	void InitializeByContext() override;
+	RendererType GetRendererType() const override { return RendererType::Mesh; }
 
 	const Mesh* mesh = nullptr;
 };
@@ -43,14 +49,13 @@ class SkinnedMeshRenderer : public Renderer
 public:
 	// •`‰æˆ—
 	void Render(GraphicsDevice& device) override;
+	RendererType GetRendererType() const override { return RendererType::Skinned; }
 
 	const SkinnedMesh* mesh = nullptr;
 	AnimationController* animationController = nullptr;
 	const Skeleton* skeleton = nullptr;
 	StructuredBuffer boneBuffer = {};
 	UINT boneBufferSize = 0;
-
-	void InitializeByContext() override;
 
 	void UpdateBoneBuffer(GraphicsDevice& device, const DirectX::XMMATRIX* matrices, size_t count)
 	{

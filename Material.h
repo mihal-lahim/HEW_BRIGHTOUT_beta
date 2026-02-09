@@ -1,7 +1,6 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "Resource.h"
 #include "GraphicsDevice.h"
 #include "ConstantBuffer.h"
 #include "Shader.h"
@@ -11,7 +10,7 @@
 #include <DirectXMath.h>
 
 
-class Material : public Resource
+class Material
 {
 public:
 
@@ -26,6 +25,11 @@ public:
 	void Apply(GraphicsDevice& device);
 	// 定数バッファのバインド
 	void Bind(GraphicsDevice& device);
+
+	bool IsBufferInitialized() const
+	{
+		return m_bufferInitialized;
+	}
 
 	// パラメータの設定
 	void SetFloat(const std::string& name, float value)
@@ -52,7 +56,7 @@ public:
 	}
 
 	// テクスチャ
-	Texture* texture = nullptr;
+	const Texture* texture = nullptr;
 
 	// 使用シェーダープログラム
 	ShaderProgram* shaderProgram = nullptr;
@@ -68,8 +72,7 @@ private:
 
 	// 変更フラグ
 	bool m_isDirty = true;
-
-	friend class RenderingSystem;
+	bool m_bufferInitialized = false;
 };
 
 

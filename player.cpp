@@ -1,4 +1,3 @@
-
 #include "Player.h"
 #include "Renderer.h"
 #include "InputSystem.h"
@@ -13,6 +12,15 @@ void Player::Start()
 {
 	// ‰Šúó‘ÔÝ’è
 	stateMachine->ChangeState(&PlayerStates::HumanIdle, *this);
+
+
+
+	const auto child = modelObject->GetChildren();
+
+	const auto child2 = child[0]->GetChildren();
+
+	auto* renderer = child2[0]->GetComponent<MeshRenderer>();
+	renderer->material.SetColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 }
 
 void Player::Update()

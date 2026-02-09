@@ -12,6 +12,7 @@ class Texture;
 class MeshRenderer;
 class SkinnedMeshRenderer;
 class Transform;
+class ShaderProgram;
 enum class RenderQueue;
 class Texture;
 
@@ -21,7 +22,6 @@ public:
 	RenderingSystem(EngineCore* engineCore)
 		: m_engineCore(engineCore)
 	{ 
-		Initialize();
 	}
 	~RenderingSystem() 
 	{ 
@@ -32,7 +32,6 @@ public:
 	void SetGraphicsDevice(GraphicsDevice* graphicsDevice) 
 	{ 
 		m_graphicsDevice = graphicsDevice; 
-		Initialize();
 	}
 
 	// グラフィックスデバイス取得メソッド
@@ -41,7 +40,7 @@ public:
 		return *m_graphicsDevice;
 	}
 
-	void Initialize();
+	void Initialize(GraphicsDevice& graphicsDevice);
 	void Finalize();
 
 	// 描画メソッド
@@ -70,6 +69,8 @@ private:
 	ConstantBuffer m_perCameraBuffer = {};
 	ConstantBuffer m_perObjectBuffer = {};
 	Texture* m_defaultTexture = nullptr;
+	ShaderProgram* m_defaultMeshShader = nullptr;
+	ShaderProgram* m_defaultSkinnedShader = nullptr;
 	bool m_buffersInitialized = false;
 
 	void UpdatePerFrame();

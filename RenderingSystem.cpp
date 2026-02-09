@@ -14,9 +14,10 @@
 
 using namespace DirectX;
 
-void RenderingSystem::Initialize()
+void RenderingSystem::Initialize(GraphicsDevice& graphicsDevice)
 {
-	if (!m_graphicsDevice || m_buffersInitialized)
+	m_graphicsDevice = &graphicsDevice;
+	if (m_buffersInitialized)
 	{
 		return;
 	}
@@ -38,13 +39,19 @@ void RenderingSystem::Render(const Scene& scene)
 		return;
 	}
 
-	Initialize();
-
 	m_graphicsDevice->Clear();
 
 	if (!m_defaultTexture)
 	{
 		m_defaultTexture = scene.resource().Load<Texture>(L"texture/Default.png");
+	}
+	if (!m_defaultMeshShader)
+	{
+		m_defaultMeshShader = scene.resource().Load<ShaderProgram>("MeshVS.cso", "MeshPS.cso");
+	}
+	if (!m_defaultSkinnedShader)
+	{
+		m_defaultSkinnedShader = scene.resource().Load<ShaderProgram>("SkinnedMeshVS.cso", "MeshPS.cso");
 	}
 
 	const auto animationControllers = scene.GetComponents<AnimationController>();
@@ -97,30 +104,38 @@ void RenderingSystem::Render(const Scene& scene)
 			ApplyRenderQueue(currentQueue);
 		}
 
-		if (renderer->material)
+		const RendererType rendererType = renderer->GetRendererType();
+		if (!renderer->material.shaderProgram)
 		{
-			if (!renderer->material->texture)
-			{
-				renderer->material->texture = m_defaultTexture;
-			}
-			if (renderer->material->shaderProgram)
-			{
-				renderer->material->shaderProgram->Bind(*m_graphicsDevice);
-			}
-			if (renderer->material->texture)
-			{
-				renderer->material->texture->Bind(*m_graphicsDevice);
-			}
-			renderer->material->Bind(*m_graphicsDevice);
+			renderer->material.shaderProgram = rendererType == RendererType::Mesh ? m_defaultMeshShader : m_defaultSkinnedShader;
 		}
+		if (!renderer->material.IsBufferInitialized() && renderer->material.shaderProgram)
+		{
+			renderer->material.CreateBuffer(*m_graphicsDevice, renderer->material.shaderProgram);
+		}
+		if (!renderer->material.texture)
+		{
+			renderer->material.texture = m_defaultTexture;
+		}
+		if (renderer->material.shaderProgram)
+		{
+			renderer->material.shaderProgram->Bind(*m_graphicsDevice);
+		}
+		if (renderer->material.texture)
+		{
+			renderer->material.texture->Bind(*m_graphicsDevice);
+		}
+		renderer->material.Apply(*m_graphicsDevice);
+		renderer->material.Bind(*m_graphicsDevice);
 
-		if (auto* meshRenderer = dynamic_cast<MeshRenderer*>(renderer))
+		switch (rendererType)
 		{
-			RenderMeshRenderer(*meshRenderer);
-		}
-		else if (auto* skinnedRenderer = dynamic_cast<SkinnedMeshRenderer*>(renderer))
-		{
-			RenderSkinnedMeshRenderer(*skinnedRenderer);
+		case RendererType::Mesh:
+			RenderMeshRenderer(*static_cast<MeshRenderer*>(renderer));
+			break;
+		case RendererType::Skinned:
+			RenderSkinnedMeshRenderer(*static_cast<SkinnedMeshRenderer*>(renderer));
+			break;
 		}
 	}
 

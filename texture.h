@@ -28,7 +28,7 @@ public:
 	void CreateFromLoaded(GraphicsDevice& device, ID3D11ShaderResourceView* srv, UINT width, UINT height);
 
 	// グラフィックスパイプラインにリソースをバインドするメソッド
-	void Bind(GraphicsDevice& device);
+	void Bind(GraphicsDevice& device) const;
 
 	// テクスチャの幅と高さを取得するメソッド
 	UINT GetWidth() const

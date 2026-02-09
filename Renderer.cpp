@@ -14,12 +14,6 @@ void MeshRenderer::Render(GraphicsDevice& device)
 	mesh->Draw(device);
 }
 
-void MeshRenderer::InitializeByContext()
-{
-	ShaderProgram* shader = resource().Load<ShaderProgram>("MeshVS.cso", "MeshPS.cso");
-	material = resource().Load<Material>(shader);
-}
-
 void SkinnedMeshRenderer::Render(GraphicsDevice& device)
 {
 	if (!mesh)
@@ -28,8 +22,4 @@ void SkinnedMeshRenderer::Render(GraphicsDevice& device)
 	}
 
 	mesh->Draw(device);
-}
-
-void SkinnedMeshRenderer::InitializeByContext()
-{
 }

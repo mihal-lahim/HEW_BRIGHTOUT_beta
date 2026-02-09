@@ -18,15 +18,8 @@ void Game::Initialize()
 	floorBodyDesc.Type = BodyType::STATIC;
 	floor->AddComponent<PhysicsBody>(floorBodyDesc);
 
-	//SkinnedModelPrefab playerModel("model/Player.glb");
-	//Instantiate(playerModel);
-
-	GameObject* hill = Instantiate(cubePrefab);
-	hill->transform().scale() = { 2.0f, 2.0f, 2.0f };
-	hill->transform().position() = { 0.0f, -0.5f, 3.0f };
-	hill->transform().rotation() = Quaternion::SetEulerX(45.0f);
-	hill->AddComponent<ColliderShape>(floorShapeDesc);
-	hill->AddComponent<PhysicsBody>(floorBodyDesc);
+	SkinnedModelPrefab playerModel("model/Player.glb");
+	Instantiate(playerModel);
 
 
 	PlayerPrefab playerPrefab{};

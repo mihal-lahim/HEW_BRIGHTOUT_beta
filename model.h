@@ -11,9 +11,11 @@
 #include <filesystem>
 #include "GameObject.h"
 
-#include "assimp/scene.h"
-#pragma comment (lib, "assimp-vc143-mt.lib")
-
+namespace tinygltf
+{
+	class Model;
+	struct Primitive;
+}
 
 struct ModelNode
 {
@@ -21,6 +23,7 @@ struct ModelNode
 	int meshIndex = -1;
 	int skinnedMeshIndex = -1;
 	int textureIndex = -1;
+	DirectX::XMFLOAT4 baseColorFactor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	int parent = -1;
 	std::vector<int> children = {};
 	DirectX::XMMATRIX localMatrix = {};
@@ -83,21 +86,21 @@ private:
 	std::filesystem::path m_baseDirectory = {};
 
 	// ノードの処理
-	int ProcessNode(GraphicsDevice& device, aiNode* node, const aiScene* scene, int parentIndex);
+	int ProcessNode(GraphicsDevice& device, const tinygltf::Model& model, int nodeIndex, int parentIndex);
 
 	// メッシュの読み込み
-	int LoadMesh(GraphicsDevice& device, aiMesh* aimesh, const aiScene* aiscene);
+	int LoadMesh(GraphicsDevice& device, const tinygltf::Model& model, const tinygltf::Primitive& primitive);
 	// スキンメッシュの読み込み
-	int LoadSkinnedMesh(GraphicsDevice& device, aiMesh* aimesh, const aiScene* aiscene);
+	int LoadSkinnedMesh(GraphicsDevice& device, const tinygltf::Model& model, const tinygltf::Primitive& primitive, int skinIndex);
 
 	// テクスチャの読み込み
-	void LoadTextures(GraphicsDevice& device, const aiScene* scene);
+	void LoadTextures(GraphicsDevice& device, const tinygltf::Model& model);
 
 	// スケルトンの読み込み
-	void LoadSkeleton(const aiScene* scene);
+	void LoadSkeleton(const tinygltf::Model& model);
 
 	// アニメーションクリップの読み込み
-	void LoadAnimationClips(const aiScene* scene);
+	void LoadAnimationClips(const tinygltf::Model& model);
 };
 
 
