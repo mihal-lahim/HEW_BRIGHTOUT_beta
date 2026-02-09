@@ -209,13 +209,15 @@ void RenderingSystem::RenderSkinnedMeshRenderer(SkinnedMeshRenderer& renderer)
 		const size_t boneCount = std::min(boneTransforms.size(), bones.size());
 		if (boneCount > 0)
 		{
+			const XMMATRIX meshWorld = renderer.gameObject().transform().GetWorldMatrix();
+			const XMMATRIX inverseMeshWorld = XMMatrixInverse(nullptr, meshWorld);
 			std::vector<XMMATRIX> matrices(boneCount, XMMatrixIdentity());
 			for (size_t i = 0; i < boneCount; ++i)
 			{
 				const Transform* boneTransform = boneTransforms[i];
 				if (boneTransform)
 				{
-					const XMMATRIX boneMatrix = bones[i].offsetMatrix * boneTransform->GetWorldMatrix();
+					const XMMATRIX boneMatrix = bones[i].offsetMatrix * boneTransform->GetWorldMatrix() * inverseMeshWorld;
 					matrices[i] = XMMatrixTranspose(boneMatrix);
 				}
 			}
