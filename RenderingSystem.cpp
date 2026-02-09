@@ -215,7 +215,8 @@ void RenderingSystem::RenderSkinnedMeshRenderer(SkinnedMeshRenderer& renderer)
 				const Transform* boneTransform = boneTransforms[i];
 				if (boneTransform)
 				{
-					matrices[i] = bones[i].offsetMatrix * boneTransform->GetWorldMatrix();
+					const XMMATRIX boneMatrix = bones[i].offsetMatrix * boneTransform->GetWorldMatrix();
+					matrices[i] = XMMatrixTranspose(boneMatrix);
 				}
 			}
 
