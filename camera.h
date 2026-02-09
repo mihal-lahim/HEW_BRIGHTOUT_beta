@@ -35,7 +35,7 @@ public:
 	DirectX::XMMATRIX GetViewMatrix() const;
 
 	// プロジェクション行列取得メソッド
-	DirectX::XMMATRIX GetProjectionMatrix() const;
+	DirectX::XMMATRIX GetProjectionMatrix(float defaultWidth, float defaultHeight) const;
 };
 
 #endif

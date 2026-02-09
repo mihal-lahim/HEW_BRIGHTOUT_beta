@@ -6,7 +6,7 @@
 #include <memory>
 #include <wrl/client.h>
 
-#define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=nullptr; } }
+
 
 class GraphicsDevice
 {
@@ -78,8 +78,8 @@ private:
 
 	// バックバッファの情報
 	D3D11_TEXTURE2D_DESC m_backBufferDesc{};
+
 };
 
-GraphicsDevice& GetGraphicsDevice();
 
 #endif

@@ -20,31 +20,76 @@ public:
 	virtual ~GameObject() = default;
 
 	// Transformコンポーネントの取得メソッド
-	Transform& transform() const { return *m_transform; }
+	Transform& transform() const 
+	{ 
+		return *m_transform;
+	}
 
 	// オブジェクトのアクティブ状態を設定するメソッド
 	void SetActive(bool active);
 
 	// オブジェクトのアクティブ状態を取得するメッド
-	bool IsActiveSelf() const { return m_isActive; }
+	bool IsActiveSelf() const 
+	{ 
+		return m_isActive;
+	}
 
 	// オブジェクトが階層内でアクティブかどうかを取得するメソッド
-	bool IsActiveInHierarchy() const { return m_isActive; /*将来的に機能追加*/ }
+	bool IsActiveInHierarchy() const;
+
+	// 親オブジェクトの設定メソッド
+	void SetParent(GameObject& parent);
+
+	// 子オブジェクトの設定メソッド
+	void SetChild(GameObject& child);
+
+	// 親オブジェクトの取得メソッド
+	GameObject* GetParent() const;
+
+	// 子オブジェクトの取得メソッド
+	std::vector<GameObject*> GetChildren() const;
+
+	// 親オブジェクトの削除メソッド
+	void RemoveParent();
+
+	// 子オブジェクトの削除メソッド
+	void RemoveChild(GameObject& child);
+
+	// 名前で子オブジェクトを再帰的に検索するメソッド
+	GameObject* FindChildByName(const std::string& name) const;
 
 	// オブジェクトの破壊を許可するメソッド
 	void Destroy();
 
 	// タグの設定メソッド
-	void SetTag(const std::string& tag) { m_tag = tag; }
+	void SetTag(const std::string& tag) 
+	{ 
+		m_tag = tag;
+	}
 
 	// タグの比較メソッド
-	bool CompareTag(const std::string& tag) const { return m_tag == tag; }
+	bool CompareTag(const std::string& tag) const 
+	{ 
+		return m_tag == tag;
+	}
 
-	// 所属しているシーンの取得メソッド
-	//Scene& scene() const { return *m_scene; }
+	// オブジェクト名の設定メソッド
+	void SetName(const std::string& name) 
+	{ 
+		m_name = name; 
+	}
+
+	// オブジェクト名の取得メソッド
+	const std::string& GetName() const 
+	{ 
+		return m_name; 
+	}
 
 	// ゲームオブジェクトを生成するメソッド
 	GameObject* CreateGameObject();
+
+	// プレハブからゲームオブジェクトを生成するメソッド
+	GameObject* Instantiate(Prefab& prefab);
 
 	// システムを取得するメソッド
 	SceneSystem& scene() const;
@@ -98,6 +143,9 @@ private:
 
 	// タグ情報
 	std::string m_tag = "None";
+
+	// オブジェクト名
+	std::string m_name = "GameObject";
 
 	// 所持しているコンポーネントの配列
 	std::vector<Component*> m_components;

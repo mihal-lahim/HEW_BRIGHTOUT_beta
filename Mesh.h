@@ -1,109 +1,91 @@
-
 #ifndef MESH_H
 #define MESH_H
 
+
+#include "GraphicsDevice.h"
 #include <DirectXMath.h>
 #include <d3d11.h>
 #include <wrl/client.h>
 #include <vector>
-#include "GraphicsDevice.h"
-#include "Resource.h"
 
-
-// メッシュクラス(頂点タイプはテンプレート引数で指定)
-class Mesh : public Resource
+class MeshBase
 {
 public:
-	Mesh() = default;
-	virtual ~Mesh() = default;
-
-	// GPUバッファの作成
-	template<typename VA>
-	bool CreateBuffer(GraphicsDevice& device, const std::vector<VA>& vertexes, const std::vector<unsigned short>& indexes);
-
-	// 一時的にMeshがやることになっている描画処理
-	void Render(GraphicsDevice& device);
-
-	// GPUバッファの取得
-	ID3D11Buffer* const GetVertexBuffer() const 
-	{ 
+	UINT GetVertexCount() const
+	{
+		return m_vertexCount;
+	}
+	UINT GetIndexCount() const
+	{
+		return m_indexCount;
+	}
+	ID3D11Buffer* const GetVertexBuffer() const
+	{
 		return m_vertexBuffer.Get();
 	}
-	ID3D11Buffer* const GetIndexBuffer() const 
-	{ 
+	ID3D11Buffer* const GetIndexBuffer() const
+	{
 		return m_indexBuffer.Get();
 	}
 
-protected:
-	// 頂点ストライド
-	UINT m_vertexStride = 0;
-
-	// 頂点数とインデックス数
+private:
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer = nullptr;
 	UINT m_vertexCount = 0;
 	UINT m_indexCount = 0;
+protected:
 
-private:
-	// 頂点バッファとインデックスバッファ
-	Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer = {};
-	Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer = {};
+	// バッファの作成の共通処理
+	bool CreateBufferInternal(GraphicsDevice& device, const void* vertexes, const size_t vertexSize, const size_t vertexCount,
+		const void* indexes, const size_t indexSize, const size_t indexCount);
 };
 
-
-// プリミティブメッシュクラス
-class PrimitiveMesh : public Mesh
-{
-};
-
-template<typename VS>
-class CubeMesh : public PrimitiveMesh
+// 通常メッシュクラス
+class Mesh : public MeshBase
 {
 public:
-	using VertexAttribute = typename VS::VertexAttribute;
-	template<typename VA>
-	static std::vector<VA> CreateVertexes();
-	static std::vector<unsigned short> CreateIndexes();
+	// 頂点構造体
+	struct VertexAttribute
+	{
+		DirectX::XMFLOAT3 position = {};
+		DirectX::XMFLOAT4 color = {};
+		DirectX::XMFLOAT3 normal = {};
+		DirectX::XMFLOAT2 uv = {};
+	};
+
+	bool CreateBuffer(GraphicsDevice& device, const std::vector<VertexAttribute>& vertexes, const std::vector<UINT>& indexes)
+	{
+		return CreateBufferInternal(device, vertexes.data(), sizeof(VertexAttribute), vertexes.size(),
+			indexes.data(), sizeof(unsigned int), indexes.size());
+	}
+
+	// 描画処理
+	void Draw(GraphicsDevice& device) const;
 };
 
-template<typename VS>
-class PlaneMesh : public PrimitiveMesh
+// スキンドメッシュクラス
+class SkinnedMesh : public MeshBase
 {
 public:
-	using VertexAttribute = typename VS::VertexAttribute;
-	template<typename VA>
-	static std::vector<VA> CreateVertexes();
-	static std::vector<unsigned short> CreateIndexes();
-};
+	// 頂点構造体
+	struct VertexAttribute
+	{
+		DirectX::XMFLOAT3 position = {};
+		DirectX::XMFLOAT4 color = {};
+		DirectX::XMFLOAT3 normal = {};
+		DirectX::XMFLOAT2 uv = {};
+		UINT bone[4] = {};
+		float weight[4] = {};
+	};
 
-template<typename VS>
-class SphereMesh : public PrimitiveMesh
-{
-public:
-	using VertexAttribute = typename VS::VertexAttribute;
-	template<typename VA>
-	static std::vector<VA> CreateVertexes();
-	static std::vector<unsigned short> CreateIndexes();
-};
+	bool CreateBuffer(GraphicsDevice& device, const std::vector<VertexAttribute>& vertexes, const std::vector<UINT>& indexes)
+	{
+		return CreateBufferInternal(device, vertexes.data(), sizeof(VertexAttribute), vertexes.size(),
+			indexes.data(), sizeof(unsigned int), indexes.size());
+	}
 
-template<typename VS>
-class CapsuleMesh : public PrimitiveMesh
-{
-public:
-	using VertexAttribute = typename VS::VertexAttribute;
-	template<typename VA>
-	static std::vector<VA> CreateVertexes();
-	static std::vector<unsigned short> CreateIndexes();
+	// 描画処理
+	void Draw(GraphicsDevice& device) const;
 };
-
-template<typename VS>
-class CylinderMesh : public PrimitiveMesh
-{
-public:
-	using VertexAttribute = typename VS::VertexAttribute;
-	template<typename VA>
-	static std::vector<VA> CreateVertexes();
-	static std::vector<unsigned short> CreateIndexes();
-};
-
-#include "Mesh.inl"
 
 #endif

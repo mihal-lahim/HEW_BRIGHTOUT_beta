@@ -6,8 +6,10 @@
 #include "InputSystem.h"
 #include "ColliderShape.h"
 #include "PhysicsBody.h"
+#include "Renderer.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "GameObject.h"
 
 class PlayerPrefab : public Prefab
 {
@@ -49,9 +51,10 @@ public:
 		// PlayerStateMachineコンポーネント設定
 		player->stateMachine = gameObject.AddComponent<PlayerStateMachine>();
 
-
-		// MeshRenderer設定
-		player->meshRenderer = gameObject.AddComponent<MeshRenderer>();
+		// モデルオブジェクト設定
+		CubePrefab cubePrefab{};
+		player->modelObject = gameObject.Instantiate(cubePrefab);
+		gameObject.SetChild(*player->modelObject);
 
 
 		// ColliderShape設定

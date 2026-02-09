@@ -1,68 +1,76 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "Shader.h"
 #include "Resource.h"
-#include <memory>
-#include <type_traits>
+#include "GraphicsDevice.h"
+#include "ConstantBuffer.h"
+#include "Shader.h"
 #include "Texture.h"
-
-// シェーダーの組み合わせテンプレートクラス
-template<typename VS, typename PS>
-	requires std::is_base_of_v<VertexShader, VS>&& std::is_base_of_v<PixelShader, PS>
-class ShaderT
-{
-public:
-	// シェーダー本体
-	VS* vs = nullptr;
-	PS* ps = nullptr;
-
-	// バインド
-	void Bind(GraphicsDevice& device);
-};
+#include <unordered_map>
+#include <string>
+#include <DirectXMath.h>
 
 
-// 基底マテリアルクラス
 class Material : public Resource
 {
 public:
-	virtual ~Material() = default;
-};
+
+	Material()
+	{
+		SetColor({ 1.0f,1.0f,1.0f,1.0f });
+	}
+
+	// 使用シェーダープログラムの設定と定数バッファの作成
+	bool CreateBuffer(GraphicsDevice& device, ShaderProgram* _shaderProgram);
+	// マテリアルの適用
+	void Apply(GraphicsDevice& device);
+	// 定数バッファのバインド
+	void Bind(GraphicsDevice& device);
+
+	// パラメータの設定
+	void SetFloat(const std::string& name, float value)
+	{
+		m_floatParams[name] = value;
+		m_isDirty = true;
+	}
+	void SetFloat4(const std::string& name, const DirectX::XMFLOAT4& value)
+	{
+		m_float4Params[name] = value;
+		m_isDirty = true;
+	}
+	void SetMatrix(const std::string& name, const DirectX::XMMATRIX& value)
+	{
+		m_matrix4x4Params[name] = value;
+		m_isDirty = true;
+	}
 
 
-// マテリアルの内部実装
-template<typename VS, typename PS>
-	requires std::is_base_of_v<VertexShader, VS>&& std::is_base_of_v<PixelShader, PS>
-class MaterialImpl : public Material
-{
-public:
-	// マテリアル用定数バッファの型定義
-	using CBType = typename PS::PerMaterialCB;
-
-	// マテリアルデータ
-	CBType property = {};
+	// ショートカット
+	void SetColor(const DirectX::XMFLOAT4& color)
+	{
+		SetFloat4("diffuse_color", color);
+	}
 
 	// テクスチャ
 	Texture* texture = nullptr;
 
-	// バッファの作成、更新、バインド
-	bool CreateBuffer(GraphicsDevice& device);
-	void UpdateBuffer(GraphicsDevice& device);
-	void Bind(GraphicsDevice& device);
+	// 使用シェーダープログラム
+	ShaderProgram* shaderProgram = nullptr;
 
 private:
-	// シェーダーの組み合わせ
-	ShaderT<VS, PS> shader = {};
-	// 定数バッファ
-	ConstantBuffer<CBType>* cb = nullptr;
+	// マテリアルパラメータ
+	std::unordered_map<std::string, float> m_floatParams;
+	std::unordered_map<std::string, DirectX::XMFLOAT4> m_float4Params;
+	std::unordered_map<std::string, DirectX::XMMATRIX> m_matrix4x4Params;
+
+	// マテリアル用定数バッファ
+	ConstantBuffer materialConstantBuffer = {};
+
+	// 変更フラグ
+	bool m_isDirty = true;
+
+	friend class RenderingSystem;
 };
 
-// 2D用マテリアルと3D用マテリアルのエイリアス
-using Material2D = MaterialImpl<SpriteVS, SpritePS>;
-using Material3D = MaterialImpl<MeshVS, MeshPS>;
-
-
-
-#include "Material.inl"
 
 #endif

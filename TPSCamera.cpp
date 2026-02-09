@@ -1,6 +1,5 @@
 #include "TPSCamera.h"
 #include "player.h"
-#include "shader3d.h"
 #include <DirectXMath.h>
 #include "GraphicsDevice.h"
 #include <cmath>

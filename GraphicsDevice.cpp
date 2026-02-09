@@ -8,11 +8,6 @@
 #pragma comment(lib, "DirectXTex_Release.lib")
 #endif
 
-GraphicsDevice& GetGraphicsDevice()
-{
-	static GraphicsDevice graphicsDevice{};
-	return graphicsDevice;
-}
 
 bool GraphicsDevice::Initialize(HWND hWnd)
 {
@@ -246,10 +241,10 @@ bool GraphicsDevice::CreateBackBuffers()
 
 	// デプスステンシルステートの作成
 	D3D11_DEPTH_STENCIL_DESC dsd = {};
-	dsd.DepthFunc = D3D11_COMPARISON_LESS;
-	dsd.StencilEnable = FALSE;
-	dsd.DepthEnable = FALSE;
-	dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		dsd.DepthFunc = D3D11_COMPARISON_LESS;
+		dsd.StencilEnable = FALSE;
+		dsd.DepthEnable = FALSE;
+		dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 
 	// 深度テスト無効ステートの作成
 	m_device->CreateDepthStencilState(&dsd, m_depthStencilStateDepthDisable.GetAddressOf());

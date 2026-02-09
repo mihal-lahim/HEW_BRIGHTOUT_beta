@@ -5,44 +5,47 @@
 #include "RenderingSystem.h"
 #include <Windows.h>
 #include "Material.h"
+#include <tuple>
 #include <utility>
 
-template<typename T>
-	requires (std::is_base_of_v<Shader, T> || std::is_base_of_v<Material, T> || std::is_base_of_v<ConstantBufferBase, T> || std::is_base_of_v<PrimitiveMesh, T>)
-inline T* ResourceSystem::Load()
+template<typename T, typename... Args>
+	requires std::is_base_of_v<Resource, T>
+inline T* ResourceSystem::Load(Args&&... args)
 {
-	// リソースキーの取得
-	size_t resourceKey = typeid(T).hash_code();
-
-	// マテリアルの場合の特別処理
-	if constexpr (std::is_base_of_v<Material, T> && requires { typename T::CBType; })
+	// テクスチャの場合の特別処理
+	if constexpr (std::is_base_of_v<Texture, T>)
 	{
-		resourceKey ^= typeid(typename T::CBType).hash_code();
-		resourceKey = MakeUniqueResourceKey(resourceKey);
+		auto filePath = static_cast<std::wstring>(std::get<0>(std::forward_as_tuple(args...)));
+		size_t resourceKey = std::hash<std::wstring>{}(filePath);
+		return LoadInternal<T>(resourceKey, filePath);
 	}
-	// プリミティブメッシュの場合の特別処理
-	if constexpr (std::is_base_of_v<PrimitiveMesh, T>)
+	// シェーダーとモデル場合の特別処理
+	else if constexpr (std::is_base_of_v <Shader, T> || std::is_base_of_v <Model, T>)
 	{
-		auto vertexes = T::template CreateVertexes<typename T::VertexAttribute>();
-		auto indexes = T::CreateIndexes();
-		return LoadInternal<T>(resourceKey, vertexes, indexes);
+		auto filePath = static_cast<std::string>(std::get<0>(std::forward_as_tuple(args...)));
+		size_t resourceKey = std::hash<std::string>{}(filePath);
+		return LoadInternal<T>(resourceKey, filePath);
+	}
+	// シェーダープログラムの場合の特別処理
+	else if constexpr (std::is_base_of_v<ShaderProgram, T>)
+	{
+		auto vsFilePath = static_cast<std::string>(std::get<0>(std::forward_as_tuple(args...)));
+		auto psFilePath = static_cast<std::string>(std::get<1>(std::forward_as_tuple(args...)));
+		size_t resourceKey = std::hash<std::string>{}(vsFilePath) ^ std::hash<std::string>{}(psFilePath);
+		return LoadInternal<T>(resourceKey, vsFilePath, psFilePath);
 	}
 	else
 	{
-		// リソースの生成
-		return LoadInternal<T>(resourceKey);
+		// リソースキーの取得
+		size_t resourceKey = typeid(T).hash_code();
+
+		// マテリアルの場合の特別処理
+		if constexpr (std::is_base_of_v<Material, T>)
+		{
+			resourceKey = MakeUniqueResourceKey(resourceKey);
+			return LoadInternal<T>(resourceKey, std::forward<Args>(args)...);
+		}
 	}
-}
-
-template<typename T>
-	requires (std::is_base_of_v<Texture, T>)
-inline T* ResourceSystem::Load(const std::wstring& filePath)
-{
-	// リソースキーの取得
-	size_t resourceKey = std::hash<std::wstring>{}(filePath);
-
-	// リソースの生成
-	return LoadInternal<T>(resourceKey, filePath);
 }
 
 template<typename T, typename Key, typename... Args>
@@ -69,10 +72,7 @@ inline T* ResourceSystem::LoadInternal(const Key& resourceKey, Args&&... args)
 	{
 		result = resource->CreateBuffer(device, std::forward<Args>(args)...);
 	}
-	else if constexpr (requires { resource->template CreateBuffer<typename T::VertexAttribute>(device, std::forward<Args>(args)...); })
-	{
-		result = resource->template CreateBuffer<typename T::VertexAttribute>(device, std::forward<Args>(args)...);
-	}
+
 	if (!result)
 	{
 		MessageBox(NULL, "リソースの初期化に失敗しました。", "Error", MB_OK | MB_ICONERROR);
@@ -98,7 +98,7 @@ inline bool ResourceSystem::FindExistingResource(const Key& resourceKey) const
 	return false;
 }
 
-inline Resource* ResourceSystem::Load(Resource* resource)
+inline Resource* ResourceSystem::Copy(Resource* resource)
 {
 	if (resource == nullptr)
 	{

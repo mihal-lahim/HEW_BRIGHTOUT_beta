@@ -23,8 +23,8 @@ bool Texture::CreateBuffer(GraphicsDevice& device, const std::wstring& filePath)
 	}
 
 	// テクスチャの幅と高さを保存
-	m_width = (unsigned int)metadata.width;
-	m_height = (unsigned int)metadata.height;
+	m_width = (UINT)metadata.width;
+	m_height = (UINT)metadata.height;
 
 	// ミップマップの生成
 	ScratchImage mipChain{};
@@ -45,9 +45,20 @@ bool Texture::CreateBuffer(GraphicsDevice& device, const std::wstring& filePath)
 	return true;
 }
 
+void Texture::CreateFromLoaded(GraphicsDevice& device, ID3D11ShaderResourceView* srv, UINT width, UINT height)
+{
+	(void)device;
+
+	m_shaderResourceView.Attach(srv);
+	m_width = width;
+	m_height = height;
+}
+
 void Texture::Bind(GraphicsDevice& device)
 {
 	// ピクセルシェーダーにシェーダーリソースビューを設定
 	ID3D11ShaderResourceView* srv = m_shaderResourceView.Get();
 	device.GetDeviceContext()->PSSetShaderResources(0, 1, &srv);
+	ID3D11SamplerState* sampler = device.GetSamplerState();
+	device.GetDeviceContext()->PSSetSamplers(0, 1, &sampler);
 }
