@@ -4,6 +4,7 @@
 #include "EngineCore.h"
 #include "RenderingSystem.h"
 #include <Windows.h>
+#include "Material.h"
 #include <tuple>
 #include <utility>
 
@@ -37,7 +38,13 @@ inline T* ResourceSystem::Load(Args&&... args)
 	{
 		// リソースキーの取得
 		size_t resourceKey = typeid(T).hash_code();
-		return LoadInternal<T>(resourceKey, std::forward<Args>(args)...);
+
+		// マテリアルの場合の特別処理
+		if constexpr (std::is_base_of_v<Material, T>)
+		{
+			resourceKey = MakeUniqueResourceKey(resourceKey);
+			return LoadInternal<T>(resourceKey, std::forward<Args>(args)...);
+		}
 	}
 }
 

@@ -1,6 +1,5 @@
 #include "Renderer.h"
 #include "Texture.h"
-#include "ResourceSystem.h"
 #include "GameObject.h"
 #include "DebugOstream.h"
 

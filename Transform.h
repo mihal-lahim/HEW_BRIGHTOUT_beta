@@ -134,6 +134,15 @@ public:
 		MarkDirty();
 	}
 
+	DirectX::XMMATRIX GetLocalMatrix() const
+	{
+		DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslation(m_localPosition.x, m_localPosition.y, m_localPosition.z);
+		DirectX::XMMATRIX rotationMatrix = m_localRotation.ToXMMATRIX();
+		DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScaling(m_localScale.x, m_localScale.y, m_localScale.z);
+		DirectX::XMMATRIX localMatrix = scaleMatrix * rotationMatrix * translationMatrix;
+		return localMatrix;
+	}
+
 private:
 
 	void MarkDirty()

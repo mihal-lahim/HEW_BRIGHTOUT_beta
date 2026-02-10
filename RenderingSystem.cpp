@@ -49,9 +49,9 @@ void RenderingSystem::Render(const Scene& scene)
 	{
 		m_defaultMeshShader = scene.resource().Load<ShaderProgram>("MeshVS.cso", "MeshPS.cso");
 	}
-	if (!m_defaultSkinnedShader)
+	if (!m_defaultSkinnedMeshShader)
 	{
-		m_defaultSkinnedShader = scene.resource().Load<ShaderProgram>("SkinnedMeshVS.cso", "MeshPS.cso");
+		m_defaultSkinnedMeshShader = scene.resource().Load<ShaderProgram>("SkinnedMeshVS.cso", "MeshPS.cso");
 	}
 
 	const auto animationControllers = scene.GetComponents<AnimationController>();
@@ -104,12 +104,12 @@ void RenderingSystem::Render(const Scene& scene)
 			ApplyRenderQueue(currentQueue);
 		}
 
-		const RendererType rendererType = renderer->GetRendererType();
+		const RendererType rendererType = renderer->rendererType;
 		if (!renderer->material.shaderProgram)
 		{
-			renderer->material.shaderProgram = rendererType == RendererType::Mesh ? m_defaultMeshShader : m_defaultSkinnedShader;
+			renderer->material.shaderProgram = rendererType == RendererType::Mesh ? m_defaultMeshShader : m_defaultSkinnedMeshShader;
 		}
-		if (!renderer->material.IsBufferInitialized() && renderer->material.shaderProgram)
+		if (!renderer->material.IsInitialized() && renderer->material.shaderProgram)
 		{
 			renderer->material.CreateBuffer(*m_graphicsDevice, renderer->material.shaderProgram);
 		}
@@ -133,7 +133,7 @@ void RenderingSystem::Render(const Scene& scene)
 		case RendererType::Mesh:
 			RenderMeshRenderer(*static_cast<MeshRenderer*>(renderer));
 			break;
-		case RendererType::Skinned:
+		case RendererType::SkinnedMesh:
 			RenderSkinnedMeshRenderer(*static_cast<SkinnedMeshRenderer*>(renderer));
 			break;
 		}
@@ -215,7 +215,8 @@ void RenderingSystem::RenderSkinnedMeshRenderer(SkinnedMeshRenderer& renderer)
 				const Transform* boneTransform = boneTransforms[i];
 				if (boneTransform)
 				{
-					const XMMATRIX boneMatrix = bones[i].offsetMatrix * boneTransform->GetWorldMatrix();
+					const XMMATRIX boneMatrix =
+						boneTransform->GetLocalMatrix() * bones[i].offsetMatrix;
 					matrices[i] = XMMatrixTranspose(boneMatrix);
 				}
 			}

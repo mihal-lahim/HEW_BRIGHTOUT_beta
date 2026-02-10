@@ -26,11 +26,6 @@ public:
 	// 定数バッファのバインド
 	void Bind(GraphicsDevice& device);
 
-	bool IsBufferInitialized() const
-	{
-		return m_bufferInitialized;
-	}
-
 	// パラメータの設定
 	void SetFloat(const std::string& name, float value)
 	{
@@ -61,6 +56,11 @@ public:
 	// 使用シェーダープログラム
 	ShaderProgram* shaderProgram = nullptr;
 
+	bool IsInitialized() const
+	{
+		return m_isInitialized;
+	}
+
 private:
 	// マテリアルパラメータ
 	std::unordered_map<std::string, float> m_floatParams;
@@ -72,7 +72,9 @@ private:
 
 	// 変更フラグ
 	bool m_isDirty = true;
-	bool m_bufferInitialized = false;
+	bool m_isInitialized = false;
+
+	friend class RenderingSystem;
 };
 
 

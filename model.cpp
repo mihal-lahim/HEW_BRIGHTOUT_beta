@@ -3,14 +3,13 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
 #include "tiny_gltf.h"
+
 #include "Model.h"
 
 #include "DirectXTex.h"
 #include "Renderer.h"
-#include "DebugOstream.h"
 #include <DirectXMath.h>
 #include <algorithm>
-#include <cstring>
 #include <filesystem>
 #include <functional>
 #include <unordered_set>
@@ -20,6 +19,15 @@ using namespace DirectX;
 
 namespace
 {
+	std::string GetNodeName(const tinygltf::Node& node, int index)
+	{
+		if (!node.name.empty())
+		{
+			return node.name;
+		}
+		return "Node_" + std::to_string(index);
+	}
+
 	DirectX::XMMATRIX ConvertMatrix(const DirectX::XMMATRIX& matrix)
 	{
 		const DirectX::XMMATRIX convert = DirectX::XMMatrixScaling(1.0f, 1.0f, -1.0f);
@@ -31,209 +39,85 @@ namespace
 		return { value.x, value.y, -value.z };
 	}
 
-	DirectX::XMFLOAT4 ConvertQuaternion(const DirectX::XMFLOAT4& value)
+	DirectX::XMFLOAT3 ConvertScale(const DirectX::XMFLOAT3& value)
 	{
-		const DirectX::XMMATRIX convert = DirectX::XMMatrixScaling(1.0f, 1.0f, -1.0f);
-		const DirectX::XMVECTOR quat = DirectX::XMVectorSet(value.x, value.y, value.z, value.w);
-		const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationQuaternion(quat);
-		const DirectX::XMMATRIX converted = convert * rotation * convert;
-		const DirectX::XMVECTOR convertedQuat = DirectX::XMQuaternionRotationMatrix(converted);
-		DirectX::XMFLOAT4 result = {};
-		DirectX::XMStoreFloat4(&result, convertedQuat);
-		return result;
+		return { value.x, value.y, value.z };
 	}
 
-	DirectX::XMMATRIX MatrixFromGltf(const std::vector<double>& matrix)
+	DirectX::XMFLOAT4 ConvertQuaternion(const DirectX::XMFLOAT4& value)
 	{
-		return DirectX::XMMATRIX(
-			static_cast<float>(matrix[0]), static_cast<float>(matrix[4]), static_cast<float>(matrix[8]), static_cast<float>(matrix[12]),
-			static_cast<float>(matrix[1]), static_cast<float>(matrix[5]), static_cast<float>(matrix[9]), static_cast<float>(matrix[13]),
-			static_cast<float>(matrix[2]), static_cast<float>(matrix[6]), static_cast<float>(matrix[10]), static_cast<float>(matrix[14]),
-			static_cast<float>(matrix[3]), static_cast<float>(matrix[7]), static_cast<float>(matrix[11]), static_cast<float>(matrix[15])
-		);
+		return { value.x, value.y, -value.z, -value.w };
 	}
 
 	DirectX::XMMATRIX GetNodeLocalMatrix(const tinygltf::Node& node)
 	{
 		if (node.matrix.size() == 16)
 		{
-			return ConvertMatrix(MatrixFromGltf(node.matrix));
+			const auto& m = node.matrix;
+
+			DirectX::XMMATRIX matrix(
+				static_cast<float>(m[0]), static_cast<float>(m[1]), static_cast<float>(m[2]), static_cast<float>(m[3]),
+				static_cast<float>(m[4]), static_cast<float>(m[5]), static_cast<float>(m[6]), static_cast<float>(m[7]),
+				static_cast<float>(m[8]), static_cast<float>(m[9]), static_cast<float>(m[10]), static_cast<float>(m[11]),
+				static_cast<float>(m[12]), static_cast<float>(m[13]), static_cast<float>(m[14]), static_cast<float>(m[15])
+			);
+			return matrix;
 		}
 
 		DirectX::XMFLOAT3 translation = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT4 rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
 		DirectX::XMFLOAT3 scale = { 1.0f, 1.0f, 1.0f };
+		DirectX::XMFLOAT4 rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 		if (node.translation.size() == 3)
 		{
-			translation = { static_cast<float>(node.translation[0]), static_cast<float>(node.translation[1]), static_cast<float>(node.translation[2]) };
-		}
-		if (node.rotation.size() == 4)
-		{
-			rotation = { static_cast<float>(node.rotation[0]), static_cast<float>(node.rotation[1]), static_cast<float>(node.rotation[2]), static_cast<float>(node.rotation[3]) };
+			translation = {
+				static_cast<float>(node.translation[0]),
+				static_cast<float>(node.translation[1]),
+				static_cast<float>(node.translation[2])
+			};
 		}
 		if (node.scale.size() == 3)
 		{
-			scale = { static_cast<float>(node.scale[0]), static_cast<float>(node.scale[1]), static_cast<float>(node.scale[2]) };
+			scale = {
+				static_cast<float>(node.scale[0]),
+				static_cast<float>(node.scale[1]),
+				static_cast<float>(node.scale[2])
+			};
 		}
-
-		DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslation(translation.x, translation.y, translation.z);
-		DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(rotation.x, rotation.y, rotation.z, rotation.w));
-		DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
-		return ConvertMatrix(scaleMatrix * rotationMatrix * translationMatrix);
-	}
-
-	int ResolveTextureIndex(const tinygltf::Model& model, int materialIndex)
-	{
-		if (materialIndex < 0 || materialIndex >= static_cast<int>(model.materials.size()))
+		if (node.rotation.size() == 4)
 		{
-			return -1;
-		}
-
-		const auto& material = model.materials[materialIndex];
-		const int textureIndex = material.pbrMetallicRoughness.baseColorTexture.index;
-		if (textureIndex < 0 || textureIndex >= static_cast<int>(model.textures.size()))
-		{
-			return -1;
-		}
-
-		const auto& texture = model.textures[textureIndex];
-		const int imageIndex = texture.source;
-		if (imageIndex < 0 || imageIndex >= static_cast<int>(model.images.size()))
-		{
-			return -1;
-		}
-
-		return imageIndex;
-	}
-
-	DirectX::XMFLOAT4 ResolveBaseColorFactor(const tinygltf::Model& model, int materialIndex)
-	{
-		if (materialIndex < 0 || materialIndex >= static_cast<int>(model.materials.size()))
-		{
-			return { 1.0f, 1.0f, 1.0f, 1.0f };
-		}
-
-		const auto& factor = model.materials[materialIndex].pbrMetallicRoughness.baseColorFactor;
-		if (factor.size() == 4)
-		{
-			return {
-				static_cast<float>(factor[0]),
-				static_cast<float>(factor[1]),
-				static_cast<float>(factor[2]),
-				static_cast<float>(factor[3])
+			rotation = {
+				static_cast<float>(node.rotation[0]),
+				static_cast<float>(node.rotation[1]),
+				static_cast<float>(node.rotation[2]),
+				static_cast<float>(node.rotation[3])
 			};
 		}
 
-		return { 1.0f, 1.0f, 1.0f, 1.0f };
+		hal::dout << "rotation: " << rotation.x << ", " << rotation.y << ", " << rotation.z << ", " << rotation.w << "\n";
+
+
+		const DirectX::XMVECTOR t = DirectX::XMLoadFloat3(&translation);
+		const DirectX::XMVECTOR s = DirectX::XMLoadFloat3(&scale);
+		const DirectX::XMVECTOR r = DirectX::XMLoadFloat4(&rotation);
+
+		XMMATRIX S = XMMatrixScaling(scale.x, scale.y, scale.z);
+		XMMATRIX R = XMMatrixRotationQuaternion(XMLoadFloat4(&rotation)); 
+		XMMATRIX T = XMMatrixTranslation(translation.x, translation.y, translation.z);
+
+		return S * R * T;
 	}
 
-	bool ReadAccessorFloats(const tinygltf::Model& model, int accessorIndex, std::vector<float>& out)
+	const unsigned char* GetAccessorData(const tinygltf::Model& model, const tinygltf::Accessor& accessor, size_t& stride)
 	{
-		if (accessorIndex < 0 || accessorIndex >= static_cast<int>(model.accessors.size()))
+		const auto& view = model.bufferViews[accessor.bufferView];
+		const auto& buffer = model.buffers[view.buffer];
+		stride = accessor.ByteStride(view);
+		if (stride == 0)
 		{
-			return false;
+			stride = tinygltf::GetComponentSizeInBytes(accessor.componentType) * tinygltf::GetNumComponentsInType(accessor.type);
 		}
-		const auto& accessor = model.accessors[accessorIndex];
-		if (accessor.bufferView < 0 || accessor.bufferView >= static_cast<int>(model.bufferViews.size()))
-		{
-			return false;
-		}
-		const auto& bufferView = model.bufferViews[accessor.bufferView];
-		const auto& buffer = model.buffers[bufferView.buffer];
-		if (accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT)
-		{
-			return false;
-		}
-
-		const size_t componentCount = tinygltf::GetNumComponentsInType(accessor.type);
-		const size_t stride = accessor.ByteStride(bufferView) == 0
-			? componentCount * sizeof(float)
-			: accessor.ByteStride(bufferView);
-		out.resize(accessor.count * componentCount);
-
-		const unsigned char* data = buffer.data.data() + bufferView.byteOffset + accessor.byteOffset;
-		for (size_t i = 0; i < accessor.count; ++i)
-		{
-			const float* src = reinterpret_cast<const float*>(data + stride * i);
-			for (size_t c = 0; c < componentCount; ++c)
-			{
-				out[i * componentCount + c] = src[c];
-			}
-		}
-
-		return true;
-	}
-
-	bool ReadAccessorUInts(const tinygltf::Model& model, int accessorIndex, std::vector<UINT>& out)
-	{
-		if (accessorIndex < 0 || accessorIndex >= static_cast<int>(model.accessors.size()))
-		{
-			return false;
-		}
-		const auto& accessor = model.accessors[accessorIndex];
-		if (accessor.bufferView < 0 || accessor.bufferView >= static_cast<int>(model.bufferViews.size()))
-		{
-			return false;
-		}
-		const auto& bufferView = model.bufferViews[accessor.bufferView];
-		const auto& buffer = model.buffers[bufferView.buffer];
-		const size_t componentCount = tinygltf::GetNumComponentsInType(accessor.type);
-		const size_t componentSize = tinygltf::GetComponentSizeInBytes(accessor.componentType);
-		const size_t stride = accessor.ByteStride(bufferView) == 0
-			? componentCount * componentSize
-			: accessor.ByteStride(bufferView);
-		out.resize(accessor.count * componentCount);
-
-		const unsigned char* data = buffer.data.data() + bufferView.byteOffset + accessor.byteOffset;
-		for (size_t i = 0; i < accessor.count; ++i)
-		{
-			const unsigned char* src = data + stride * i;
-			for (size_t c = 0; c < componentCount; ++c)
-			{
-				UINT value = 0;
-				switch (accessor.componentType)
-				{
-				case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
-					value = *(reinterpret_cast<const uint8_t*>(src + componentSize * c));
-					break;
-				case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
-					value = *(reinterpret_cast<const uint16_t*>(src + componentSize * c));
-					break;
-				case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
-					value = *(reinterpret_cast<const uint32_t*>(src + componentSize * c));
-					break;
-				default:
-					return false;
-				}
-				out[i * componentCount + c] = value;
-			}
-		}
-
-		return true;
-	}
-
-	bool ReadAccessorMatrices(const tinygltf::Model& model, int accessorIndex, std::vector<DirectX::XMMATRIX>& out)
-	{
-		std::vector<float> values = {};
-		if (!ReadAccessorFloats(model, accessorIndex, values))
-		{
-			return false;
-		}
-		const size_t count = values.size() / 16;
-		out.resize(count);
-		for (size_t i = 0; i < count; ++i)
-		{
-			const float* m = &values[i * 16];
-			DirectX::XMMATRIX matrix = DirectX::XMMATRIX(
-				m[0], m[4], m[8], m[12],
-				m[1], m[5], m[9], m[13],
-				m[2], m[6], m[10], m[14],
-				m[3], m[7], m[11], m[15]
-			);
-			out[i] = ConvertMatrix(matrix);
-		}
-		return true;
+		return buffer.data.data() + view.byteOffset + accessor.byteOffset;
 	}
 
 	std::string MakeNodeName(const ModelNode& node, size_t)
@@ -271,6 +155,8 @@ namespace
 	}
 }
 
+#include "DebugOstream.h"
+
 bool Model::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 {
 	m_meshes.clear();
@@ -282,109 +168,140 @@ bool Model::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 
 	m_baseDirectory = std::filesystem::path(filePath).parent_path();
 
-	tinygltf::Model model = {};
+	tinygltf::Model gltfModel = {};
 	tinygltf::TinyGLTF loader = {};
-	std::string warning = {};
-	std::string error = {};
-	const std::string extension = std::filesystem::path(filePath).extension().string();
-	bool loaded = false;
-	if (extension == ".glb" || extension == ".GLB")
+	std::string err = {};
+	std::string warn = {};
+	const bool loaded = loader.LoadBinaryFromFile(&gltfModel, &err, &warn, filePath);
+	if (!warn.empty())
 	{
-		loaded = loader.LoadBinaryFromFile(&model, &error, &warning, filePath);
+		hal::dout << warn << std::endl;
 	}
-	else
+	if (!err.empty())
 	{
-		loaded = loader.LoadASCIIFromFile(&model, &error, &warning, filePath);
-	}
-
-	if (!warning.empty())
-	{
-		hal::dout << warning << std::endl;
+		hal::dout << err << std::endl;
 	}
 	if (!loaded)
 	{
-		hal::dout << error << std::endl;
 		return false;
 	}
 
-	LoadSkeleton(model);
-	LoadTextures(device, model);
+	LoadSkeleton(gltfModel);
 
-	int sceneIndex = model.defaultScene >= 0 ? model.defaultScene : 0;
-	if (sceneIndex >= 0 && sceneIndex < static_cast<int>(model.scenes.size()))
+	int sceneIndex = gltfModel.defaultScene;
+	if (sceneIndex < 0 && !gltfModel.scenes.empty())
 	{
-		const auto& scene = model.scenes[sceneIndex];
+		sceneIndex = 0;
+	}
+	if (sceneIndex >= 0 && sceneIndex < static_cast<int>(gltfModel.scenes.size()))
+	{
+		const auto& scene = gltfModel.scenes[sceneIndex];
 		for (int nodeIndex : scene.nodes)
 		{
-			ProcessNode(device, model, nodeIndex, -1);
+			ProcessNode(device, gltfModel, nodeIndex, -1);
 		}
 	}
 
-	LoadAnimationClips(model);
+	LoadTextures(device, gltfModel);
+	LoadAnimationClips(gltfModel);
 
 	return true;
 }
 
 int Model::ProcessNode(GraphicsDevice& device, const tinygltf::Model& model, int nodeIndex, int parentIndex)
 {
-	if (nodeIndex < 0 || nodeIndex >= static_cast<int>(model.nodes.size()))
-	{
-		return -1;
-	}
-
 	const auto& node = model.nodes[nodeIndex];
 	ModelNode modelNode = {};
-	modelNode.name = node.name;
+	modelNode.name = GetNodeName(node, nodeIndex);
 	modelNode.parent = parentIndex;
-	modelNode.localMatrix = GetNodeLocalMatrix(node);
+	modelNode.localMatrix = ConvertMatrix(GetNodeLocalMatrix(node));
 
-	int textureIndex = -1;
+	const int modelNodeIndex = static_cast<int>(m_nodes.size());
+	m_nodes.push_back(std::move(modelNode));
 
 	if (node.mesh >= 0 && node.mesh < static_cast<int>(model.meshes.size()))
 	{
 		const auto& mesh = model.meshes[node.mesh];
-		if (!mesh.primitives.empty())
+		const bool isSkinned = node.skin >= 0;
+		const size_t primitiveCount = mesh.primitives.size();
+		for (size_t i = 0; i < primitiveCount; ++i)
 		{
-			textureIndex = ResolveTextureIndex(model, mesh.primitives.front().material);
-			modelNode.baseColorFactor = ResolveBaseColorFactor(model, mesh.primitives.front().material);
-		}
-
-		if (node.skin >= 0)
-		{
-			const int skinnedMeshIndex = LoadSkinnedMesh(device, model, mesh.primitives.front(), node.skin);
-			if (skinnedMeshIndex >= 0)
+			const auto& primitive = mesh.primitives[i];
+			int meshIndex = -1;
+			if (isSkinned)
 			{
-				modelNode.skinnedMeshIndex = skinnedMeshIndex;
+				meshIndex = LoadSkinnedMesh(device, model, primitive, node.skin);
+			}
+			else
+			{
+				meshIndex = LoadMesh(device, model, primitive);
+			}
+
+			DirectX::XMFLOAT4 baseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+			int textureIndex = -1;
+			if (primitive.material >= 0 && primitive.material < static_cast<int>(model.materials.size()))
+			{
+				const auto& material = model.materials[primitive.material];
+				const auto& pbr = material.pbrMetallicRoughness;
+				if (pbr.baseColorFactor.size() == 4)
+				{
+					baseColor = {
+						static_cast<float>(pbr.baseColorFactor[0]),
+						static_cast<float>(pbr.baseColorFactor[1]),
+						static_cast<float>(pbr.baseColorFactor[2]),
+						static_cast<float>(pbr.baseColorFactor[3])
+					};
+				}
+				if (pbr.baseColorTexture.index >= 0 && pbr.baseColorTexture.index < static_cast<int>(model.textures.size()))
+				{
+					const auto& texture = model.textures[pbr.baseColorTexture.index];
+					textureIndex = texture.source;
+				}
+			}
+
+			if (primitiveCount == 1)
+			{
+				if (isSkinned)
+				{
+					m_nodes[modelNodeIndex].skinnedMeshIndex = meshIndex;
+				}
+				else
+				{
+					m_nodes[modelNodeIndex].meshIndex = meshIndex;
+				}
+				m_nodes[modelNodeIndex].textureIndex = textureIndex;
+				m_nodes[modelNodeIndex].baseColorFactor = baseColor;
+			}
+			else
+			{
+				ModelNode childNode = {};
+				childNode.name = modelNode.name + "_Primitive" + std::to_string(i);
+				childNode.parent = modelNodeIndex;
+				childNode.localMatrix = DirectX::XMMatrixIdentity();
+				childNode.textureIndex = textureIndex;
+				childNode.baseColorFactor = baseColor;
+				if (isSkinned)
+				{
+					childNode.skinnedMeshIndex = meshIndex;
+				}
+				else
+				{
+					childNode.meshIndex = meshIndex;
+				}
+				const int childIndex = static_cast<int>(m_nodes.size());
+				m_nodes.push_back(std::move(childNode));
+				m_nodes[modelNodeIndex].children.push_back(childIndex);
 			}
 		}
-		else
-		{
-			const int meshIndex = LoadMesh(device, model, mesh.primitives.front());
-			if (meshIndex >= 0)
-			{
-				modelNode.meshIndex = meshIndex;
-			}
-		}
 	}
 
-	if (textureIndex >= 0)
+	for (int childNodeIndex : node.children)
 	{
-		modelNode.textureIndex = textureIndex;
+		const int childIndex = ProcessNode(device, model, childNodeIndex, modelNodeIndex);
+		m_nodes[modelNodeIndex].children.push_back(childIndex);
 	}
 
-	const int currentIndex = static_cast<int>(m_nodes.size());
-	m_nodes.push_back(std::move(modelNode));
-
-	for (int child : node.children)
-	{
-		const int childIndex = ProcessNode(device, model, child, currentIndex);
-		if (childIndex >= 0)
-		{
-			m_nodes[currentIndex].children.push_back(childIndex);
-		}
-	}
-
-	return currentIndex;
+	return modelNodeIndex;
 }
 
 int Model::LoadMesh(GraphicsDevice& device, const tinygltf::Model& model, const tinygltf::Primitive& primitive)
@@ -394,63 +311,102 @@ int Model::LoadMesh(GraphicsDevice& device, const tinygltf::Model& model, const 
 		return -1;
 	}
 
-	std::vector<float> positions = {};
-	std::vector<float> normals = {};
-	std::vector<float> uvs = {};
-	const auto positionIt = primitive.attributes.find("POSITION");
+	auto positionIt = primitive.attributes.find("POSITION");
 	if (positionIt == primitive.attributes.end())
 	{
 		return -1;
 	}
 
-	ReadAccessorFloats(model, positionIt->second, positions);
-	const size_t vertexCount = positions.size() / 3;
-	const auto normalIt = primitive.attributes.find("NORMAL");
-	if (normalIt != primitive.attributes.end())
+	const tinygltf::Accessor& positionAccessor = model.accessors[positionIt->second];
+	std::vector<Mesh::VertexAttribute> vertexes = {};
+	vertexes.resize(positionAccessor.count);
+
+	size_t positionStride = 0;
+	const unsigned char* positionData = GetAccessorData(model, positionAccessor, positionStride);
+
+	const tinygltf::Accessor* normalAccessor = nullptr;
+	const unsigned char* normalData = nullptr;
+	size_t normalStride = 0;
+	if (auto normalIt = primitive.attributes.find("NORMAL"); normalIt != primitive.attributes.end())
 	{
-		ReadAccessorFloats(model, normalIt->second, normals);
-	}
-	const auto uvIt = primitive.attributes.find("TEXCOORD_0");
-	if (uvIt != primitive.attributes.end())
-	{
-		ReadAccessorFloats(model, uvIt->second, uvs);
+		normalAccessor = &model.accessors[normalIt->second];
+		normalData = GetAccessorData(model, *normalAccessor, normalStride);
 	}
 
-	std::vector<Mesh::VertexAttribute> vertexes = {};
-	vertexes.resize(vertexCount);
-	for (size_t i = 0; i < vertexCount; ++i)
+	const tinygltf::Accessor* texcoordAccessor = nullptr;
+	const unsigned char* texcoordData = nullptr;
+	size_t texcoordStride = 0;
+	if (auto texcoordIt = primitive.attributes.find("TEXCOORD_0"); texcoordIt != primitive.attributes.end())
+	{
+		texcoordAccessor = &model.accessors[texcoordIt->second];
+		texcoordData = GetAccessorData(model, *texcoordAccessor, texcoordStride);
+	}
+
+	for (size_t i = 0; i < vertexes.size(); ++i)
 	{
 		auto& vertex = vertexes[i];
-		DirectX::XMFLOAT3 position = { positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2] };
-		vertex.position = ConvertVector(position);
+		const float* position = reinterpret_cast<const float*>(positionData + i * positionStride);
+		vertex.position = ConvertVector({ position[0], position[1], position[2] });
 		vertex.color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		if (!normals.empty())
+
+		if (normalAccessor)
 		{
-			DirectX::XMFLOAT3 normal = { normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2] };
-			vertex.normal = ConvertVector(normal);
+			const float* normal = reinterpret_cast<const float*>(normalData + i * normalStride);
+			vertex.normal = ConvertVector({ normal[0], normal[1], normal[2] });
 		}
-		if (uvs.size() >= (i + 1) * 2)
+		if (texcoordAccessor)
 		{
-			vertex.uv = { uvs[i * 2], uvs[i * 2 + 1] };
+			const float* uv = reinterpret_cast<const float*>(texcoordData + i * texcoordStride);
+			vertex.uv = { uv[0], uv[1] };
 		}
 	}
 
 	std::vector<UINT> indexes = {};
 	if (primitive.indices >= 0)
 	{
-		ReadAccessorUInts(model, primitive.indices, indexes);
+		const tinygltf::Accessor& indexAccessor = model.accessors[primitive.indices];
+		size_t indexStride = 0;
+		const unsigned char* indexData = GetAccessorData(model, indexAccessor, indexStride);
+		std::vector<UINT> rawIndices = {};
+		rawIndices.resize(indexAccessor.count);
+
+		for (size_t i = 0; i < indexAccessor.count; ++i)
+		{
+			const unsigned char* ptr = indexData + i * indexStride;
+			switch (indexAccessor.componentType)
+			{
+			case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+				rawIndices[i] = static_cast<UINT>(*ptr);
+				break;
+			case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+				rawIndices[i] = static_cast<UINT>(*reinterpret_cast<const uint16_t*>(ptr));
+				break;
+			case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+				rawIndices[i] = static_cast<UINT>(*reinterpret_cast<const uint32_t*>(ptr));
+				break;
+			default:
+				rawIndices[i] = 0;
+				break;
+			}
+		}
+
+		indexes.reserve(rawIndices.size());
+		for (size_t i = 0; i + 2 < rawIndices.size(); i += 3)
+		{
+			indexes.push_back(rawIndices[i]);
+			indexes.push_back(rawIndices[i + 2]);
+			indexes.push_back(rawIndices[i + 1]);
+		}
 	}
 	else
 	{
-		indexes.resize(vertexCount);
-		for (size_t i = 0; i < vertexCount; ++i)
+		indexes.reserve(vertexes.size());
+		for (UINT i = 0; i + 2 < static_cast<UINT>(vertexes.size()); i += 3)
 		{
-			indexes[i] = static_cast<UINT>(i);
+			indexes.push_back(i);
+			indexes.push_back(i + 2);
+			indexes.push_back(i + 1);
 		}
-	}
-	for (size_t i = 0; i + 2 < indexes.size(); i += 3)
-	{
-		std::swap(indexes[i + 1], indexes[i + 2]);
 	}
 
 	Mesh mesh = {};
@@ -470,89 +426,131 @@ int Model::LoadSkinnedMesh(GraphicsDevice& device, const tinygltf::Model& model,
 	{
 		return -1;
 	}
+	if (skinIndex < 0 || skinIndex >= static_cast<int>(model.skins.size()))
+	{
+		return -1;
+	}
 
-	std::vector<float> positions = {};
-	std::vector<float> normals = {};
-	std::vector<float> uvs = {};
-	std::vector<float> weights = {};
-	std::vector<UINT> joints = {};
-
-	const auto positionIt = primitive.attributes.find("POSITION");
+	auto positionIt = primitive.attributes.find("POSITION");
 	if (positionIt == primitive.attributes.end())
 	{
 		return -1;
 	}
-	ReadAccessorFloats(model, positionIt->second, positions);
-	const size_t vertexCount = positions.size() / 3;
 
-	const auto normalIt = primitive.attributes.find("NORMAL");
-	if (normalIt != primitive.attributes.end())
-	{
-		ReadAccessorFloats(model, normalIt->second, normals);
-	}
-	const auto uvIt = primitive.attributes.find("TEXCOORD_0");
-	if (uvIt != primitive.attributes.end())
-	{
-		ReadAccessorFloats(model, uvIt->second, uvs);
-	}
-	const auto weightIt = primitive.attributes.find("WEIGHTS_0");
-	if (weightIt != primitive.attributes.end())
-	{
-		ReadAccessorFloats(model, weightIt->second, weights);
-	}
-	const auto jointsIt = primitive.attributes.find("JOINTS_0");
-	if (jointsIt != primitive.attributes.end())
-	{
-		ReadAccessorUInts(model, jointsIt->second, joints);
-	}
-
-	std::vector<int> jointToBone = {};
-	if (skinIndex >= 0 && skinIndex < static_cast<int>(model.skins.size()))
-	{
-		const auto& skin = model.skins[skinIndex];
-		jointToBone.resize(skin.joints.size(), -1);
-		for (size_t i = 0; i < skin.joints.size(); ++i)
-		{
-			const int jointNodeIndex = skin.joints[i];
-			if (jointNodeIndex >= 0 && jointNodeIndex < static_cast<int>(model.nodes.size()))
-			{
-				const auto& jointNode = model.nodes[jointNodeIndex];
-				jointToBone[i] = m_skeleton.FindBoneIndex(jointNode.name);
-			}
-		}
-	}
-
+	const tinygltf::Accessor& positionAccessor = model.accessors[positionIt->second];
 	std::vector<SkinnedMesh::VertexAttribute> vertexes = {};
-	vertexes.resize(vertexCount);
-	for (size_t i = 0; i < vertexCount; ++i)
+	vertexes.resize(positionAccessor.count);
+
+	size_t positionStride = 0;
+	const unsigned char* positionData = GetAccessorData(model, positionAccessor, positionStride);
+
+	const tinygltf::Accessor* normalAccessor = nullptr;
+	const unsigned char* normalData = nullptr;
+	size_t normalStride = 0;
+	if (auto normalIt = primitive.attributes.find("NORMAL"); normalIt != primitive.attributes.end())
+	{
+		normalAccessor = &model.accessors[normalIt->second];
+		normalData = GetAccessorData(model, *normalAccessor, normalStride);
+	}
+
+	const tinygltf::Accessor* texcoordAccessor = nullptr;
+	const unsigned char* texcoordData = nullptr;
+	size_t texcoordStride = 0;
+	if (auto texcoordIt = primitive.attributes.find("TEXCOORD_0"); texcoordIt != primitive.attributes.end())
+	{
+		texcoordAccessor = &model.accessors[texcoordIt->second];
+		texcoordData = GetAccessorData(model, *texcoordAccessor, texcoordStride);
+	}
+
+	const tinygltf::Accessor* jointsAccessor = nullptr;
+	const unsigned char* jointsData = nullptr;
+	size_t jointsStride = 0;
+	if (auto jointsIt = primitive.attributes.find("JOINTS_0"); jointsIt != primitive.attributes.end())
+	{
+		jointsAccessor = &model.accessors[jointsIt->second];
+		jointsData = GetAccessorData(model, *jointsAccessor, jointsStride);
+	}
+
+	const tinygltf::Accessor* weightsAccessor = nullptr;
+	const unsigned char* weightsData = nullptr;
+	size_t weightsStride = 0;
+	if (auto weightsIt = primitive.attributes.find("WEIGHTS_0"); weightsIt != primitive.attributes.end())
+	{
+		weightsAccessor = &model.accessors[weightsIt->second];
+		weightsData = GetAccessorData(model, *weightsAccessor, weightsStride);
+	}
+
+	const auto& skin = model.skins[skinIndex];
+
+	for (size_t i = 0; i < vertexes.size(); ++i)
 	{
 		auto& vertex = vertexes[i];
-		DirectX::XMFLOAT3 position = { positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2] };
-		vertex.position = ConvertVector(position);
+		const float* position = reinterpret_cast<const float*>(positionData + i * positionStride);
+		vertex.position = ConvertVector({ position[0], position[1], position[2] });
 		vertex.color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		if (!normals.empty())
+
+		if (normalAccessor)
 		{
-			DirectX::XMFLOAT3 normal = { normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2] };
-			vertex.normal = ConvertVector(normal);
+			const float* normal = reinterpret_cast<const float*>(normalData + i * normalStride);
+			vertex.normal = ConvertVector({ normal[0], normal[1], normal[2] });
 		}
-		if (uvs.size() >= (i + 1) * 2)
+		if (texcoordAccessor)
 		{
-			vertex.uv = { uvs[i * 2], uvs[i * 2 + 1] };
+			const float* uv = reinterpret_cast<const float*>(texcoordData + i * texcoordStride);
+			vertex.uv = { uv[0], uv[1] };
 		}
-		for (int k = 0; k < 4; ++k)
+
+		if (jointsAccessor && weightsAccessor)
 		{
-			const size_t index = i * 4 + k;
-			if (index < joints.size())
+			const unsigned char* jointPtr = jointsData + i * jointsStride;
+			const unsigned char* weightPtr = weightsData + i * weightsStride;
+			for (int k = 0; k < 4; ++k)
 			{
-				const UINT jointIndex = joints[index];
-				if (jointIndex < jointToBone.size() && jointToBone[jointIndex] >= 0)
+				uint16_t jointIndex = 0;
+				switch (jointsAccessor->componentType)
 				{
-					vertex.bone[k] = static_cast<UINT>(jointToBone[jointIndex]);
+				case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+					jointIndex = static_cast<uint16_t>(jointPtr[k]);
+					break;
+				case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+					jointIndex = reinterpret_cast<const uint16_t*>(jointPtr)[k];
+					break;
+				default:
+					jointIndex = 0;
+					break;
 				}
-			}
-			if (index < weights.size())
-			{
-				vertex.weight[k] = weights[index];
+
+				int boneIndex = 0;
+				if (jointIndex < skin.joints.size())
+				{
+					const int jointNodeIndex = skin.joints[jointIndex];
+					const auto& jointNode = model.nodes[jointNodeIndex];
+					const std::string jointName = GetNodeName(jointNode, jointNodeIndex);
+					const int foundIndex = m_skeleton.FindBoneIndex(jointName);
+					if (foundIndex >= 0)
+					{
+						boneIndex = foundIndex;
+					}
+				}
+				vertex.bone[k] = static_cast<UINT>(boneIndex);
+
+				float weightValue = 0.0f;
+				switch (weightsAccessor->componentType)
+				{
+				case TINYGLTF_COMPONENT_TYPE_FLOAT:
+					weightValue = reinterpret_cast<const float*>(weightPtr)[k];
+					break;
+				case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+					weightValue = static_cast<float>(weightPtr[k]) / 255.0f;
+					break;
+				case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+					weightValue = static_cast<float>(reinterpret_cast<const uint16_t*>(weightPtr)[k]) / 65535.0f;
+					break;
+				default:
+					weightValue = 0.0f;
+					break;
+				}
+				vertex.weight[k] = weightValue;
 			}
 		}
 	}
@@ -560,19 +558,49 @@ int Model::LoadSkinnedMesh(GraphicsDevice& device, const tinygltf::Model& model,
 	std::vector<UINT> indexes = {};
 	if (primitive.indices >= 0)
 	{
-		ReadAccessorUInts(model, primitive.indices, indexes);
+		const tinygltf::Accessor& indexAccessor = model.accessors[primitive.indices];
+		size_t indexStride = 0;
+		const unsigned char* indexData = GetAccessorData(model, indexAccessor, indexStride);
+		std::vector<UINT> rawIndices = {};
+		rawIndices.resize(indexAccessor.count);
+
+		for (size_t i = 0; i < indexAccessor.count; ++i)
+		{
+			const unsigned char* ptr = indexData + i * indexStride;
+			switch (indexAccessor.componentType)
+			{
+			case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+				rawIndices[i] = static_cast<UINT>(*ptr);
+				break;
+			case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+				rawIndices[i] = static_cast<UINT>(*reinterpret_cast<const uint16_t*>(ptr));
+				break;
+			case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+				rawIndices[i] = static_cast<UINT>(*reinterpret_cast<const uint32_t*>(ptr));
+				break;
+			default:
+				rawIndices[i] = 0;
+				break;
+			}
+		}
+
+		indexes.reserve(rawIndices.size());
+		for (size_t i = 0; i + 2 < rawIndices.size(); i += 3)
+		{
+			indexes.push_back(rawIndices[i]);
+			indexes.push_back(rawIndices[i + 2]);
+			indexes.push_back(rawIndices[i + 1]);
+		}
 	}
 	else
 	{
-		indexes.resize(vertexCount);
-		for (size_t i = 0; i < vertexCount; ++i)
+		indexes.reserve(vertexes.size());
+		for (UINT i = 0; i + 2 < static_cast<UINT>(vertexes.size()); i += 3)
 		{
-			indexes[i] = static_cast<UINT>(i);
+			indexes.push_back(i);
+			indexes.push_back(i + 2);
+			indexes.push_back(i + 1);
 		}
-	}
-	for (size_t i = 0; i + 2 < indexes.size(); i += 3)
-	{
-		std::swap(indexes[i + 1], indexes[i + 2]);
 	}
 
 	SkinnedMesh mesh = {};
@@ -588,51 +616,41 @@ int Model::LoadSkinnedMesh(GraphicsDevice& device, const tinygltf::Model& model,
 
 void Model::LoadTextures(GraphicsDevice& device, const tinygltf::Model& model)
 {
-	m_textures.clear();
-	m_textures.resize(model.images.size());
-	for (size_t imageIndex = 0; imageIndex < model.images.size(); ++imageIndex)
+	for (const auto& image : model.images)
 	{
-		const auto& image = model.images[imageIndex];
-		if (image.width <= 0 || image.height <= 0 || image.image.empty())
+		if (image.image.empty() || image.width <= 0 || image.height <= 0)
 		{
+			m_textures.emplace_back();
 			continue;
 		}
 
-		std::vector<uint8_t> rgba = {};
-		if (image.component == 4)
-		{
-			rgba = image.image;
-		}
-		else if (image.component == 3)
-		{
-			rgba.resize(static_cast<size_t>(image.width) * image.height * 4);
-			for (int i = 0; i < image.width * image.height; ++i)
-			{
-				rgba[i * 4] = image.image[i * 3];
-				rgba[i * 4 + 1] = image.image[i * 3 + 1];
-				rgba[i * 4 + 2] = image.image[i * 3 + 2];
-				rgba[i * 4 + 3] = 255;
-			}
-		}
-		else
-		{
-			rgba.resize(static_cast<size_t>(image.width) * image.height * 4);
-			for (int i = 0; i < image.width * image.height; ++i)
-			{
-				const uint8_t value = image.image[i];
-				rgba[i * 4] = value;
-				rgba[i * 4 + 1] = value;
-				rgba[i * 4 + 2] = value;
-				rgba[i * 4 + 3] = 255;
-			}
-		}
-
+		const UINT width = static_cast<UINT>(image.width);
+		const UINT height = static_cast<UINT>(image.height);
 		DirectX::ScratchImage scratch = {};
-		if (FAILED(scratch.Initialize2D(DXGI_FORMAT_R8G8B8A8_UNORM, image.width, image.height, 1, 1)))
+		if (FAILED(scratch.Initialize2D(DXGI_FORMAT_R8G8B8A8_UNORM, width, height, 1, 1)))
 		{
+			m_textures.emplace_back();
 			continue;
 		}
-		memcpy(scratch.GetPixels(), rgba.data(), rgba.size());
+
+		const DirectX::Image* dstImage = scratch.GetImage(0, 0, 0);
+		uint8_t* dst = dstImage->pixels;
+		const size_t dstRowPitch = dstImage->rowPitch;
+		const uint8_t* src = image.image.data();
+		const int components = image.component > 0 ? image.component : 4;
+		for (UINT y = 0; y < height; ++y)
+		{
+			uint8_t* row = dst + y * dstRowPitch;
+			const uint8_t* srcRow = src + static_cast<size_t>(y) * width * components;
+			for (UINT x = 0; x < width; ++x)
+			{
+				const uint8_t* pixel = srcRow + static_cast<size_t>(x) * components;
+				row[x * 4 + 0] = pixel[0];
+				row[x * 4 + 1] = components > 1 ? pixel[1] : pixel[0];
+				row[x * 4 + 2] = components > 2 ? pixel[2] : pixel[0];
+				row[x * 4 + 3] = components > 3 ? pixel[3] : 255;
+			}
+		}
 
 		DirectX::TexMetadata metadata = scratch.GetMetadata();
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv = nullptr;
@@ -643,154 +661,222 @@ void Model::LoadTextures(GraphicsDevice& device, const tinygltf::Model& model)
 			metadata,
 			&srv)))
 		{
+			m_textures.emplace_back();
 			continue;
 		}
 
 		Texture texture = {};
-		texture.CreateFromLoaded(device, srv.Detach(), static_cast<UINT>(metadata.width), static_cast<UINT>(metadata.height));
-		m_textures[imageIndex] = std::move(texture);
+		texture.CreateFromLoaded(device, srv.Detach(), width, height);
+		m_textures.push_back(std::move(texture));
 	}
 }
 
 void Model::LoadSkeleton(const tinygltf::Model& model)
 {
-	std::unordered_set<int> jointNodes = {};
-	std::unordered_map<int, DirectX::XMMATRIX> inverseBindMap = {};
-
-	for (const auto& skin : model.skins)
+	if (model.skins.empty())
 	{
-		for (int jointIndex : skin.joints)
+		return;
+	}
+
+	std::vector<int> parentMap(model.nodes.size(), -1);
+	for (size_t i = 0; i < model.nodes.size(); ++i)
+	{
+		for (int childIndex : model.nodes[i].children)
 		{
-			jointNodes.insert(jointIndex);
-		}
-		if (skin.inverseBindMatrices >= 0)
-		{
-			std::vector<DirectX::XMMATRIX> matrices = {};
-			if (ReadAccessorMatrices(model, skin.inverseBindMatrices, matrices))
+			if (childIndex >= 0 && childIndex < static_cast<int>(parentMap.size()))
 			{
-				const size_t count = std::min(matrices.size(), skin.joints.size());
-				for (size_t i = 0; i < count; ++i)
-				{
-					inverseBindMap[skin.joints[i]] = matrices[i];
-				}
+				parentMap[childIndex] = static_cast<int>(i);
 			}
 		}
 	}
 
-	std::function<void(int, int)> buildSkeleton = [&](int nodeIndex, int parentIndex)
-	{
-		if (nodeIndex < 0 || nodeIndex >= static_cast<int>(model.nodes.size()))
-		{
-			return;
-		}
+	std::vector<int> orderedJoints = {};
+	std::unordered_set<int> jointSet = {};
+	std::unordered_map<int, DirectX::XMMATRIX> inverseBindMap = {};
 
-		const auto& node = model.nodes[nodeIndex];
-		int currentIndex = parentIndex;
-		if (jointNodes.find(nodeIndex) != jointNodes.end())
+	for (const auto& skin : model.skins)
+	{
+		if (skin.inverseBindMatrices >= 0 && skin.inverseBindMatrices < static_cast<int>(model.accessors.size()))
 		{
-			Bone bone = {};
-			bone.name = node.name;
-			bone.parentIndex = parentIndex;
-			bone.offsetMatrix = DirectX::XMMatrixIdentity();
-			bone.bindPose = GetNodeLocalMatrix(node);
-			const auto inverseBindIt = inverseBindMap.find(nodeIndex);
-			if (inverseBindIt != inverseBindMap.end())
+			const auto& accessor = model.accessors[skin.inverseBindMatrices];
+			size_t stride = 0;
+			const unsigned char* data = GetAccessorData(model, accessor, stride);
+			for (size_t i = 0; i < skin.joints.size(); ++i)
 			{
-				bone.offsetMatrix = inverseBindIt->second;
+				const float* matrixData = reinterpret_cast<const float*>(data + i * stride);
+				DirectX::XMMATRIX matrix(
+					matrixData[0], matrixData[1], matrixData[2], matrixData[3],
+					matrixData[4], matrixData[5], matrixData[6], matrixData[7],
+					matrixData[8], matrixData[9], matrixData[10], matrixData[11],
+					matrixData[12], matrixData[13], matrixData[14], matrixData[15]);
+				matrix = DirectX::XMMatrixTranspose(matrix);
+				matrix = ConvertMatrix(matrix);
+				inverseBindMap[skin.joints[i]] = matrix;
 			}
-			m_skeleton.boneMap[bone.name] = static_cast<int>(m_skeleton.bones.size());
-			m_skeleton.bones.push_back(std::move(bone));
-			currentIndex = static_cast<int>(m_skeleton.bones.size()) - 1;
 		}
 
-		for (int child : node.children)
+		for (int jointIndex : skin.joints)
 		{
-			buildSkeleton(child, currentIndex);
+			if (jointSet.insert(jointIndex).second)
+			{
+				orderedJoints.push_back(jointIndex);
+			}
 		}
-	};
+	}
 
-	int sceneIndex = model.defaultScene >= 0 ? model.defaultScene : 0;
-	if (sceneIndex >= 0 && sceneIndex < static_cast<int>(model.scenes.size()))
+	std::unordered_map<int, int> nodeToBone = {};
+	for (int jointIndex : orderedJoints)
 	{
-		const auto& scene = model.scenes[sceneIndex];
-		for (int nodeIndex : scene.nodes)
+		if (jointIndex < 0 || jointIndex >= static_cast<int>(model.nodes.size()))
 		{
-			buildSkeleton(nodeIndex, -1);
+			continue;
 		}
+
+		const auto& node = model.nodes[jointIndex];
+		Bone bone = {};
+		bone.name = GetNodeName(node, jointIndex);
+		bone.parentIndex = -1;
+		bone.bindPose = ConvertMatrix(GetNodeLocalMatrix(node));
+		bone.offsetMatrix = XMMatrixInverse(nullptr, bone.bindPose);
+
+		
+		/*
+		auto it = inverseBindMap.find(jointIndex);
+		if (it != inverseBindMap.end())
+		{
+			bone.offsetMatrix = it->second;
+		}
+		*/
+		
+
+
+		hal::dout << "Bone: " << bone.name << "\n"; 
+		
+		// bindPose 出力 
+		hal::dout << "bindPose:\n"; 
+		for (int row = 0; row < 4; ++row) 
+		{ 
+			XMFLOAT4 r; 
+			XMStoreFloat4(&r, bone.bindPose.r[row]); 
+			hal::dout << r.x << " " << r.y << " " << r.z << " " << r.w << "\n"; 
+		}
+
+		// offsetMatrix 出力（inverseBindMatrix） 
+		hal::dout << "offsetMatrix:\n"; 
+
+		for (int row = 0; row < 4; ++row) 
+		{ 
+			XMFLOAT4 r; 
+			XMStoreFloat4(&r, bone.offsetMatrix.r[row]); 
+			hal::dout << r.x << " " << r.y << " " << r.z << " " << r.w << "\n"; 
+		} 
+
+		// bindPose * offsetMatrix の積（単位行列に近いか？） 
+		XMMATRIX product = bone.bindPose * bone.offsetMatrix; 
+		hal::dout << "bindPose * offsetMatrix:\n"; 
+		for (int row = 0; row < 4; ++row) 
+		{ 
+			XMFLOAT4 r; 
+			XMStoreFloat4(&r, product.r[row]); 
+			hal::dout << r.x << " " << r.y << " " << r.z << " " << r.w << "\n";
+		}
+
+		const int boneIndex = static_cast<int>(m_skeleton.bones.size());
+		m_skeleton.boneMap[bone.name] = boneIndex;
+		m_skeleton.bones.push_back(std::move(bone));
+		nodeToBone[jointIndex] = boneIndex;
+	}
+
+	for (const auto& [nodeIndex, boneIndex] : nodeToBone)
+	{
+		int parentIndex = -1;
+		if (nodeIndex >= 0 && nodeIndex < static_cast<int>(parentMap.size()))
+		{
+			const int parentNode = parentMap[nodeIndex];
+			if (auto it = nodeToBone.find(parentNode); it != nodeToBone.end())
+			{
+				parentIndex = it->second;
+			}
+		}
+		m_skeleton.bones[boneIndex].parentIndex = parentIndex;
 	}
 }
 
 void Model::LoadAnimationClips(const tinygltf::Model& model)
 {
-	for (const auto& animation : model.animations)
+	for (size_t i = 0; i < model.animations.size(); ++i)
 	{
+		const auto& animation = model.animations[i];
 		AnimationClip clip = {};
-		clip.name = animation.name;
+		clip.name = animation.name.empty() ? "Animation_" + std::to_string(i) : animation.name;
 		clip.ticksPerSecond = 1.0f;
 		clip.boneTracks.resize(m_skeleton.bones.size());
-		float maxTime = 0.0f;
 
+		float maxTime = 0.0f;
 		for (const auto& channel : animation.channels)
 		{
-			if (channel.sampler < 0 || channel.sampler >= static_cast<int>(animation.samplers.size()))
-			{
-				continue;
-			}
 			if (channel.target_node < 0 || channel.target_node >= static_cast<int>(model.nodes.size()))
 			{
 				continue;
 			}
 
-			const auto& node = model.nodes[channel.target_node];
-			const int boneIndex = m_skeleton.FindBoneIndex(node.name);
-			if (boneIndex < 0)
+			const auto& targetNode = model.nodes[channel.target_node];
+			const std::string targetName = GetNodeName(targetNode, channel.target_node);
+			const int boneIndex = m_skeleton.FindBoneIndex(targetName);
+			if (boneIndex < 0 || channel.sampler < 0 || channel.sampler >= static_cast<int>(animation.samplers.size()))
 			{
 				continue;
 			}
 
 			const auto& sampler = animation.samplers[channel.sampler];
-			std::vector<float> times = {};
-			if (!ReadAccessorFloats(model, sampler.input, times))
+			if (sampler.input < 0 || sampler.input >= static_cast<int>(model.accessors.size()) ||
+				sampler.output < 0 || sampler.output >= static_cast<int>(model.accessors.size()))
 			{
 				continue;
 			}
 
+			const auto& inputAccessor = model.accessors[sampler.input];
+			const auto& outputAccessor = model.accessors[sampler.output];
+			size_t inputStride = 0;
+			size_t outputStride = 0;
+			const unsigned char* inputData = GetAccessorData(model, inputAccessor, inputStride);
+			const unsigned char* outputData = GetAccessorData(model, outputAccessor, outputStride);
+			const size_t keyCount = std::min(inputAccessor.count, outputAccessor.count);
 			BoneKeyframes& keyframes = clip.boneTracks[boneIndex];
-			if (channel.target_path == "translation" || channel.target_path == "scale")
+
+			for (size_t k = 0; k < keyCount; ++k)
 			{
-				std::vector<float> values = {};
-				if (!ReadAccessorFloats(model, sampler.output, values))
+				float time = 0.0f;
+				const unsigned char* timePtr = inputData + k * inputStride;
+				switch (inputAccessor.componentType)
 				{
-					continue;
+				case TINYGLTF_COMPONENT_TYPE_FLOAT:
+					time = *reinterpret_cast<const float*>(timePtr);
+					break;
+				case TINYGLTF_COMPONENT_TYPE_DOUBLE:
+					time = static_cast<float>(*reinterpret_cast<const double*>(timePtr));
+					break;
+				default:
+					time = 0.0f;
+					break;
 				}
-				const size_t count = std::min(times.size(), values.size() / 3);
-				for (size_t i = 0; i < count; ++i)
+
+				maxTime = std::max(maxTime, time);
+				const unsigned char* valuePtr = outputData + k * outputStride;
+				if (channel.target_path == "translation" && outputAccessor.type == TINYGLTF_TYPE_VEC3)
 				{
-					const DirectX::XMFLOAT3 value = { values[i * 3], values[i * 3 + 1], values[i * 3 + 2] };
-					if (channel.target_path == "translation")
-					{
-						keyframes.positionKeyframes.push_back({ times[i], ConvertVector(value) });
-					}
-					else
-					{
-						keyframes.scaleKeyframes.push_back({ times[i], ConvertVector(value) });
-					}
-					maxTime = std::max(maxTime, times[i]);
+					const float* value = reinterpret_cast<const float*>(valuePtr);
+					keyframes.positionKeyframes.push_back({ time, ConvertVector({ value[0], value[1], value[2] }) });
 				}
-			}
-			else if (channel.target_path == "rotation")
-			{
-				std::vector<float> values = {};
-				if (!ReadAccessorFloats(model, sampler.output, values))
+				else if (channel.target_path == "scale" && outputAccessor.type == TINYGLTF_TYPE_VEC3)
 				{
-					continue;
+					const float* value = reinterpret_cast<const float*>(valuePtr);
+					keyframes.scaleKeyframes.push_back({ time, ConvertScale({ value[0], value[1], value[2] }) });
 				}
-				const size_t count = std::min(times.size(), values.size() / 4);
-				for (size_t i = 0; i < count; ++i)
+				else if (channel.target_path == "rotation" && outputAccessor.type == TINYGLTF_TYPE_VEC4)
 				{
-					const DirectX::XMFLOAT4 value = { values[i * 4], values[i * 4 + 1], values[i * 4 + 2], values[i * 4 + 3] };
-					keyframes.rotationKeyframes.push_back({ times[i], ConvertQuaternion(value) });
-					maxTime = std::max(maxTime, times[i]);
+					const float* value = reinterpret_cast<const float*>(valuePtr);
+					keyframes.rotationKeyframes.push_back({ time, ConvertQuaternion({ value[0], value[1], value[2], value[3] }) });
 				}
 			}
 		}
@@ -881,6 +967,7 @@ void SkinnedModelPrefab::Instantiate(GameObject& gameObject)
 		{
 			auto* renderer = nodeObjects[i]->AddComponent<MeshRenderer>();
 			renderer->mesh = &meshes[node.meshIndex];
+			renderer->model = model;
 			renderer->material.SetColor(node.baseColorFactor);
 			if (node.textureIndex >= 0 && node.textureIndex < static_cast<int>(textures.size()))
 			{
@@ -891,6 +978,7 @@ void SkinnedModelPrefab::Instantiate(GameObject& gameObject)
 		{
 			auto* renderer = nodeObjects[i]->AddComponent<SkinnedMeshRenderer>();
 			renderer->mesh = &skinnedMeshes[node.skinnedMeshIndex];
+			renderer->model = model;
 			renderer->animationController = animationController;
 			renderer->skeleton = &skeleton;
 			renderer->material.SetColor(node.baseColorFactor);

@@ -22,24 +22,29 @@ enum class RenderQueue
 enum class RendererType
 {
 	Mesh,
-	Skinned
+	SkinnedMesh
 };
 
 class Renderer : public Component
 {
 public:
 	virtual void Render(GraphicsDevice& device) = 0;
-	virtual RendererType GetRendererType() const = 0;
 	RenderQueue renderQueue = RenderQueue::Opaque;
 	Material material = {};
+	RendererType rendererType = RendererType::Mesh;
+	Model* model = nullptr;
 };
 
 class MeshRenderer : public Renderer
 {
 public:
+	MeshRenderer()
+	{
+		rendererType = RendererType::Mesh;
+	}
+
 	// •`‰æˆ—
 	void Render(GraphicsDevice& device) override;
-	RendererType GetRendererType() const override { return RendererType::Mesh; }
 
 	const Mesh* mesh = nullptr;
 };
@@ -47,9 +52,13 @@ public:
 class SkinnedMeshRenderer : public Renderer
 {
 public:
+	SkinnedMeshRenderer()
+	{
+		rendererType = RendererType::SkinnedMesh;
+	}
+
 	// •`‰æˆ—
 	void Render(GraphicsDevice& device) override;
-	RendererType GetRendererType() const override { return RendererType::Skinned; }
 
 	const SkinnedMesh* mesh = nullptr;
 	AnimationController* animationController = nullptr;

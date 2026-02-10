@@ -9,7 +9,11 @@
 #include "Prefab.h"
 #include <string>
 #include <filesystem>
+#include <DirectXMath.h>
 #include "GameObject.h"
+
+#pragma comment (lib, "assimp-vc143-mt.lib")
+
 
 namespace tinygltf
 {

@@ -12,9 +12,9 @@ class Texture;
 class MeshRenderer;
 class SkinnedMeshRenderer;
 class Transform;
-class ShaderProgram;
 enum class RenderQueue;
 class Texture;
+class ShaderProgram;
 
 class RenderingSystem
 {
@@ -70,7 +70,7 @@ private:
 	ConstantBuffer m_perObjectBuffer = {};
 	Texture* m_defaultTexture = nullptr;
 	ShaderProgram* m_defaultMeshShader = nullptr;
-	ShaderProgram* m_defaultSkinnedShader = nullptr;
+	ShaderProgram* m_defaultSkinnedMeshShader = nullptr;
 	bool m_buffersInitialized = false;
 
 	void UpdatePerFrame();
