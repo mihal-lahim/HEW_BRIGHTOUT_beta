@@ -1,158 +1,174 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include <string>
-#include <unordered_map>
-#include <vector>
 #include <DirectXMath.h>
+#include <string>
+#include <vector>
+#include <unordered_map>
 #include "Component.h"
-#include "Transform.h"
+#include "StructuredBuffer.h"
 
-class Model;
-
-// ƒ{[ƒ“\‘¢‘Ì
+// ãƒœãƒ¼ãƒ³æƒ…å ±æ§‹é€ ä½“
 struct Bone
 {
 	std::string name = {};
 	int parentIndex = -1;
+	// è£œæ­£ç”¨è¡Œåˆ—
 	DirectX::XMMATRIX offsetMatrix = {};
-	DirectX::XMMATRIX bindPose = {};
 };
 
-// ƒXƒPƒ‹ƒgƒ“
+// ã‚¹ã‚±ãƒ«ãƒˆãƒ³æ§‹é€ ä½“
 struct Skeleton
 {
 	std::vector<Bone> bones = {};
-	std::unordered_map<std::string, int> boneMap = {};
-
-	// ƒ{[ƒ“–¼‚©‚çƒCƒ“ƒfƒbƒNƒX‚ğæ“¾‚·‚éƒƒ\ƒbƒh
-	int FindBoneIndex(const std::string& boneName) const
-	{
-		auto it = boneMap.find(boneName);
-		if (it != boneMap.end())
-		{
-			return it->second;
-		}
-		return -1;
-	}
+	// ãƒœãƒ¼ãƒ³åã‹ã‚‰ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¸ã®ãƒãƒƒãƒ”ãƒ³ã‚°
+	std::unordered_map<std::string, int> boneNameToIndexMap = {};
 };
 
-// ƒxƒNƒ^[3‚ÌƒL[ƒtƒŒ[ƒ€\‘¢‘Ì
-struct keyframeVec3
+// ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ï¼ˆãƒ™ã‚¯ã‚¿ãƒ¼3ï¼‰æ§‹é€ ä½“
+struct KeyframeVec3
 {
-	float time = 0.0f;
+	float time = -1;
 	DirectX::XMFLOAT3 value = {};
 };
 
-// ƒNƒH[ƒ^ƒjƒIƒ“‚ÌƒL[ƒtƒŒ[ƒ€\‘¢‘Ì
-struct keyframeQuat
+// ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ï¼ˆã‚¯ã‚©ãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³ï¼‰æ§‹é€ ä½“
+struct KeyframeQuat
 {
-	float time = 0.0f;
+	float time = -1;
+	// ã‚¯ã‚©ãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³(x, y, z, w)
 	DirectX::XMFLOAT4 value = {};
 };
 
-// ƒ{[ƒ“‚²‚Æ‚ÌƒL[ƒtƒŒ[ƒ€ŒQ\‘¢‘Ì
-struct BoneKeyframes
+// ç‰¹å®šã®ãƒœãƒ¼ãƒ³ã®ç‰¹å®šã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿æ§‹é€ ä½“
+struct BoneAnimation
 {
-	std::vector<keyframeVec3> positionKeyframes = {};
-	std::vector<keyframeQuat> rotationKeyframes = {};
-	std::vector<keyframeVec3> scaleKeyframes = {};
-
-	// ƒL[ƒtƒŒ[ƒ€‚ª‹ó‚©‚Ç‚¤‚©‚ğŠm”F‚·‚éƒƒ\ƒbƒh
-	bool IsEmpty() const
-	{
-		return positionKeyframes.empty() && rotationKeyframes.empty() && scaleKeyframes.empty();
-	}
+	std::vector<KeyframeVec3> positionKeyframes = {};
+	std::vector<KeyframeQuat> rotationKeyframes = {};
+	std::vector<KeyframeVec3> scaleKeyframes = {};
 };
 
-// ƒ[ƒJƒ‹ƒ|[ƒY\‘¢‘Ì
-struct LocalPose
-{
-	DirectX::XMFLOAT3 position = {};
-	DirectX::XMFLOAT4 rotation = {};
-	DirectX::XMFLOAT3 scale = {};
-};
-
-// ƒAƒjƒ[ƒVƒ‡ƒ“ƒNƒŠƒbƒv\‘¢‘Ì
+// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³æ§‹é€ ä½“
 struct AnimationClip
 {
 	std::string name = {};
-	float duration = 0.0f;
-	float ticksPerSecond = 0.0f;
-	std::vector<BoneKeyframes> boneTracks = {};
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®ç·æ™‚é–“ï¼ˆç§’ï¼‰
+	float duration = -1;
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®æ™‚é–“å˜ä½ï¼ˆãƒ†ã‚£ãƒƒã‚¯/ç§’ï¼‰
+	float ticksPerSecond = -1;
 
-	// w’è‚µ‚½ƒ{[ƒ“‚ÌƒL[ƒtƒŒ[ƒ€ŒQ‚ğæ“¾‚·‚éƒƒ\ƒbƒh
-	const BoneKeyframes& GetBoneTrack(int boneIndex) const
-	{
-		return boneTracks[boneIndex];
-	}
-
-	// w’è‚µ‚½ŠÔ‚Ìƒ[ƒJƒ‹ƒ|[ƒY‚ğƒTƒ“ƒvƒŠƒ“ƒO‚·‚éƒƒ\ƒbƒh
-	std::vector<LocalPose> Sample(float time) const;
-
-	// ƒxƒNƒ^[3‚ÌƒL[ƒtƒŒ[ƒ€‚ğƒTƒ“ƒvƒŠƒ“ƒO‚·‚éƒwƒ‹ƒp[ƒƒ\ƒbƒh
-	DirectX::XMFLOAT3 SampleVec3(const std::vector<keyframeVec3>& keyframes, float time) const;
-
-	// ƒNƒH[ƒ^ƒjƒIƒ“‚ÌƒL[ƒtƒŒ[ƒ€‚ğƒTƒ“ƒvƒŠƒ“ƒO‚·‚éƒwƒ‹ƒp[ƒƒ\ƒbƒh
-	DirectX::XMFLOAT4 SampleQuat(const std::vector<keyframeQuat>& keyframes, float time) const;
+	// ãƒœãƒ¼ãƒ³ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ã‚‰ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿ã¸ã®ãƒãƒƒãƒ”ãƒ³ã‚°
+	std::unordered_map<int, BoneAnimation> boneAnimations = {};
 };
 
+// ãƒãƒ¼ã‚ºæ§‹é€ ä½“
+struct Pose
+{
+	// ãƒ­ãƒ¼ã‚«ãƒ«è¡Œåˆ—ç¾¤
+	std::vector<DirectX::XMMATRIX> localMatrixes = {};
+	// ã‚°ãƒ­ãƒ¼ãƒãƒ«è¡Œåˆ—ç¾¤
+	std::vector<DirectX::XMMATRIX> globalMatrixes = {};
+	// ã‚¹ã‚­ãƒ³è¡Œåˆ—ç¾¤
+	std::vector<DirectX::XMMATRIX> skinMatrixes = {};
+};
 
-class AnimationController : public Component
+class Model;
+
+class Animator : public Component
 {
 public:
-	void Setup(Model* model, const std::vector<Transform*>& boneTransforms);
-	void Update();
+	Animator(const Model* model);
 
-	const std::vector<Transform*>& GetBoneTransforms() const
-	{
-		return m_boneTransforms;
-	}
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®å†ç”Ÿ
+	void Play();
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®åœæ­¢
+	void Stop();
 
-	const Skeleton* GetSkeleton() const
-	{
-		return m_skeleton;
-	}
-
-	// ƒAƒjƒ[ƒVƒ‡ƒ“‚Ì•ÏX
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®åˆ‡ã‚Šæ›¿ãˆ
 	void ChangeAnimation(const std::string& clipName);
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“‚ÌŠJn
-	void StartAnimation();
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®æ›´æ–°
+	void UpdateAnimation();
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“‚Ì’â~
-	void StopAnimation();
+	// ãƒœãƒ¼ãƒ³è¡Œåˆ—ç”¨æ§‹é€ åŒ–ãƒãƒƒãƒ•ã‚¡ã®ãƒã‚¤ãƒ³ãƒ‰
+	void Bind(GraphicsDevice& device);
 
-	// ƒ‹[ƒvİ’è
-	void SetLoop(bool isLoop);
+	// ãƒ«ãƒ¼ãƒ—è¨­å®šã®å¤‰æ›´
+	void SetModel(Model* model);
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“‚ÌƒXƒs[ƒhİ’è
-	void SetSpeed(float speed);
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¯ãƒªãƒƒãƒ—ã®è¨­å®š
+	void SetAnimationClip(const AnimationClip* clip);
+
+	// ãƒ«ãƒ¼ãƒ—è¨­å®šã®å¤‰æ›´
+	bool& isLoop()
+	{
+		return m_isLoop;
+	}
+
+	// å†ç”Ÿé€Ÿåº¦ã®è¨­å®š
+	float& speed()
+	{
+		return m_speed;
+	}
+
+	// å†ç”ŸçŠ¶æ…‹ã®å–å¾—
+	bool isPlaying() const
+	{
+		return m_isPlaying;
+	}
+
+	// ç¾åœ¨ã®å†ç”Ÿæ™‚é–“ã®å–å¾—
+	float currentTime() const
+	{
+		return m_currentTime;
+	}
+
+	// ç¾åœ¨ã®ãƒãƒ¼ã‚ºã®å–å¾—
+	const Pose& currentPose() const
+	{
+		return m_currentPose;
+	}
+
+
 private:
-	// ƒ‚ƒfƒ‹
-	Model* m_model = nullptr;
+	// ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ãƒ¡ã‚½ãƒƒãƒ‰
+	DirectX::XMFLOAT3 SampleVec3(const std::vector<KeyframeVec3>& keyframes, float time);
+	DirectX::XMFLOAT4 SampleQuat(const std::vector<KeyframeQuat>& keyframes, float time);
 
-	// Œ»İÄ¶’†‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ƒNƒŠƒbƒv
+	// ãƒ­ãƒ¼ã‚«ãƒ«ãƒãƒ¼ã‚ºã®ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ãƒ¡ã‚½ãƒƒãƒ‰
+	void SampleLocalPose(float time);
+
+	// ã‚°ãƒ­ãƒ¼ãƒãƒ«ãƒãƒ¼ã‚ºã®è¨ˆç®—ãƒ¡ã‚½ãƒƒãƒ‰
+	void ComputeGlobalPose();
+	void RecursiveComputeGlobalPose(int boneIndex, const DirectX::XMMATRIX& parentMatrix);
+
+	// ã‚¹ã‚­ãƒ³ãƒãƒ¼ã‚ºã®è¨ˆç®—ãƒ¡ã‚½ãƒƒãƒ‰
+	void ComputeSkinPose();
+
+	// ã‚¹ã‚±ãƒ«ãƒˆãƒ³ã¸ã®å‚ç…§
+	const Skeleton* m_skeleton = nullptr;
+	// ç¾åœ¨ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¯ãƒªãƒƒãƒ—
 	const AnimationClip* m_currentClip = nullptr;
 
-	// ŠÇ—‚·‚éƒXƒPƒ‹ƒgƒ“
-	const Skeleton* m_skeleton = nullptr;
+	// ç¾åœ¨ã®ãƒãƒ¼ã‚º
+	Pose m_currentPose = {};
 
-	// ŠÇ—‚·‚éƒ{[ƒ“‚ÌTransformŒQ
-	std::vector<Transform*> m_boneTransforms = {};
-
-	// ƒAƒjƒ[ƒVƒ‡ƒ“Ä¶’†‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
+	// å†ç”Ÿæ™‚é–“
+	float m_currentTime = 0.0f;
+	// å†ç”Ÿé€Ÿåº¦
+	float m_speed = 1.0f;
+	// å†ç”ŸçŠ¶æ…‹
 	bool m_isPlaying = false;
-
-	// ƒ‹[ƒvÄ¶‚·‚é‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
+	// ãƒ«ãƒ¼ãƒ—è¨­å®š
 	bool m_isLoop = true;
 
-	// Œ»İ‚ÌÄ¶ŠÔ
-	float m_currentTime = 0.0f;
+	// ãƒ¢ãƒ‡ãƒ«ã¸ã®å‚ç…§
+	const Model* m_model = nullptr;
 
-	// Ä¶‘¬“x
-	float m_speed = 1.0f;
+	// ãƒœãƒ¼ãƒ³è¡Œåˆ—ç”¨æ§‹é€ åŒ–ãƒãƒƒãƒ•ã‚¡
+	StructuredBuffer m_boneMatrixBuffer = {};
 };
+
 
 
 #endif

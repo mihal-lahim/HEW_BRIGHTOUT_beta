@@ -1,188 +1,57 @@
-#include "Animation.h"
+﻿#include "Animation.h"
 #include "Model.h"
+#include "GameObject.h"
 #include "Time.h"
-#include <algorithm>
-#include <cmath>
+#include "RenderingSystem.h"
 
-std::vector<LocalPose> AnimationClip::Sample(float time) const
+using namespace DirectX;
+
+Animator::Animator(const Model* model)
+	: m_model(model)
 {
-	std::vector<LocalPose> poses{};
-	poses.resize(boneTracks.size());
-
-	for (size_t i = 0; i < boneTracks.size(); i++)
-	{
-		const BoneKeyframes& keyframes = boneTracks[i];
-		LocalPose& pose = poses[i];
-		pose.position = SampleVec3(keyframes.positionKeyframes, time);
-		pose.rotation = SampleQuat(keyframes.rotationKeyframes, time);
-		pose.scale = SampleVec3(keyframes.scaleKeyframes, time);
-	}
-
-	return poses;
+	m_skeleton = &m_model->GetSkeleton();
 }
 
-DirectX::XMFLOAT3 AnimationClip::SampleVec3(const std::vector<keyframeVec3>& keyframes, float time) const
+void Animator::Play()
 {
-	if (keyframes.empty())
-	{
-		return { 0.0f,0.0f,0.0f };
-	}
-	if (time <= keyframes.front().time)
-	{
-		return keyframes.front().value;
-	}
-	if (time >= keyframes.back().time)
-	{
-		return keyframes.back().value;
-	}
-
-	// ���`���
-	for (int i = 0; i < static_cast<int>(keyframes.size()) - 1; i++)
-	{
-		if (time < keyframes[i + 1].time)
-		{
-			float t0 = keyframes[i].time;
-			float t1 = keyframes[i + 1].time;
-			float alpha = (time - t0) / (t1 - t0);
-
-			DirectX::XMVECTOR a = DirectX::XMLoadFloat3(&keyframes[i].value);
-			DirectX::XMVECTOR b = DirectX::XMLoadFloat3(&keyframes[i + 1].value);
-			DirectX::XMVECTOR r = DirectX::XMVectorLerp(a, b, alpha);
-
-			DirectX::XMFLOAT3 result{};
-			DirectX::XMStoreFloat3(&result, r);
-			return result;
-		}
-	}
-
-	return keyframes.back().value;
+	m_isPlaying = true;
 }
 
-DirectX::XMFLOAT4 AnimationClip::SampleQuat(const std::vector<keyframeQuat>& keyframes, float time) const
+void Animator::Stop()
 {
-	if (keyframes.empty())
-	{
-		return { 0.0f,0.0f,0.0f,1.0f };
-	}
-	if (time <= keyframes.front().time)
-	{
-		return keyframes.front().value;
-	}
-	if (time >= keyframes.back().time)
-	{
-		return keyframes.back().value;
-	}
-
-	// ���ʐ��`���
-	for (int i = 0; i < static_cast<int>(keyframes.size()) - 1; i++)
-	{
-		if (time < keyframes[i + 1].time)
-		{
-			float t0 = keyframes[i].time;
-			float t1 = keyframes[i + 1].time;
-			float alpha = (time - t0) / (t1 - t0);
-
-			DirectX::XMVECTOR a = DirectX::XMLoadFloat4(&keyframes[i].value);
-			DirectX::XMVECTOR b = DirectX::XMLoadFloat4(&keyframes[i + 1].value);
-			DirectX::XMVECTOR r = DirectX::XMQuaternionSlerp(a, b, alpha);
-
-			DirectX::XMFLOAT4 result{};
-			DirectX::XMStoreFloat4(&result, r);
-			return result;
-		}
-	}
-
-	return keyframes.back().value;
+	m_isPlaying = false;
 }
 
-void AnimationController::ChangeAnimation(const std::string& clipName)
+void Animator::ChangeAnimation(const std::string& clipName)
 {
 	if (!m_model)
 	{
 		return;
 	}
-
-	const auto& clips = m_model->GetAnimationClips();
-	for (const auto& clip : clips)
+	const auto& animations = m_model->GetAnimations();
+	for (const auto& clip : animations)
 	{
 		if (clip.name == clipName)
 		{
-			m_currentClip = &clip;
-			m_currentTime = 0.0f;
+			SetAnimationClip(&clip);
 			return;
 		}
 	}
 }
 
-void AnimationController::StartAnimation()
+void Animator::UpdateAnimation()
 {
-	if (!m_currentClip && m_model)
-	{
-		const auto& clips = m_model->GetAnimationClips();
-		if (!clips.empty())
-		{
-			m_currentClip = &clips.front();
-		}
-	}
-
-	if (m_currentClip)
-	{
-		m_isPlaying = true;
-		m_currentTime = 0.0f;
-	}
-}
-
-void AnimationController::StopAnimation()
-{
-	m_isPlaying = false;
-}
-
-void AnimationController::SetLoop(bool isLoop)
-{
-	m_isLoop = isLoop;
-}
-
-void AnimationController::SetSpeed(float speed)
-{
-	m_speed = speed;
-}
-
-void AnimationController::Setup(Model* model, const std::vector<Transform*>& boneTransforms)
-{
-	m_model = model;
-	m_skeleton = model ? &model->GetSkeleton() : nullptr;
-	m_boneTransforms = boneTransforms;
-	m_currentClip = nullptr;
-	m_currentTime = 0.0f;
-
-	if (m_model)
-	{
-		const auto& clips = m_model->GetAnimationClips();
-		if (!clips.empty())
-		{
-			m_currentClip = &clips.front();
-		}
-	}
-}
-
-void AnimationController::Update()
-{
-	if (!m_isPlaying || !m_currentClip)
+	if (!m_isPlaying || !m_currentClip || !m_skeleton)
 	{
 		return;
 	}
+	// 再生時間の更新
+	m_currentTime += m_speed * (float)Time::DeltaTime();
 
-	if (m_currentClip->duration <= 0.0f || m_boneTransforms.empty())
+	// ループ処理
+	if (m_isLoop && m_currentTime > m_currentClip->duration)
 	{
-		return;
-	}
-
-	const float delta = static_cast<float>(Time::DeltaTime());
-	m_currentTime += delta * m_speed * m_currentClip->ticksPerSecond;
-
-	if (m_isLoop)
-	{
-		m_currentTime = std::fmod(m_currentTime, m_currentClip->duration);
+		m_currentTime = fmodf(m_currentTime, m_currentClip->duration);
 	}
 	else if (m_currentTime > m_currentClip->duration)
 	{
@@ -190,28 +59,157 @@ void AnimationController::Update()
 		m_isPlaying = false;
 	}
 
-	const auto& tracks = m_currentClip->boneTracks;
-	const size_t count = std::min(tracks.size(), m_boneTransforms.size());
-	for (size_t i = 0; i < count; ++i)
-	{
-		Transform* boneTransform = m_boneTransforms[i];
-		if (!boneTransform)
-		{
-			continue;
-		}
+	// ローカルポーズのサンプリング
+	SampleLocalPose(m_currentTime);
+	// グローバルポーズの計算
+	ComputeGlobalPose();
+	// スキンポーズの計算
+	ComputeSkinPose();
+}
 
-		const BoneKeyframes& keyframes = tracks[i];
-		if (!keyframes.positionKeyframes.empty())
+void Animator::Bind(GraphicsDevice& device)
+{
+	// ボーン行列用構造化バッファの更新とバインド
+	if (m_boneMatrixBuffer.GetElementCount() != m_skeleton->bones.size())
+	{
+		m_boneMatrixBuffer.CreateBuffer(device, sizeof(XMMATRIX), (UINT)m_skeleton->bones.size(), USAGE_TYPE::DEFAULT, VIEW_TYPE::SRV);
+	}
+
+	m_boneMatrixBuffer.UpdateBuffer(device, m_currentPose.skinMatrixes.data());
+	m_boneMatrixBuffer.BindVS(device, 0);
+}
+
+void Animator::SetModel(Model* model)
+{
+	m_model = model;
+	if (m_model)
+	{
+		m_skeleton = &m_model->GetSkeleton();
+	}
+}
+void Animator::SetAnimationClip(const AnimationClip* clip)
+{
+	m_currentClip = clip;
+	m_currentTime = 0.0f;
+}
+
+XMFLOAT3 Animator::SampleVec3(const std::vector<KeyframeVec3>& keyframes, float time)
+{
+	// キーフレームが存在しない場合や1つしかない場合の処理
+	if (keyframes.empty()) 
+		return {};
+	if (keyframes.size() == 1)
+		return keyframes[0].value;
+
+	for (size_t i = 0; i < keyframes.size() - 1; i++)
+	{
+		// 指定時間がこの区間にある場合
+		if (time >= keyframes[i].time && time <= keyframes[i + 1].time)
 		{
-			boneTransform->position().FromXMFLOAT3(m_currentClip->SampleVec3(keyframes.positionKeyframes, m_currentTime));
+			// 線形補間
+			float t = (time - keyframes[i].time) / (keyframes[i + 1].time - keyframes[i].time);
+			XMFLOAT3 start = keyframes[i].value;
+			XMFLOAT3 end = keyframes[i + 1].value;
+			XMFLOAT3 result{};
+			XMVECTOR r = XMVectorLerp(XMLoadFloat3(&start), XMLoadFloat3(&end), t);
+			XMStoreFloat3(&result, r);
+
+			return result;
 		}
-		if (!keyframes.rotationKeyframes.empty())
+	}
+}
+
+XMFLOAT4 Animator::SampleQuat(const std::vector<KeyframeQuat>& keyframes, float time)
+{
+	// キーフレームが存在しない場合や1つしかない場合の処理
+	if (keyframes.empty())
+		return {};
+	if (keyframes.size() == 1)
+		return keyframes[0].value;
+
+	for (size_t i = 0; i < keyframes.size() - 1; i++)
+	{
+		// 指定時間がこの区間にある場合
+		if (time >= keyframes[i].time && time <= keyframes[i + 1].time)
 		{
-			boneTransform->rotation().FromXMFLOAT4(m_currentClip->SampleQuat(keyframes.rotationKeyframes, m_currentTime));
+			// 線形補間
+			float t = (time - keyframes[i].time) / (keyframes[i + 1].time - keyframes[i].time);
+			XMFLOAT4 start = keyframes[i].value;
+			XMFLOAT4 end = keyframes[i + 1].value;
+			XMFLOAT4 result{};
+			XMVECTOR r = XMQuaternionSlerp(XMLoadFloat4(&start), XMLoadFloat4(&end), t);
+			XMStoreFloat4(&result, r);
+
+			return result;
 		}
-		if (!keyframes.scaleKeyframes.empty())
+	}
+}
+
+void Animator::SampleLocalPose(float time)
+{
+	for (int i = 0; i < m_skeleton->bones.size(); ++i)
+	{
+		// ボーンアニメーションの取得
+		const auto& boneAnimIt = m_currentClip->boneAnimations.find(i);
+		if (boneAnimIt != m_currentClip->boneAnimations.end())
 		{
-			boneTransform->scale().FromXMFLOAT3(m_currentClip->SampleVec3(keyframes.scaleKeyframes, m_currentTime));
+			const BoneAnimation& boneAnim = boneAnimIt->second;
+
+			// サンプリング
+			XMFLOAT3 position = SampleVec3(boneAnim.positionKeyframes, time);
+			XMFLOAT4 rotation = SampleQuat(boneAnim.rotationKeyframes, time);
+			XMFLOAT3 scale = SampleVec3(boneAnim.scaleKeyframes, time);
+
+			XMVECTOR posV = XMLoadFloat3(&position);
+			XMVECTOR rotV = XMLoadFloat4(&rotation);
+			XMVECTOR scaleV = XMLoadFloat3(&scale);
+
+			// ローカルポーズに設定
+			XMMATRIX localMatrix = 
+				  XMMatrixScalingFromVector(scaleV) 
+				* XMMatrixRotationQuaternion(rotV) 
+				* XMMatrixTranslationFromVector(posV);
+
+			m_currentPose.localMatrixes[i] = localMatrix;
 		}
+	}
+}
+
+void Animator::ComputeGlobalPose()
+{
+	// ルートボーンから再帰的にグローバルポーズを計算
+	for (int i = 0; i < m_skeleton->bones.size(); ++i)
+	{
+		if (m_skeleton->bones[i].parentIndex == -1)
+		{
+			RecursiveComputeGlobalPose(i, gameObject().transform().GetWorldMatrix());
+		}
+	}
+}
+
+void Animator::RecursiveComputeGlobalPose(int boneIndex, const DirectX::XMMATRIX& parentMatrix)
+{
+	// ローカル行列を取得して親行列と掛け合わせる
+	XMMATRIX current = m_currentPose.localMatrixes[boneIndex];
+	m_currentPose.globalMatrixes[boneIndex] = current * parentMatrix;
+
+	// 子ボーンに対して再帰的に処理
+	for (int i = 0; i < m_skeleton->bones.size(); ++i)
+	{
+		if (m_skeleton->bones[i].parentIndex == boneIndex)
+		{
+			RecursiveComputeGlobalPose(i, m_currentPose.globalMatrixes[boneIndex]);
+		}
+	}
+}
+
+void Animator::ComputeSkinPose()
+{
+	for (int i = 0; i < m_skeleton->bones.size(); ++i)
+	{
+		// スキン行列 = 補正行列 * グローバル行列
+		XMMATRIX offsetMatrix = m_skeleton->bones[i].offsetMatrix;
+		XMMATRIX globalMatrix = m_currentPose.globalMatrixes[i];
+		m_currentPose.skinMatrixes[i] = XMMatrixTranspose(offsetMatrix * globalMatrix);
 	}
 }

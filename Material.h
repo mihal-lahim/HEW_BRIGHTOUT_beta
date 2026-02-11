@@ -22,9 +22,9 @@ public:
 	// 使用シェーダープログラムの設定と定数バッファの作成
 	bool CreateBuffer(GraphicsDevice& device, ShaderProgram* _shaderProgram);
 	// マテリアルの適用
-	void Apply(GraphicsDevice& device);
+	void Apply(GraphicsDevice& device) const;
 	// 定数バッファのバインド
-	void Bind(GraphicsDevice& device);
+	void Bind(GraphicsDevice& device) const;
 
 	// パラメータの設定
 	void SetFloat(const std::string& name, float value)
@@ -53,13 +53,16 @@ public:
 	// テクスチャ
 	const Texture* texture = nullptr;
 
+	// 遅延ロード用テクスチャパス
+	std::wstring texturePath = L"texture/Default.png";
+
+	// 遅延ロード用シェーダーパス
+	std::string vsPath = "MeshVS.cso";
+	std::string psPath = "MeshPS.cso";
+
 	// 使用シェーダープログラム
 	ShaderProgram* shaderProgram = nullptr;
 
-	bool IsInitialized() const
-	{
-		return m_isInitialized;
-	}
 
 private:
 	// マテリアルパラメータ
@@ -71,8 +74,7 @@ private:
 	ConstantBuffer materialConstantBuffer = {};
 
 	// 変更フラグ
-	bool m_isDirty = true;
-	bool m_isInitialized = false;
+	mutable bool m_isDirty = true;
 
 	friend class RenderingSystem;
 };

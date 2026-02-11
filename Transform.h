@@ -17,40 +17,16 @@ public:
 	~Transform() = default;
 
 	// 位置の取得・設定メソッド
-	Vector3& position() 
-	{ 
-		MarkDirty();
-		return m_localPosition;
-	}
+	Vector3& position();
 
 	// 回転の取得・設定メソッド
-	Quaternion& rotation() 
-	{ 
-		MarkDirty();
-		return m_localRotation;
-	}
+	Quaternion& rotation();
 
 	// スケールの取得・設定メソッド
-	Vector3& scale() 
-	{ 
-		MarkDirty();
-		return m_localScale;
-	}
+	Vector3& scale();
 
 	// 親の設定
-	void SetParent(Transform& parent)
-	{
-		// 既に親がいる場合は、現在の親から自分を削除
-		if (m_parent)
-		{
-			m_parent->RemoveChild(*this);
-		}
-
-		// 新しい親を設定し、親の子リストに自分を追加
-		m_parent = &parent;
-		parent.m_children.push_back(this);
-		MarkDirty();
-	}
+	void SetParent(Transform& parent);
 
 	// 子の追加
 	void AddChild(Transform& child)
@@ -59,29 +35,10 @@ public:
 	}
 
 	// 子の削除
-	void RemoveChild(Transform& child)
-	{
-		child.m_parent = nullptr;
-		m_children.erase(
-			std::remove(
-				m_children.begin(),
-				m_children.end(),
-				&child),
-			m_children.end()
-		);
-		MarkDirty();
-	}
+	void RemoveChild(Transform& child);
 
 	// 親の削除
-	void RemoveParent()
-	{
-		if (m_parent)
-		{
-			m_parent->RemoveChild(*this);
-			m_parent = nullptr;
-			MarkDirty();
-		}
-	}
+	void RemoveParent();
 
 	// 親の取得
 	Transform* GetParent()
@@ -96,63 +53,18 @@ public:
 	}
 
 	// ワールド変換行列の取得メソッド
-	DirectX::XMMATRIX GetWorldMatrix() const
-	{
-		if (isDirty)
-		{
-			// ローカル変換行列の計算
-			DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslation(m_localPosition.x, m_localPosition.y, m_localPosition.z);
-			DirectX::XMMATRIX rotationMatrix = m_localRotation.ToXMMATRIX();
-			DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScaling(m_localScale.x, m_localScale.y, m_localScale.z);
-			DirectX::XMMATRIX localMatrix = scaleMatrix * rotationMatrix * translationMatrix;
-			// 親の変換行列を考慮
-			if (m_parent)
-			{
-				m_worldMatrix = localMatrix * m_parent->GetWorldMatrix();
-			}
-			else
-			{
-				m_worldMatrix = localMatrix;
-			}
-			isDirty = false;
-		}
-		return m_worldMatrix;
-	}
+	DirectX::XMMATRIX GetWorldMatrix() const;
 
 	// ローカル変換行列の設定メソッド
-	void SetLocalMatrix(const DirectX::XMMATRIX& localMatrix)
-	{
-		// スケールの抽出
-		DirectX::XMVECTOR scaleVec;
-		DirectX::XMVECTOR rotationVec;
-		DirectX::XMVECTOR translationVec;
-		DirectX::XMMatrixDecompose(&scaleVec, &rotationVec, &translationVec, localMatrix);
-		// 各成分を設定
-		m_localScale.FromXMVECTOR(scaleVec);
-		m_localRotation.FromXMVECTOR(rotationVec);
-		m_localPosition.FromXMVECTOR(translationVec);
-		MarkDirty();
-	}
+	void SetLocalMatrix(const DirectX::XMMATRIX& localMatrix);
 
-	DirectX::XMMATRIX GetLocalMatrix() const
-	{
-		DirectX::XMMATRIX translationMatrix = DirectX::XMMatrixTranslation(m_localPosition.x, m_localPosition.y, m_localPosition.z);
-		DirectX::XMMATRIX rotationMatrix = m_localRotation.ToXMMATRIX();
-		DirectX::XMMATRIX scaleMatrix = DirectX::XMMatrixScaling(m_localScale.x, m_localScale.y, m_localScale.z);
-		DirectX::XMMATRIX localMatrix = scaleMatrix * rotationMatrix * translationMatrix;
-		return localMatrix;
-	}
+	// ローカル変換行列の取得メソッド
+	DirectX::XMMATRIX GetLocalMatrix() const;
 
 private:
 
-	void MarkDirty()
-	{
-		isDirty = true;
-		for (auto* child : m_children)
-		{
-			child->MarkDirty();
-		}
-	}
+	// 変換行列が変更されたことをマークするメソッド
+	void MarkDirty();
 
 	// 位置
 	Vector3 m_localPosition{};

@@ -32,6 +32,14 @@ public:
 	void BindPS(GraphicsDevice& device, UINT slot);
 	void BindCS(GraphicsDevice& device, UINT slot);
 
+	UINT GetElementCount() const
+	{
+		return m_elementCount;
+	}
+	UINT GetElementSize() const
+	{
+		return m_elementSize;
+	}
 private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srv = nullptr;

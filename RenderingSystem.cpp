@@ -1,5 +1,4 @@
 #include "RenderingSystem.h"
-#include "Animation.h"
 #include "Camera.h"
 #include "Renderer.h"
 #include "GraphicsDevice.h"
@@ -9,6 +8,7 @@
 #include "Shader.h"
 #include "Scene.h"
 #include "Texture.h"
+#include "Animation.h"
 #include <algorithm>
 #include <vector>
 
@@ -16,16 +16,13 @@ using namespace DirectX;
 
 void RenderingSystem::Initialize(GraphicsDevice& graphicsDevice)
 {
+	// グラフィックスデバイスの設定
 	m_graphicsDevice = &graphicsDevice;
-	if (m_buffersInitialized)
-	{
-		return;
-	}
 
+	// 各種定数バッファの作成
 	m_perFrameBuffer.CreateBuffer(*m_graphicsDevice, sizeof(PerFrameConstants));
 	m_perCameraBuffer.CreateBuffer(*m_graphicsDevice, sizeof(PerCameraConstants));
 	m_perObjectBuffer.CreateBuffer(*m_graphicsDevice, sizeof(PerObjectConstants));
-	m_buffersInitialized = true;
 }
 
 void RenderingSystem::Finalize()
@@ -41,105 +38,103 @@ void RenderingSystem::Render(const Scene& scene)
 
 	m_graphicsDevice->Clear();
 
-	if (!m_defaultTexture)
-	{
-		m_defaultTexture = scene.resource().Load<Texture>(L"texture/Default.png");
-	}
-	if (!m_defaultMeshShader)
-	{
-		m_defaultMeshShader = scene.resource().Load<ShaderProgram>("MeshVS.cso", "MeshPS.cso");
-	}
-	if (!m_defaultSkinnedMeshShader)
-	{
-		m_defaultSkinnedMeshShader = scene.resource().Load<ShaderProgram>("SkinnedMeshVS.cso", "MeshPS.cso");
-	}
-
-	const auto animationControllers = scene.GetComponents<AnimationController>();
-	for (auto* controller : animationControllers)
-	{
-		if (controller && controller->IsEnable())
-		{
-			controller->Update();
-		}
-	}
-
+	// フレーム毎の更新
 	UpdatePerFrame();
-	UpdatePerCamera(scene);
 
-	std::vector<Renderer*> renderers = {};
-	const auto meshRenderers = scene.GetComponents<MeshRenderer>();
-	const auto skinnedMeshRenderers = scene.GetComponents<SkinnedMeshRenderer>();
-	for (auto* renderer : meshRenderers)
-	{
-		if (renderer && renderer->IsEnable() && renderer->mesh)
-		{
-			renderers.push_back(renderer);
-		}
-	}
-	for (auto* renderer : skinnedMeshRenderers)
-	{
-		if (renderer && renderer->IsEnable() && renderer->mesh)
-		{
-			renderers.push_back(renderer);
-		}
-	}
 
-	std::sort(renderers.begin(), renderers.end(), [](const Renderer* a, const Renderer* b)
-		{
-			return static_cast<int>(a->renderQueue) < static_cast<int>(b->renderQueue);
-		});
-
-	RenderQueue currentQueue = RenderQueue::Opaque;
-	ApplyRenderQueue(currentQueue);
-	for (auto* renderer : renderers)
+	// アニメーションコントローラーの取得
+	auto animControllers = scene.GetComponents<Animator>();
+	for (auto& controller : animControllers)
 	{
-		if (!renderer)
+		if (!controller->IsEnable())
 		{
 			continue;
 		}
+		// アニメーションの更新
+		controller->UpdateAnimation();
+		controller->Bind(*m_graphicsDevice);
+	}
 
-		if (renderer->renderQueue != currentQueue)
+
+	// カメラの取得
+	auto cameras = scene.GetComponents<Camera>();
+
+	std::sort(cameras.begin(), cameras.end(),
+		[](const Camera* a, const Camera* b)
 		{
-			currentQueue = renderer->renderQueue;
+			return a->Priority < b->Priority;
+		}
+	);
+
+	for (auto& camera : cameras)
+	{
+		if (!camera->IsEnable())
+		{
+			continue;
+		}
+		// カメラ毎の更新
+		UpdatePerCamera(*camera);
+
+		// メッシュレンダラーの取得
+		auto meshRenderers = scene.GetComponents<MeshRenderer>();
+
+		for (auto& renderer : meshRenderers)
+		{
+			if (!renderer->IsEnable())
+			{
+				continue;
+			}
+			// レンダーキューの適用
+			RenderQueue currentQueue = renderer->renderQueue;
 			ApplyRenderQueue(currentQueue);
+
+			// マテリアルの遅延ロード処理
+			MaterialLoadingProcess(renderer->material);
+
+			// レンダー
+			renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
 		}
 
-		const RendererType rendererType = renderer->rendererType;
-		if (!renderer->material.shaderProgram)
-		{
-			renderer->material.shaderProgram = rendererType == RendererType::Mesh ? m_defaultMeshShader : m_defaultSkinnedMeshShader;
-		}
-		if (!renderer->material.IsInitialized() && renderer->material.shaderProgram)
-		{
-			renderer->material.CreateBuffer(*m_graphicsDevice, renderer->material.shaderProgram);
-		}
-		if (!renderer->material.texture)
-		{
-			renderer->material.texture = m_defaultTexture;
-		}
-		if (renderer->material.shaderProgram)
-		{
-			renderer->material.shaderProgram->Bind(*m_graphicsDevice);
-		}
-		if (renderer->material.texture)
-		{
-			renderer->material.texture->Bind(*m_graphicsDevice);
-		}
-		renderer->material.Apply(*m_graphicsDevice);
-		renderer->material.Bind(*m_graphicsDevice);
+		// スキンドメッシュレンダラーの取得
+		auto skinnedMeshRenderers = scene.GetComponents<SkinnedMeshRenderer>();
 
-		switch (rendererType)
+		for (auto& renderer : skinnedMeshRenderers)
 		{
-		case RendererType::Mesh:
-			RenderMeshRenderer(*static_cast<MeshRenderer*>(renderer));
-			break;
-		case RendererType::SkinnedMesh:
-			RenderSkinnedMeshRenderer(*static_cast<SkinnedMeshRenderer*>(renderer));
-			break;
+			if (!renderer->IsEnable())
+			{
+				continue;
+			}
+			// レンダーキューの適用
+			RenderQueue currentQueue = renderer->renderQueue;
+			ApplyRenderQueue(currentQueue);
+
+			// マテリアルの遅延ロード処理
+			MaterialLoadingProcess(renderer->material);
+
+			// レンダー
+			renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
 		}
 	}
 
 	m_graphicsDevice->Present();
+}
+
+void RenderingSystem::MaterialLoadingProcess(Material& material)
+{
+	// シェーダープログラムの設定
+	if (!material.shaderProgram)
+	{
+		auto* resourceSystem = m_engineCore->GetGameContext().resourceSystem;
+		auto* shader = resourceSystem->Load<ShaderProgram>(material.vsPath, material.psPath);
+		material.CreateBuffer(*m_graphicsDevice, shader);
+	}
+	// テクスチャの設定
+	if (!material.texture)
+	{
+		auto* resourceSystem = m_engineCore->GetGameContext().resourceSystem;
+		auto* texture = resourceSystem->Load<Texture>(material.texturePath);
+		material.texture = texture;
+	}
 }
 
 void RenderingSystem::UpdatePerFrame()
@@ -154,79 +149,24 @@ void RenderingSystem::UpdatePerFrame()
 	m_perFrameBuffer.BindPS(*m_graphicsDevice, 0);
 }
 
-void RenderingSystem::UpdatePerCamera(const Scene& scene)
+void RenderingSystem::UpdatePerCamera(const Camera& camera)
 {
+	// カメラ毎構造体の更新
 	PerCameraConstants perCamera = {};
-	XMMATRIX view = XMMatrixIdentity();
-	XMMATRIX projection = XMMatrixIdentity();
-	const auto cameras = scene.GetComponents<Camera>();
-	if (!cameras.empty())
-	{
-		auto* camera = *std::max_element(cameras.begin(), cameras.end(), [](const Camera* a, const Camera* b)
-			{
-				return a->Priority < b->Priority;
-			});
-		if (camera)
-		{
-			view = camera->GetViewMatrix();
-			projection = camera->GetProjectionMatrix(static_cast<float>(m_graphicsDevice->GetBackBufferWidth()),
-				static_cast<float>(m_graphicsDevice->GetBackBufferHeight()));
-		}
-	}
+	XMMATRIX view = camera.GetViewMatrix();
+	XMMATRIX projection = camera.GetProjectionMatrix(
+		static_cast<float>(m_graphicsDevice->GetBackBufferWidth()),
+		static_cast<float>(m_graphicsDevice->GetBackBufferHeight())
+	);
 
+	// 行列を転置して格納
 	XMStoreFloat4x4(&perCamera.view, XMMatrixTranspose(view));
 	XMStoreFloat4x4(&perCamera.projection, XMMatrixTranspose(projection));
 
+	// 定数バッファの更新とバインド
 	m_perCameraBuffer.UpdateBuffer(*m_graphicsDevice, &perCamera, sizeof(perCamera));
 	m_perCameraBuffer.BindVS(*m_graphicsDevice, 1);
 	m_perCameraBuffer.BindPS(*m_graphicsDevice, 1);
-}
-
-void RenderingSystem::UpdatePerObject(const Transform& transform)
-{
-	PerObjectConstants perObject = {};
-	XMStoreFloat4x4(&perObject.world, XMMatrixTranspose(transform.GetWorldMatrix()));
-
-	m_perObjectBuffer.UpdateBuffer(*m_graphicsDevice, &perObject, sizeof(perObject));
-	m_perObjectBuffer.BindVS(*m_graphicsDevice, 2);
-	m_perObjectBuffer.BindPS(*m_graphicsDevice, 2);
-}
-
-void RenderingSystem::RenderMeshRenderer(MeshRenderer& renderer)
-{
-	UpdatePerObject(renderer.gameObject().transform());
-	renderer.Render(*m_graphicsDevice);
-}
-
-void RenderingSystem::RenderSkinnedMeshRenderer(SkinnedMeshRenderer& renderer)
-{
-	UpdatePerObject(renderer.gameObject().transform());
-
-	if (renderer.animationController && renderer.skeleton)
-	{
-		const auto& boneTransforms = renderer.animationController->GetBoneTransforms();
-		const auto& bones = renderer.skeleton->bones;
-		const size_t boneCount = std::min(boneTransforms.size(), bones.size());
-		if (boneCount > 0)
-		{
-			std::vector<XMMATRIX> matrices(boneCount, XMMatrixIdentity());
-			for (size_t i = 0; i < boneCount; ++i)
-			{
-				const Transform* boneTransform = boneTransforms[i];
-				if (boneTransform)
-				{
-					const XMMATRIX boneMatrix =
-						boneTransform->GetLocalMatrix() * bones[i].offsetMatrix;
-					matrices[i] = XMMatrixTranspose(boneMatrix);
-				}
-			}
-
-			renderer.UpdateBoneBuffer(*m_graphicsDevice, matrices.data(), boneCount);
-			renderer.BindBoneBuffer(*m_graphicsDevice, 0);
-		}
-	}
-
-	renderer.Render(*m_graphicsDevice);
 }
 
 void RenderingSystem::ApplyRenderQueue(RenderQueue queue)

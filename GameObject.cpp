@@ -75,6 +75,9 @@ GameObject* GameObject::FindChildByName(const std::string& name) const
 			return child;
 		}
 		result = child->FindChildByName(name);
+
+		if (result)
+			break;
 	}
 
 	return result;

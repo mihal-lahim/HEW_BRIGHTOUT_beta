@@ -10,11 +10,12 @@ class EngineCore;
 class Scene;
 class Texture;
 class MeshRenderer;
-class SkinnedMeshRenderer;
 class Transform;
 enum class RenderQueue;
 class Texture;
 class ShaderProgram;
+class Material;
+class Camera;
 
 class RenderingSystem
 {
@@ -46,7 +47,8 @@ public:
 	// 描画メソッド
 	void Render(const Scene& scene);
 
-private:
+
+	// フレーム毎更新用定数バッファ構造体
 	struct PerFrameConstants
 	{
 		DirectX::XMFLOAT4 ambient_light_color = {};
@@ -54,30 +56,31 @@ private:
 		DirectX::XMFLOAT4 directional_light_vector = {};
 	};
 
+	// カメラ毎更新用定数バッファ構造体
 	struct PerCameraConstants
 	{
 		DirectX::XMFLOAT4X4 view = {};
 		DirectX::XMFLOAT4X4 projection = {};
 	};
 
+	// オブジェクト毎更新用定数バッファ構造体
 	struct PerObjectConstants
 	{
 		DirectX::XMFLOAT4X4 world = {};
 	};
 
+private:
+
+	// 各種定数バッファ
 	ConstantBuffer m_perFrameBuffer = {};
 	ConstantBuffer m_perCameraBuffer = {};
 	ConstantBuffer m_perObjectBuffer = {};
-	Texture* m_defaultTexture = nullptr;
-	ShaderProgram* m_defaultMeshShader = nullptr;
-	ShaderProgram* m_defaultSkinnedMeshShader = nullptr;
-	bool m_buffersInitialized = false;
+
+	// マテリアルの遅延ロード処理
+	void MaterialLoadingProcess(Material& material);
 
 	void UpdatePerFrame();
-	void UpdatePerCamera(const Scene& scene);
-	void UpdatePerObject(const Transform& transform);
-	void RenderMeshRenderer(MeshRenderer& renderer);
-	void RenderSkinnedMeshRenderer(SkinnedMeshRenderer& renderer);
+	void UpdatePerCamera(const Camera& camera);
 	void ApplyRenderQueue(RenderQueue queue);
 
 	// 所属するエンジンコア
