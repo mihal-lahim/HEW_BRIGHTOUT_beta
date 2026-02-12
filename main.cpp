@@ -13,6 +13,10 @@
 #include "EngineCore.h"
 #include "Window.h"
 
+#include "Kageyama.h"
+#include "Kasiwagi.h"
+#include "Namioka.h"
+
 using namespace DirectX;
 
 
