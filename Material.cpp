@@ -43,10 +43,12 @@ bool Material::CreateBuffer(GraphicsDevice& device, ShaderProgram* _shaderProgra
 	}
 
 	m_isDirty = true;
-	return materialConstantBuffer.CreateBuffer(device, bufferSize);
+	materialConstantBuffer.CreateBuffer(device, bufferSize);
+
+	return true;
 }
 
-void Material::Apply(GraphicsDevice& device)
+void Material::Apply(GraphicsDevice& device) const
 {
 	if (!m_isDirty || !shaderProgram)
 	{
@@ -110,9 +112,15 @@ void Material::Apply(GraphicsDevice& device)
 	m_isDirty = false;
 }
 
-void Material::Bind(GraphicsDevice& device)
+void Material::Bind(GraphicsDevice& device) const
 {
-	Apply(device);
 	materialConstantBuffer.BindVS(device, 3);
 	materialConstantBuffer.BindPS(device, 3);
+	
+	shaderProgram->Bind(device);
+
+	if (texture)
+	{
+		texture->Bind(device);
+	}
 }

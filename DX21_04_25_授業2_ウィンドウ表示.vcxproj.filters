@@ -310,14 +310,17 @@
     <ClCompile Include="Model.cpp">
       <Filter>SorceFile\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>SorceFile\Resource</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>SorceFile\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="StructuredBuffer.cpp">
       <Filter>SorceFile\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>SorceFile\GameObject\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>SorceFile\Resource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -552,14 +555,14 @@
     <ClInclude Include="Model.h">
       <Filter>HeaderFile\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Animation.h">
-      <Filter>HeaderFile\Resource</Filter>
-    </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>HeaderFile\GameObject\Base</Filter>
     </ClInclude>
     <ClInclude Include="StructuredBuffer.h">
       <Filter>HeaderFile\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>HeaderFile\Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

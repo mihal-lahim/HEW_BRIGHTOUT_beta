@@ -54,7 +54,7 @@ void Texture::CreateFromLoaded(GraphicsDevice& device, ID3D11ShaderResourceView*
 	m_height = height;
 }
 
-void Texture::Bind(GraphicsDevice& device)
+void Texture::Bind(GraphicsDevice& device) const
 {
 	// ピクセルシェーダーにシェーダーリソースビューを設定
 	ID3D11ShaderResourceView* srv = m_shaderResourceView.Get();

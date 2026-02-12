@@ -16,7 +16,7 @@ bool ConstantBuffer::CreateBuffer(GraphicsDevice& device, UINT size)
 	return SUCCEEDED(hr);
 }
 
-void ConstantBuffer::UpdateBuffer(GraphicsDevice& device, const void* data, UINT size)
+void ConstantBuffer::UpdateBuffer(GraphicsDevice& device, const void* data, UINT size) const
 {
 	D3D11_MAPPED_SUBRESOURCE mapped{};
 	device.GetDeviceContext()->Map(m_constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
@@ -27,12 +27,12 @@ void ConstantBuffer::UpdateBuffer(GraphicsDevice& device, const void* data, UINT
 
 }
 
-void ConstantBuffer::BindVS(GraphicsDevice& device, UINT slot)
+void ConstantBuffer::BindVS(GraphicsDevice& device, UINT slot) const
 {
 	device.GetDeviceContext()->VSSetConstantBuffers(slot, 1, m_constantBuffer.GetAddressOf());
 }
 
-void ConstantBuffer::BindPS(GraphicsDevice& device, UINT slot)
+void ConstantBuffer::BindPS(GraphicsDevice& device, UINT slot) const
 {
 	device.GetDeviceContext()->PSSetConstantBuffers(slot, 1, m_constantBuffer.GetAddressOf());
 }

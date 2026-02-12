@@ -161,11 +161,17 @@ private:
 	// シーン更新処理メソッド
 	void Cycle()
 	{
+		// 先に保留分を登録して InitializeByContext を実行
+		AddPendingGameObjectsProcess();
+		AddPendingScriptComponentsProcess();
+		AddPendingComponentsProcess();
+
 		Start();
 		PreUpdate();
 		Update();
 		PostUpdate();
 
+		// そのフレーム中に追加された分を処理
 		AddPendingGameObjectsProcess();
 		AddPendingScriptComponentsProcess();
 		AddPendingComponentsProcess();

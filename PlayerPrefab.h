@@ -35,7 +35,10 @@ public:
 		// InputSystem設定
 		player->inputHandler = gameObject.AddComponent<InputHandler>(&gameObject.input().gamePad(), commandSet);
 
-
+		// モデル設定
+		ModelPrefab modelPrefab{ "model/cube.glb" };
+		GameObject* modelObject = gameObject.Instantiate(modelPrefab);
+		gameObject.SetChild(*modelObject);
 
 		// Healthコンポーネント設定
 		gameObject.AddComponent<Health>(100.0f);
@@ -50,11 +53,6 @@ public:
 
 		// PlayerStateMachineコンポーネント設定
 		player->stateMachine = gameObject.AddComponent<PlayerStateMachine>();
-
-		// モデルオブジェクト設定
-		CubePrefab cubePrefab{};
-		player->modelObject = gameObject.Instantiate(cubePrefab);
-		gameObject.SetChild(*player->modelObject);
 
 
 		// ColliderShape設定

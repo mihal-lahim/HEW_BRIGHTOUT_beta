@@ -4,7 +4,6 @@
 #include "Resource.h"
 #include "Mesh.h"
 #include "Shader.h"
-#include "Material.h"
 #include "Texture.h"
 #include "Model.h"
 #include <memory>

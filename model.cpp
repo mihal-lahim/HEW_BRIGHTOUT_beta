@@ -1,600 +1,645 @@
 #include "Model.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include "DirectXTex.h"
 #include "Renderer.h"
 #include <DirectXMath.h>
-#include <filesystem>
+#include "WICTextureLoader11.h"
+#include "DirectXTex.h"
 #include <functional>
-#include <unordered_set>
-#include <wrl/client.h>
 
-#include "assimp/postprocess.h"
-#include "assimp/Importer.hpp"
-#include "assimp/version.h"
+#include "ResourceSystem.h"
+#include "GameObject.h"
 
 using namespace DirectX;
 
-namespace
+
+XMMATRIX AiMatrixToXmMatrix(const aiMatrix4x4& aiMat)
 {
-	DirectX::XMMATRIX ToMatrix(const aiMatrix4x4& matrix)
-	{
-		return DirectX::XMMATRIX(
-			matrix.a1, matrix.b1, matrix.c1, matrix.d1,
-			matrix.a2, matrix.b2, matrix.c2, matrix.d2,
-			matrix.a3, matrix.b3, matrix.c3, matrix.d3,
-			matrix.a4, matrix.b4, matrix.c4, matrix.d4
-		);
-	}
-
-	DirectX::XMMATRIX ConvertMatrix(const aiMatrix4x4& matrix)
-	{
-		const DirectX::XMMATRIX convert = DirectX::XMMatrixScaling(1.0f, 1.0f, -1.0f);
-		return convert * ToMatrix(matrix) * convert;
-	}
-
-	DirectX::XMFLOAT3 ConvertVector(const aiVector3D& value)
-	{
-		return { value.x, value.y, -value.z };
-	}
-
-	DirectX::XMFLOAT4 ConvertQuaternion(const aiQuaternion& value)
-	{
-		const DirectX::XMMATRIX convert = DirectX::XMMatrixScaling(1.0f, 1.0f, -1.0f);
-		const DirectX::XMVECTOR quat = DirectX::XMVectorSet(value.x, value.y, value.z, value.w);
-		const DirectX::XMMATRIX rotation = DirectX::XMMatrixRotationQuaternion(quat);
-		const DirectX::XMMATRIX converted = convert * rotation * convert;
-		const DirectX::XMVECTOR convertedQuat = DirectX::XMQuaternionRotationMatrix(converted);
-		DirectX::XMFLOAT4 result = {};
-		DirectX::XMStoreFloat4(&result, convertedQuat);
-		return result;
-	}
-
-	std::string MakeNodeName(const ModelNode& node, size_t)
-	{
-		return node.name;
-	}
-
-	std::vector<GameObject*> CreateNodeObjects(GameObject& root, const std::vector<ModelNode>& nodes)
-	{
-		std::vector<GameObject*> objects(nodes.size(), nullptr);
-
-		for (size_t i = 0; i < nodes.size(); ++i)
-		{
-			const auto& node = nodes[i];
-			GameObject* child = root.CreateGameObject();
-			child->SetName(MakeNodeName(node, i));
-			child->transform().SetLocalMatrix(node.localMatrix);
-			objects[i] = child;
-		}
-
-		for (size_t i = 0; i < nodes.size(); ++i)
-		{
-			const auto& node = nodes[i];
-			if (node.parent >= 0 && node.parent < static_cast<int>(nodes.size()))
-			{
-				objects[i]->SetParent(*objects[node.parent]);
-			}
-			else
-			{
-				objects[i]->SetParent(root);
-			}
-		}
-
-		return objects;
-	}
+	return XMMATRIX(
+		aiMat.a1, aiMat.a2, aiMat.a3, aiMat.a4,
+		aiMat.b1, aiMat.b2, aiMat.b3, aiMat.b4,
+		aiMat.c1, aiMat.c2, aiMat.c3, aiMat.c4,
+		aiMat.d1, aiMat.d2, aiMat.d3, aiMat.d4
+	);
 }
 
-#include "DebugOstream.h"
 
 bool Model::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 {
-
-
-	Assimp::Importer importer;
-
 	m_meshes.clear();
-	m_skinnedMeshes.clear();
-	m_textures.clear();
-	m_nodes.clear();
-	m_skeleton = {};
-	m_animationClips.clear();
+	m_materials.clear();
+	m_modelNodes.clear();
 
-	m_baseDirectory = std::filesystem::path(filePath).parent_path();
+	// Assimpのインポーターを作成
+	Assimp::Importer importer{};
 
-	const aiScene* scene = importer.ReadFile(
-		filePath,
-		aiProcess_JoinIdenticalVertices |
-		aiProcess_ImproveCacheLocality
-		// | aiProcess_PreTransformVertices
+	// 左手系への変換を適用してモデルを読み込む
+	const aiScene* scene = importer.ReadFile(filePath,
+		aiProcess_ConvertToLeftHanded
 	);
 
-	hal::dout << importer.GetErrorString() << std::endl;
-
-	if (!scene || !scene->mRootNode)
+	if (!scene || !scene->HasMeshes() || !scene->mRootNode)
 	{
 		return false;
 	}
 
-	LoadSkeleton(scene);
-	ProcessNode(device, scene->mRootNode, scene, -1);
-	LoadTextures(device, scene);
-	LoadAnimationClips(scene);
+	// ポインタからインデックスへのマッピング
+	PtrToIndexMap ptrToIndexMap{};
+
+	// スケルトンの作成
+	CreateSkeleton(scene);
+
+	// メッシュの作成
+	CreateMesh(device, scene, ptrToIndexMap);
+
+	// マテリアルの作成
+	m_materials.reserve(scene->mNumMaterials);
+	CreateMaterial(device, scene, ptrToIndexMap);
+
+	// アニメーションの作成
+	m_animations.reserve(scene->mNumAnimations);
+	CreateAnimation(scene);
+
+
+	// ルートノードから再帰的にノードを作成
+	CreateNode(scene->mRootNode, scene, ptrToIndexMap);
 
 	return true;
 }
 
-int Model::ProcessNode(GraphicsDevice& device, aiNode* node, const aiScene* scene, int parentIndex)
+int Model::CreateNode(const aiNode* node, const aiScene* scene, PtrToIndexMap& map)
 {
-	ModelNode modelNode = {};
-	modelNode.name = node->mName.C_Str();
-	modelNode.parent = parentIndex;
-	modelNode.localMatrix = ConvertMatrix(node->mTransformation);
+	// 現在のノードのインデックスを取得
+	int thisIndex = static_cast<int>(m_modelNodes.size());
 
-	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
+	// 新たなモデルノードを作成
+	ModelNode modelNode = {};
+
+	// ノード名の設定
+	modelNode.name = node->mName.C_Str();
+
+
+	for (int i = 0; i < static_cast<int>(node->mNumMeshes); ++i)
 	{
-		aiMesh* aimesh = scene->mMeshes[node->mMeshes[i]];
-		if (aimesh->HasBones())
+		// メッシュインデックスの取得
+		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+		if (mesh->HasBones())
 		{
-			const int skinnedMeshIndex = LoadSkinnedMesh(device, aimesh, scene);
-			if (modelNode.skinnedMeshIndex < 0 && skinnedMeshIndex >= 0)
-			{
-				modelNode.skinnedMeshIndex = skinnedMeshIndex;
-			}
+			int skinnedMeshIndex = map.skinnedMeshToIndexMap[mesh];
+			modelNode.skinnedMeshIndexes.push_back(skinnedMeshIndex);
 		}
 		else
 		{
-			const int meshIndex = LoadMesh(device, aimesh, scene);
-			if (modelNode.meshIndex < 0 && meshIndex >= 0)
-			{
-				modelNode.meshIndex = meshIndex;
-			}
+			int meshIndex = map.meshToIndexMap[mesh];
+			modelNode.meshIndexes.push_back(meshIndex);
 		}
+
+		// マテリアルインデックスの取得
+		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+		int materialIndex = map.materialToIndexMap[material];
+		modelNode.materialIndexes.push_back(materialIndex);
 	}
 
-	const int nodeIndex = static_cast<int>(m_nodes.size());
-	m_nodes.push_back(std::move(modelNode));
 
+	// ローカルトランスフォームの設定
+	modelNode.transform = AiMatrixToXmMatrix(node->mTransformation);
+
+	// モデルノードを追加
+	m_modelNodes.push_back(modelNode);
+
+	// 子ノードを再帰的に処理
 	for (unsigned int i = 0; i < node->mNumChildren; ++i)
 	{
-		const int childIndex = ProcessNode(device, node->mChildren[i], scene, nodeIndex);
-		m_nodes[nodeIndex].children.push_back(childIndex);
+		int childIndex = CreateNode(node->mChildren[i], scene, map);
+		m_modelNodes[thisIndex].childIndexes.push_back(childIndex);
 	}
 
-	return nodeIndex;
+	return thisIndex;
 }
 
-int Model::LoadMesh(GraphicsDevice& device, aiMesh* aimesh, const aiScene*)
+void Model::CreateMesh(GraphicsDevice& device, const aiScene* scene, PtrToIndexMap& ptrToIndex)
 {
-
-	std::vector<Mesh::VertexAttribute> vertexes = {};
-	vertexes.resize(aimesh->mNumVertices);
-
-	for (unsigned int i = 0; i < aimesh->mNumVertices; ++i)
+	for (unsigned int m = 0; m < scene->mNumMeshes; m++)
 	{
-		auto& vertex = vertexes[i];
-		const aiVector3D& position = aimesh->mVertices[i];
-		vertex.position = ConvertVector(position);
-		vertex.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		aiMesh* mesh = scene->mMeshes[m];
 
-		if (aimesh->HasNormals())
+		// メッシュがスキンメッシュかどうかで処理を分岐
+		if (mesh->HasBones())
 		{
-			const aiVector3D& normal = aimesh->mNormals[i];
-			vertex.normal = ConvertVector(normal);
+			ConstructSkinnedMesh(device, mesh, ptrToIndex);
 		}
-		if (aimesh->HasTextureCoords(0))
+		else
 		{
-			const aiVector3D& uv = aimesh->mTextureCoords[0][i];
-			vertex.uv = { uv.x, uv.y };
+			ConstructMesh(device, mesh, ptrToIndex);
 		}
 	}
-
-	std::vector<UINT> indexes = {};
-	indexes.reserve(aimesh->mNumFaces * 3);
-
-	for (unsigned int i = 0; i < aimesh->mNumFaces; ++i)
-	{
-		const aiFace& face = aimesh->mFaces[i];
-		if (face.mNumIndices >= 3)
-		{
-			indexes.push_back(static_cast<UINT>(face.mIndices[0]));
-			indexes.push_back(static_cast<UINT>(face.mIndices[2]));
-			indexes.push_back(static_cast<UINT>(face.mIndices[1]));
-			for (unsigned int j = 3; j < face.mNumIndices; ++j)
-			{
-				indexes.push_back(static_cast<UINT>(face.mIndices[j]));
-			}
-		}
-	}
-
-	Mesh mesh = {};
-	if (mesh.CreateBuffer(device, vertexes, indexes))
-	{
-		const int meshIndex = static_cast<int>(m_meshes.size());
-		m_meshes.push_back(std::move(mesh));
-		return meshIndex;
-	}
-
-	return -1;
 }
 
-int Model::LoadSkinnedMesh(GraphicsDevice& device, aiMesh* aimesh, const aiScene* aiscene)
+void Model::ConstructMesh(GraphicsDevice& device, const aiMesh* mesh, PtrToIndexMap& ptrToIndex)
 {
-	(void)aiscene;
+	// メッシュの作成
+	Mesh newMesh{};
 
-	std::vector<SkinnedMesh::VertexAttribute> vertexes = {};
-	vertexes.resize(aimesh->mNumVertices);
+	// 頂点データの準備
+	std::vector<Mesh::VertexAttribute> vertices{};
 
-	for (unsigned int i = 0; i < aimesh->mNumVertices; ++i)
+	// 頂点情報の取得
+	for (unsigned int v = 0; v < mesh->mNumVertices; v++)
 	{
-		auto& vertex = vertexes[i];
-		const aiVector3D& position = aimesh->mVertices[i];
-		vertex.position = ConvertVector(position);
-		vertex.color = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-		if (aimesh->HasNormals())
+		Mesh::VertexAttribute vertex{};
+		// 頂点位置
+		vertex.position.x = mesh->mVertices[v].x;
+		vertex.position.y = mesh->mVertices[v].y;
+		vertex.position.z = mesh->mVertices[v].z;
+		// 頂点法線
+		if (mesh->HasNormals())
 		{
-			const aiVector3D& normal = aimesh->mNormals[i];
-			vertex.normal = ConvertVector(normal);
+			vertex.normal.x = mesh->mNormals[v].x;
+			vertex.normal.y = mesh->mNormals[v].y;
+			vertex.normal.z = mesh->mNormals[v].z;
 		}
-		if (aimesh->HasTextureCoords(0))
+		// テクスチャ座標
+		if (mesh->HasTextureCoords(0))
 		{
-			const aiVector3D& uv = aimesh->mTextureCoords[0][i];
-			vertex.uv = { uv.x, uv.y };
+			vertex.uv.x = mesh->mTextureCoords[0][v].x;
+			vertex.uv.y = mesh->mTextureCoords[0][v].y;
+		}
+		// 頂点カラー
+		if (mesh->HasVertexColors(0))
+		{
+			vertex.color.x = mesh->mColors[0][v].r;
+			vertex.color.y = mesh->mColors[0][v].g;
+			vertex.color.z = mesh->mColors[0][v].b;
+			vertex.color.w = mesh->mColors[0][v].a;
+		}
+		else
+		{
+			vertex.color.x = 1.0f;
+			vertex.color.y = 1.0f;
+			vertex.color.z = 1.0f;
+			vertex.color.w = 1.0f;
+		}
+		vertices.push_back(vertex);
+	}
+
+	// インデックスデータの準備
+	std::vector<unsigned int> indices{};
+
+	// 面情報の取得
+	for (unsigned int f = 0; f < mesh->mNumFaces; f++)
+	{
+		// 面を取得
+		const aiFace& face = mesh->mFaces[f];
+		for (unsigned int i = 0; i < face.mNumIndices; i++)
+		{
+			indices.push_back(face.mIndices[i]);
 		}
 	}
 
-	for (unsigned int i = 0; i < aimesh->mNumBones; ++i)
-	{
-		const aiBone* bone = aimesh->mBones[i];
-		const std::string boneName = bone->mName.C_Str();
-		int boneIndex = m_skeleton.FindBoneIndex(boneName);
-		if (boneIndex < 0)
-		{
-			Bone newBone = {};
-			newBone.name = boneName;
-			newBone.parentIndex = -1;
-			newBone.offsetMatrix = ConvertMatrix(bone->mOffsetMatrix);
-			newBone.bindPose = DirectX::XMMatrixIdentity();
-			m_skeleton.boneMap[newBone.name] = static_cast<int>(m_skeleton.bones.size());
-			m_skeleton.bones.push_back(std::move(newBone));
-			boneIndex = static_cast<int>(m_skeleton.bones.size()) - 1;
-		}
+	// メッシュバッファの作成
+	newMesh.CreateBuffer(device, vertices, indices);
 
-		for (unsigned int j = 0; j < bone->mNumWeights; ++j)
-		{
-			const aiVertexWeight& weight = bone->mWeights[j];
-			auto& vertex = vertexes[weight.mVertexId];
-			for (int k = 0; k < 4; ++k)
-			{
-				if (vertex.weight[k] == 0.0f)
-				{
-					vertex.bone[k] = static_cast<UINT>(boneIndex);
-					vertex.weight[k] = weight.mWeight;
-					break;
-				}
-			}
-		}
-	}
+	// メッシュとインデックスのマッピングを更新
+	ptrToIndex.meshToIndexMap[mesh] = static_cast<int>(m_meshes.size());
 
-	std::vector<UINT> indexes = {};
-	indexes.reserve(aimesh->mNumFaces * 3);
-
-	for (unsigned int i = 0; i < aimesh->mNumFaces; ++i)
-	{
-		const aiFace& face = aimesh->mFaces[i];
-		if (face.mNumIndices >= 3)
-		{
-			indexes.push_back(static_cast<UINT>(face.mIndices[0]));
-			indexes.push_back(static_cast<UINT>(face.mIndices[2]));
-			indexes.push_back(static_cast<UINT>(face.mIndices[1]));
-			for (unsigned int j = 3; j < face.mNumIndices; ++j)
-			{
-				indexes.push_back(static_cast<UINT>(face.mIndices[j]));
-			}
-		}
-	}
-
-	SkinnedMesh mesh = {};
-	if (mesh.CreateBuffer(device, vertexes, indexes))
-	{
-		const int meshIndex = static_cast<int>(m_skinnedMeshes.size());
-		m_skinnedMeshes.push_back(std::move(mesh));
-		return meshIndex;
-	}
-
-	return -1;
+	// メッシュをモデルに追加
+	m_meshes.push_back(std::move(newMesh));
 }
 
-void Model::LoadTextures(GraphicsDevice& device, const aiScene* scene)
+void Model::ConstructSkinnedMesh(GraphicsDevice& device, const aiMesh* mesh, PtrToIndexMap& ptrToIndex)
 {
-	std::unordered_set<std::string> loadedTextures = {};
+	// スキンメッシュの作成
+	SkinnedMesh newMesh{};
 
-	for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
+	// 頂点データの準備
+	std::vector<SkinnedMesh::VertexAttribute> vertices{};
+
+	// 頂点情報の取得
+	for (unsigned int v = 0; v < mesh->mNumVertices; v++)
 	{
-		aiMaterial* material = scene->mMaterials[i];
-		aiString path = {};
+		SkinnedMesh::VertexAttribute vertex{};
 
-		const aiTextureType textureTypes[] = { aiTextureType_BASE_COLOR, aiTextureType_DIFFUSE };
-		for (auto textureType : textureTypes)
+		for (int i = 0; i < SkinnedMesh::MAX_BONE_INFLUENCE; ++i)
 		{
-			const unsigned int textureCount = material->GetTextureCount(textureType);
-			for (unsigned int j = 0; j < textureCount; ++j)
+			vertex.boneIndexes[i] = -1;
+			vertex.boneWeights[i] = 0.0f;
+		}
+
+		// 頂点位置
+		vertex.position.x = mesh->mVertices[v].x;
+		vertex.position.y = mesh->mVertices[v].y;
+		vertex.position.z = mesh->mVertices[v].z;
+		// 頂点法線
+		if (mesh->HasNormals())
+		{
+			vertex.normal.x = mesh->mNormals[v].x;
+			vertex.normal.y = mesh->mNormals[v].y;
+			vertex.normal.z = mesh->mNormals[v].z;
+		}
+		// テクスチャ座標
+		if (mesh->HasTextureCoords(0))
+		{
+			vertex.uv.x = mesh->mTextureCoords[0][v].x;
+			vertex.uv.y = mesh->mTextureCoords[0][v].y;
+		}
+		// 頂点カラー
+		if (mesh->HasVertexColors(0))
+		{
+			vertex.color.x = mesh->mColors[0][v].r;
+			vertex.color.y = mesh->mColors[0][v].g;
+			vertex.color.z = mesh->mColors[0][v].b;
+			vertex.color.w = mesh->mColors[0][v].a;
+		}
+		else
+		{
+			vertex.color.x = 1.0f;
+			vertex.color.y = 1.0f;
+			vertex.color.z = 1.0f;
+			vertex.color.w = 1.0f;
+		}
+
+		if (mesh->HasBones())
+		{
+			// ボーン情報の取得
+			for (unsigned int b = 0; b < mesh->mNumBones; b++)
 			{
-				if (material->GetTexture(textureType, j, &path) != AI_SUCCESS)
+				aiBone* bone = mesh->mBones[b];
+
+				auto boneIt = m_skeleton.boneNameToIndexMap.find(bone->mName.C_Str());
+				if (boneIt == m_skeleton.boneNameToIndexMap.end())
 				{
 					continue;
 				}
 
-				const std::string texturePath = path.C_Str();
-				if (!loadedTextures.insert(texturePath).second)
+				for (unsigned int w = 0; w < bone->mNumWeights; w++)
 				{
+					// 頂点に影響を与えるボーンか確認
+					if (bone->mWeights[w].mVertexId == v)
+					{
+						for (int i = 0; i < SkinnedMesh::MAX_BONE_INFLUENCE; i++)
+						{
+							if (vertex.boneIndexes[i] == -1)
+							{
+								vertex.boneIndexes[i] = boneIt->second;
+								vertex.boneWeights[i] = bone->mWeights[w].mWeight;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		vertices.push_back(vertex);
+	}
+
+	// インデックスデータの準備
+	std::vector<unsigned int> indices{};
+
+	// 面情報の取得
+	for (unsigned int f = 0; f < mesh->mNumFaces; f++)
+	{
+		// 面を取得
+		const aiFace& face = mesh->mFaces[f];
+		for (unsigned int i = 0; i < face.mNumIndices; i++)
+		{
+			indices.push_back(face.mIndices[i]);
+		}
+	}
+
+	// メッシュバッファの作成
+	newMesh.CreateBuffer(device, vertices, indices);
+
+	// メッシュとインデックスのマッピングを更新
+	ptrToIndex.skinnedMeshToIndexMap[mesh] = static_cast<int>(m_skinnedMeshes.size());
+
+	// メッシュをモデルに追加
+	m_skinnedMeshes.push_back(std::move(newMesh));
+}
+
+void Model::CreateMaterial(GraphicsDevice& device, const aiScene* scene, PtrToIndexMap& ptrToIndex)
+{
+
+	for (unsigned int m = 0; m < scene->mNumMaterials; m++)
+	{
+		// マテリアルを取得
+		aiMaterial* material = scene->mMaterials[m];
+
+		// マテリアルの作成
+		Material newMaterial{};
+
+		// マテリアルの色情報を取得
+		aiColor3D color(0.0f, 0.0f, 0.0f);
+		if (material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
+		{
+			newMaterial.SetColor({ color.r, color.g, color.b, 1.0f });
+		}
+
+
+		// テクスチャ読み込み
+		for (unsigned int i = 0; i < scene->mNumTextures; i++)
+		{
+			// 埋め込みテクスチャを取得
+			aiTexture* tex = scene->mTextures[i];
+
+			// SRVの作成
+			ID3D11ShaderResourceView* texture;
+
+			// 画像データをDirectXTexで読み込む
+			DirectX::TexMetadata metadata;
+			DirectX::ScratchImage image;
+			LoadFromWICMemory((const void*)tex->pcData, tex->mWidth, DirectX::WIC_FLAGS_NONE, &metadata, image);
+			CreateShaderResourceView(device.GetDevice(), image.GetImages(), image.GetImageCount(), metadata, &texture);
+			assert(texture);
+
+			// テクスチャをモデルに登録
+			Texture newTexture{};
+			newTexture.CreateFromLoaded(device, texture, static_cast<UINT>(metadata.width), static_cast<UINT>(metadata.height));
+
+			// テクスチャをモデルのテクスチャリストに追加
+			m_textures.push_back(std::move(newTexture));
+
+			// マテリアルにテクスチャを設定
+			newMaterial.texture = &m_textures.back();
+
+		}
+
+		// マテリアルとインデックスのマッピングを更新
+		ptrToIndex.materialToIndexMap[material] = static_cast<int>(m_materials.size());
+
+		// マテリアルをモデルに追加
+		m_materials.push_back(std::move(newMaterial));
+	}
+}
+
+void Model::CreateSkeleton(const aiScene* scene)
+{
+	// 新しいスケルトンを作成
+	Skeleton newSkeleton{};
+
+	// まず全てのボーンを登録
+	for (unsigned int m = 0; m < scene->mNumMeshes; m++)
+	{
+		aiMesh* mesh = scene->mMeshes[m];
+
+		// ボーンが存在する場合
+		if (mesh->HasBones())
+		{
+			for (unsigned int b = 0; b < mesh->mNumBones; b++)
+			{
+				aiBone* bone = mesh->mBones[b];
+
+				// ボーン名の取得
+				std::string boneName = bone->mName.C_Str();
+
+				// 既に登録されているか確認
+				if (newSkeleton.boneNameToIndexMap.contains(boneName))
+				{
+					// 既に登録されている場合はスキップ
 					continue;
 				}
 
-				if (!texturePath.empty() && texturePath[0] == '*')
-				{
-					const aiTexture* embedded = scene->GetEmbeddedTexture(texturePath.c_str());
-					if (!embedded || embedded->mHeight != 0)
-					{
-						continue;
-					}
+				// 新しいボーンを作成
+				Bone newBone{};
+				newBone.name = boneName;
+				newBone.offsetMatrix = AiMatrixToXmMatrix(bone->mOffsetMatrix);
 
-					DirectX::ScratchImage image = {};
-					DirectX::TexMetadata metadata = {};
-					if (FAILED(DirectX::LoadFromWICMemory(
-						reinterpret_cast<const uint8_t*>(embedded->pcData),
-						static_cast<size_t>(embedded->mWidth),
-						DirectX::WIC_FLAGS_NONE,
-						&metadata,
-						image)))
-					{
-						continue;
-					}
-
-					Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv = nullptr;
-					if (FAILED(DirectX::CreateShaderResourceView(
-						device.GetDevice(),
-						image.GetImages(),
-						image.GetImageCount(),
-						metadata,
-						&srv)))
-					{
-						continue;
-					}
-
-					Texture texture = {};
-					texture.CreateFromLoaded(device, srv.Detach(), static_cast<UINT>(metadata.width), static_cast<UINT>(metadata.height));
-					m_textures.push_back(std::move(texture));
-				}
-				else
-				{
-					std::filesystem::path resolvedPath = std::filesystem::path(texturePath);
-					if (resolvedPath.is_relative())
-					{
-						resolvedPath = m_baseDirectory / resolvedPath;
-					}
-
-					Texture texture = {};
-					if (texture.CreateBuffer(device, resolvedPath.wstring()))
-					{
-						m_textures.push_back(std::move(texture));
-					}
-				}
+				// ボーンをスケルトンに追加
+				int boneIndex = static_cast<int>(newSkeleton.bones.size());
+				newSkeleton.bones.push_back(newBone);
+				newSkeleton.boneNameToIndexMap[boneName] = boneIndex;
 			}
 		}
 	}
-}
 
-void Model::LoadSkeleton(const aiScene* scene)
-{
-	std::unordered_set<std::string> boneNames = {};
-
-	for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
-	{
-		aiMesh* aimesh = scene->mMeshes[i];
-		for (unsigned int j = 0; j < aimesh->mNumBones; ++j)
+	// 次に親子関係を構築
+	std::function<void(const aiNode*)> Traverse = [&](const aiNode* node)
 		{
-			boneNames.insert(aimesh->mBones[j]->mName.C_Str());
-		}
-	}
+			// ノード名からボーンインデックスを取得
+			std::string parentName = node->mName.C_Str();
+			auto parentIt = newSkeleton.boneNameToIndexMap.find(parentName);
 
-	for (unsigned int i = 0; i < scene->mNumAnimations; ++i)
-	{
-		aiAnimation* animation = scene->mAnimations[i];
-		for (unsigned int j = 0; j < animation->mNumChannels; ++j)
-		{
-			boneNames.insert(animation->mChannels[j]->mNodeName.C_Str());
-		}
-	}
-
-	std::function<void(aiNode*, int)> buildSkeleton = [&](aiNode* node, int parentIndex)
-	{
-		const std::string nodeName = node->mName.C_Str();
-		int currentIndex = parentIndex;
-		if (boneNames.find(nodeName) != boneNames.end())
-		{
-			Bone bone = {};
-			bone.name = nodeName;
-			bone.parentIndex = parentIndex;
-			bone.offsetMatrix = DirectX::XMMatrixIdentity();
-			bone.bindPose = ConvertMatrix(node->mTransformation);
-			m_skeleton.boneMap[bone.name] = static_cast<int>(m_skeleton.bones.size());
-			m_skeleton.bones.push_back(std::move(bone));
-			currentIndex = static_cast<int>(m_skeleton.bones.size()) - 1;
-		}
-
-		for (unsigned int i = 0; i < node->mNumChildren; ++i)
-		{
-			buildSkeleton(node->mChildren[i], currentIndex);
-		}
-	};
-
-	buildSkeleton(scene->mRootNode, -1);
-
-	for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
-	{
-		aiMesh* aimesh = scene->mMeshes[i];
-		for (unsigned int j = 0; j < aimesh->mNumBones; ++j)
-		{
-			aiBone* bone = aimesh->mBones[j];
-			int index = m_skeleton.FindBoneIndex(bone->mName.C_Str());
-			if (index >= 0)
+			// 親ボーンが存在する場合
+			if (parentIt != newSkeleton.boneNameToIndexMap.end())
 			{
-				m_skeleton.bones[index].offsetMatrix = ConvertMatrix(bone->mOffsetMatrix);
+				// 親ボーンインデックスを取得
+				int parentIndex = parentIt->second;
+
+				// 子ノードを処理
+				for (unsigned int i = 0; i < node->mNumChildren; ++i)
+				{
+					const aiNode* child = node->mChildren[i];
+					std::string childName = child->mName.C_Str();
+
+					// 子ノード名からボーンインデックスを取得
+					auto childIt = newSkeleton.boneNameToIndexMap.find(childName);
+					if (childIt != newSkeleton.boneNameToIndexMap.end())
+					{
+						// 子ボーンインデックスを取得して親ボーンに追加
+						int childIndex = childIt->second;
+						newSkeleton.bones[parentIndex].childIndexes.push_back(childIndex);
+
+						// 子ボーンに親インデックスを設定
+						newSkeleton.bones[childIndex].parentIndex = parentIndex;
+					}
+				}
 			}
-		}
-	}
+
+			// 再帰的に子ノードを処理
+			for (unsigned int i = 0; i < node->mNumChildren; ++i)
+			{
+				Traverse(node->mChildren[i]);
+			}
+		};
+
+	Traverse(scene->mRootNode);
+	m_skeleton = std::move(newSkeleton);
 }
 
-void Model::LoadAnimationClips(const aiScene* scene)
+void Model::CreateAnimation(const aiScene* scene)
 {
-	for (unsigned int i = 0; i < scene->mNumAnimations; ++i)
+	for (unsigned int a = 0; a < scene->mNumAnimations; a++)
 	{
-		aiAnimation* animation = scene->mAnimations[i];
-		AnimationClip clip = {};
-		clip.name = animation->mName.C_Str();
-		clip.duration = static_cast<float>(animation->mDuration);
-		clip.ticksPerSecond = animation->mTicksPerSecond == 0.0 ? 25.0f : static_cast<float>(animation->mTicksPerSecond);
-		clip.boneTracks.resize(m_skeleton.bones.size());
+		aiAnimation* aiAnim = scene->mAnimations[a];
 
-		for (unsigned int j = 0; j < animation->mNumChannels; ++j)
+		// 新しいアニメーションクリップを作成
+		AnimationClip newClip{};
+		newClip.name = aiAnim->mName.C_Str();
+		newClip.duration = static_cast<float>(aiAnim->mDuration);
+		newClip.ticksPerSecond = static_cast<float>(aiAnim->mTicksPerSecond != 0 ? aiAnim->mTicksPerSecond : 25.0f);
+
+		// チャンネルの処理
+		for (unsigned int c = 0; c < aiAnim->mNumChannels; c++)
 		{
-			aiNodeAnim* channel = animation->mChannels[j];
-			const int boneIndex = m_skeleton.FindBoneIndex(channel->mNodeName.C_Str());
-			if (boneIndex < 0)
+			aiNodeAnim* aiChannel = aiAnim->mChannels[c];
+			std::string boneName = aiChannel->mNodeName.C_Str();
+
+			// 新しいボーンアニメーションチャンネルを作成
+			BoneAnimation boneAnim{};
+
+			// 位置キーフレームの取得
+			for (unsigned int k = 0; k < aiChannel->mNumPositionKeys; k++)
 			{
+				// 位置キーフレームの追加
+				aiVectorKey posKey = aiChannel->mPositionKeys[k];
+				KeyframeVec3 positionKeyframe{};
+				positionKeyframe.time = static_cast<float>(posKey.mTime);
+				positionKeyframe.value = { posKey.mValue.x, posKey.mValue.y, posKey.mValue.z };
+				boneAnim.positionKeyframes.push_back(positionKeyframe);
+			}
+			// 回転キーフレームの取得
+			for (unsigned int k = 0; k < aiChannel->mNumRotationKeys; k++)
+			{
+				// 回転キーフレームの追加
+				aiQuatKey rotKey = aiChannel->mRotationKeys[k];
+				KeyframeQuat rotationKeyframe{};
+				rotationKeyframe.time = static_cast<float>(rotKey.mTime);
+				rotationKeyframe.value = { rotKey.mValue.x, rotKey.mValue.y, rotKey.mValue.z, rotKey.mValue.w };
+				boneAnim.rotationKeyframes.push_back(rotationKeyframe);
+			}
+			// スケールキーフレームの取得
+			for (unsigned int k = 0; k < aiChannel->mNumScalingKeys; k++)
+			{
+				// スケールキーフレームの追加
+				aiVectorKey scaleKey = aiChannel->mScalingKeys[k];
+				KeyframeVec3 scaleKeyframe{};
+				scaleKeyframe.time = static_cast<float>(scaleKey.mTime);
+				scaleKeyframe.value = { scaleKey.mValue.x, scaleKey.mValue.y, scaleKey.mValue.z };
+				boneAnim.scaleKeyframes.push_back(scaleKeyframe);
+			}
+
+			// ボーン名からインデックスを取得
+
+			auto it = m_skeleton.boneNameToIndexMap.find(boneName);
+
+			if (it == m_skeleton.boneNameToIndexMap.end())
+			{
+				// ボーンが見つからない場合はスキップ
 				continue;
 			}
+			int boneIndex = it->second;
 
-			BoneKeyframes& keyframes = clip.boneTracks[boneIndex];
-
-			for (unsigned int k = 0; k < channel->mNumPositionKeys; ++k)
-			{
-				const aiVectorKey& key = channel->mPositionKeys[k];
-				keyframes.positionKeyframes.push_back({
-					static_cast<float>(key.mTime),
-					ConvertVector(key.mValue)
-				});
-			}
-
-			for (unsigned int k = 0; k < channel->mNumRotationKeys; ++k)
-			{
-				const aiQuatKey& key = channel->mRotationKeys[k];
-				keyframes.rotationKeyframes.push_back({
-					static_cast<float>(key.mTime),
-					ConvertQuaternion(key.mValue)
-				});
-			}
-
-			for (unsigned int k = 0; k < channel->mNumScalingKeys; ++k)
-			{
-				const aiVectorKey& key = channel->mScalingKeys[k];
-				keyframes.scaleKeyframes.push_back({
-					static_cast<float>(key.mTime),
-					ConvertVector(key.mValue)
-				});
-			}
+			// ボーンアニメーションをクリップに追加
+			newClip.boneAnimations[boneIndex] = boneAnim;
 		}
-
-		m_animationClips.push_back(std::move(clip));
+		// クリップをモデルに追加
+		m_animations.push_back(std::move(newClip));
 	}
 }
+
 
 void ModelPrefab::Instantiate(GameObject& gameObject)
 {
-	Model* model = gameObject.resource().Load<Model>(m_filePath);
-	if (!model)
+	auto* model = gameObject.resource().Load<Model>(m_filePath);
+
+	// ルートノードから再帰的にモデルを構築
+	ConstructModel(gameObject, model, 0);
+}
+
+void ModelPrefab::ConstructModel(GameObject& parent, const Model* model, int index)
+{
+	// 現在のノードを取得
+	const ModelNode& currentNode = model->GetModelNodes()[index];
+
+	// 新たなゲームオブジェクトを作成
+	GameObject* newObject = parent.CreateGameObject();
+	newObject->SetName(currentNode.name);
+
+	// トランスフォームの設定
+	newObject->transform().SetLocalMatrix(currentNode.transform);
+
+	// 親子関係の設定
+	parent.SetChild(*newObject);
+
+	// メッシュとマテリアルの設定
+	for (size_t i = 0; i < currentNode.meshIndexes.size(); ++i)
 	{
-		return;
+		int meshIndex = currentNode.meshIndexes[i];
+		int materialIndex = currentNode.materialIndexes[i];
+
+		// メッシュ用の子オブジェクトを作成
+		GameObject* meshObject = parent.CreateGameObject();
+
+		// メッシュレンダラーコンポーネントを追加
+		auto* meshRenderer = meshObject->AddComponent<MeshRenderer>();
+		meshRenderer->mesh = &model->GetMeshes()[meshIndex];
+		meshRenderer->material = model->GetMaterials()[materialIndex];
+		meshRenderer->material.vsPath = "MeshVS.cso";
+		meshRenderer->material.psPath = "MeshPS.cso";
+		meshRenderer->model = model;
+
+		// 親子関係の設定
+		newObject->SetChild(*meshObject);
+
+		// メッシュオブジェクトの名前設定
+		std::string meshName = currentNode.name + "_Mesh_" + std::to_string(i);
+		meshObject->SetName(meshName);
 	}
 
-	const auto& nodes = model->GetModelNodes();
-	const auto& meshes = model->GetMeshes();
-	std::vector<GameObject*> nodeObjects = CreateNodeObjects(gameObject, nodes);
-
-	for (size_t i = 0; i < nodes.size(); ++i)
+	// 子ノードを再帰的に処理
+	for (int childIndex : currentNode.childIndexes)
 	{
-		const auto& node = nodes[i];
-		if (node.meshIndex >= 0 && node.meshIndex < static_cast<int>(meshes.size()))
-		{
-			auto* renderer = nodeObjects[i]->AddComponent<MeshRenderer>();
-			renderer->mesh = &meshes[node.meshIndex];
-		}
+		ConstructModel(*newObject, model, childIndex);
 	}
 }
 
 void SkinnedModelPrefab::Instantiate(GameObject& gameObject)
 {
-	Model* model = gameObject.resource().Load<Model>(m_filePath);
-	if (!model)
-	{
-		return;
-	}
+	auto* model = gameObject.resource().Load<Model>(m_filePath);
+	gameObject.AddComponent<Animator>(model);
 
-	const auto& nodes = model->GetModelNodes();
-	const auto& meshes = model->GetMeshes();
-	const auto& skinnedMeshes = model->GetSkinnedMeshes();
-	std::vector<GameObject*> nodeObjects = CreateNodeObjects(gameObject, nodes);
-
-	const auto& skeleton = model->GetSkeleton();
-	std::vector<GameObject*> boneObjects(skeleton.bones.size(), nullptr);
-	std::vector<Transform*> boneTransforms = {};
-	boneTransforms.reserve(skeleton.bones.size());
-
-	for (size_t i = 0; i < skeleton.bones.size(); ++i)
-	{
-		const Bone& bone = skeleton.bones[i];
-		GameObject* boneObject = gameObject.CreateGameObject();
-		boneObject->SetName(bone.name);
-		boneObject->transform().SetLocalMatrix(bone.bindPose);
-		boneObjects[i] = boneObject;
-		boneTransforms.push_back(&boneObject->transform());
-	}
-
-	for (size_t i = 0; i < skeleton.bones.size(); ++i)
-	{
-		const Bone& bone = skeleton.bones[i];
-		if (bone.parentIndex >= 0 && bone.parentIndex < static_cast<int>(skeleton.bones.size()))
-		{
-			boneObjects[i]->SetParent(*boneObjects[bone.parentIndex]);
-		}
-		else
-		{
-			boneObjects[i]->SetParent(gameObject);
-		}
-	}
-
-	auto* animationController = gameObject.AddComponent<AnimationController>();
-	animationController->Setup(model, boneTransforms);
-
-	for (size_t i = 0; i < nodes.size(); ++i)
-	{
-		const auto& node = nodes[i];
-		if (node.meshIndex >= 0 && node.meshIndex < static_cast<int>(meshes.size()))
-		{
-			auto* renderer = nodeObjects[i]->AddComponent<MeshRenderer>();
-			renderer->mesh = &meshes[node.meshIndex];
-		}
-		if (node.skinnedMeshIndex >= 0 && node.skinnedMeshIndex < static_cast<int>(skinnedMeshes.size()))
-		{
-			auto* renderer = nodeObjects[i]->AddComponent<SkinnedMeshRenderer>();
-			renderer->mesh = &skinnedMeshes[node.skinnedMeshIndex];
-			renderer->animationController = animationController;
-			renderer->skeleton = &skeleton;
-		}
-	}
+	// ルートノードから再帰的にモデルを構築
+	ConstructModel(gameObject, model, 0);
 }
 
-void CubePrefab::Instantiate(GameObject& gameObject)
+void SkinnedModelPrefab::ConstructModel(GameObject& parent, const Model* model, int index)
 {
-	ModelPrefab cubePrefab("model/Cube.glb");
-	GameObject* cubeObject = gameObject.Instantiate(cubePrefab);
-	gameObject.SetChild(*cubeObject);
-}
+	// 現在のノードを取得
+	const ModelNode& currentNode = model->GetModelNodes()[index];
 
-void SpherePrefab::Instantiate(GameObject& gameObject)
-{
-	ModelPrefab cubePrefab("model/Sphere.glb");
-	GameObject* cubeObject = gameObject.Instantiate(cubePrefab);
-	gameObject.SetChild(*cubeObject);
+	// 新たなゲームオブジェクトを作成
+	GameObject* newObject = parent.CreateGameObject();
+	newObject->SetName(currentNode.name);
+
+	// トランスフォームの設定
+	newObject->transform().SetLocalMatrix(currentNode.transform);
+
+	// 親子関係の設定
+	parent.SetChild(*newObject);
+
+	// メッシュとマテリアルの設定
+	for (size_t i = 0; i < currentNode.skinnedMeshIndexes.size(); ++i)
+	{
+		int meshIndex = currentNode.skinnedMeshIndexes[i];
+		int materialIndex = currentNode.materialIndexes[i];
+
+		// メッシュ用の子オブジェクトを作成
+		GameObject* meshObject = parent.CreateGameObject();
+
+		// メッシュレンダラーコンポーネントを追加
+		auto* meshRenderer = meshObject->AddComponent<SkinnedMeshRenderer>();
+		meshRenderer->skinnedMesh = &model->GetSkinnedMeshes()[meshIndex];
+		meshRenderer->material = model->GetMaterials()[materialIndex];
+		meshRenderer->material.vsPath = "SkinnedMeshVS.cso";
+		meshRenderer->material.psPath = "MeshPS.cso";
+		meshRenderer->model = model;
+
+		// 親子関係の設定
+		parent.SetChild(*meshObject);
+
+		// メッシュオブジェクトの名前設定
+		std::string meshName = currentNode.name + "_Mesh_" + std::to_string(i);
+		meshObject->SetName(meshName);
+	}
+
+	// 子ノードを再帰的に処理
+	for (int childIndex : currentNode.childIndexes)
+	{
+		ConstructModel(*newObject, model, childIndex);
+	}
 }

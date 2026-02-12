@@ -67,7 +67,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 
 	// ウィンドウをウィンドウシステムに登録
 	ctx.windowSystem->RegisterWindow(&window);
-	ctx.renderingSystem->SetGraphicsDevice(&graphicsDevice);
+	ctx.renderingSystem->Initialize(graphicsDevice);
 
 
 	// デフォルトシーン
