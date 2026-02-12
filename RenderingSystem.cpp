@@ -41,7 +41,7 @@ void RenderingSystem::Render(const Scene& scene)
 	// フレーム毎の更新
 	UpdatePerFrame();
 
-
+	
 	// アニメーションコントローラーの取得
 	auto animControllers = scene.GetComponents<Animator>();
 	for (auto& controller : animControllers)
@@ -54,6 +54,7 @@ void RenderingSystem::Render(const Scene& scene)
 		controller->UpdateAnimation();
 		controller->Bind(*m_graphicsDevice);
 	}
+	
 
 
 	// カメラの取得

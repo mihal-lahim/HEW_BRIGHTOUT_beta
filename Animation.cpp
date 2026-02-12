@@ -7,9 +7,19 @@
 using namespace DirectX;
 
 Animator::Animator(const Model* model)
-	: m_model(model)
 {
+	m_model = model;
 	m_skeleton = &m_model->GetSkeleton();
+	m_currentPose.localMatrixes.resize(m_skeleton->bones.size(), XMMatrixIdentity());
+	m_currentPose.globalMatrixes.resize(m_skeleton->bones.size(), XMMatrixIdentity());
+	m_currentPose.skinMatrixes.resize(m_skeleton->bones.size(), XMMatrixIdentity());
+}
+
+void Animator::InitializeByContext()
+{
+	// ポーズの初期化
+	ComputeGlobalPose();
+	ComputeSkinPose();
 }
 
 void Animator::Play()
@@ -45,8 +55,9 @@ void Animator::UpdateAnimation()
 	{
 		return;
 	}
-	// 再生時間の更新
-	m_currentTime += m_speed * (float)Time::DeltaTime();
+	// 再生時間の更新（ticks）
+	const float ticksPerSecond = (m_currentClip->ticksPerSecond > 0.0f) ? m_currentClip->ticksPerSecond : 1.0f;
+	m_currentTime += m_speed * (float)Time::DeltaTime() * ticksPerSecond;
 
 	// ループ処理
 	if (m_isLoop && m_currentTime > m_currentClip->duration)
@@ -72,7 +83,7 @@ void Animator::Bind(GraphicsDevice& device)
 	// ボーン行列用構造化バッファの更新とバインド
 	if (m_boneMatrixBuffer.GetElementCount() != m_skeleton->bones.size())
 	{
-		m_boneMatrixBuffer.CreateBuffer(device, sizeof(XMMATRIX), (UINT)m_skeleton->bones.size(), USAGE_TYPE::DEFAULT, VIEW_TYPE::SRV);
+		m_boneMatrixBuffer.CreateBuffer(device, (UINT)m_skeleton->bones.size(), sizeof(XMMATRIX), USAGE_TYPE::DYNAMIC, VIEW_TYPE::SRV);
 	}
 
 	m_boneMatrixBuffer.UpdateBuffer(device, m_currentPose.skinMatrixes.data());
@@ -95,15 +106,23 @@ void Animator::SetAnimationClip(const AnimationClip* clip)
 
 XMFLOAT3 Animator::SampleVec3(const std::vector<KeyframeVec3>& keyframes, float time)
 {
-	// キーフレームが存在しない場合や1つしかない場合の処理
-	if (keyframes.empty()) 
+	// キーフレームが存在しない場合はデフォルト値を返す
+	if (keyframes.empty())
 		return {};
+
+	// 単一キーフレームの場合、その値を返す
 	if (keyframes.size() == 1)
 		return keyframes[0].value;
 
+	// 時間が範囲外の場合、最初または最後のキーフレームの値を返す
+	if (time <= keyframes.front().time)
+		return keyframes.front().value;
+
+	if (time >= keyframes.back().time)
+		return keyframes.back().value;
+
 	for (size_t i = 0; i < keyframes.size() - 1; i++)
 	{
-		// 指定時間がこの区間にある場合
 		if (time >= keyframes[i].time && time <= keyframes[i + 1].time)
 		{
 			// 線形補間
@@ -117,22 +136,33 @@ XMFLOAT3 Animator::SampleVec3(const std::vector<KeyframeVec3>& keyframes, float 
 			return result;
 		}
 	}
+
+	// 最後のキーフレームの値を返す
+	return keyframes.back().value;
 }
 
 XMFLOAT4 Animator::SampleQuat(const std::vector<KeyframeQuat>& keyframes, float time)
 {
-	// キーフレームが存在しない場合や1つしかない場合の処理
+	// キーフレームが存在しない場合はデフォルト値を返す
 	if (keyframes.empty())
 		return {};
+
+	// 単一キーフレームの場合、その値を返す
 	if (keyframes.size() == 1)
 		return keyframes[0].value;
 
+	// 時間が範囲外の場合、最初または最後のキーフレームの値を返す
+	if (time <= keyframes.front().time)
+		return keyframes.front().value;
+
+	if (time >= keyframes.back().time)
+		return keyframes.back().value;
+
 	for (size_t i = 0; i < keyframes.size() - 1; i++)
 	{
-		// 指定時間がこの区間にある場合
 		if (time >= keyframes[i].time && time <= keyframes[i + 1].time)
 		{
-			// 線形補間
+			// 球面線形補間
 			float t = (time - keyframes[i].time) / (keyframes[i + 1].time - keyframes[i].time);
 			XMFLOAT4 start = keyframes[i].value;
 			XMFLOAT4 end = keyframes[i + 1].value;
@@ -143,31 +173,39 @@ XMFLOAT4 Animator::SampleQuat(const std::vector<KeyframeQuat>& keyframes, float 
 			return result;
 		}
 	}
+
+	// 最後のキーフレームの値を返す
+	return keyframes.back().value;
 }
 
 void Animator::SampleLocalPose(float time)
 {
 	for (int i = 0; i < m_skeleton->bones.size(); ++i)
 	{
-		// ボーンアニメーションの取得
 		const auto& boneAnimIt = m_currentClip->boneAnimations.find(i);
 		if (boneAnimIt != m_currentClip->boneAnimations.end())
 		{
 			const BoneAnimation& boneAnim = boneAnimIt->second;
 
-			// サンプリング
-			XMFLOAT3 position = SampleVec3(boneAnim.positionKeyframes, time);
-			XMFLOAT4 rotation = SampleQuat(boneAnim.rotationKeyframes, time);
-			XMFLOAT3 scale = SampleVec3(boneAnim.scaleKeyframes, time);
+			XMFLOAT3 position = boneAnim.positionKeyframes.empty()
+				? XMFLOAT3(0.0f, 0.0f, 0.0f)
+				: SampleVec3(boneAnim.positionKeyframes, time);
+
+			XMFLOAT4 rotation = boneAnim.rotationKeyframes.empty()
+				? XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)
+				: SampleQuat(boneAnim.rotationKeyframes, time);
+
+			XMFLOAT3 scale = boneAnim.scaleKeyframes.empty()
+				? XMFLOAT3(1.0f, 1.0f, 1.0f)
+				: SampleVec3(boneAnim.scaleKeyframes, time);
 
 			XMVECTOR posV = XMLoadFloat3(&position);
 			XMVECTOR rotV = XMLoadFloat4(&rotation);
 			XMVECTOR scaleV = XMLoadFloat3(&scale);
 
-			// ローカルポーズに設定
-			XMMATRIX localMatrix = 
-				  XMMatrixScalingFromVector(scaleV) 
-				* XMMatrixRotationQuaternion(rotV) 
+			XMMATRIX localMatrix =
+				  XMMatrixScalingFromVector(scaleV)
+				* XMMatrixRotationQuaternion(rotV)
 				* XMMatrixTranslationFromVector(posV);
 
 			m_currentPose.localMatrixes[i] = localMatrix;
@@ -177,12 +215,11 @@ void Animator::SampleLocalPose(float time)
 
 void Animator::ComputeGlobalPose()
 {
-	// ルートボーンから再帰的にグローバルポーズを計算
 	for (int i = 0; i < m_skeleton->bones.size(); ++i)
 	{
 		if (m_skeleton->bones[i].parentIndex == -1)
 		{
-			RecursiveComputeGlobalPose(i, gameObject().transform().GetWorldMatrix());
+			RecursiveComputeGlobalPose(i, XMMatrixIdentity());
 		}
 	}
 }
@@ -193,13 +230,10 @@ void Animator::RecursiveComputeGlobalPose(int boneIndex, const DirectX::XMMATRIX
 	XMMATRIX current = m_currentPose.localMatrixes[boneIndex];
 	m_currentPose.globalMatrixes[boneIndex] = current * parentMatrix;
 
-	// 子ボーンに対して再帰的に処理
-	for (int i = 0; i < m_skeleton->bones.size(); ++i)
+	// 子ボーンに対して再帰的に処理を行う
+	for (int childIndex : m_skeleton->bones[boneIndex].childIndexes)
 	{
-		if (m_skeleton->bones[i].parentIndex == boneIndex)
-		{
-			RecursiveComputeGlobalPose(i, m_currentPose.globalMatrixes[boneIndex]);
-		}
+		RecursiveComputeGlobalPose(childIndex, m_currentPose.globalMatrixes[boneIndex]);
 	}
 }
 
@@ -210,6 +244,6 @@ void Animator::ComputeSkinPose()
 		// スキン行列 = 補正行列 * グローバル行列
 		XMMATRIX offsetMatrix = m_skeleton->bones[i].offsetMatrix;
 		XMMATRIX globalMatrix = m_currentPose.globalMatrixes[i];
-		m_currentPose.skinMatrixes[i] = XMMatrixTranspose(offsetMatrix * globalMatrix);
+		m_currentPose.skinMatrixes[i] = XMMatrixTranspose(globalMatrix * offsetMatrix);
 	}
 }

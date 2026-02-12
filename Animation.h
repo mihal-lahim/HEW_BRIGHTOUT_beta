@@ -1,4 +1,4 @@
-#ifndef ANIMATION_H
+﻿#ifndef ANIMATION_H
 #define ANIMATION_H
 
 #include <DirectXMath.h>
@@ -13,6 +13,7 @@ struct Bone
 {
 	std::string name = {};
 	int parentIndex = -1;
+	std::vector<int> childIndexes = {};
 	// 補正用行列
 	DirectX::XMMATRIX offsetMatrix = {};
 };
@@ -25,14 +26,14 @@ struct Skeleton
 	std::unordered_map<std::string, int> boneNameToIndexMap = {};
 };
 
-// キーフレーム（ベクター3）構造体
+// キーフレーム(ベクター3)構造体
 struct KeyframeVec3
 {
 	float time = -1;
 	DirectX::XMFLOAT3 value = {};
 };
 
-// キーフレーム（クォータニオン）構造体
+// キーフレーム(クォータニオン)構造体
 struct KeyframeQuat
 {
 	float time = -1;
@@ -130,6 +131,7 @@ public:
 	}
 
 
+	void InitializeByContext() override;
 private:
 	// キーフレームのサンプリングメソッド
 	DirectX::XMFLOAT3 SampleVec3(const std::vector<KeyframeVec3>& keyframes, float time);

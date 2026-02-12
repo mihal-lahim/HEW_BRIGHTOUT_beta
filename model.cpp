@@ -9,6 +9,7 @@
 #include <DirectXMath.h>
 #include "WICTextureLoader11.h"
 #include "DirectXTex.h"
+#include <functional>
 
 #include "ResourceSystem.h"
 #include "GameObject.h"
@@ -19,10 +20,10 @@ using namespace DirectX;
 XMMATRIX AiMatrixToXmMatrix(const aiMatrix4x4& aiMat)
 {
 	return XMMATRIX(
-		aiMat.a1, aiMat.b1, aiMat.c1, aiMat.d1,
-		aiMat.a2, aiMat.b2, aiMat.c2, aiMat.d2,
-		aiMat.a3, aiMat.b3, aiMat.c3, aiMat.d3,
-		aiMat.a4, aiMat.b4, aiMat.c4, aiMat.d4
+		aiMat.a1, aiMat.a2, aiMat.a3, aiMat.a4,
+		aiMat.b1, aiMat.b2, aiMat.b3, aiMat.b4,
+		aiMat.c1, aiMat.c2, aiMat.c3, aiMat.c4,
+		aiMat.d1, aiMat.d2, aiMat.d3, aiMat.d4
 	);
 }
 
@@ -38,9 +39,7 @@ bool Model::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 
 	// 左手系への変換を適用してモデルを読み込む
 	const aiScene* scene = importer.ReadFile(filePath,
-		aiProcess_ConvertToLeftHanded |
-		aiProcess_CalcTangentSpace |
-		aiProcess_OptimizeMeshes
+		aiProcess_ConvertToLeftHanded
 	);
 
 	if (!scene || !scene->HasMeshes() || !scene->mRootNode)
@@ -55,7 +54,6 @@ bool Model::CreateBuffer(GraphicsDevice& device, const std::string& filePath)
 	CreateSkeleton(scene);
 
 	// メッシュの作成
-	m_meshes.reserve(scene->mNumMeshes);
 	CreateMesh(device, scene, ptrToIndexMap);
 
 	// マテリアルの作成
@@ -89,8 +87,17 @@ int Model::CreateNode(const aiNode* node, const aiScene* scene, PtrToIndexMap& m
 	{
 		// メッシュインデックスの取得
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		int meshIndex = map.meshToIndexMap[mesh];
-		modelNode.meshIndexes.push_back(meshIndex);
+
+		if (mesh->HasBones())
+		{
+			int skinnedMeshIndex = map.skinnedMeshToIndexMap[mesh];
+			modelNode.skinnedMeshIndexes.push_back(skinnedMeshIndex);
+		}
+		else
+		{
+			int meshIndex = map.meshToIndexMap[mesh];
+			modelNode.meshIndexes.push_back(meshIndex);
+		}
 
 		// マテリアルインデックスの取得
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
@@ -100,7 +107,7 @@ int Model::CreateNode(const aiNode* node, const aiScene* scene, PtrToIndexMap& m
 
 
 	// ローカルトランスフォームの設定
-	modelNode.transform = XMMatrixTranspose(AiMatrixToXmMatrix(node->mTransformation));
+	modelNode.transform = AiMatrixToXmMatrix(node->mTransformation);
 
 	// モデルノードを追加
 	m_modelNodes.push_back(modelNode);
@@ -216,6 +223,13 @@ void Model::ConstructSkinnedMesh(GraphicsDevice& device, const aiMesh* mesh, Ptr
 	for (unsigned int v = 0; v < mesh->mNumVertices; v++)
 	{
 		SkinnedMesh::VertexAttribute vertex{};
+
+		for (int i = 0; i < SkinnedMesh::MAX_BONE_INFLUENCE; ++i)
+		{
+			vertex.boneIndexes[i] = -1;
+			vertex.boneWeights[i] = 0.0f;
+		}
+
 		// 頂点位置
 		vertex.position.x = mesh->mVertices[v].x;
 		vertex.position.y = mesh->mVertices[v].y;
@@ -249,13 +263,19 @@ void Model::ConstructSkinnedMesh(GraphicsDevice& device, const aiMesh* mesh, Ptr
 			vertex.color.w = 1.0f;
 		}
 
-
 		if (mesh->HasBones())
 		{
 			// ボーン情報の取得
 			for (unsigned int b = 0; b < mesh->mNumBones; b++)
 			{
 				aiBone* bone = mesh->mBones[b];
+
+				auto boneIt = m_skeleton.boneNameToIndexMap.find(bone->mName.C_Str());
+				if (boneIt == m_skeleton.boneNameToIndexMap.end())
+				{
+					continue;
+				}
+
 				for (unsigned int w = 0; w < bone->mNumWeights; w++)
 				{
 					// 頂点に影響を与えるボーンか確認
@@ -263,11 +283,9 @@ void Model::ConstructSkinnedMesh(GraphicsDevice& device, const aiMesh* mesh, Ptr
 					{
 						for (int i = 0; i < SkinnedMesh::MAX_BONE_INFLUENCE; i++)
 						{
-							// 空きスロットを探す
 							if (vertex.boneIndexes[i] == -1)
 							{
-								// ボーンインデックスとウェイトを設定
-								vertex.boneIndexes[i] = m_skeleton.boneNameToIndexMap[bone->mName.C_Str()];
+								vertex.boneIndexes[i] = boneIt->second;
 								vertex.boneWeights[i] = bone->mWeights[w].mWeight;
 								break;
 							}
@@ -298,7 +316,7 @@ void Model::ConstructSkinnedMesh(GraphicsDevice& device, const aiMesh* mesh, Ptr
 	newMesh.CreateBuffer(device, vertices, indices);
 
 	// メッシュとインデックスのマッピングを更新
-	ptrToIndex.skinnedMeshToIndexMap[mesh] = static_cast<int>(m_meshes.size());
+	ptrToIndex.skinnedMeshToIndexMap[mesh] = static_cast<int>(m_skinnedMeshes.size());
 
 	// メッシュをモデルに追加
 	m_skinnedMeshes.push_back(std::move(newMesh));
@@ -364,14 +382,15 @@ void Model::CreateSkeleton(const aiScene* scene)
 	// 新しいスケルトンを作成
 	Skeleton newSkeleton{};
 
+	// まず全てのボーンを登録
 	for (unsigned int m = 0; m < scene->mNumMeshes; m++)
 	{
 		aiMesh* mesh = scene->mMeshes[m];
 
 		// ボーンが存在する場合
-		if(mesh->HasBones())
+		if (mesh->HasBones())
 		{
-			for(unsigned int b=0;b<mesh->mNumBones;b++)
+			for (unsigned int b = 0; b < mesh->mNumBones; b++)
 			{
 				aiBone* bone = mesh->mBones[b];
 
@@ -379,7 +398,7 @@ void Model::CreateSkeleton(const aiScene* scene)
 				std::string boneName = bone->mName.C_Str();
 
 				// 既に登録されているか確認
-				if(newSkeleton.boneNameToIndexMap.contains(boneName))
+				if (newSkeleton.boneNameToIndexMap.contains(boneName))
 				{
 					// 既に登録されている場合はスキップ
 					continue;
@@ -388,7 +407,7 @@ void Model::CreateSkeleton(const aiScene* scene)
 				// 新しいボーンを作成
 				Bone newBone{};
 				newBone.name = boneName;
-				newBone.offsetMatrix = XMMatrixTranspose(AiMatrixToXmMatrix(bone->mOffsetMatrix));
+				newBone.offsetMatrix = AiMatrixToXmMatrix(bone->mOffsetMatrix);
 
 				// ボーンをスケルトンに追加
 				int boneIndex = static_cast<int>(newSkeleton.bones.size());
@@ -397,6 +416,49 @@ void Model::CreateSkeleton(const aiScene* scene)
 			}
 		}
 	}
+
+	// 次に親子関係を構築
+	std::function<void(const aiNode*)> Traverse = [&](const aiNode* node)
+		{
+			// ノード名からボーンインデックスを取得
+			std::string parentName = node->mName.C_Str();
+			auto parentIt = newSkeleton.boneNameToIndexMap.find(parentName);
+
+			// 親ボーンが存在する場合
+			if (parentIt != newSkeleton.boneNameToIndexMap.end())
+			{
+				// 親ボーンインデックスを取得
+				int parentIndex = parentIt->second;
+
+				// 子ノードを処理
+				for (unsigned int i = 0; i < node->mNumChildren; ++i)
+				{
+					const aiNode* child = node->mChildren[i];
+					std::string childName = child->mName.C_Str();
+
+					// 子ノード名からボーンインデックスを取得
+					auto childIt = newSkeleton.boneNameToIndexMap.find(childName);
+					if (childIt != newSkeleton.boneNameToIndexMap.end())
+					{
+						// 子ボーンインデックスを取得して親ボーンに追加
+						int childIndex = childIt->second;
+						newSkeleton.bones[parentIndex].childIndexes.push_back(childIndex);
+
+						// 子ボーンに親インデックスを設定
+						newSkeleton.bones[childIndex].parentIndex = parentIndex;
+					}
+				}
+			}
+
+			// 再帰的に子ノードを処理
+			for (unsigned int i = 0; i < node->mNumChildren; ++i)
+			{
+				Traverse(node->mChildren[i]);
+			}
+		};
+
+	Traverse(scene->mRootNode);
+	m_skeleton = std::move(newSkeleton);
 }
 
 void Model::CreateAnimation(const aiScene* scene)
@@ -412,7 +474,7 @@ void Model::CreateAnimation(const aiScene* scene)
 		newClip.ticksPerSecond = static_cast<float>(aiAnim->mTicksPerSecond != 0 ? aiAnim->mTicksPerSecond : 25.0f);
 
 		// チャンネルの処理
-		for(unsigned int c=0;c<aiAnim->mNumChannels;c++)
+		for (unsigned int c = 0; c < aiAnim->mNumChannels; c++)
 		{
 			aiNodeAnim* aiChannel = aiAnim->mChannels[c];
 			std::string boneName = aiChannel->mNodeName.C_Str();
@@ -452,7 +514,15 @@ void Model::CreateAnimation(const aiScene* scene)
 			}
 
 			// ボーン名からインデックスを取得
-			int boneIndex = m_skeleton.boneNameToIndexMap[boneName];
+
+			auto it = m_skeleton.boneNameToIndexMap.find(boneName);
+
+			if (it == m_skeleton.boneNameToIndexMap.end())
+			{
+				// ボーンが見つからない場合はスキップ
+				continue;
+			}
+			int boneIndex = it->second;
 
 			// ボーンアニメーションをクリップに追加
 			newClip.boneAnimations[boneIndex] = boneAnim;
@@ -501,9 +571,10 @@ void ModelPrefab::ConstructModel(GameObject& parent, const Model* model, int ind
 		meshRenderer->material = model->GetMaterials()[materialIndex];
 		meshRenderer->material.vsPath = "MeshVS.cso";
 		meshRenderer->material.psPath = "MeshPS.cso";
+		meshRenderer->model = model;
 
 		// 親子関係の設定
-		parent.SetChild(*meshObject);
+		newObject->SetChild(*meshObject);
 
 		// メッシュオブジェクトの名前設定
 		std::string meshName = currentNode.name + "_Mesh_" + std::to_string(i);
@@ -542,9 +613,9 @@ void SkinnedModelPrefab::ConstructModel(GameObject& parent, const Model* model, 
 	parent.SetChild(*newObject);
 
 	// メッシュとマテリアルの設定
-	for (size_t i = 0; i < currentNode.meshIndexes.size(); ++i)
+	for (size_t i = 0; i < currentNode.skinnedMeshIndexes.size(); ++i)
 	{
-		int meshIndex = currentNode.meshIndexes[i];
+		int meshIndex = currentNode.skinnedMeshIndexes[i];
 		int materialIndex = currentNode.materialIndexes[i];
 
 		// メッシュ用の子オブジェクトを作成
@@ -556,6 +627,7 @@ void SkinnedModelPrefab::ConstructModel(GameObject& parent, const Model* model, 
 		meshRenderer->material = model->GetMaterials()[materialIndex];
 		meshRenderer->material.vsPath = "SkinnedMeshVS.cso";
 		meshRenderer->material.psPath = "MeshPS.cso";
+		meshRenderer->model = model;
 
 		// 親子関係の設定
 		parent.SetChild(*meshObject);
