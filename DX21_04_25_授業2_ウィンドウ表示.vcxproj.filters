@@ -343,6 +343,9 @@
     <ClCompile Include="SpriteRenderer.cpp">
       <Filter>SorceFile\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="MaptipManager.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemTimer.h">
@@ -614,6 +617,12 @@
     </ClInclude>
     <ClInclude Include="BillboardPrefab.h">
       <Filter>HeaderFile\Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="MaptipManager.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Maptip.h">
+      <Filter>HeaderFile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

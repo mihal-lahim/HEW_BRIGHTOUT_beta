@@ -32,3 +32,5 @@ MODEL* ModelLoad(const char* FileName, float scale);
 void ModelRelease(MODEL* model);
 
 void ModelDraw(const MODEL* model, const DirectX::XMMATRIX& mtxWorld);
+
+static void LogSceneBounds(const MODEL* model);

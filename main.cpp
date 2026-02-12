@@ -27,6 +27,7 @@
 #include <sstream>
 
 #include "light.h"
+#include "MaptipManager.h"
 
 
 using namespace DirectX;
@@ -109,6 +110,8 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	Shader3d_Initialize(GetGraphicsDevice().GetDevice(), GetGraphicsDevice().GetDeviceContext());
 	
 	ModelInitialize(&GetGraphicsDevice());
+
+	MapTipManager::Instance().LoadFromCSV("maptip.csv");
 
 	GameContext ctx = engineCore.GetGameContext();
 

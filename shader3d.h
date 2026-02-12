@@ -7,21 +7,31 @@
 
 ==============================================================================*/
 #ifndef SHADER3D_H
-#define	SHADER3D_H
+#define SHADER3D_H
 
 #include <d3d11.h>
 #include <DirectXMath.h>
-#include "GraphicsDevice.h"
 
+// 初期化・終了
 bool Shader3d_Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 void Shader3d_Finalize();
 
+// 行列設定
 void Shader3d_SetWorldMatrix(const DirectX::XMMATRIX& matrix);
 void Shader3d_SetViewMatrix(const DirectX::XMMATRIX& matrix);
 void Shader3d_SetProjectionMatrix(const DirectX::XMMATRIX& matrix);
 
-void Shader3d_SetMaterialDiffuse(const DirectX::XMFLOAT4 color);
+// マテリアル
+void Shader3d_SetMaterialDiffuse(const DirectX::XMFLOAT4& color);
 
+// ライト
+void Shader3d_SetLight(
+    const DirectX::XMFLOAT4& ambient,
+    const DirectX::XMFLOAT4& dirColor,
+    const DirectX::XMFLOAT4& dirVec);
+
+// 描画開始
 void Shader3d_Begin();
+void Shader3d_SetCamera(const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj);
 
 #endif // SHADER3D_H

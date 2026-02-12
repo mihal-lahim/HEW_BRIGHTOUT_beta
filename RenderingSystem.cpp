@@ -10,6 +10,7 @@
 #include "shader3d.h"
 #include "Scene.h"
 #include <algorithm>
+#include "MaptipManager.h"
 
 using namespace DirectX;
 
@@ -87,6 +88,9 @@ void RenderingSystem::Render(const Scene& scene)
 
 		GetGraphicsDevice().SetAlphaBlend(GraphicsDevice::BLEND_OPAQUE);
 
+
+		MapTipManager::Instance().RenderAll();
+ 
         // メッシュレンダラーを描画
 		PerCameraCB::CBData cameraData{};
 		XMStoreFloat4x4(&cameraData.ViewMatrix, XMMatrixTranspose(view));

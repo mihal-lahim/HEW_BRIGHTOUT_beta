@@ -176,6 +176,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
     <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="MaptipManager.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="PhysicsBody.cpp" />
     <ClCompile Include="PoleManager.cpp" />
@@ -244,6 +245,8 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DebugCameraPrefab.h" />
     <ClInclude Include="GraphicsDevice.h" />
+    <ClInclude Include="Maptip.h" />
+    <ClInclude Include="MaptipManager.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="PlayerPrefab.h" />
     <ClInclude Include="PrimitivePrefab.h" />
