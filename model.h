@@ -2,35 +2,28 @@
 #define MODEL_H
 
 #include "Mesh.h"
+#include "Material.h"
 #include "Texture.h"
-#include "Animation.h"
 #include "Resource.h"
-#include "ResourceSystem.h"
 #include "Prefab.h"
+#include "Animation.h"
 #include <string>
-#include <filesystem>
-#include <DirectXMath.h>
-#include "GameObject.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #pragma comment (lib, "assimp-vc143-mt.lib")
 
-
-namespace tinygltf
-{
-	class Model;
-	struct Primitive;
-}
-
+// モデルノード構造体
 struct ModelNode
 {
 	std::string name = {};
-	int meshIndex = -1;
-	int skinnedMeshIndex = -1;
-	int textureIndex = -1;
-	DirectX::XMFLOAT4 baseColorFactor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	int parent = -1;
-	std::vector<int> children = {};
-	DirectX::XMMATRIX localMatrix = {};
+	std::vector<int> meshIndexes = {};
+	std::vector<int> skinnedMeshIndexes = {};
+	std::vector<int> materialIndexes = {};
+	std::vector<int> childIndexes = {};
+	std::vector<int> boneIndexes = {};
+	DirectX::XMMATRIX transform = {};
 };
 
 class Model : public Resource
@@ -44,72 +37,88 @@ public:
 	{
 		return m_meshes;
 	}
+
 	// スキンメッシュ群の取得
 	const std::vector<SkinnedMesh>& GetSkinnedMeshes() const
 	{
 		return m_skinnedMeshes;
 	}
-	// テクスチャ群の取得
-	const std::vector<Texture>& GetTextures() const
+
+	// マテリアル群の取得
+	const std::vector<Material>& GetMaterials() const
 	{
-		return m_textures;
+		return m_materials;
 	}
+
 	// スケルトンの取得
 	const Skeleton& GetSkeleton() const
 	{
 		return m_skeleton;
 	}
-	// アニメーションクリップ群の取得
-	const std::vector<AnimationClip>& GetAnimationClips() const
+
+	// アニメーション群の取得
+	const std::vector<AnimationClip>& GetAnimations() const
 	{
-		return m_animationClips;
+		return m_animations;
 	}
 
-	// ノード群の取得
+	// モデルノード群の取得
 	const std::vector<ModelNode>& GetModelNodes() const
 	{
-		return m_nodes;
+		return m_modelNodes;
 	}
-
 private:
-	// ノード群
-	std::vector<ModelNode> m_nodes = {};
-
 	// メッシュ群
 	std::vector<Mesh> m_meshes = {};
+
 	// スキンメッシュ群
 	std::vector<SkinnedMesh> m_skinnedMeshes = {};
+
+	// マテリアル群
+	std::vector<Material> m_materials = {};
 
 	// テクスチャ群
 	std::vector<Texture> m_textures = {};
 
-	// スケルトン
+	// スケルトン（ボーン群）
 	Skeleton m_skeleton = {};
-	std::vector<AnimationClip> m_animationClips = {};
 
-	std::filesystem::path m_baseDirectory = {};
+	// アニメーション群
+	std::vector<AnimationClip> m_animations = {};
 
-	// ノードの処理
-	int ProcessNode(GraphicsDevice& device, const tinygltf::Model& model, int nodeIndex, int parentIndex);
+	// モデルノード群
+	std::vector<ModelNode> m_modelNodes = {};
 
-	// メッシュの読み込み
-	int LoadMesh(GraphicsDevice& device, const tinygltf::Model& model, const tinygltf::Primitive& primitive);
-	// スキンメッシュの読み込み
-	int LoadSkinnedMesh(GraphicsDevice& device, const tinygltf::Model& model, const tinygltf::Primitive& primitive, int skinIndex);
+	// ポインタからインデックスへのマッピング構造体
+	struct PtrToIndexMap
+	{
+		std::unordered_map<const aiMesh*, int> meshToIndexMap = {};
+		std::unordered_map<const aiMesh*, int> skinnedMeshToIndexMap = {};
+		std::unordered_map<const aiMaterial*, int> materialToIndexMap = {};
+	};
 
-	// テクスチャの読み込み
-	void LoadTextures(GraphicsDevice& device, const tinygltf::Model& model);
+	// モデルノード処理構築メソッド
+	int CreateNode(const aiNode* node, const aiScene* scene, PtrToIndexMap& map);
 
-	// スケルトンの読み込み
-	void LoadSkeleton(const tinygltf::Model& model);
+	// メッシュ構築メソッド
+	void CreateMesh(GraphicsDevice& device, const aiScene* scene, PtrToIndexMap& ptrToIndex);
 
-	// アニメーションクリップの読み込み
-	void LoadAnimationClips(const tinygltf::Model& model);
+	// メッシュ構築ヘルパーメソッド
+	void ConstructMesh(GraphicsDevice& device, const aiMesh* mesh, PtrToIndexMap& ptrToIndex);
+	void ConstructSkinnedMesh(GraphicsDevice& device, const aiMesh* mesh, PtrToIndexMap& ptrToIndex);
+
+
+	// マテリアル構築メソッド
+	void CreateMaterial(GraphicsDevice& device, const aiScene* scene, PtrToIndexMap& ptrToIndex);
+
+	// スケルトン構築メソッド
+	void CreateSkeleton(const aiScene* scene);
+
+	// アニメーション構築メソッド
+	void CreateAnimation(const aiScene* scene);
 };
 
 
-
-// モデルプレハブクラス
 class ModelPrefab : public Prefab
 {
 public:
@@ -117,14 +126,18 @@ public:
 		: m_filePath(filePath)
 	{
 	}
-	// インスタンス化メソッド
+
 	void Instantiate(GameObject& gameObject) override;
 
 private:
+	// モデルファイルパス
 	std::string m_filePath = {};
+
+	// モデル構築メソッド
+	void ConstructModel(GameObject& parent, const Model* model, int index);
 };
 
-// アニメーションモデルプレハブクラス
+
 class SkinnedModelPrefab : public Prefab
 {
 public:
@@ -132,24 +145,14 @@ public:
 		: m_filePath(filePath)
 	{
 	}
-	// インスタンス化メソッド
 	void Instantiate(GameObject& gameObject) override;
 
 private:
+	// モデルファイルパス
 	std::string m_filePath = {};
-};
 
-
-class CubePrefab : public Prefab
-{
-public:
-	void Instantiate(GameObject& gameObject) override;
-};
-
-class SpherePrefab : public Prefab
-{
-public:
-	void Instantiate(GameObject& gameObject) override;
+	// モデル構築メソッド
+	void ConstructModel(GameObject& parent, const Model* model, int index);
 };
 
 #endif

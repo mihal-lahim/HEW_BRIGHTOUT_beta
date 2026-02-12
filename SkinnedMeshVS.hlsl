@@ -44,34 +44,28 @@ VS_OUTPUT main(VS_INPUT vsin)
     float4 skinnedPos = float4(0, 0, 0, 0);
     float3 skinnedNormal = float3(0, 0, 0);
 
-    // ウェイトを事前に正規化
-    float totalW = dot(vsin.weight, float4(1, 1, 1, 1));
-    float4 weights = vsin.weight / (totalW > 0 ? totalW : 1.0f);
+    // ウェイト正規化
+    float totalW = vsin.weight.x + vsin.weight.y + vsin.weight.z + vsin.weight.w;
+    float4 weights = (totalW > 0.001f) ? (vsin.weight / totalW) : float4(1, 0, 0, 0);
 
-    // ループを使わずに計算（展開）
     [unroll]
     for (int i = 0; i < 4; i++)
     {
-        if (weights[i] > 0.0f)
+        float w = weights[i];
+        if (w > 0.0f)
         {
-            // 座標変換
-            skinnedPos += weights[i] * mul(localPos, Bones[vsin.bone[i]]);
-            // 法線変換（ここではまだ normalize しない）
-            skinnedNormal += weights[i] * mul(localNormal, (float3x3) Bones[vsin.bone[i]]);
+            float4x4 bone = Bones[vsin.bone[i]];
+            skinnedPos.xyz += w * mul(localPos, bone).xyz;
+            skinnedNormal += w * mul(localNormal, (float3x3) bone);
         }
     }
-
-    // 正規化と w の修正
+    
     skinnedPos.w = 1.0f;
-    skinnedNormal = normalize(skinnedNormal);
 
-    // WVP変換
-    float4x4 mtxWVP = mul(mul(world, view), proj);
-    vsout.posH = mul(skinnedPos, mtxWVP);
+    // viewプロジェクション変換
+    vsout.posH = mul(mul(mul(skinnedPos, world), view), proj);
     
-    // 法線の最終変換（ワールド行列を適用）
-    vsout.normalW = normalize(mul(skinnedNormal, (float3x3) world));
-    
+    vsout.normalW = normalize(skinnedNormal);
     vsout.color = vsin.color;
     vsout.uv = vsin.uv;
     

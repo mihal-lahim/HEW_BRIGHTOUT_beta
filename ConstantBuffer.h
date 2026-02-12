@@ -13,11 +13,11 @@ class ConstantBuffer
 public:
 	// バッファの作成、更新
 	bool CreateBuffer(GraphicsDevice& device, UINT size);
-	void UpdateBuffer(GraphicsDevice& device, const void* data, UINT size);
+	void UpdateBuffer(GraphicsDevice& device, const void* data, UINT size) const;
 
 	// バインド
-	void BindVS(GraphicsDevice& device, UINT slot);
-	void BindPS(GraphicsDevice& device, UINT slot);
+	void BindVS(GraphicsDevice& device, UINT slot) const;
+	void BindPS(GraphicsDevice& device, UINT slot) const;
 
 private:
 	// 定数バッファ

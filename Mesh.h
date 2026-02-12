@@ -63,10 +63,13 @@ public:
 	void Draw(GraphicsDevice& device) const;
 };
 
-// スキンドメッシュクラス
+// スキンメッシュクラス
 class SkinnedMesh : public MeshBase
 {
 public:
+	// ボーンの影響を受ける最大数
+	static constexpr int MAX_BONE_INFLUENCE = 4;
+
 	// 頂点構造体
 	struct VertexAttribute
 	{
@@ -74,8 +77,10 @@ public:
 		DirectX::XMFLOAT4 color = {};
 		DirectX::XMFLOAT3 normal = {};
 		DirectX::XMFLOAT2 uv = {};
-		UINT bone[4] = {};
-		float weight[4] = {};
+		// ボーンインデックス（最大4つ）
+		int boneIndexes[4] = { -1, -1, -1, -1 };
+		// ボーンウェイト（最大4つ）
+		float boneWeights[4] = {};
 	};
 
 	bool CreateBuffer(GraphicsDevice& device, const std::vector<VertexAttribute>& vertexes, const std::vector<UINT>& indexes)
@@ -87,5 +92,6 @@ public:
 	// 描画処理
 	void Draw(GraphicsDevice& device) const;
 };
+
 
 #endif
