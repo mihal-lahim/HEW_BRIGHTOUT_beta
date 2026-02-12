@@ -36,7 +36,7 @@ public:
 		player->inputHandler = gameObject.AddComponent<InputHandler>(&gameObject.input().gamePad(), commandSet);
 
 		// ƒ‚ƒfƒ‹İ’è
-		ModelPrefab modelPrefab{ "model/Cube.glb" };
+		ModelPrefab modelPrefab{ "model/cube.glb" };
 		GameObject* modelObject = gameObject.Instantiate(modelPrefab);
 		gameObject.SetChild(*modelObject);
 
