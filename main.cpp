@@ -75,7 +75,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 
 
 	// デフォルトシーン
-	engineCore.GetGameContext().sceneSystem->ChangeScene<Game>();
+	//engineCore.GetGameContext().sceneSystem->ChangeScene<Game>();
 
 
 
@@ -85,7 +85,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	//engineCore.GetGameContext().sceneSystem->ChangeScene<Kasiwagi>();
 
 
-	//engineCore.GetGameContext().sceneSystem->ChangeScene<Namioka>();
+	engineCore.GetGameContext().sceneSystem->ChangeScene<Namioka>();
 
 
 	//ゲームループ

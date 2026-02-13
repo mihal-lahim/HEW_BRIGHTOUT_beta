@@ -182,6 +182,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Namioka.cpp" />
     <ClCompile Include="PhysicsBody.cpp" />
     <ClCompile Include="PoleManager.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -244,6 +245,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Namioka.h" />
     <ClInclude Include="PlayerPrefab.h" />
     <ClInclude Include="DebugCounter.h" />
     <ClInclude Include="GameContext.h" />
