@@ -8,6 +8,8 @@ using namespace DirectX;
 
 void Namioka::Initialize()
 {
+	g_Bgm = LoadAudio("asset/bgm.wav");
+
 	//Player
 	PlayerPrefab playerPrefab{};
 	Instantiate(playerPrefab)->transform().position() += Vector3(0.0f, 0.0f, 10.0f);
@@ -1056,5 +1058,77 @@ void Namioka::Initialize()
 		PhysicsBodyDesc bodyDesc{};
 		bodyDesc.Type = BodyType::STATIC;
 		spedensen->AddComponent<PhysicsBody>(bodyDesc);
+	}
+
+	//Building01
+	struct Building01Data
+	{
+		Vector3 position;
+		float yRotation; // Y軸回転（度）
+	};
+	ModelPrefab building01Prefab{ "model/building01.glb" };
+	std::vector<Building01Data> building01List =
+	{
+	};
+
+	for (const auto& data : building01List)
+	{
+		GameObject* building01 = Instantiate(building01Prefab);
+
+		building01->transform().scale() = { 30.0f,30.0f,30.0f };
+		building01->transform().position() = data.position;
+
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		building01->transform().rotation().FromXMVECTOR(q);
+
+		BoxColliderDesc shapeDesc{};
+		shapeDesc.SizeX = 0.2f;
+		shapeDesc.SizeY = 0.3f;
+		shapeDesc.SizeZ = 0.2f;
+		building01->AddComponent<ColliderShape>(shapeDesc);
+
+		PhysicsBodyDesc bodyDesc{};
+		bodyDesc.Type = BodyType::STATIC;
+		building01->AddComponent<PhysicsBody>(bodyDesc);
+	}
+
+	//Building02
+	struct Building02Data
+	{
+		Vector3 position;
+		float yRotation; // Y軸回転（度）
+	};
+	ModelPrefab building02Prefab{ "model/building02.glb" };
+	std::vector<Building02Data> building02List =
+	{
+	};
+
+	for (const auto& data : building02List)
+	{
+		GameObject* building02 = Instantiate(building02Prefab);
+
+		building02->transform().scale() = { 30.0f,50.0f,30.0f };
+		building02->transform().position() = data.position;
+
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		building02->transform().rotation().FromXMVECTOR(q);
+
+		BoxColliderDesc shapeDesc{};
+		shapeDesc.SizeX = 0.1f;
+		shapeDesc.SizeY = 1.0f;
+		shapeDesc.SizeZ = 0.1f;
+		building02->AddComponent<ColliderShape>(shapeDesc);
+
+		PhysicsBodyDesc bodyDesc{};
+		bodyDesc.Type = BodyType::STATIC;
+		building02->AddComponent<PhysicsBody>(bodyDesc);
 	}
 }
