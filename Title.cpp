@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "TitleController.h"
 #include "RenderingSystem.h"
+#include "audio.h"
 
 void Title::Initialize()
 {

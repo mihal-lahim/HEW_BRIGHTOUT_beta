@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include "PowerPlant.h"
 #include "GameClearChecker.h"
+#include "audio.h"
 
 	using namespace DirectX;
 
