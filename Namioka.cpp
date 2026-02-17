@@ -1,5 +1,6 @@
 #include "Namioka.h"
 #include "PlayerPrefab.h"
+#include "EnemyPrefab.h"
 #include "GameObject.h"
 #include "DebugCamera.h"
 #include "Texture.h"
@@ -13,6 +14,11 @@ void Namioka::Initialize()
 	//Player
 	PlayerPrefab playerPrefab{};
 	Instantiate(playerPrefab)->transform().position() += Vector3(0.0f, 0.0f, 10.0f);
+
+	//Enemy
+	EnemyPrefab enemyPrefab{};
+	auto* enemy = Instantiate(enemyPrefab);
+	enemy->transform().position() = Vector3(10.0f, 0.0f, 0.0f);
 
 	////Ground
 	//ModelPrefab cubePrefab{ "model/cube.glb" };

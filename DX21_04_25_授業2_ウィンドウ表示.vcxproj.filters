@@ -328,6 +328,21 @@
     <ClCompile Include="PowerPlant.cpp">
       <Filter>SorceFile</Filter>
     </ClCompile>
+    <ClCompile Include="Title.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Result.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="ResultController.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="GameClearChecker.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleController.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemTimer.h">
@@ -574,6 +589,27 @@
       <Filter>HeaderFile</Filter>
     </ClInclude>
     <ClInclude Include="PowerPlant.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Title.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Result.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="ResultController.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="GameClearChecker.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleController.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyPrefab.h">
       <Filter>HeaderFile</Filter>
     </ClInclude>
   </ItemGroup>

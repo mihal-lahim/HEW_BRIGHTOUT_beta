@@ -22,7 +22,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{0cd14713-b3d2-4f0b-90c6-5d08fe1b933e}</ProjectGuid>
-    <RootNamespace>DX210425ö‹Æ2ƒEƒBƒ“ƒhƒE•\¦</RootNamespace>
+    <RootNamespace>DX210425ï¿½ï¿½ï¿½ï¿½2ï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½\ï¿½ï¿½</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -87,7 +87,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ƒtƒ@ƒCƒ‹‚ğƒvƒƒWƒFƒNƒgƒfƒBƒŒƒNƒgƒŠ‚ÉƒRƒs[i‘SŠpEƒXƒy[ƒX‘Î‰j
+      <Command>:: .cso ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½gï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ÉƒRï¿½sï¿½[ï¿½iï¿½Sï¿½pï¿½Eï¿½Xï¿½yï¿½[ï¿½Xï¿½Î‰ï¿½ï¿½j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -110,7 +110,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ƒtƒ@ƒCƒ‹‚ğƒvƒƒWƒFƒNƒgƒfƒBƒŒƒNƒgƒŠ‚ÉƒRƒs[i‘SŠpEƒXƒy[ƒX‘Î‰j
+      <Command>:: .cso ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½gï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ÉƒRï¿½sï¿½[ï¿½iï¿½Sï¿½pï¿½Eï¿½Xï¿½yï¿½[ï¿½Xï¿½Î‰ï¿½ï¿½j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -134,7 +134,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ƒtƒ@ƒCƒ‹‚ğƒvƒƒWƒFƒNƒgƒfƒBƒŒƒNƒgƒŠ‚ÉƒRƒs[i‘SŠpEƒXƒy[ƒX‘Î‰j
+      <Command>:: .cso ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½gï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ÉƒRï¿½sï¿½[ï¿½iï¿½Sï¿½pï¿½Eï¿½Xï¿½yï¿½[ï¿½Xï¿½Î‰ï¿½ï¿½j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -162,7 +162,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ƒtƒ@ƒCƒ‹‚ğƒvƒƒWƒFƒNƒgƒfƒBƒŒƒNƒgƒŠ‚ÉƒRƒs[i‘SŠpEƒXƒy[ƒX‘Î‰j
+      <Command>:: .cso ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½gï¿½fï¿½Bï¿½ï¿½ï¿½Nï¿½gï¿½ï¿½ï¿½ÉƒRï¿½sï¿½[ï¿½iï¿½Sï¿½pï¿½Eï¿½Xï¿½yï¿½[ï¿½Xï¿½Î‰ï¿½ï¿½j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -247,6 +247,8 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Component.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DebugCameraPrefab.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyPrefab.h" />
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
