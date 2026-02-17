@@ -78,6 +78,9 @@ public:
 	// “düËoˆ—
 	void Eject(float inputX, float inputZ);
 
+	// PoleManagerd
+	void SetPoleManager(PoleManager* poleManager) { m_PoleManager = poleManager; }
+
 	// ˆÚ“®İ’è’læ“¾Eİ’è
 	void SetMoveCtx(const PlayerMoveCtx& moveCtx) { m_Ctx = moveCtx; }
 	const PlayerMoveCtx& GetMoveCtx() const { return m_Ctx; }

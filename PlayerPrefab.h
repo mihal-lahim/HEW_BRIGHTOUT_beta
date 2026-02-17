@@ -64,6 +64,9 @@ public:
 		shapeDesc.Height = 1.0f;
 		gameObject.AddComponent<ColliderShape>(shapeDesc);
 
+		// ÉÇÉfÉãÇÃë´å≥Çínñ Ç…çáÇÌÇπÇÈ
+		modelObject->transform().position().y = -(shapeDesc.Radius + (shapeDesc.Height * 0.5f));
+
 
 		// PhysicsBodyê›íË
 		PhysicsBodyDesc bodyDesc{};

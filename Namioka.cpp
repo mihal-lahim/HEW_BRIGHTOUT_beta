@@ -5,12 +5,31 @@
 #include "DebugCamera.h"
 #include "Texture.h"
 #include "PowerPlant.h"
+#include "Road.h"
+#include "House.h"
+#include "Convenience.h"
+#include "Mansion01.h"
+#include "Mansion02.h"
+#include "Karaoke.h"
+#include "Apartment.h"
+#include "Clocktower.h"
+#include "Wacdonald.h"
+#include "Dentyuu.h"
+#include "SpecialDentyuu.h"
+#include "SpecialDensen.h"
 #include "GameClearChecker.h"
+#include "PoleManager.h"
+#include "Pole.h"
+#include "PowerLine.h"
 
 	using namespace DirectX;
 
 void Namioka::Initialize()
 {
+	// PoleManager
+	GameObject* poleManagerObject = CreateGameObject();
+	auto* poleManager = poleManagerObject->AddComponent<PoleManager>();
+
 	//Player
 	PlayerPrefab playerPrefab{};
 	Instantiate(playerPrefab)->transform().position() += Vector3(0.0f, 0.0f, 10.0f);
@@ -48,6 +67,7 @@ void Namioka::Initialize()
 	for (const auto& pos : roadPositions)
 	{
 		GameObject* road = Instantiate(roadPrefab);
+		road->AddComponent<Road>();
 
 		road->transform().scale() = { 1.0f, 1.0f, 1.0f };
 		road->transform().position() = pos;
@@ -124,6 +144,7 @@ void Namioka::Initialize()
 	for (const auto& pos : housePositions)
 	{
 		GameObject* house = Instantiate(housePrefab);
+		house->AddComponent<House>();
 
 		house->transform().scale() = { 1.0f, 1.0f, 1.0f };
 		house->transform().position() = pos;
@@ -182,6 +203,7 @@ void Namioka::Initialize()
 	for (const auto& pos : conveniencePositions)
 	{
 		GameObject* convenience = Instantiate(conveniencePrefab);
+		convenience->AddComponent<Convenience>();
 
 		convenience->transform().scale() = { 1.0f, 1.0f, 1.0f };
 		convenience->transform().position() = pos;
@@ -249,6 +271,7 @@ void Namioka::Initialize()
 	for (const auto& pos : mansion01Positions)
 	{
 		GameObject* mansion01 = Instantiate(mansion01Prefab);
+		mansion01->AddComponent<Mansion01>();
 
 		mansion01->transform().scale() = { 1.0f, 1.0f, 1.0f };
 		mansion01->transform().position() = pos;
@@ -298,6 +321,7 @@ void Namioka::Initialize()
 	for (const auto& pos : mansion02Positions)
 	{
 		GameObject* mansion02 = Instantiate(mansion02Prefab);
+		mansion02->AddComponent<Mansion02>();
 
 		mansion02->transform().scale() = { 1.0f, 1.0f, 1.0f };
 		mansion02->transform().position() = pos;
@@ -347,6 +371,7 @@ void Namioka::Initialize()
 	for (const auto& pos : karaokePositions)
 	{
 		GameObject* karaoke = Instantiate(karaokePrefab);
+		karaoke->AddComponent<Karaoke>();
 
 		karaoke->transform().scale() = { 1.0f, 1.0f, 1.0f };
 		karaoke->transform().position() = pos;
@@ -405,6 +430,7 @@ void Namioka::Initialize()
 	for (const auto& pos : apartmentPositions)
 	{
 		GameObject* apartment = Instantiate(apartmentPrefab);
+		apartment->AddComponent<Apartment>();
 
 		apartment->transform().scale() = { 1.0f, 1.0f, 1.0f };
 		apartment->transform().position() = pos;
@@ -455,6 +481,7 @@ void Namioka::Initialize()
 	for (const auto& pos : clocktowerPositions)
 	{
 		GameObject* clocktower = Instantiate(clocktowerPrefab);
+		clocktower->AddComponent<Clocktower>();
 
 		clocktower->transform().scale() = { 0.5f, 0.5f, 0.5f };
 		clocktower->transform().position() = pos;
@@ -504,6 +531,7 @@ void Namioka::Initialize()
 	for (const auto& pos : wacdonaldPositions)
 	{
 		GameObject* wacdonald = Instantiate(wacdonaldPrefab);
+		wacdonald->AddComponent<Wacdonald>();
 
 		wacdonald->transform().scale() = { 1.0f, 1.0f, 1.0f };
 		wacdonald->transform().position() = pos;
@@ -760,6 +788,7 @@ void Namioka::Initialize()
 	for (const auto& pos : dentyuuPositions)
 	{
 		GameObject* dentyuu = Instantiate(dentyuuPrefab);
+		dentyuu->AddComponent<Dentyuu>();
 
 		dentyuu->transform().scale() = { 10.0f, 8.0f, 10.0f };
 		dentyuu->transform().position() = pos;
@@ -829,9 +858,14 @@ void Namioka::Initialize()
 
 
 	};
+	std::vector<PoleID> specialPoleIDs;
+	specialPoleIDs.reserve(spedentyuPositions.size());
 	for (const auto& pos : spedentyuPositions)
 	{
 		GameObject* spedentyuu = Instantiate(spedentyuPrefab);
+		spedentyuu->AddComponent<SpecialDentyuu>();
+		auto* pole = spedentyuu->AddComponent<Pole>();
+		specialPoleIDs.push_back(poleManager->RegisterPole(pole));
 
 		spedentyuu->transform().scale() = { 0.1f, 0.1f, 0.1f };
 		spedentyuu->transform().position() = pos;
@@ -881,9 +915,28 @@ void Namioka::Initialize()
 		{ { -138.0f, 5.0f, -240.0f },  90.0f },
 	};
 
-	for (const auto& data : spedensenList)
+	std::vector<std::pair<size_t, size_t>> specialLinePolePairs =
 	{
+		{ 0, 1 },
+		{ 2, 3 },
+		{ 4, 5 },
+		{ 6, 7 },
+		{ 8, 9 },
+		{ 10, 11 },
+		{ 12, 13 },
+		{ 14, 15 }
+	};
+	for (size_t index = 0; index < spedensenList.size(); ++index)
+	{
+		const auto& data = spedensenList.at(index);
 		GameObject* spedentyuu = Instantiate(spedensenPrefab);
+		spedentyuu->AddComponent<SpecialDensen>();
+		if (index < specialLinePolePairs.size() && specialPoleIDs.size() > specialLinePolePairs.at(index).second)
+		{
+			auto [startIndex, endIndex] = specialLinePolePairs.at(index);
+			auto* line = spedentyuu->AddComponent<PowerLine>(specialPoleIDs.at(startIndex), specialPoleIDs.at(endIndex));
+			poleManager->RegisterPowerLine(line);
+		}
 
 		spedentyuu->transform().scale() = { 0.2f,0.2f,0.18f };
 		spedentyuu->transform().position() = data.position;

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "Camera.h"
 #include "Ray.h"
+#include "Time.h"
 
 
 Vector3 PlayerMovement::SetInputDir(float inputX, float inputZ)
@@ -184,6 +185,10 @@ void PlayerMovement::Turn(float inputX, float inputZ)
 
 void PlayerMovement::LineMove()
 {
+	float deltaTime = (float)Time::DeltaTime();
+	if (deltaTime <= 0.0f)
+		return;
+
 	// 次の電柱に到達したか判定
 	if (m_LineParam >= 1.0f)
 	{
@@ -199,18 +204,17 @@ void PlayerMovement::LineMove()
 
 	// tを進める
 	float lineLength = m_PoleManager->GetPowerLineLength(m_LineID);
-	m_LineParam += (m_Ctx.LineMoveSpeed / lineLength);
+	if (lineLength <= 0.0f)
+		return;
+	m_LineParam += (m_Ctx.LineMoveSpeed * deltaTime / lineLength);
 
 	// 電線上の位置を取得
 	Vector3 newPos;
 	newPos = m_PoleManager->GetPositionOnPowerLine(m_StartPole, m_DestPole, m_LineParam);
 
-	// 速度ベクトルを計算
-	Vector3 currentPos = gameObject().transform().position();
-	Vector3 velocityVec = newPos - currentPos;
-
-	// 速度ベクトルを設定
-	VelocityVec = velocityVec;
+	// 位置を直接更新してガタつきを抑える
+	gameObject().transform().position() = newPos;
+	VelocityVec = { 0.0f, 0.0f, 0.0f };
 }
 
 void PlayerMovement::Eject(float inputX, float inputZ)
