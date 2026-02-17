@@ -3,16 +3,27 @@
 #include "GameObject.h"
 #include "DebugCamera.h"
 #include "Texture.h"
+#include "PowerPlant.h"
+#include "GameClearChecker.h"
 
-using namespace DirectX;
+	using namespace DirectX;
 
 void Namioka::Initialize()
 {
-	g_Bgm = LoadAudio("asset/bgm.wav");
-
 	//Player
 	PlayerPrefab playerPrefab{};
 	Instantiate(playerPrefab)->transform().position() += Vector3(0.0f, 0.0f, 10.0f);
+
+	////Ground
+	//ModelPrefab cubePrefab{ "model/cube.glb" };
+	//GameObject* floor = Instantiate(cubePrefab);
+	//floor->transform().scale() = { 50.0f, 1.0f, 50.0f };
+	//floor->transform().position() = { 0.0f, -1.0f, 0.0f };
+	//BoxColliderDesc floorShapeDesc{};
+	//floor->AddComponent<ColliderShape>(floorShapeDesc);
+	//PhysicsBodyDesc floorBodyDesc{};
+	//floorBodyDesc.Type = BodyType::STATIC;
+	//floor->AddComponent<PhysicsBody>(floorBodyDesc);
 
 	//Road
 	ModelPrefab roadPrefab{ "model/intersection.glb" };
@@ -37,7 +48,7 @@ void Namioka::Initialize()
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 40.0f;
-		shapeDesc.SizeY = 1.0f;
+		shapeDesc.SizeY = 2.0f;
 		shapeDesc.SizeZ = 40.0f;
 		road->AddComponent<ColliderShape>(shapeDesc);
 
@@ -46,83 +57,70 @@ void Namioka::Initialize()
 		road->AddComponent<PhysicsBody>(bodyDesc);
 	}
 
-
 	//House
-	struct HouseData
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab housePrefab{ "model/house.glb" };
-	std::vector<HouseData> houseList =
+	std::vector<Vector3> housePositions =
 	{
 		//á@
-		{ {  -6.0f, 0.0f,  -6.0f },	 0.0f },
-		{ { -18.0f, 0.0f,  -6.0f },	 0.0f },
-		{ {  -6.0f, 0.0f, -18.0f },	 0.0f },
-		{ { -18.0f, 0.0f, -18.0f },	 0.0f },
+		{  -6.0f, 0.0f,  -6.0f },
+		{ -18.0f, 0.0f,  -6.0f },
+		{  -6.0f, 0.0f, -18.0f },
+		{ -18.0f, 0.0f, -18.0f },
 
 		//áA
-		{ {  -6.0f, 0.0f, -66.0f },  0.0f },
-		{ { -18.0f, 0.0f, -66.0f },  0.0f },
-		{ {  -6.0f, 0.0f, -78.0f },  0.0f },
-		{ { -18.0f, 0.0f, -78.0f },  0.0f },
+		{  -6.0f, 0.0f, -66.0f },
+		{ -18.0f, 0.0f, -66.0f },
+		{  -6.0f, 0.0f, -78.0f },
+		{ -18.0f, 0.0f, -78.0f },
 
 		//áB
-		{ { -66.0f, 0.0f, -66.0f },	 0.0f },
-		{ { -78.0f, 0.0f, -66.0f },	 0.0f },
-		{ { -66.0f, 0.0f, -78.0f },	 0.0f },
-		{ { -78.0f, 0.0f, -78.0f },	 0.0f },
+		{ -66.0f, 0.0f, -66.0f },
+		{ -78.0f, 0.0f, -66.0f },
+		{ -66.0f, 0.0f, -78.0f },
+		{ -78.0f, 0.0f, -78.0f },
 
 		//áC
-		{ { -66.0f, 0.0f, -126.0f }, 0.0f },
-		{ { -78.0f, 0.0f, -126.0f }, 0.0f },
-		{ { -66.0f, 0.0f, -138.0f }, 0.0f },
-		{ { -78.0f, 0.0f, -138.0f }, 0.0f },
+		{ -66.0f, 0.0f, -126.0f },
+		{ -78.0f, 0.0f, -126.0f },
+		{ -66.0f, 0.0f, -138.0f },
+		{ -78.0f, 0.0f, -138.0f },
 
 		//áD
-		{ {  -6.0f, 0.0f, -126.0f }, 0.0f },
-		{ { -18.0f, 0.0f, -126.0f }, 0.0f },
-		{ {  -6.0f, 0.0f, -138.0f }, 0.0f },
-		{ { -18.0f, 0.0f, -138.0f }, 0.0f },
+		{  -6.0f, 0.0f, -126.0f },
+		{ -18.0f, 0.0f, -126.0f },
+		{  -6.0f, 0.0f, -138.0f },
+		{ -18.0f, 0.0f, -138.0f },
 
 		//áE
-		{ { -126.0f, 0.0f, -126.0f }, 0.0f },
-		{ { -138.0f, 0.0f, -126.0f }, 0.0f },
-		{ { -126.0f, 0.0f, -138.0f }, 0.0f },
-		{ { -138.0f, 0.0f, -138.0f }, 0.0f },
+		{ -126.0f, 0.0f, -126.0f },
+		{ -138.0f, 0.0f, -126.0f },
+		{ -126.0f, 0.0f, -138.0f },
+		{ -138.0f, 0.0f, -138.0f },
 
 		//áF
-		{ { -126.0f, 0.0f, -186.0f },  0.0f },
-		{ { -138.0f, 0.0f, -186.0f },  0.0f },
-		{ { -126.0f, 0.0f, -198.0f },  0.0f },
-		{ { -138.0f, 0.0f, -198.0f },  0.0f },
+		{ -126.0f, 0.0f, -186.0f },
+		{ -138.0f, 0.0f, -186.0f },
+		{ -126.0f, 0.0f, -198.0f },
+		{ -138.0f, 0.0f, -198.0f },
 
 		//áG
-		{ { -126.0f, 0.0f, -246.0f },  0.0f },
-		{ { -138.0f, 0.0f, -246.0f },  0.0f },
-		{ { -126.0f, 0.0f, -258.0f },  0.0f },
-		{ { -138.0f, 0.0f, -258.0f },  0.0f },
+		{ -126.0f, 0.0f, -246.0f },
+		{ -138.0f, 0.0f, -246.0f },
+		{ -126.0f, 0.0f, -258.0f },
+		{ -138.0f, 0.0f, -258.0f },
 
 		//áH
-		{ { -186.0f, 0.0f, -246.0f },  0.0f },
-		{ { -198.0f, 0.0f, -246.0f },  0.0f },
-		{ { -186.0f, 0.0f, -258.0f },  0.0f },
-		{ { -198.0f, 0.0f, -258.0f },  0.0f },
+		{ -186.0f, 0.0f, -246.0f },
+		{ -198.0f, 0.0f, -246.0f },
+		{ -186.0f, 0.0f, -258.0f },
+		{ -198.0f, 0.0f, -258.0f },
 	};
-	for (const auto& data : houseList)
+	for (const auto& pos : housePositions)
 	{
 		GameObject* house = Instantiate(housePrefab);
 
 		house->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		house->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		house->transform().rotation().FromXMVECTOR(q);
+		house->transform().position() = pos;
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 2.0f;
@@ -136,63 +134,51 @@ void Namioka::Initialize()
 	}
 
 	//Convenience
-	struct ConveniData
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab conveniencePrefab{ "model/convenience.glb" };
-	std::vector<ConveniData> conveniList =
+	std::vector<Vector3> conveniencePositions =
 	{
 		//á@
-		{{ 6.0f, 0.0f,   6.0f },      0.0f },
-		{{ 6.0f, 0.0f, -16.0f },	  0.0f },
-									 
-		//áA						    
-		{{ 6.0f, 0.0f, -54.0f },	  0.0f },
-		{{ 6.0f, 0.0f, -76.0f },	  0.0f },
-									 
-		//áB						  
-		{{ -54.0f, 0.0f, -54.0f },	  0.0f },
-		{{ -54.0f, 0.0f, -76.0f },	  0.0f },
-									 
-		//áC						   
-		{{ -54.0f, 0.0f, -114.0f },	  0.0f },
-		{{ -54.0f, 0.0f, -136.0f },	  0.0f },
-									 
-		//áD						   
-		{{ 6.0f, 0.0f, -114.0f },	  0.0f },
-		{{ 6.0f, 0.0f, -136.0f },	  0.0f },
-									  
-		//áE						  
-		{{ -114.0f, 0.0f, -114.0f },  0.0f },
-		{{ -114.0f, 0.0f, -136.0f },  0.0f },
-									
-		//áF						    
-		{{ -114.0f, 0.0f, -174.0f },  0.0f },
-		{{ -114.0f, 0.0f, -196.0f },  0.0f },
-									 
-		//áG						    
-		{{ -114.0f, 0.0f, -234.0f },  0.0f },
-		{{ -114.0f, 0.0f, -256.0f },  0.0f },
-									
-		//áH						    
-		{{ -174.0f, 0.0f, -234.0f },  0.0f },
-		{{ -174.0f, 0.0f, -256.0f },  0.0f },
+		{ 6.0f, 0.0f,   6.0f },
+		{ 6.0f, 0.0f, -16.0f },
+
+		//áA
+		{ 6.0f, 0.0f, -54.0f },
+		{ 6.0f, 0.0f, -76.0f },
+
+		//áB
+		{ -54.0f, 0.0f, -54.0f },
+		{ -54.0f, 0.0f, -76.0f },
+
+		//áC
+		{ -54.0f, 0.0f, -114.0f },
+		{ -54.0f, 0.0f, -136.0f },
+
+		//áD
+		{ 6.0f, 0.0f, -114.0f },
+		{ 6.0f, 0.0f, -136.0f },
+
+		//áE
+		{ -114.0f, 0.0f, -114.0f },
+		{ -114.0f, 0.0f, -136.0f },
+
+		//áF
+		{ -114.0f, 0.0f, -174.0f },
+		{ -114.0f, 0.0f, -196.0f },
+
+		//áG
+		{ -114.0f, 0.0f, -234.0f },
+		{ -114.0f, 0.0f, -256.0f },
+
+		//áH
+		{ -174.0f, 0.0f, -234.0f },
+		{ -174.0f, 0.0f, -256.0f },
 	};
-	for (const auto& data : conveniList)
+	for (const auto& pos : conveniencePositions)
 	{
 		GameObject* convenience = Instantiate(conveniencePrefab);
 
 		convenience->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		convenience->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		convenience->transform().rotation().FromXMVECTOR(q);
+		convenience->transform().position() = pos;
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 4.0f;
@@ -206,75 +192,63 @@ void Namioka::Initialize()
 	}
 
 	//Mansion01
-	struct Mansion01Data
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab mansion01Prefab{ "model/mansion01.glb" };
-	std::vector<Mansion01Data> mansion01List =
+	std::vector<Vector3> mansion01Positions =
 	{
 		//á@
-		{{  -8.0f, 0.0f, 18.0f },    0.0f },
-		{{ -16.0f, 0.0f,  8.0f },	 0.0f },
-		{{   6.0f, 0.0f, -6.0f },	 0.0f },
-									
-		//áA						
-		{{  -8.0f, 0.0f, -42.0f },	 0.0f },
-		{{ -16.0f, 0.0f, -52.0f },	 0.0f },
-		{{   6.0f, 0.0f, -66.0f },	 0.0f },
-									
-		//áB						
-		{{ -68.0f, 0.0f, -42.0f },	 0.0f },
-		{{ -76.0f, 0.0f, -52.0f },	 0.0f },
-		{{ -54.0f, 0.0f, -66.0f },	 0.0f },
-								
-		//áC						
-		{{ -68.0f, 0.0f, -102.0f },	 0.0f },
-		{{ -76.0f, 0.0f, -112.0f },	 0.0f },
-		{{ -54.0f, 0.0f, -126.0f },	 0.0f },
-									
-		//áD						
-		{{  -8.0f, 0.0f, -102.0f },	 0.0f },
-		{{ -16.0f, 0.0f, -112.0f },	 0.0f },
-		{{   6.0f, 0.0f, -126.0f },	 0.0f },
-									
-		//áE							
-		{{ -128.0f, 0.0f, -102.0f }, 0.0f },
-		{{ -136.0f, 0.0f, -112.0f }, 0.0f },
-		{{ -114.0f, 0.0f, -126.0f }, 0.0f },
-									
-		//áF						
-		{{ -128.0f, 0.0f, -162.0f }, 0.0f },
-		{{ -136.0f, 0.0f, -172.0f }, 0.0f },
-		{{ -114.0f, 0.0f, -186.0f }, 0.0f },
-									
-		//áG						
-		{{ -128.0f, 0.0f, -222.0f }, 0.0f },
-		{{ -136.0f, 0.0f, -232.0f }, 0.0f },
-		{{ -114.0f, 0.0f, -246.0f }, 0.0f },
-									
-		//áH						
-		{{ -188.0f, 0.0f, -222.0f }, 0.0f },
-		{{ -196.0f, 0.0f, -232.0f }, 0.0f },
-		{{ -174.0f, 0.0f, -246.0f }, 0.0f },
+		{  -8.0f, 0.0f, 18.0f },
+		{ -16.0f, 0.0f,  8.0f },
+		{   6.0f, 0.0f, -6.0f },
+
+		//áA
+		{  -8.0f, 0.0f, -42.0f },
+		{ -16.0f, 0.0f, -52.0f },
+		{   6.0f, 0.0f, -66.0f },
+
+		//áB
+		{ -68.0f, 0.0f, -42.0f },
+		{ -76.0f, 0.0f, -52.0f },
+		{ -54.0f, 0.0f, -66.0f },
+
+		//áC
+		{ -68.0f, 0.0f, -102.0f },
+		{ -76.0f, 0.0f, -112.0f },
+		{ -54.0f, 0.0f, -126.0f },
+
+		//áD
+		{  -8.0f, 0.0f, -102.0f },
+		{ -16.0f, 0.0f, -112.0f },
+		{   6.0f, 0.0f, -126.0f },
+
+		//áE
+		{ -128.0f, 0.0f, -102.0f },
+		{ -136.0f, 0.0f, -112.0f },
+		{ -114.0f, 0.0f, -126.0f },
+
+		//áF
+		{ -128.0f, 0.0f, -162.0f },
+		{ -136.0f, 0.0f, -172.0f },
+		{ -114.0f, 0.0f, -186.0f },
+
+		//áG
+		{ -128.0f, 0.0f, -222.0f },
+		{ -136.0f, 0.0f, -232.0f },
+		{ -114.0f, 0.0f, -246.0f },
+
+		//áH
+		{ -188.0f, 0.0f, -222.0f },
+		{ -196.0f, 0.0f, -232.0f },
+		{ -174.0f, 0.0f, -246.0f },
 	};
-	for (const auto& data : mansion01List)
+	for (const auto& pos : mansion01Positions)
 	{
 		GameObject* mansion01 = Instantiate(mansion01Prefab);
 
 		mansion01->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		mansion01->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		mansion01->transform().rotation().FromXMVECTOR(q);
+		mansion01->transform().position() = pos;
 
 		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 4.0f;
+		shapeDesc.SizeX = 5.0f;
 		shapeDesc.SizeY = 5.0f;
 		shapeDesc.SizeZ = 5.0f;
 		mansion01->AddComponent<ColliderShape>(shapeDesc);
@@ -285,59 +259,47 @@ void Namioka::Initialize()
 	}
 
 	//Mansion02
-	struct Mansion02Data
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab mansion02Prefab{ "model/mansion02.glb" };
-	std::vector<Mansion02Data> mansion02List =
+	std::vector<Vector3> mansion02Positions =
 	{
 		//á@
-		{{ 8.0f, 0.0f, 18.0f },      0.0f },
-									
-		//áA						   
-		{{ 8.0f, 0.0f, -42.0f },	 0.0f },
-									
-		//áB						  
-		{{ -52.0f, 0.0f, -42.0f },	 0.0f },
-									
-		//áC						   
-		{{ -52.0f, 0.0f, -102.0f },	 0.0f },
-									
-		//áD						   
-		{{ 8.0f, 0.0f, -102.0f },	 0.0f },
-									 
-		//áE						   
-		{{ -112.0f, 0.0f, -102.0f }, 0.0f },
-									 
-		//áF						  
-		{{ -112.0f, 0.0f, -162.0f }, 0.0f },
-									
-		//áG						 
-		{{ -112.0f, 0.0f, -222.0f }, 0.0f },
-									
-		//áH						   
-		{{ -172.0f, 0.0f, -222.0f }, 0.0f },
+		{ 8.0f, 0.0f, 18.0f },
+
+		//áA
+		{ 8.0f, 0.0f, -42.0f },
+
+		//áB
+		{ -52.0f, 0.0f, -42.0f },
+
+		//áC
+		{ -52.0f, 0.0f, -102.0f },
+
+		//áD
+		{ 8.0f, 0.0f, -102.0f },
+
+		//áE
+		{ -112.0f, 0.0f, -102.0f },
+
+		//áF
+		{ -112.0f, 0.0f, -162.0f },
+
+		//áG
+		{ -112.0f, 0.0f, -222.0f },
+
+		//áH
+		{ -172.0f, 0.0f, -222.0f },
 	};
-	for (const auto& data : mansion02List)
+	for (const auto& pos : mansion02Positions)
 	{
 		GameObject* mansion02 = Instantiate(mansion02Prefab);
 
-		mansion02->transform().scale() = { 1.0f, 1.0f, 0.8f };
-		mansion02->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		mansion02->transform().rotation().FromXMVECTOR(q);
+		mansion02->transform().scale() = { 1.0f, 1.0f, 1.0f };
+		mansion02->transform().position() = pos;
 
 		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 8.0f;
-		shapeDesc.SizeY = 5.0f;
-		shapeDesc.SizeZ = 8.0f;
+		shapeDesc.SizeX = 2.0f;
+		shapeDesc.SizeY = 2.0f;
+		shapeDesc.SizeZ = 2.0f;
 		mansion02->AddComponent<ColliderShape>(shapeDesc);
 
 		PhysicsBodyDesc bodyDesc{};
@@ -346,54 +308,42 @@ void Namioka::Initialize()
 	}
 
 	//karaoke
-	struct KaraokeData
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab karaokePrefab{ "model/karaoke.glb" };
-	std::vector<KaraokeData> karaokeList =
+	std::vector<Vector3> karaokePositions =
 	{
 		//á@
-		{{ 16.0f, 0.0f, 8.0f },      0.0f },
-									 
-		//áA						   
-		{{ 16.0f, 0.0f, -52.0f },	 0.0f },
-									 
-		//áB						   
-		{{ -44.0f, 0.0f, -52.0f },	 0.0f },
-									
-		//áC						   
-		{{ -44.0f, 0.0f, -112.0f },	 0.0f },
-									 
-		//áD						   
-		{{ 16.0f, 0.0f, -112.0f },	 0.0f },
-									 
-		//áE						   
-		{{ -104.0f, 0.0f, -112.0f }, 0.0f },
-									 
-		//áF						  
-		{{ -104.0f, 0.0f, -172.0f }, 0.0f },
-									 
-		//áG						   
-		{{ -104.0f, 0.0f, -232.0f }, 0.0f },
-									
-		//áH						    
-		{{ -164.0f, 0.0f, -232.0f }, 0.0f },
+		{ 16.0f, 0.0f, 8.0f },
+
+		//áA
+		{ 16.0f, 0.0f, -52.0f },
+
+		//áB
+		{ -44.0f, 0.0f, -52.0f },
+
+		//áC
+		{ -44.0f, 0.0f, -112.0f },
+
+		//áD
+		{ 16.0f, 0.0f, -112.0f },
+
+		//áE
+		{ -104.0f, 0.0f, -112.0f },
+
+		//áF
+		{ -104.0f, 0.0f, -172.0f },
+
+		//áG
+		{ -104.0f, 0.0f, -232.0f },
+
+		//áH
+		{ -164.0f, 0.0f, -232.0f },
 	};
-	for (const auto& data : karaokeList)
+	for (const auto& pos : karaokePositions)
 	{
 		GameObject* karaoke = Instantiate(karaokePrefab);
 
 		karaoke->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		karaoke->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		karaoke->transform().rotation().FromXMVECTOR(q);
+		karaoke->transform().position() = pos;
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 3.0f;
@@ -407,68 +357,56 @@ void Namioka::Initialize()
 	}
 
 	//apartment
-	struct ApartmentData
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab apartmentPrefab{ "model/apartment.glb" };
-	std::vector<ApartmentData> apartmentList =
+	std::vector<Vector3> apartmentPositions =
 	{
 		//á@
-		{ { -8.0f, 0.0f,   8.0f },    0.0f },
-		{ { 16.0f, 0.0f, -16.0f },	  0.0f },
-									  
-		//áA							
-		{ { -8.0f, 0.0f, -52.0f },	  0.0f },
-		{ { 16.0f, 0.0f, -76.0f },	  0.0f },
-		 							
-		//áB						
-		{ { -68.0f, 0.0f, -52.0f },	  0.0f },
-		{ { -44.0f, 0.0f, -76.0f },	  0.0f },
-		 							  
-		//áC							
-		{ { -68.0f, 0.0f, -112.0f },  0.0f },
-		{ { -44.0f, 0.0f, -136.0f },  0.0f },
-		 							  
-		//áD							
-		{ { -8.0f, 0.0f, -112.0f },	  0.0f },
-		{ { 16.0f, 0.0f, -136.0f },	  0.0f },
-									 
-		//áE							
-		{ { -128.0f, 0.0f, -112.0f }, 0.0f },
-		{ { -104.0f, 0.0f, -136.0f }, 0.0f },
-		 							 
-		//áF							
-		{ { -128.0f, 0.0f, -172.0f }, 0.0f },
-		{ { -104.0f, 0.0f, -196.0f }, 0.0f },
-		 							  
-		//áG							
-		{ { -128.0f, 0.0f, -232.0f }, 0.0f },
-		{ { -104.0f, 0.0f, -256.0f }, 0.0f },
-		 							  
-		//áH							
-		{ { -188.0f, 0.0f, -232.0f }, 0.0f },
-		{ { -164.0f, 0.0f, -256.0f }, 0.0f },
+		{ -8.0f, 0.0f,   8.0f },
+		{ 16.0f, 0.0f, -16.0f },
+
+		//áA
+		{ -8.0f, 0.0f, -52.0f },
+		{ 16.0f, 0.0f, -76.0f },
+
+		//áB
+		{ -68.0f, 0.0f, -52.0f },
+		{ -44.0f, 0.0f, -76.0f },
+
+		//áC
+		{ -68.0f, 0.0f, -112.0f },
+		{ -44.0f, 0.0f, -136.0f },
+
+		//áD
+		{ -8.0f, 0.0f, -112.0f },
+		{ 16.0f, 0.0f, -136.0f },
+
+		//áE
+		{ -128.0f, 0.0f, -112.0f },
+		{ -104.0f, 0.0f, -136.0f },
+
+		//áF
+		{ -128.0f, 0.0f, -172.0f },
+		{ -104.0f, 0.0f, -196.0f },
+
+		//áG
+		{ -128.0f, 0.0f, -232.0f },
+		{ -104.0f, 0.0f, -256.0f },
+
+		//áH
+		{ -188.0f, 0.0f, -232.0f },
+		{ -164.0f, 0.0f, -256.0f },
 	};
-	for (const auto& data : apartmentList)
+	for (const auto& pos : apartmentPositions)
 	{
 		GameObject* apartment = Instantiate(apartmentPrefab);
 
 		apartment->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		apartment->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		apartment->transform().rotation().FromXMVECTOR(q);
+		apartment->transform().position() = pos;
 
 		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 10.0f;
+		shapeDesc.SizeX = 8.0f;
 		shapeDesc.SizeY = 16.0f;
-		shapeDesc.SizeZ = 7.0f;
+		shapeDesc.SizeZ = 8.0f;
 		apartment->AddComponent<ColliderShape>(shapeDesc);
 
 		PhysicsBodyDesc bodyDesc{};
@@ -478,59 +416,47 @@ void Namioka::Initialize()
 
 
 	//clocktower
-	struct ClockTowerData
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab clocktowerPrefab{ "model/clocktower01.glb" };
-	std::vector<ClockTowerData> clocktowerList =
+	std::vector<Vector3> clocktowerPositions =
 	{
 		//á@
-		{ { -11.0f, 0.0f, -11.0f },   0.0f },
-		 							  
-		//áA							
-		{ { -11.0f, 0.0f, -71.0f },	  0.0f },
-									  
-		//áB						
-		{ { -71.0f, 0.0f, -71.0f },	  0.0f },
-		 							 
-		//áC							
-		{ { -71.0f, 0.0f, -131.0f },  0.0f },
-									 
-		//áD							
-		{ { -11.0f, 0.0f, -131.0f },  0.0f },
-									 
-		//áE							
-		{ { -131.0f, 0.0f, -131.0f }, 0.0f },
-		 							  
-		//áF							
-		{ { -131.0f, 0.0f, -191.0f }, 0.0f },
-									 
-		//áG							
-		{ { -131.0f, 0.0f, -251.0f }, 0.0f },
-									 
-		//áH							
-		{ { -191.0f, 0.0f, -251.0f }, 0.0f },
+		{ -11.0f, 0.0f, -11.0f },
+
+		//áA
+		{ -11.0f, 0.0f, -71.0f },
+
+		//áB
+		{ -71.0f, 0.0f, -71.0f },
+
+		//áC
+		{ -71.0f, 0.0f, -131.0f },
+
+		//áD
+		{ -11.0f, 0.0f, -131.0f },
+
+		//áE
+		{ -131.0f, 0.0f, -131.0f },
+
+		//áF
+		{ -131.0f, 0.0f, -191.0f },
+
+		//áG
+		{ -131.0f, 0.0f, -251.0f },
+
+		//áH
+		{ -191.0f, 0.0f, -251.0f },
 	};
-	for (const auto& data : clocktowerList)
+	for (const auto& pos : clocktowerPositions)
 	{
 		GameObject* clocktower = Instantiate(clocktowerPrefab);
 
 		clocktower->transform().scale() = { 0.5f, 0.5f, 0.5f };
-		clocktower->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		clocktower->transform().rotation().FromXMVECTOR(q);
+		clocktower->transform().position() = pos;
 
 		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 8.0f;
+		shapeDesc.SizeX = 4.0f;
 		shapeDesc.SizeY = 4.0f;
-		shapeDesc.SizeZ = 7.0f;
+		shapeDesc.SizeZ = 4.0f;
 		clocktower->AddComponent<ColliderShape>(shapeDesc);
 
 		PhysicsBodyDesc bodyDesc{};
@@ -539,59 +465,54 @@ void Namioka::Initialize()
 	}
 
 	//wacdonald
-	struct WacdonaldData
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab wacdonaldPrefab{ "model/wacdonald.glb" };
-	std::vector<WacdonaldData> wacdonaldList =
+	std::vector<Vector3> wacdonaldPositions =
 	{
 		//á@
-		{{ 14.0f, 0.0f, -6.0f },     180.0f },
-								
-		//áA						
-		{{ 14.0f, 0.0f, -66.0f },	 180.0f },
-									
-		//áB					
-		{{ -46.0f, 0.0f, -66.0f },	 180.0f },
-									
-		//áC						 
-		{{ -46.0f, 0.0f, -126.0f },	 180.0f },
-									
-		//áD						 
-		{{ 14.0f, 0.0f, -126.0f },	 180.0f },
-									
-		//áE						  
-		{{ -106.0f, 0.0f, -126.0f }, 180.0f },
-									
-		//áF						  
-		{{ -106.0f, 0.0f, -186.0f }, 180.0f },
-									
-		//áG						  
-		{{ -106.0f, 0.0f, -246.0f }, 180.0f },
-									
-		//áH						  
-		{{ -166.0f, 0.0f, -246.0f }, 180.0f },
+		{ 14.0f, 0.0f, -6.0f },
+
+		//áA
+		{ 14.0f, 0.0f, -66.0f },
+
+		//áB
+		{ -46.0f, 0.0f, -66.0f },
+
+		//áC
+		{ -46.0f, 0.0f, -126.0f },
+
+		//áD
+		{ 14.0f, 0.0f, -126.0f },
+
+		//áE
+		{ -106.0f, 0.0f, -126.0f },
+
+		//áF
+		{ -106.0f, 0.0f, -186.0f },
+
+		//áG
+		{ -106.0f, 0.0f, -246.0f },
+
+		//áH
+		{ -166.0f, 0.0f, -246.0f },
 	};
-	for (const auto& data : wacdonaldList)
+	for (const auto& pos : wacdonaldPositions)
 	{
 		GameObject* wacdonald = Instantiate(wacdonaldPrefab);
 
 		wacdonald->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		wacdonald->transform().position() = data.position;
-		
+		wacdonald->transform().position() = pos;
 		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
+			XMConvertToRadians(0.0f),     // Xé≤
+			XMConvertToRadians(180.0f),   // Yé≤
+			XMConvertToRadians(0.0f)      // Zé≤
 		);
+
 		wacdonald->transform().rotation().FromXMVECTOR(q);
 
 		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 8.0f;
+		shapeDesc.SizeX = 4.0f;
 		shapeDesc.SizeY = 4.0f;
-		shapeDesc.SizeZ = 5.0f;
+		shapeDesc.SizeZ = 4.0f;
 		wacdonald->AddComponent<ColliderShape>(shapeDesc);
 
 		PhysicsBodyDesc bodyDesc{};
@@ -600,311 +521,242 @@ void Namioka::Initialize()
 	}
 
 	//powerplant
-	struct PowerplantData
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab powerplantPrefab{ "model/powerplant.glb" };
-	std::vector<PowerplantData> powerplantList =
-	{
-		//á@
-		{{ 0.0f, 0.0f, 0.0f },       0.0f },
-									
-		//áA						 
-		{{ 0.0f, 0.0f, -60.0f },	 0.0f },
-									
-		//áB						
-		{{ -60.0f, 0.0f, -60.0f },	 0.0f },
-									
-		//áC						
-		{{ -60.0f, 0.0f, -120.0f },	 0.0f },
-									
-		//áD						
-		{{ 0.0f, 0.0f, -120.0f },	 0.0f },
-									
-		//áE					
-		{{ -120.0f, 0.0f, -120.0f }, 0.0f },
-									
-		//áF						
-		{{ -120.0f, 0.0f, -180.0f }, 0.0f },
-									
-		//áG						  
-		{{ -120.0f, 0.0f, -240.0f},	 0.0f },
-									
-		//áH						   
-		{{ -180.0f, 0.0f, -240.0f }, 0.0f },
-	};
-	for (const auto& data : powerplantList)
-	{
-		GameObject* powerplant = Instantiate(powerplantPrefab);
-
-		powerplant->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		powerplant->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		powerplant->transform().rotation().FromXMVECTOR(q);
-
-		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 6.0f;
-		shapeDesc.SizeY = 6.0f;
-		shapeDesc.SizeZ = 6.0f;
-		powerplant->AddComponent<ColliderShape>(shapeDesc);
-
-		PhysicsBodyDesc bodyDesc{};
-		bodyDesc.Type = BodyType::STATIC;
-		powerplant->AddComponent<PhysicsBody>(bodyDesc);
-	}
-
-	//powerplant_broken
-	struct Powerplant_BrokenData
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab powerplant_brokenPrefab{ "model/powerplant_broken.glb" };
-	std::vector<Powerplant_BrokenData> powerplant_brokenList =
+	std::vector<Vector3> powerplantPositions =
 	{
 		//á@
-		{{ 0.0f, 0.0f, 0.0f },       0.0f },
+		{ 0.0f, 0.0f, 0.0f },
 
-		//áA						 
-		{{ 0.0f, 0.0f, -60.0f },	 0.0f },
+		//áA
+		{ 0.0f, 0.0f, -60.0f },
 
-		//áB						
-		{{ -60.0f, 0.0f, -60.0f },	 0.0f },
+		//áB
+		{ -60.0f, 0.0f, -60.0f },
 
-		//áC						
-		{{ -60.0f, 0.0f, -120.0f },	 0.0f },
+		//áC
+		{ -60.0f, 0.0f, -120.0f },
 
-		//áD						
-		{{ 0.0f, 0.0f, -120.0f },	 0.0f },
+		//áD
+		{ 0.0f, 0.0f, -120.0f },
 
-		//áE					
-		{{ -120.0f, 0.0f, -120.0f }, 0.0f },
+		//áE
+		{ -120.0f, 0.0f, -120.0f },
 
-		//áF						
-		{{ -120.0f, 0.0f, -180.0f }, 0.0f },
+		//áF
+		{ -120.0f, 0.0f, -180.0f },
 
-		//áG						  
-		{{ -120.0f, 0.0f, -240.0f},	 0.0f },
+		//áG
+		{ -120.0f, 0.0f, -240.0f},
 
-		//áH						   
-		{{ -180.0f, 0.0f, -240.0f }, 0.0f },
+		//áH
+		{ -180.0f, 0.0f, -240.0f },
 	};
-	for (const auto& data : powerplant_brokenList)
+	for (const auto& pos : powerplantPositions)
 	{
-		GameObject* powerplant_broken = Instantiate(powerplant_brokenPrefab);
+		// êeÉIÉuÉWÉFÉNÉgÅiPowerPlantÉRÉìÉ|Å[ÉlÉìÉgïtÇ´Åj
+		GameObject* plantObj = CreateGameObject();
+		plantObj->SetName("PowerPlant");
+		plantObj->SetTag("PowerPlant");
+		plantObj->transform().position() = pos;
+		auto* plant = plantObj->AddComponent<PowerPlant>(10.0f);
 
-		powerplant_broken->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		powerplant_broken->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		powerplant_broken->transform().rotation().FromXMVECTOR(q);
-
+		// ìñÇΩÇËîªíËÇÕêeÉIÉuÉWÉFÉNÉgÇ…ê›íË
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 6.0f;
 		shapeDesc.SizeY = 6.0f;
 		shapeDesc.SizeZ = 6.0f;
-		powerplant_broken->AddComponent<ColliderShape>(shapeDesc);
+		plantObj->AddComponent<ColliderShape>(shapeDesc);
 
 		PhysicsBodyDesc bodyDesc{};
 		bodyDesc.Type = BodyType::STATIC;
-		powerplant_broken->AddComponent<PhysicsBody>(bodyDesc);
+		plantObj->AddComponent<PhysicsBody>(bodyDesc);
+
+		// ïúãåçœÇ›ÉÇÉfÉãÅiStart()Ç≈îÒï\é¶Ç…Ç∑ÇÈÅj
+		GameObject* restored = Instantiate(powerplantPrefab);
+		restored->transform().position() = pos;
+
+		// åÃè·ÉÇÉfÉãÅièâä˙ÇÕï\é¶Åj
+		GameObject* broken = Instantiate(powerplant_brokenPrefab);
+		broken->transform().position() = pos;
+
+		// PowerPlantÇ…ÉÇÉfÉãéQè∆Çê›íË
+		plant->restoredModel = restored;
+		plant->brokenModel = broken;
 	}
 
 	//dentyuu
-	struct DentyuData
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab dentyuuPrefab{ "model/dentyuu.glb" };
-	std::vector<DentyuData> dentyuuList =
+	std::vector<Vector3> dentyuuPositions =
 	{
 		//á@
-		{{   3.0f, 2.0f,  10.0f }, 0.0f},
-		{{   3.0f, 2.0f,  20.0f }, 0.0f},
-		{{  -3.0f, 2.0f,  10.0f }, 0.0f},
-		{{  -3.0f, 2.0f,  20.0f }, 0.0f},
-		{{   3.0f, 2.0f, -10.0f }, 0.0f},
-		{{   3.0f, 2.0f, -20.0f }, 0.0f},
-		{{  -3.0f, 2.0f, -10.0f }, 0.0f},
-		{{  -3.0f, 2.0f, -20.0f }, 0.0f},
-		{{   9.0f, 2.0f,   3.0f }, 0.0f},
-		{{  18.0f, 2.0f,   3.0f }, 0.0f},
-		{{   9.0f, 2.0f,  -3.0f }, 0.0f},
-		{{  18.0f, 2.0f,  -3.0f }, 0.0f},
-		{{  -9.0f, 2.0f,   3.0f }, 0.0f},
-		{{ -18.0f, 2.0f,   3.0f }, 0.0f},
-		{{  -9.0f, 2.0f,  -3.0f }, 0.0f},
-		{{ -18.0f, 2.0f,  -3.0f }, 0.0f},
+		{   3.0f, 2.0f,  10.0f },
+		{   3.0f, 2.0f,  20.0f },
+		{  -3.0f, 2.0f,  10.0f },
+		{  -3.0f, 2.0f,  20.0f },
+		{   3.0f, 2.0f, -10.0f },
+		{   3.0f, 2.0f, -20.0f },
+		{  -3.0f, 2.0f, -10.0f },
+		{  -3.0f, 2.0f, -20.0f },
+		{   9.0f, 2.0f,   3.0f },
+		{  18.0f, 2.0f,   3.0f },
+		{   9.0f, 2.0f,  -3.0f },
+		{  18.0f, 2.0f,  -3.0f },
+		{  -9.0f, 2.0f,   3.0f },
+		{ -18.0f, 2.0f,   3.0f },
+		{  -9.0f, 2.0f,  -3.0f },
+		{ -18.0f, 2.0f,  -3.0f },
 
 		//áA
-		{{   3.0f, 2.0f, -50.0f }, 0.0f},
-		{{   3.0f, 2.0f, -40.0f }, 0.0f},
-		{{  -3.0f, 2.0f, -50.0f }, 0.0f},
-		{{  -3.0f, 2.0f, -40.0f }, 0.0f},
-		{{   3.0f, 2.0f, -70.0f }, 0.0f},
-		{{   3.0f, 2.0f, -80.0f }, 0.0f},
-		{{  -3.0f, 2.0f, -70.0f }, 0.0f},
-		{{  -3.0f, 2.0f, -80.0f }, 0.0f},
-		{{   9.0f, 2.0f, -57.0f }, 0.0f},
-		{{  18.0f, 2.0f, -57.0f }, 0.0f},
-		{{   9.0f, 2.0f, -63.0f }, 0.0f},
-		{{  18.0f, 2.0f, -63.0f }, 0.0f},
-		{{  -9.0f, 2.0f, -57.0f }, 0.0f},
-		{{ -18.0f, 2.0f, -57.0f }, 0.0f},
-		{{  -9.0f, 2.0f, -63.0f }, 0.0f},
-		{{ -18.0f, 2.0f, -63.0f }, 0.0f},
+		{   3.0f, 2.0f, -50.0f },
+		{   3.0f, 2.0f, -40.0f },
+		{  -3.0f, 2.0f, -50.0f },
+		{  -3.0f, 2.0f, -40.0f },
+		{   3.0f, 2.0f, -70.0f },
+		{   3.0f, 2.0f, -80.0f },
+		{  -3.0f, 2.0f, -70.0f },
+		{  -3.0f, 2.0f, -80.0f },
+		{   9.0f, 2.0f, -57.0f },
+		{  18.0f, 2.0f, -57.0f },
+		{   9.0f, 2.0f, -63.0f },
+		{  18.0f, 2.0f, -63.0f },
+		{  -9.0f, 2.0f, -57.0f },
+		{ -18.0f, 2.0f, -57.0f },
+		{  -9.0f, 2.0f, -63.0f },
+		{ -18.0f, 2.0f, -63.0f },
 
 		//áB
-		{{ -57.0f, 2.0f, -50.0f }, 0.0f},
-		{{ -57.0f, 2.0f, -40.0f }, 0.0f},
-		{{ -63.0f, 2.0f, -50.0f }, 0.0f},
-		{{ -63.0f, 2.0f, -40.0f }, 0.0f},
-		{{ -57.0f, 2.0f, -70.0f }, 0.0f},
-		{{ -57.0f, 2.0f, -80.0f }, 0.0f},
-		{{ -63.0f, 2.0f, -70.0f }, 0.0f},
-		{{ -63.0f, 2.0f, -80.0f }, 0.0f},
-		{{ -51.0f, 2.0f, -57.0f }, 0.0f},
-		{{ -42.0f, 2.0f, -57.0f }, 0.0f},
-		{{ -51.0f, 2.0f, -63.0f }, 0.0f},
-		{{ -42.0f, 2.0f, -63.0f }, 0.0f},
-		{{ -69.0f, 2.0f, -57.0f }, 0.0f},
-		{{ -78.0f, 2.0f, -57.0f }, 0.0f},
-		{{ -69.0f, 2.0f, -63.0f }, 0.0f},
-		{{ -78.0f, 2.0f, -63.0f }, 0.0f},
+		{ -57.0f, 2.0f, -50.0f },
+		{ -57.0f, 2.0f, -40.0f },
+		{ -63.0f, 2.0f, -50.0f },
+		{ -63.0f, 2.0f, -40.0f },
+		{ -57.0f, 2.0f, -70.0f },
+		{ -57.0f, 2.0f, -80.0f },
+		{ -63.0f, 2.0f, -70.0f },
+		{ -63.0f, 2.0f, -80.0f },
+		{ -51.0f, 2.0f, -57.0f },
+		{ -42.0f, 2.0f, -57.0f },
+		{ -51.0f, 2.0f, -63.0f },
+		{ -42.0f, 2.0f, -63.0f },
+		{ -69.0f, 2.0f, -57.0f },
+		{ -78.0f, 2.0f, -57.0f },
+		{ -69.0f, 2.0f, -63.0f },
+		{ -78.0f, 2.0f, -63.0f },
 
 		//áC
-		{{ -57.0f, 2.0f, -110.0f },0.0f},
-		{{ -57.0f, 2.0f, -100.0f },0.0f},
-		{{ -63.0f, 2.0f, -110.0f },0.0f},
-		{{ -63.0f, 2.0f, -100.0f },0.0f},
-		{{ -57.0f, 2.0f, -130.0f },0.0f},
-		{{ -57.0f, 2.0f, -140.0f },0.0f},
-		{{ -63.0f, 2.0f, -130.0f },0.0f},
-		{{ -63.0f, 2.0f, -140.0f },0.0f},
-		{{ -51.0f, 2.0f, -117.0f },0.0f},
-		{{ -42.0f, 2.0f, -117.0f },0.0f},
-		{{ -51.0f, 2.0f, -123.0f },0.0f},
-		{{ -42.0f, 2.0f, -123.0f },0.0f},
-		{{ -69.0f, 2.0f, -117.0f },0.0f},
-		{{ -78.0f, 2.0f, -117.0f },0.0f},
-		{{ -69.0f, 2.0f, -123.0f },0.0f},
-		{{ -78.0f, 2.0f, -123.0f },0.0f},
+		{ -57.0f, 2.0f, -110.0f },
+		{ -57.0f, 2.0f, -100.0f },
+		{ -63.0f, 2.0f, -110.0f },
+		{ -63.0f, 2.0f, -100.0f },
+		{ -57.0f, 2.0f, -130.0f },
+		{ -57.0f, 2.0f, -140.0f },
+		{ -63.0f, 2.0f, -130.0f },
+		{ -63.0f, 2.0f, -140.0f },
+		{ -51.0f, 2.0f, -117.0f },
+		{ -42.0f, 2.0f, -117.0f },
+		{ -51.0f, 2.0f, -123.0f },
+		{ -42.0f, 2.0f, -123.0f },
+		{ -69.0f, 2.0f, -117.0f },
+		{ -78.0f, 2.0f, -117.0f },
+		{ -69.0f, 2.0f, -123.0f },
+		{ -78.0f, 2.0f, -123.0f },
 
 		//áD
-		{{   3.0f, 2.0f, -110.0f },0.0f},
-		{{   3.0f, 2.0f, -100.0f },0.0f},
-		{{  -3.0f, 2.0f, -110.0f },0.0f},
-		{{  -3.0f, 2.0f, -100.0f },0.0f},
-		{{   3.0f, 2.0f, -130.0f },0.0f},
-		{{   3.0f, 2.0f, -140.0f },0.0f},
-		{{  -3.0f, 2.0f, -130.0f },0.0f},
-		{{  -3.0f, 2.0f, -140.0f },0.0f},
-		{{   9.0f, 2.0f, -117.0f },0.0f},
-		{{  18.0f, 2.0f, -117.0f },0.0f},
-		{{   9.0f, 2.0f, -123.0f },0.0f},
-		{{  18.0f, 2.0f, -123.0f },0.0f},
-		{{  -9.0f, 2.0f, -117.0f },0.0f},
-		{{ -18.0f, 2.0f, -117.0f },0.0f},
-		{{  -9.0f, 2.0f, -123.0f },0.0f},
-		{{ -18.0f, 2.0f, -123.0f },0.0f},
+		{   3.0f, 2.0f, -110.0f },
+		{   3.0f, 2.0f, -100.0f },
+		{  -3.0f, 2.0f, -110.0f },
+		{  -3.0f, 2.0f, -100.0f },
+		{   3.0f, 2.0f, -130.0f },
+		{   3.0f, 2.0f, -140.0f },
+		{  -3.0f, 2.0f, -130.0f },
+		{  -3.0f, 2.0f, -140.0f },
+		{   9.0f, 2.0f, -117.0f },
+		{  18.0f, 2.0f, -117.0f },
+		{   9.0f, 2.0f, -123.0f },
+		{  18.0f, 2.0f, -123.0f },
+		{  -9.0f, 2.0f, -117.0f },
+		{ -18.0f, 2.0f, -117.0f },
+		{  -9.0f, 2.0f, -123.0f },
+		{ -18.0f, 2.0f, -123.0f },
 
 		//áE
-		{{ -117.0f, 2.0f, -110.0f },0.0f},
-		{{ -117.0f, 2.0f, -100.0f },0.0f},
-		{{ -123.0f, 2.0f, -110.0f },0.0f},
-		{{ -123.0f, 2.0f, -100.0f },0.0f},
-		{{ -117.0f, 2.0f, -130.0f },0.0f},
-		{{ -117.0f, 2.0f, -140.0f },0.0f},
-		{{ -123.0f, 2.0f, -130.0f },0.0f},
-		{{ -123.0f, 2.0f, -140.0f },0.0f},
-		{{ -111.0f, 2.0f, -117.0f },0.0f},
-		{{ -102.0f, 2.0f, -117.0f },0.0f},
-		{{ -111.0f, 2.0f, -123.0f },0.0f},
-		{{ -102.0f, 2.0f, -123.0f },0.0f},
-		{{ -129.0f, 2.0f, -117.0f },0.0f},
-		{{ -138.0f, 2.0f, -117.0f },0.0f},
-		{{ -129.0f, 2.0f, -123.0f },0.0f},
-		{{ -138.0f, 2.0f, -123.0f },0.0f},
+		{ -117.0f, 2.0f, -110.0f },
+		{ -117.0f, 2.0f, -100.0f },
+		{ -123.0f, 2.0f, -110.0f },
+		{ -123.0f, 2.0f, -100.0f },
+		{ -117.0f, 2.0f, -130.0f },
+		{ -117.0f, 2.0f, -140.0f },
+		{ -123.0f, 2.0f, -130.0f },
+		{ -123.0f, 2.0f, -140.0f },
+		{ -111.0f, 2.0f, -117.0f },
+		{ -102.0f, 2.0f, -117.0f },
+		{ -111.0f, 2.0f, -123.0f },
+		{ -102.0f, 2.0f, -123.0f },
+		{ -129.0f, 2.0f, -117.0f },
+		{ -138.0f, 2.0f, -117.0f },
+		{ -129.0f, 2.0f, -123.0f },
+		{ -138.0f, 2.0f, -123.0f },
 
 		//áF
-		{{ -117.0f, 2.0f, -170.0f }, 0.0f},
-		{{ -117.0f, 2.0f, -160.0f }, 0.0f},
-		{{ -123.0f, 2.0f, -170.0f }, 0.0f},
-		{{ -123.0f, 2.0f, -160.0f }, 0.0f},
-		{{ -117.0f, 2.0f, -190.0f }, 0.0f},
-		{{ -117.0f, 2.0f, -200.0f }, 0.0f},
-		{{ -123.0f, 2.0f, -190.0f }, 0.0f},
-		{{ -123.0f, 2.0f, -200.0f }, 0.0f},
-		{{ -111.0f, 2.0f, -177.0f }, 0.0f},
-		{{ -102.0f, 2.0f, -177.0f }, 0.0f},
-		{{ -111.0f, 2.0f, -183.0f }, 0.0f},
-		{{ -102.0f, 2.0f, -183.0f }, 0.0f},
-		{{ -129.0f, 2.0f, -177.0f }, 0.0f},
-		{{ -138.0f, 2.0f, -177.0f }, 0.0f},
-		{{ -129.0f, 2.0f, -183.0f }, 0.0f},
-		{{ -138.0f, 2.0f, -183.0f }, 0.0f},
+		{ -117.0f, 2.0f, -170.0f },
+		{ -117.0f, 2.0f, -160.0f },
+		{ -123.0f, 2.0f, -170.0f },
+		{ -123.0f, 2.0f, -160.0f },
+		{ -117.0f, 2.0f, -190.0f },
+		{ -117.0f, 2.0f, -200.0f },
+		{ -123.0f, 2.0f, -190.0f },
+		{ -123.0f, 2.0f, -200.0f },
+		{ -111.0f, 2.0f, -177.0f },
+		{ -102.0f, 2.0f, -177.0f },
+		{ -111.0f, 2.0f, -183.0f },
+		{ -102.0f, 2.0f, -183.0f },
+		{ -129.0f, 2.0f, -177.0f },
+		{ -138.0f, 2.0f, -177.0f },
+		{ -129.0f, 2.0f, -183.0f },
+		{ -138.0f, 2.0f, -183.0f },
 
 		//áG
-		{{ -117.0f, 2.0f, -230.0f }, 0.0f},
-		{{ -117.0f, 2.0f, -220.0f }, 0.0f},
-		{{ -123.0f, 2.0f, -230.0f }, 0.0f},
-		{{ -123.0f, 2.0f, -220.0f }, 0.0f},
-		{{ -117.0f, 2.0f, -250.0f }, 0.0f},
-		{{ -117.0f, 2.0f, -260.0f }, 0.0f},
-		{{ -123.0f, 2.0f, -250.0f }, 0.0f},
-		{{ -123.0f, 2.0f, -260.0f }, 0.0f},
-		{{ -111.0f, 2.0f, -237.0f }, 0.0f},
-		{{ -102.0f, 2.0f, -237.0f }, 0.0f},
-		{{ -111.0f, 2.0f, -243.0f }, 0.0f},
-		{{ -102.0f, 2.0f, -243.0f }, 0.0f},
-		{{ -129.0f, 2.0f, -237.0f }, 0.0f},
-		{{ -138.0f, 2.0f, -237.0f }, 0.0f},
-		{{ -129.0f, 2.0f, -243.0f }, 0.0f},
-		{{ -138.0f, 2.0f, -243.0f }, 0.0f},
+		{ -117.0f, 2.0f, -230.0f },
+		{ -117.0f, 2.0f, -220.0f },
+		{ -123.0f, 2.0f, -230.0f },
+		{ -123.0f, 2.0f, -220.0f },
+		{ -117.0f, 2.0f, -250.0f },
+		{ -117.0f, 2.0f, -260.0f },
+		{ -123.0f, 2.0f, -250.0f },
+		{ -123.0f, 2.0f, -260.0f },
+		{ -111.0f, 2.0f, -237.0f },
+		{ -102.0f, 2.0f, -237.0f },
+		{ -111.0f, 2.0f, -243.0f },
+		{ -102.0f, 2.0f, -243.0f },
+		{ -129.0f, 2.0f, -237.0f },
+		{ -138.0f, 2.0f, -237.0f },
+		{ -129.0f, 2.0f, -243.0f },
+		{ -138.0f, 2.0f, -243.0f },
 
 		//áH
-		{{ -177.0f, 2.0f, -230.0f }, 0.0f},
-		{{ -177.0f, 2.0f, -220.0f }, 0.0f},
-		{{ -183.0f, 2.0f, -230.0f }, 0.0f},
-		{{ -183.0f, 2.0f, -220.0f }, 0.0f},
-		{{ -177.0f, 2.0f, -250.0f }, 0.0f},
-		{{ -177.0f, 2.0f, -260.0f }, 0.0f},
-		{{ -183.0f, 2.0f, -250.0f }, 0.0f},
-		{{ -183.0f, 2.0f, -260.0f }, 0.0f},
-		{{ -171.0f, 2.0f, -237.0f }, 0.0f},
-		{{ -162.0f, 2.0f, -237.0f }, 0.0f},
-		{{ -171.0f, 2.0f, -243.0f }, 0.0f},
-		{{ -162.0f, 2.0f, -243.0f }, 0.0f},
-		{{ -189.0f, 2.0f, -237.0f }, 0.0f},
-		{{ -198.0f, 2.0f, -237.0f }, 0.0f},
-		{{ -189.0f, 2.0f, -243.0f }, 0.0f},
-		{{ -198.0f, 2.0f, -243.0f }, 0.0f},
+		{ -177.0f, 2.0f, -230.0f },
+		{ -177.0f, 2.0f, -220.0f },
+		{ -183.0f, 2.0f, -230.0f },
+		{ -183.0f, 2.0f, -220.0f },
+		{ -177.0f, 2.0f, -250.0f },
+		{ -177.0f, 2.0f, -260.0f },
+		{ -183.0f, 2.0f, -250.0f },
+		{ -183.0f, 2.0f, -260.0f },
+		{ -171.0f, 2.0f, -237.0f },
+		{ -162.0f, 2.0f, -237.0f },
+		{ -171.0f, 2.0f, -243.0f },
+		{ -162.0f, 2.0f, -243.0f },
+		{ -189.0f, 2.0f, -237.0f },
+		{ -198.0f, 2.0f, -237.0f },
+		{ -189.0f, 2.0f, -243.0f },
+		{ -198.0f, 2.0f, -243.0f },
 	};
-	for (const auto& data : dentyuuList)
+	for (const auto& pos : dentyuuPositions)
 	{
 		GameObject* dentyuu = Instantiate(dentyuuPrefab);
 
 		dentyuu->transform().scale() = { 10.0f, 8.0f, 10.0f };
-		dentyuu->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		dentyuu->transform().rotation().FromXMVECTOR(q);
+		dentyuu->transform().position() = pos;
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 0.1f;
@@ -918,77 +770,65 @@ void Namioka::Initialize()
 	}
 
 	//Special_Dentyuu
-	struct SpeDenData
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
 	ModelPrefab spedentyuPrefab{ "model/special_dentyu.glb" };
-	std::vector<SpeDenData> spedentyuList =
+	std::vector<Vector3> spedentyuPositions =
 	{
 		//á@Å®áA
-		{{ 0.0f, 0.0f, -18.0f},      0.0f },
-								
-		//áAÅ®á@					
-		{{ 0.0f, 0.0f, -42.0f },	 0.0f },
-								
-		//áAÅ®áB					
-		{{ -18.0f, 0.0f, -60.0f },	 0.0f },
-									
-		//áBÅ®áA					
-		{{ -42.0f, 0.0f, -60.0f },	 0.0f },
-									
-		//áBÅ®áC					 
-		{{ -60.0f, 0.0f, -78.0f },	 0.0f },
-									
-		//áCÅ®áB				
-		{{ -60.0f, 0.0f, -102.0f },	 0.0f },
-									
-		//áCÅ®áD					 
-		{{ -42.0f, 0.0f, -120.0f },	 0.0f },
-								
-		//áDÅ®áC					
-		{{ -18.0f, 0.0f, -120.0f },	 0.0f },
-									
-		//áCÅ®áE					  
-		{{ -102.0f, 0.0f, -120.0f }, 0.0f },
-								
-		//áEÅ®áC					 
-		{{ -78.0f, 0.0f, -120.0f },	 0.0f },
-									
-		//áEÅ®áF					 
-		{{ -120.0f, 0.0f, -138.0f }, 0.0f },
-									
-		//áFÅ®áE					 
-		{{ -120.0f, 0.0f, -162.0f }, 0.0f },
-								
-		//áFÅ®áG					 
-		{{ -120.0f, 0.0f, -198.0f }, 0.0f },
-									
-		//áGÅ®áF					 
-		{{ -120.0f, 0.0f, -222.0f }, 0.0f },
-									
-		//áGÅ®áH					 
-		{{ -162.0f, 0.0f, -240.0f }, 0.0f },
-									
+		{ 0.0f, 0.0f, -18.0f},
+
+		//áAÅ®á@
+		{ 0.0f, 0.0f, -42.0f },
+
+		//áAÅ®áB
+		{ -18.0f, 0.0f, -60.0f },
+
+		//áBÅ®áA
+		{ -42.0f, 0.0f, -60.0f },
+
+		//áBÅ®áC
+		{ -60.0f, 0.0f, -78.0f },
+
+		//áCÅ®áB
+		{ -60.0f, 0.0f, -102.0f },
+
+		//áCÅ®áD
+		{ -42.0f, 0.0f, -120.0f },
+
+		//áDÅ®áC
+		{ -18.0f, 0.0f, -120.0f },
+
+		//áCÅ®áE
+		{ -102.0f, 0.0f, -120.0f },
+
+		//áEÅ®áC
+		{ -78.0f, 0.0f, -120.0f },
+
+		//áEÅ®áF
+		{ -120.0f, 0.0f, -138.0f },
+
+		//áFÅ®áE
+		{ -120.0f, 0.0f, -162.0f },
+
+		//áFÅ®áG
+		{ -120.0f, 0.0f, -198.0f },
+
+		//áGÅ®áF
+		{ -120.0f, 0.0f, -222.0f },
+
+		//áGÅ®áH
+		{ -162.0f, 0.0f, -240.0f },
+
 		//áHÅ®áG
-		{{ -138.0f, 0.0f, -240.0f }, 0.0f },
+		{ -138.0f, 0.0f, -240.0f },
 
 
 	};
-	for (const auto& data : spedentyuList)
+	for (const auto& pos : spedentyuPositions)
 	{
 		GameObject* spedentyuu = Instantiate(spedentyuPrefab);
 
 		spedentyuu->transform().scale() = { 0.1f, 0.1f, 0.1f };
-		spedentyuu->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		spedentyuu->transform().rotation().FromXMVECTOR(q);
+		spedentyuu->transform().position() = pos;
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 1.0f;
@@ -1037,98 +877,30 @@ void Namioka::Initialize()
 
 	for (const auto& data : spedensenList)
 	{
-		GameObject* spedensen = Instantiate(spedensenPrefab);
+		GameObject* spedentyuu = Instantiate(spedensenPrefab);
 
-		spedensen->transform().scale() = { 0.2f,0.2f,0.18f };
-		spedensen->transform().position() = data.position;
+		spedentyuu->transform().scale() = { 0.2f,0.2f,0.18f };
+		spedentyuu->transform().position() = data.position;
 
 		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
 			0.0f,
 			XMConvertToRadians(data.yRotation),
 			0.0f
 		);
-		spedensen->transform().rotation().FromXMVECTOR(q);
+		spedentyuu->transform().rotation().FromXMVECTOR(q);
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 1.0f;
 		shapeDesc.SizeY = 1.0f;
 		shapeDesc.SizeZ = 1.0f;
-		spedensen->AddComponent<ColliderShape>(shapeDesc);
+		spedentyuu->AddComponent<ColliderShape>(shapeDesc);
 
 		PhysicsBodyDesc bodyDesc{};
 		bodyDesc.Type = BodyType::STATIC;
-		spedensen->AddComponent<PhysicsBody>(bodyDesc);
+		spedentyuu->AddComponent<PhysicsBody>(bodyDesc);
 	}
 
-	//Building01
-	struct Building01Data
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
-	ModelPrefab building01Prefab{ "model/building01.glb" };
-	std::vector<Building01Data> building01List =
-	{
-	};
-
-	for (const auto& data : building01List)
-	{
-		GameObject* building01 = Instantiate(building01Prefab);
-
-		building01->transform().scale() = { 30.0f,30.0f,30.0f };
-		building01->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		building01->transform().rotation().FromXMVECTOR(q);
-
-		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 0.2f;
-		shapeDesc.SizeY = 0.3f;
-		shapeDesc.SizeZ = 0.2f;
-		building01->AddComponent<ColliderShape>(shapeDesc);
-
-		PhysicsBodyDesc bodyDesc{};
-		bodyDesc.Type = BodyType::STATIC;
-		building01->AddComponent<PhysicsBody>(bodyDesc);
-	}
-
-	//Building02
-	struct Building02Data
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
-	ModelPrefab building02Prefab{ "model/building02.glb" };
-	std::vector<Building02Data> building02List =
-	{
-	};
-
-	for (const auto& data : building02List)
-	{
-		GameObject* building02 = Instantiate(building02Prefab);
-
-		building02->transform().scale() = { 30.0f,50.0f,30.0f };
-		building02->transform().position() = data.position;
-
-		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			0.0f,
-			XMConvertToRadians(data.yRotation),
-			0.0f
-		);
-		building02->transform().rotation().FromXMVECTOR(q);
-
-		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 0.1f;
-		shapeDesc.SizeY = 1.0f;
-		shapeDesc.SizeZ = 0.1f;
-		building02->AddComponent<ColliderShape>(shapeDesc);
-
-		PhysicsBodyDesc bodyDesc{};
-		bodyDesc.Type = BodyType::STATIC;
-		building02->AddComponent<PhysicsBody>(bodyDesc);
-	}
+	// ëSî≠ìdèäÇÃïúãåÉ`ÉFÉbÉNópGameObjectÇçÏê¨
+	GameObject* checker = CreateGameObject();
+	checker->AddComponent<GameClearChecker>();
 }
