@@ -36,9 +36,12 @@ public:
 		player->inputHandler = gameObject.AddComponent<InputHandler>(&gameObject.input().gamePad(), commandSet);
 
 		// モデル設定
-		ModelPrefab modelPrefab{ "model/cube.glb" };
+		ModelPrefab modelPrefab{ "model/model_dake.fbx" };
 		GameObject* modelObject = gameObject.Instantiate(modelPrefab);
 		gameObject.SetChild(*modelObject);
+		modelObject->transform().scale() = Vector3(0.01f, 0.01f, 0.01f);
+		modelObject->transform().rotation() = Quaternion::SetEulerY(180.0f);
+		player->modelObject = modelObject;
 
 		// Healthコンポーネント設定
 		gameObject.AddComponent<Health>(100.0f);

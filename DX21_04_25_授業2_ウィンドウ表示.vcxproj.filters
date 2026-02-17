@@ -325,6 +325,9 @@
     <ClCompile Include="Namioka.cpp">
       <Filter>SorceFile</Filter>
     </ClCompile>
+    <ClCompile Include="PowerPlant.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemTimer.h">
@@ -568,6 +571,9 @@
       <Filter>HeaderFile\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Namioka.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerPlant.h">
       <Filter>HeaderFile</Filter>
     </ClInclude>
   </ItemGroup>

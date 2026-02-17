@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "DebugCamera.h"
 #include "Texture.h"
+#include "PowerPlant.h"
 
 using namespace DirectX;
 

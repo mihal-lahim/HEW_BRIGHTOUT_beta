@@ -6,6 +6,7 @@
 #include <type_traits>
 #include <stack>
 #include <memory>
+#include <functional>
 
 class EngineCore;
 
@@ -66,6 +67,27 @@ private:
 
 	// シーンスタック
 	std::stack<std::unique_ptr<Scene>> m_sceneStack{};
+
+	// 保留中のシーン遷移処理
+	std::function<void()> m_pendingSceneChange{};
+
+	// 保留中のシーン遷移を実行するメソッド
+	void ProcessPendingSceneChange();
+
+	// 即座にシーン変更を実行する内部メソッド
+	template<typename T>
+		requires std::is_base_of<Scene, T>::value
+	void ChangeSceneImmediate();
+
+	// 即座にシーンをプッシュする内部メソッド
+	template<typename T>
+		requires std::is_base_of<Scene, T>::value
+	void PushSceneImmediate();
+
+	// 即座にシーンをポップする内部メソッド
+	template<typename T>
+		requires std::is_base_of<Scene, T>::value
+	void PopSceneImmediate();
 };
 
 #include "SceneSystem.inl"

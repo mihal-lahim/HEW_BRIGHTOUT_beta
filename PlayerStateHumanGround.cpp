@@ -1,5 +1,6 @@
 #include "PlayerState_Human_Ground.h"
 #include "Player.h"
+#include "PowerPlant.h"
 
 
 using namespace DirectX;
@@ -31,6 +32,21 @@ void PlayerState_Human_Ground::HandleInput(Player& player)
 		movement->GroundJump(inputX, inputZ);
 	}
 
+	// インタラクト処理（発電所の復旧）
+	if (inputHandler->IsIssued<PlayerCommand_Interact>())
+	{
+		Vector3 playerPos = player.gameObject().transform().position();
+		auto powerPlants = player.GetGameObjectsByTag("PowerPlant");
+		for (auto* obj : powerPlants)
+		{
+			PowerPlant* plant = obj->GetComponent<PowerPlant>();
+			if (plant && !plant->IsRestored() && plant->IsInRange(playerPos))
+			{
+				plant->Restore();
+				break;
+			}
+		}
+	}
 
 	PlayerState_Human::HandleInput(player);
 }

@@ -43,7 +43,7 @@ public:
 	void UpdateScene();
 
 	// シーンシステム取得メソッド
-	SceneSystem& sceneSystem() const { return *m_sceneSystem; }
+	SceneSystem& sceneSystem() const { return *m_gameContext.sceneSystem; }
 
 	// ウィンドウシステム取得メソッド
 	WindowSystem& window() const;
