@@ -39,7 +39,7 @@ public:
 		ModelPrefab modelPrefab{ "model/model_dake.fbx" };
 		GameObject* modelObject = gameObject.Instantiate(modelPrefab);
 		gameObject.SetChild(*modelObject);
-		modelObject->transform().scale() = Vector3(0.03f, 0.03f, 0.03f);
+		modelObject->transform().scale() = Vector3(0.01f, 0.01f, 0.01f);
 		modelObject->transform().rotation() = Quaternion::SetEulerY(180.0f);
 		player->modelObject = modelObject;
 

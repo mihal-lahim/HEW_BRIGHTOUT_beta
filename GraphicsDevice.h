@@ -21,6 +21,9 @@ public:
 	void Clear();
 	void Present();
 
+	// クリア色の設定メソッド
+	void SetClearColor(float r, float g, float b, float a = 1.0f);
+
 	unsigned int GetBackBufferWidth() const;
 	unsigned int GetBackBufferHeight() const;
 
@@ -78,6 +81,9 @@ private:
 
 	// バックバッファの情報
 	D3D11_TEXTURE2D_DESC m_backBufferDesc{};
+
+	// クリア色
+	float m_clearColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
 
 };
 

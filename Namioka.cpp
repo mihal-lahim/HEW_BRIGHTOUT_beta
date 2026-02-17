@@ -3,6 +3,8 @@
 #include "GameObject.h"
 #include "DebugCamera.h"
 #include "Texture.h"
+#include "PowerPlant.h"
+#include "GameClearChecker.h"
 
 using namespace DirectX;
 
@@ -520,6 +522,7 @@ void Namioka::Initialize()
 
 	//powerplant
 	ModelPrefab powerplantPrefab{ "model/powerplant.glb" };
+	ModelPrefab powerplant_brokenPrefab{ "model/powerplant_broken.glb" };
 	std::vector<Vector3> powerplantPositions =
 	{
 		//①
@@ -551,69 +554,35 @@ void Namioka::Initialize()
 	};
 	for (const auto& pos : powerplantPositions)
 	{
-		GameObject* powerplant = Instantiate(powerplantPrefab);
+		// 親オブジェクト（PowerPlantコンポーネント付き）
+		GameObject* plantObj = CreateGameObject();
+		plantObj->SetName("PowerPlant");
+		plantObj->SetTag("PowerPlant");
+		plantObj->transform().position() = pos;
+		auto* plant = plantObj->AddComponent<PowerPlant>(10.0f);
 
-		powerplant->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		powerplant->transform().position() = pos;
-
+		// 当たり判定は親オブジェクトに設定
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 6.0f;
 		shapeDesc.SizeY = 6.0f;
 		shapeDesc.SizeZ = 6.0f;
-		powerplant->AddComponent<ColliderShape>(shapeDesc);
+		plantObj->AddComponent<ColliderShape>(shapeDesc);
 
 		PhysicsBodyDesc bodyDesc{};
 		bodyDesc.Type = BodyType::STATIC;
-		powerplant->AddComponent<PhysicsBody>(bodyDesc);
-	}
+		plantObj->AddComponent<PhysicsBody>(bodyDesc);
 
-	//powerplant_broken
-	ModelPrefab powerplant_brokenPrefab{ "model/powerplant_broken.glb" };
-	std::vector<Vector3> powerplant_brokenPositions =
-	{
-		//①
-		{ 0.0f, 0.0f, 0.0f },
+		// 復旧済みモデル（Start()で非表示にする）
+		GameObject* restored = Instantiate(powerplantPrefab);
+		restored->transform().position() = pos;
 
-		//②
-		{ 0.0f, 0.0f, -60.0f },
+		// 故障モデル（初期は表示）
+		GameObject* broken = Instantiate(powerplant_brokenPrefab);
+		broken->transform().position() = pos;
 
-		//③
-		{ -60.0f, 0.0f, -60.0f },
-
-		//④
-		{ -60.0f, 0.0f, -120.0f },
-
-		//⑤
-		{ 0.0f, 0.0f, -120.0f },
-
-		//⑥
-		{ -120.0f, 0.0f, -120.0f },
-
-		//⑦
-		{ -120.0f, 0.0f, -180.0f },
-
-		//⑧
-		{ -120.0f, 0.0f, -240.0f},
-
-		//⑨
-		{ -180.0f, 0.0f, -240.0f },
-	};
-	for (const auto& pos : powerplant_brokenPositions)
-	{
-		GameObject* powerplant_broken = Instantiate(powerplant_brokenPrefab);
-
-		powerplant_broken->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		powerplant_broken->transform().position() = pos;
-
-		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 6.0f;
-		shapeDesc.SizeY = 6.0f;
-		shapeDesc.SizeZ = 6.0f;
-		powerplant_broken->AddComponent<ColliderShape>(shapeDesc);
-
-		PhysicsBodyDesc bodyDesc{};
-		bodyDesc.Type = BodyType::STATIC;
-		powerplant_broken->AddComponent<PhysicsBody>(bodyDesc);
+		// PowerPlantにモデル参照を設定
+		plant->restoredModel = restored;
+		plant->brokenModel = broken;
 	}
 
 	//dentyuu
@@ -930,4 +899,8 @@ void Namioka::Initialize()
 		bodyDesc.Type = BodyType::STATIC;
 		spedentyuu->AddComponent<PhysicsBody>(bodyDesc);
 	}
+
+	// 全発電所の復旧チェック用GameObjectを作成
+	GameObject* checker = CreateGameObject();
+	checker->AddComponent<GameClearChecker>();
 }
