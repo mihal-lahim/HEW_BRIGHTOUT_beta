@@ -7,24 +7,24 @@
 #include "GameClearChecker.h"
 #include "audio.h"
 
-	using namespace DirectX;
+using namespace DirectX;
+
+static int g_GameBgm{};
 
 void Namioka::Initialize()
 {
+	// オーディオ初期化
+	InitAudio();
+
+	g_GameBgm = LoadAudio("sound/GameBGM_01.wav");
+
+	// BGM再生（ループ）
+	PlayAudio(g_GameBgm, true);
+
 	//Player
 	PlayerPrefab playerPrefab{};
 	Instantiate(playerPrefab)->transform().position() += Vector3(0.0f, 0.0f, 10.0f);
 
-	////Ground
-	//ModelPrefab cubePrefab{ "model/cube.glb" };
-	//GameObject* floor = Instantiate(cubePrefab);
-	//floor->transform().scale() = { 50.0f, 1.0f, 50.0f };
-	//floor->transform().position() = { 0.0f, -1.0f, 0.0f };
-	//BoxColliderDesc floorShapeDesc{};
-	//floor->AddComponent<ColliderShape>(floorShapeDesc);
-	//PhysicsBodyDesc floorBodyDesc{};
-	//floorBodyDesc.Type = BodyType::STATIC;
-	//floor->AddComponent<PhysicsBody>(floorBodyDesc);
 
 	//Road
 	ModelPrefab roadPrefab{ "model/intersection.glb" };
@@ -904,4 +904,13 @@ void Namioka::Initialize()
 	// 全発電所の復旧チェック用GameObjectを作成
 	GameObject* checker = CreateGameObject();
 	checker->AddComponent<GameClearChecker>();
+}
+
+void Namioka::Finalize()
+{
+	// 音声解放
+	UnloadAudio(g_GameBgm);
+
+	// XAudio終了
+	UninitAudio();
 }
