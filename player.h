@@ -18,6 +18,7 @@
 #include "PlayerCommand.h"
 #include "PlayerCommandSet.h"
 #include "Renderer.h"
+#include <vector>
 
 
 #include "PlayerState_Electric.h"
@@ -71,9 +72,20 @@ public:
 	// モデルオブジェクト
 	GameObject* modelObject = nullptr;
 
+	// 歩行アニメーション用モデル
+	std::vector<GameObject*> walkModelObjects{};
+	// 歩行アニメーションの更新間隔
+	float walkAnimationInterval = 1.0f;
+	// 歩行アニメーションタイマー
+	float walkAnimationTimer = 0.0f;
+	// 歩行アニメーションインデックス
+	size_t walkAnimationIndex = 0;
+
 
 	void Start() override;
 	void Update() override;
+	void ResetWalkAnimation();
+	void AdvanceWalkAnimation(float deltaTime);
 };
 
 

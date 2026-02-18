@@ -47,6 +47,9 @@ public:
 	// 速度を取得するメソッド
 	Vector3 GetVelocity() const;
 
+	// Transformの位置・回転をBulletに同期するメソッド
+	void SyncTransformToGameObject();
+
 	// オブジェクトのアクティブ状態を設定するメソッド
 	void OnEnable() override;
 	void OnDisable() override;

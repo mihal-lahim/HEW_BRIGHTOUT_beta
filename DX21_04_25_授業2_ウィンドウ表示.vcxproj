@@ -170,21 +170,32 @@ for %%F in ("$(TargetDir)*.cso") do (
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Apartment.cpp" />
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Clocktower.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="Convenience.cpp" />
+    <ClCompile Include="Dentyuu.cpp" />
     <ClCompile Include="EngineCore.cpp" />
     <ClCompile Include="EventSystem.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
+    <ClCompile Include="House.cpp" />
     <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="Karaoke.cpp" />
+    <ClCompile Include="Mansion01.cpp" />
+    <ClCompile Include="Mansion02.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Namioka.cpp" />
     <ClCompile Include="PlayerAudio.cpp" />
+    <ClCompile Include="Road.cpp" />
+    <ClCompile Include="SpecialDensen.cpp" />
+    <ClCompile Include="SpecialDentyuu.cpp" />
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="Result.cpp" />
     <ClCompile Include="ResultController.cpp" />
@@ -203,6 +214,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Vector4.cpp" />
+    <ClCompile Include="Wacdonald.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WindowSystem.cpp" />
     <ClCompile Include="GamePad.cpp" />
@@ -238,24 +250,37 @@ for %%F in ("$(TargetDir)*.cso") do (
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="Apartment.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Billboard.h" />
     <ClInclude Include="BillboardPrefab.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraPrefab.h" />
+    <ClInclude Include="Clocktower.h" />
     <ClInclude Include="ColliderShape.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandSet.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="Convenience.h" />
     <ClInclude Include="DebugCameraPrefab.h" />
     <ClInclude Include="EventSystem.h" />
+    <ClInclude Include="Dentyuu.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyPrefab.h" />
     <ClInclude Include="GraphicsDevice.h" />
+    <ClInclude Include="House.h" />
+    <ClInclude Include="Karaoke.h" />
+    <ClInclude Include="Mansion01.h" />
+    <ClInclude Include="Mansion02.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Namioka.h" />
     <ClInclude Include="PlayerAudio.h" />
+    <ClInclude Include="Road.h" />
+    <ClInclude Include="SpecialDensen.h" />
+    <ClInclude Include="SpecialDentyuu.h" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="Result.h" />
     <ClInclude Include="ResultController.h" />
@@ -282,6 +307,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
+    <ClInclude Include="Wacdonald.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowSystem.h" />
     <ClInclude Include="GamePad.h" />

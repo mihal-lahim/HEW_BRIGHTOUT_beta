@@ -347,6 +347,40 @@
       <Filter>SorceFile</Filter>
     </ClCompile>
     <ClCompile Include="PlayerAudio.cpp">
+    <ClCompile Include="SpecialDensen.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Apartment.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Dentyuu.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Mansion01.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="SpecialDentyuu.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Karaoke.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Mansion02.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Clocktower.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Wacdonald.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Road.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="House.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Convenience.cpp">
       <Filter>SorceFile</Filter>
     </ClCompile>
   </ItemGroup>
@@ -616,6 +650,46 @@
       <Filter>HeaderFile</Filter>
     </ClInclude>
     <ClInclude Include="PlayerAudio.h">
+    <ClInclude Include="Enemy.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyPrefab.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Apartment.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Dentyuu.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Karaoke.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="SpecialDensen.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Wacdonald.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Clocktower.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="SpecialDentyuu.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Convenience.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="House.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Mansion01.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Mansion02.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Road.h">
       <Filter>HeaderFile</Filter>
     </ClInclude>
   </ItemGroup>

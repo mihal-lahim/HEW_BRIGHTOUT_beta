@@ -12,6 +12,8 @@ class PlayerMorphSystem : public ScriptComponent
 private:
 	// PoleManager‚Ö‚ÌQÆ
 	PoleManager* m_PoleManager = nullptr;
+	// •Ïg‰Â”\”ÍˆÍ
+	float m_MorphRadius = 5.0f;
 public:
 	void Awake() override;
 
