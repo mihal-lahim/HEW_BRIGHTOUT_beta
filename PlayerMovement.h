@@ -14,7 +14,7 @@ class Camera;
 struct PlayerMoveCtx
 {
 	// •às‘¬“x
-	float WalkSpeed = 10.0f;
+	float WalkSpeed = 5.0f;
 	// ‹ó’†ˆÚ“®‘¬“x
 	float AirMoveSpeed = 3.0f;
 	// ‹ó’†Å¬‘¬“x‚Ì”{—¦
@@ -23,10 +23,10 @@ struct PlayerMoveCtx
 	// ƒWƒƒƒ“ƒv—Í
 	float JumpForce = 20.0f;
 	// “d‹CƒWƒƒƒ“ƒv—Í
-	float ElectricJumpForce = 20.0f;
+	float ElectricJumpForce = 10.0f;
 
 	// “düãˆÚ“®‘¬“x
-	float LineMoveSpeed = 0.0f;
+	float LineMoveSpeed = 20.0f;
 	// “düãˆÚ“®‘¬“x‚ÌÅ¬’l
 	float LineMoveSpeedMin = 1.0f;
 
@@ -61,6 +61,8 @@ public:
 	void Walk(float inputX, float inputZ);
 	// ‘–sˆ—
 	void Run(float inputX, float inputZ);
+	// ‹ó’†ˆÚ“®ˆ—
+	void AirMove(float inputX, float inputZ);
 	// ƒWƒƒƒ“ƒvŒÄ‚Ño‚µˆ—
 	void Jump(float inputX, float inputZ, float force);
 	// ’nãƒWƒƒƒ“ƒvˆ—
@@ -78,7 +80,7 @@ public:
 	// “düËoˆ—
 	void Eject(float inputX, float inputZ);
 
-	// PoleManagerd
+	// PoleManager
 	void SetPoleManager(PoleManager* poleManager) { m_PoleManager = poleManager; }
 
 	// ˆÚ“®İ’è’læ“¾Eİ’è
@@ -87,7 +89,7 @@ public:
 
 	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 	PlayerMovement(Camera* camera, PlayerMoveCtx moveCtx = {})
-		: m_Camera(camera), m_Ctx(moveCtx)
+		: m_Camera(camera), m_Ctx(moveCtx), m_LineMoveSpeed(moveCtx.LineMoveSpeed)
 	{
 	}
 
@@ -116,6 +118,9 @@ private:
 
 	// “düã‚ÌˆÊ’uƒpƒ‰ƒ[ƒ^
 	float m_LineParam = 0.0f;
+
+	// “düãˆÚ“®‘¬“x
+	float m_LineMoveSpeed = 0.0f;
 
 	// ÅŒã‚Ì“ü—Í•ûŒü
 	Vector3 m_LastInputDir{};

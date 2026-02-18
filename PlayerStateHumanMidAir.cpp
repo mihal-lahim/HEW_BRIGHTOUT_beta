@@ -9,6 +9,20 @@ void PlayerState_Human_MidAir::Enter(Player& player)
 
 void PlayerState_Human_MidAir::HandleInput(Player& player)
 {
+	// 入力システム取得
+	InputHandler* inputHandler = player.inputHandler;
+
+	// 移動コンポーネント取得
+	PlayerMovement* movement = player.movement;
+
+	// 空中移動処理
+	if (inputHandler->IsIssued<PlayerCommand_MoveX>()
+		|| inputHandler->IsIssued<PlayerCommand_MoveZ>())
+	{
+		movement->AirMove(
+			inputHandler->GetValue<PlayerCommand_MoveX>(),
+			inputHandler->GetValue<PlayerCommand_MoveZ>());
+	}
 
 	// 電気ジャンプ処理は無効化
 

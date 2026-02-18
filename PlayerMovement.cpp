@@ -69,6 +69,23 @@ void PlayerMovement::Run(float inputX, float inputZ)
 	GroundMove(inputX, inputZ, m_Ctx.WalkSpeed * 2.0f);
 }
 
+void PlayerMovement::AirMove(float inputX, float inputZ)
+{
+	Vector3 vec = ConvertToXZPlane(SetInputDir(inputX, inputZ));
+	if (vec.IsZero())
+		return;
+
+	MoveVec += vec * m_Ctx.AirMoveSpeed;
+
+	float minSpeed = m_Ctx.AirMoveSpeed * m_Ctx.AirMinSpeedFactor;
+	if (minSpeed > 0.0f)
+	{
+		Vector3 minDir = vec.Normalize();
+		VelocityVec.x = minDir.x * minSpeed;
+		VelocityVec.z = minDir.z * minSpeed;
+	}
+}
+
 
 void PlayerMovement::Jump(float inputX, float inputZ, float force)
 {
@@ -148,11 +165,8 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 	// 電線上の位置パラメータtを設定（0.0f ~ 1.0fの範囲にクランプ）
 	m_LineParam = std::clamp(toPlayerVec.Dot(lineVec) / lineLength, 0.0f, 1.0f);
 
-	// 速度ベクトルの長さを取得
-	float velocityLength = vec.Length();
-
 	// 電線上速度を設定
-	m_Ctx.LineMoveSpeed = velocityLength >= m_Ctx.LineMoveSpeedMin ? velocityLength : m_Ctx.LineMoveSpeedMin;
+	m_LineMoveSpeed = std::max(m_Ctx.LineMoveSpeed, m_Ctx.LineMoveSpeedMin);
 }
 
 void PlayerMovement::Turn(float inputX, float inputZ)
@@ -206,7 +220,7 @@ void PlayerMovement::LineMove()
 	float lineLength = m_PoleManager->GetPowerLineLength(m_LineID);
 	if (lineLength <= 0.0f)
 		return;
-	m_LineParam += (m_Ctx.LineMoveSpeed * deltaTime / lineLength);
+	m_LineParam += (m_LineMoveSpeed * deltaTime / lineLength);
 
 	// 電線上の位置を取得
 	Vector3 newPos;

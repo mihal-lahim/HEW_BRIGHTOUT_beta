@@ -5,6 +5,7 @@
 
 void PlayerState_Human_Idle::Enter(Player& player)
 {
+	player.ResetWalkAnimation();
 	PlayerState_Human_Ground::Enter(player);
 }
 

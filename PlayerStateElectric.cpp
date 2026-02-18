@@ -32,8 +32,9 @@ void PlayerState_Electric::HandleInput(Player& player)
 	// ステートマシン取得
 	PlayerStateMachine* stateMachine = player.stateMachine;
 
-	// ジャンプコマンドが発行されたら射出・変身処理
-	if (inputHandler->IsIssued<PlayerCommand_Jump>())
+	// ジャンプ・変身コマンドが発行されたら射出・変身処理
+	if (inputHandler->IsIssued<PlayerCommand_Jump>()
+		|| inputHandler->IsIssued<PlayerCommand_Morph>())
 	{
 		// 電線から射出
 		movement->Eject(
