@@ -11,6 +11,7 @@ void PlayerAudio::Awake()
             if (!m_IsMoving)
             {
                 PlayAudio(m_FootstepSE, true);
+                SetAudioVolume(m_FootstepSE, 0.3f);
                 m_IsMoving = true;
             }
         });

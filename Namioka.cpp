@@ -38,7 +38,7 @@ void Namioka::Initialize()
 	// BGM再生（ループ）
 	PlayAudio(g_GameBgm, true);
 
-	SetAudioVolume(g_GameBgm, 0.0f);
+	SetAudioVolume(g_GameBgm, 0.2f);
 
 	// PoleManager
 	GameObject* poleManagerObject = CreateGameObject();
@@ -966,7 +966,7 @@ void Namioka::Initialize()
 
 		specialPoleIDs.push_back(poleManager->RegisterPole(pole));
 
-		spedentyuu->transform().scale() = { 0.2f, 0.2f, 0.2f };
+		spedentyuu->transform().scale() = { 0.3f, 0.6f, 0.3f };
 		spedentyuu->transform().position() = data.position;
 
 		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
