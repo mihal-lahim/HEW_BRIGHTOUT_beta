@@ -1,5 +1,6 @@
 
 #include "Player.h"
+#include "Time.h"
 
 using namespace DirectX;
 
@@ -26,6 +27,17 @@ void PlayerState_Human_Walk::HandleInput(Player& player)
 	// 歩行処理
 	movement->Walk(inputX, inputZ);
 
+	// 移動方向にモデルの向きを回転
+	if (player.modelObject)
+	{
+		Vector3 moveDir = movement->MoveVec;
+		if (!(moveDir.x == 0.0f && moveDir.z == 0.0f))
+		{
+			float yaw = XMConvertToDegrees(atan2f(moveDir.x, moveDir.z));
+			player.modelObject->transform().rotation() = Quaternion::SetEulerY(yaw + 180.0f);
+		}
+	}
+
 	// 歩行入力がなくなったらアイドル状態へ遷移
 	if(inputX == 0.0f &&
 		inputZ == 0.0f)
@@ -39,5 +51,6 @@ void PlayerState_Human_Walk::HandleInput(Player& player)
 
 void PlayerState_Human_Walk::Update(Player& player)
 {
+	player.AdvanceWalkAnimation((float)Time::DeltaTime());
 	PlayerState_Human_Ground::Update(player);
 }

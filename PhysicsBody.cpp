@@ -1,5 +1,6 @@
 #include "PhysicsBody.h"
 #include "PhysicsSystem.h"
+#include "GameObject.h"
 
 void PhysicsBody::ApplyForce(const Vector3& force)
 {
@@ -45,6 +46,26 @@ Vector3 PhysicsBody::GetVelocity() const
 	btVector3 btVelocity = m_rigidBody->getLinearVelocity();
 	// DirectXÀ•WŒn‚É•ÏŠ·‚µ‚Ä•Ô‚·
 	return ToDirectXPosition(btVelocity);
+}
+
+void PhysicsBody::SyncTransformToGameObject()
+{
+	btTransform transform;
+	transform.setOrigin(ToBulletPosition(gameObject().transform().position()));
+	transform.setRotation(ToBulletRotation(gameObject().transform().rotation()));
+
+	if (m_rigidBody)
+	{
+		m_rigidBody->setWorldTransform(transform);
+		if (m_motionState)
+		{
+			m_motionState->setWorldTransform(transform);
+		}
+	}
+	if (m_collisionObject)
+	{
+		m_collisionObject->setWorldTransform(transform);
+	}
 }
 
 

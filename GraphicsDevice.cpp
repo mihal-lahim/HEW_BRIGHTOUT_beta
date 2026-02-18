@@ -81,13 +81,19 @@ void GraphicsDevice::Finalize()
 
 void GraphicsDevice::Clear()
 {
-	float clearColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
-
-	m_deviceContext->ClearRenderTargetView(m_renderTargetView.Get(), clearColor);
+	m_deviceContext->ClearRenderTargetView(m_renderTargetView.Get(), m_clearColor);
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	ID3D11RenderTargetView* renderTargetView = m_renderTargetView.Get();
 	m_deviceContext->OMSetRenderTargets(1, &renderTargetView, m_depthStencilView.Get());
+}
+
+void GraphicsDevice::SetClearColor(float r, float g, float b, float a)
+{
+	m_clearColor[0] = r;
+	m_clearColor[1] = g;
+	m_clearColor[2] = b;
+	m_clearColor[3] = a;
 }
 
 void GraphicsDevice::Present()

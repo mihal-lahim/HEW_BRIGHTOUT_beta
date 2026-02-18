@@ -14,7 +14,7 @@ class Camera;
 struct PlayerMoveCtx
 {
 	// 歩行速度
-	float WalkSpeed = 10.0f;
+	float WalkSpeed = 5.0f;
 	// 空中移動速度
 	float AirMoveSpeed = 3.0f;
 	// 空中最小速度の倍率
@@ -23,10 +23,10 @@ struct PlayerMoveCtx
 	// ジャンプ力
 	float JumpForce = 20.0f;
 	// 電気ジャンプ力
-	float ElectricJumpForce = 20.0f;
+	float ElectricJumpForce = 10.0f;
 
 	// 電線上移動速度
-	float LineMoveSpeed = 0.0f;
+	float LineMoveSpeed = 20.0f;
 	// 電線上移動速度の最小値
 	float LineMoveSpeedMin = 1.0f;
 
@@ -61,6 +61,8 @@ public:
 	void Walk(float inputX, float inputZ);
 	// 走行処理
 	void Run(float inputX, float inputZ);
+	// 空中移動処理
+	void AirMove(float inputX, float inputZ);
 	// ジャンプ呼び出し処理
 	void Jump(float inputX, float inputZ, float force);
 	// 地上ジャンプ処理
@@ -78,13 +80,16 @@ public:
 	// 電線射出処理
 	void Eject(float inputX, float inputZ);
 
+	// PoleManager
+	void SetPoleManager(PoleManager* poleManager) { m_PoleManager = poleManager; }
+
 	// 移動設定値取得・設定
 	void SetMoveCtx(const PlayerMoveCtx& moveCtx) { m_Ctx = moveCtx; }
 	const PlayerMoveCtx& GetMoveCtx() const { return m_Ctx; }
 
 	// コンストラクタ
 	PlayerMovement(Camera* camera, PlayerMoveCtx moveCtx = {})
-		: m_Camera(camera), m_Ctx(moveCtx)
+		: m_Camera(camera), m_Ctx(moveCtx), m_LineMoveSpeed(moveCtx.LineMoveSpeed)
 	{
 	}
 
@@ -113,6 +118,9 @@ private:
 
 	// 電線上の位置パラメータ
 	float m_LineParam = 0.0f;
+
+	// 電線上移動速度
+	float m_LineMoveSpeed = 0.0f;
 
 	// 最後の入力方向
 	Vector3 m_LastInputDir{};

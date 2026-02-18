@@ -17,11 +17,15 @@ Vector3 Movement::GetCurrentVelocity() const
 
 void Movement::RotateByMoveVec()
 {
-	// XZ平面の回転を計算
-	float yaw = atan2f(MoveVec.x, MoveVec.z);
+	// 移動ベクトルがゼロの場合は回転しない
+	if (MoveVec.x == 0.0f && MoveVec.z == 0.0f)
+		return;
 
-	// オーナーの回転を更新
-	gameObject().transform().rotation() *= Quaternion::SetEulerY(yaw);
+	// XZ平面の回転を計算
+	float yaw = XMConvertToDegrees(atan2f(MoveVec.x, MoveVec.z));
+
+	// 移動方向に向きを設定
+	gameObject().transform().rotation() = Quaternion::SetEulerY(yaw);
 }
 
 

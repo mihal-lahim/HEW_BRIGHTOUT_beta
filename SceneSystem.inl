@@ -1,4 +1,5 @@
 
+
 #ifndef SCENE_SYSTEM_INL
 #define SCENE_SYSTEM_INL
 
@@ -6,9 +7,34 @@
 #include "EngineCore.h"
 #include "Scene.h"
 
+// 遅延シーン変更（コンポーネントのUpdate中から呼び出し可能）
 template<typename T>
 	requires std::is_base_of<Scene, T>::value
 inline void SceneSystem::ChangeScene()
+{
+	m_pendingSceneChange = [this]() { ChangeSceneImmediate<T>(); };
+}
+
+// 遅延シーンプッシュ
+template<typename T>
+	requires std::is_base_of<Scene, T>::value
+inline void SceneSystem::PushScene()
+{
+	m_pendingSceneChange = [this]() { PushSceneImmediate<T>(); };
+}
+
+// 遅延シーンポップ
+template<typename T>
+	requires std::is_base_of<Scene, T>::value
+inline void SceneSystem::PopScene()
+{
+	m_pendingSceneChange = [this]() { PopSceneImmediate<T>(); };
+}
+
+// 即座にシーン変更を実行する内部メソッド
+template<typename T>
+	requires std::is_base_of<Scene, T>::value
+inline void SceneSystem::ChangeSceneImmediate()
 {
 	// 終了処理を呼び出す
 	if (m_currentScene)
@@ -24,10 +50,10 @@ inline void SceneSystem::ChangeScene()
 	m_currentScene->Initialize();
 }
 
-
+// 即座にシーンをプッシュする内部メソッド
 template<typename T>
 	requires std::is_base_of<Scene, T>::value
-inline void SceneSystem::PushScene()
+inline void SceneSystem::PushSceneImmediate()
 {
 	// 現在のシーンが存在する場合はスタックに保存
 	if (m_currentScene)
@@ -43,10 +69,10 @@ inline void SceneSystem::PushScene()
 	m_currentScene->Initialize();
 }
 
-
+// 即座にシーンをポップする内部メソッド
 template<typename T>
 	requires std::is_base_of<Scene, T>::value
-inline void SceneSystem::PopScene()
+inline void SceneSystem::PopSceneImmediate()
 {
 	// 現在のシーンが存在する場合は終了処理を呼び出す
 	if (m_currentScene)

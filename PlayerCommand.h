@@ -30,4 +30,7 @@ class playerCommand_ADS : public Command {};
 // 射撃コマンド
 class PlayerCommand_Fire : public Command {};
 
+// インタラクトコマンド
+class PlayerCommand_Interact : public Command {};
+
 #endif

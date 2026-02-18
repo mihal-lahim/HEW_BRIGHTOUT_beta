@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -22,7 +22,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{0cd14713-b3d2-4f0b-90c6-5d08fe1b933e}</ProjectGuid>
-    <RootNamespace>DX210425授業2ウィンドウ表示</RootNamespace>
+    <RootNamespace>DX210425����2�E�B���h�E�\��</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -87,7 +87,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
+      <Command>:: .cso �t�@�C����v���W�F�N�g�f�B���N�g���ɃR�s�[�i�S�p�E�X�y�[�X�Ή��j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -110,7 +110,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
+      <Command>:: .cso �t�@�C����v���W�F�N�g�f�B���N�g���ɃR�s�[�i�S�p�E�X�y�[�X�Ή��j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -134,7 +134,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
+      <Command>:: .cso �t�@�C����v���W�F�N�g�f�B���N�g���ɃR�s�[�i�S�p�E�X�y�[�X�Ή��j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -162,7 +162,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ファイルをプロジェクトディレクトリにコピー（全角・スペース対応）
+      <Command>:: .cso �t�@�C����v���W�F�N�g�f�B���N�g���ɃR�s�[�i�S�p�E�X�y�[�X�Ή��j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -170,20 +170,38 @@ for %%F in ("$(TargetDir)*.cso") do (
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Apartment.cpp" />
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Clocktower.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="Convenience.cpp" />
+    <ClCompile Include="Dentyuu.cpp" />
     <ClCompile Include="EngineCore.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
+    <ClCompile Include="House.cpp" />
     <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="Karaoke.cpp" />
+    <ClCompile Include="Mansion01.cpp" />
+    <ClCompile Include="Mansion02.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Namioka.cpp" />
+    <ClCompile Include="Road.cpp" />
+    <ClCompile Include="SpecialDensen.cpp" />
+    <ClCompile Include="SpecialDentyuu.cpp" />
+    <ClCompile Include="Title.cpp" />
+    <ClCompile Include="Result.cpp" />
+    <ClCompile Include="ResultController.cpp" />
+    <ClCompile Include="GameClearChecker.cpp" />
+    <ClCompile Include="TitleController.cpp" />
     <ClCompile Include="PhysicsBody.cpp" />
     <ClCompile Include="PoleManager.cpp" />
+    <ClCompile Include="PowerPlant.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceSystem.cpp" />
@@ -194,6 +212,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Vector4.cpp" />
+    <ClCompile Include="Wacdonald.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WindowSystem.cpp" />
     <ClCompile Include="GamePad.cpp" />
@@ -229,27 +248,47 @@ for %%F in ("$(TargetDir)*.cso") do (
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="Apartment.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Billboard.h" />
     <ClInclude Include="BillboardPrefab.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraPrefab.h" />
+    <ClInclude Include="Clocktower.h" />
     <ClInclude Include="ColliderShape.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandSet.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="Convenience.h" />
     <ClInclude Include="DebugCameraPrefab.h" />
+    <ClInclude Include="Dentyuu.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyPrefab.h" />
     <ClInclude Include="GraphicsDevice.h" />
+    <ClInclude Include="House.h" />
+    <ClInclude Include="Karaoke.h" />
+    <ClInclude Include="Mansion01.h" />
+    <ClInclude Include="Mansion02.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Namioka.h" />
+    <ClInclude Include="Road.h" />
+    <ClInclude Include="SpecialDensen.h" />
+    <ClInclude Include="SpecialDentyuu.h" />
+    <ClInclude Include="Title.h" />
+    <ClInclude Include="Result.h" />
+    <ClInclude Include="ResultController.h" />
+    <ClInclude Include="GameClearChecker.h" />
+    <ClInclude Include="TitleController.h" />
     <ClInclude Include="PlayerPrefab.h" />
     <ClInclude Include="DebugCounter.h" />
     <ClInclude Include="GameContext.h" />
     <ClInclude Include="InputSystem.h" />
     <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="PhysicsBody.h" />
+    <ClInclude Include="PowerPlant.h" />
     <ClInclude Include="Prefab.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ResourceSystem.h" />
@@ -264,6 +303,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
+    <ClInclude Include="Wacdonald.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowSystem.h" />
     <ClInclude Include="GamePad.h" />

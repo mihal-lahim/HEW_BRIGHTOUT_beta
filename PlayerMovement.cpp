@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "Camera.h"
 #include "Ray.h"
+#include "Time.h"
 
 
 Vector3 PlayerMovement::SetInputDir(float inputX, float inputZ)
@@ -66,6 +67,23 @@ void PlayerMovement::Walk(float inputX, float inputZ)
 void PlayerMovement::Run(float inputX, float inputZ)
 {
 	GroundMove(inputX, inputZ, m_Ctx.WalkSpeed * 2.0f);
+}
+
+void PlayerMovement::AirMove(float inputX, float inputZ)
+{
+	Vector3 vec = ConvertToXZPlane(SetInputDir(inputX, inputZ));
+	if (vec.IsZero())
+		return;
+
+	MoveVec += vec * m_Ctx.AirMoveSpeed;
+
+	float minSpeed = m_Ctx.AirMoveSpeed * m_Ctx.AirMinSpeedFactor;
+	if (minSpeed > 0.0f)
+	{
+		Vector3 minDir = vec.Normalize();
+		VelocityVec.x = minDir.x * minSpeed;
+		VelocityVec.z = minDir.z * minSpeed;
+	}
 }
 
 
@@ -147,11 +165,8 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 	// 電線上の位置パラメータtを設定（0.0f ~ 1.0fの範囲にクランプ）
 	m_LineParam = std::clamp(toPlayerVec.Dot(lineVec) / lineLength, 0.0f, 1.0f);
 
-	// 速度ベクトルの長さを取得
-	float velocityLength = vec.Length();
-
 	// 電線上速度を設定
-	m_Ctx.LineMoveSpeed = velocityLength >= m_Ctx.LineMoveSpeedMin ? velocityLength : m_Ctx.LineMoveSpeedMin;
+	m_LineMoveSpeed = std::max(m_Ctx.LineMoveSpeed, m_Ctx.LineMoveSpeedMin);
 }
 
 void PlayerMovement::Turn(float inputX, float inputZ)
@@ -184,6 +199,10 @@ void PlayerMovement::Turn(float inputX, float inputZ)
 
 void PlayerMovement::LineMove()
 {
+	float deltaTime = (float)Time::DeltaTime();
+	if (deltaTime <= 0.0f)
+		return;
+
 	// 次の電柱に到達したか判定
 	if (m_LineParam >= 1.0f)
 	{
@@ -199,18 +218,17 @@ void PlayerMovement::LineMove()
 
 	// tを進める
 	float lineLength = m_PoleManager->GetPowerLineLength(m_LineID);
-	m_LineParam += (m_Ctx.LineMoveSpeed / lineLength);
+	if (lineLength <= 0.0f)
+		return;
+	m_LineParam += (m_LineMoveSpeed * deltaTime / lineLength);
 
 	// 電線上の位置を取得
 	Vector3 newPos;
 	newPos = m_PoleManager->GetPositionOnPowerLine(m_StartPole, m_DestPole, m_LineParam);
 
-	// 速度ベクトルを計算
-	Vector3 currentPos = gameObject().transform().position();
-	Vector3 velocityVec = newPos - currentPos;
-
-	// 速度ベクトルを設定
-	VelocityVec = velocityVec;
+	// 位置を直接更新してガタつきを抑える
+	gameObject().transform().position() = newPos;
+	VelocityVec = { 0.0f, 0.0f, 0.0f };
 }
 
 void PlayerMovement::Eject(float inputX, float inputZ)

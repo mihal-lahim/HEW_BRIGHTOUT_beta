@@ -10,6 +10,8 @@
 #include "Camera.h"
 #include "Texture.h"
 #include "GameObject.h"
+#include <string>
+#include <vector>
 
 class PlayerPrefab : public Prefab
 {
@@ -36,9 +38,27 @@ public:
 		player->inputHandler = gameObject.AddComponent<InputHandler>(&gameObject.input().gamePad(), commandSet);
 
 		// モデル設定
-		ModelPrefab modelPrefab{ "model/cube.glb" };
-		GameObject* modelObject = gameObject.Instantiate(modelPrefab);
-		gameObject.SetChild(*modelObject);
+		std::vector<std::string> walkModelPaths =
+		{
+			"model/run_hidari.fbx",
+			"model/run_migi.fbx"
+		};
+		GameObject* modelRoot = gameObject.CreateGameObject();
+		gameObject.SetChild(*modelRoot);
+		player->modelObject = modelRoot;
+		player->walkModelObjects.clear();
+		player->walkModelObjects.reserve(walkModelPaths.size());
+		player->walkAnimationInterval = 0.1f;
+		for (size_t i = 0; i < walkModelPaths.size(); ++i)
+		{
+			ModelPrefab modelPrefab{ walkModelPaths[i] };
+			GameObject* modelObject = modelRoot->Instantiate(modelPrefab);
+			modelRoot->SetChild(*modelObject);
+			modelObject->SetActive(i == 0);
+			player->walkModelObjects.push_back(modelObject);
+		}
+		modelRoot->transform().scale() = Vector3(0.01f, 0.01f, 0.01f);
+		modelRoot->transform().rotation() = Quaternion::SetEulerY(180.0f);
 
 		// Healthコンポーネント設定
 		gameObject.AddComponent<Health>(100.0f);
@@ -60,6 +80,9 @@ public:
 		shapeDesc.Radius = 0.5f;
 		shapeDesc.Height = 1.0f;
 		gameObject.AddComponent<ColliderShape>(shapeDesc);
+
+		// モデルの足元を地面に合わせる
+		modelRoot->transform().position().y = -(shapeDesc.Radius + (shapeDesc.Height * 0.5f));
 
 
 		// PhysicsBody設定

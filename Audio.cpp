@@ -9,7 +9,6 @@
 
 #pragma comment(lib, "winmm.lib")
 
-
 static IXAudio2* g_Xaudio{};
 static IXAudio2MasteringVoice* g_MasteringVoice{};
 
@@ -22,7 +21,6 @@ void InitAudio()
 	// マスタリングボイス生成
 	g_Xaudio->CreateMasteringVoice(&g_MasteringVoice);
 }
-
 
 void UninitAudio()
 {

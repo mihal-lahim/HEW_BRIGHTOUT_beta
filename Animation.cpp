@@ -241,9 +241,9 @@ void Animator::ComputeSkinPose()
 {
 	for (int i = 0; i < m_skeleton->bones.size(); ++i)
 	{
-		// スキン行列 = 補正行列 * グローバル行列
+		// スキン行列 = オフセット行列 * グローバル行列
 		XMMATRIX offsetMatrix = m_skeleton->bones[i].offsetMatrix;
 		XMMATRIX globalMatrix = m_currentPose.globalMatrixes[i];
-		m_currentPose.skinMatrixes[i] = XMMatrixTranspose(globalMatrix * offsetMatrix);
+		m_currentPose.skinMatrixes[i] = XMMatrixTranspose(offsetMatrix * globalMatrix);
 	}
 }
