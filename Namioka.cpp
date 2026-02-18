@@ -1,4 +1,4 @@
-#include "Namioka.h"
+﻿#include "Namioka.h"
 #include "PlayerPrefab.h"
 #include "EnemyPrefab.h"
 #include "GameObject.h"
@@ -953,19 +953,22 @@ void Namioka::Initialize()
 
 	};
 
-	for (const auto& data : spedentyuList)
+	// SpecialPole
 	std::vector<PoleID> specialPoleIDs;
-	specialPoleIDs.reserve(spedentyuPositions.size());
-	for (const auto& pos : spedentyuPositions)
+	specialPoleIDs.reserve(spedentyuList.size());
 
+	for (const auto& data : spedentyuList)
 	{
 		GameObject* spedentyuu = Instantiate(spedentyuPrefab);
+
 		spedentyuu->AddComponent<SpecialDentyuu>();
 		auto* pole = spedentyuu->AddComponent<Pole>();
+
 		specialPoleIDs.push_back(poleManager->RegisterPole(pole));
 
 		spedentyuu->transform().scale() = { 0.2f, 0.2f, 0.2f };
 		spedentyuu->transform().position() = data.position;
+
 		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
 			0.0f,
 			XMConvertToRadians(data.yRotation),
