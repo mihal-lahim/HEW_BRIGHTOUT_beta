@@ -343,6 +343,10 @@
     <ClCompile Include="TitleController.cpp">
       <Filter>SorceFile</Filter>
     </ClCompile>
+    <ClCompile Include="EventSystem.cpp">
+      <Filter>SorceFile</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerAudio.cpp">
     <ClCompile Include="SpecialDensen.cpp">
       <Filter>SorceFile</Filter>
     </ClCompile>
@@ -642,6 +646,10 @@
     <ClInclude Include="TitleController.h">
       <Filter>HeaderFile</Filter>
     </ClInclude>
+    <ClInclude Include="EventSystem.h">
+      <Filter>HeaderFile</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerAudio.h">
     <ClInclude Include="Enemy.h">
       <Filter>HeaderFile</Filter>
     </ClInclude>

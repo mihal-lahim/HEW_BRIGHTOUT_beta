@@ -44,6 +44,7 @@ static AUDIO g_Audio[AUDIO_MAX]{};
 
 int LoadAudio(const char* FileName)
 {
+	assert(g_Xaudio);
 	int index = -1;
 
 	for (int i = 0; i < AUDIO_MAX; i++)
@@ -160,5 +161,20 @@ void PlayAudio(int Index, bool Loop)
 
 }
 
+void StopAudio(int Index)
+{
+	if (g_Audio[Index].SourceVoice)
+	{
+		g_Audio[Index].SourceVoice->Stop();
+		g_Audio[Index].SourceVoice->FlushSourceBuffers();
+	}
+}
 
+void SetAudioVolume(int Index, float volume)
+{
+	if (g_Audio[Index].SourceVoice)
+	{
+		g_Audio[Index].SourceVoice->SetVolume(volume);
+	}
+}
 

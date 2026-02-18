@@ -39,6 +39,7 @@ struct PlayerMoveCtx
 
 	// 重力加速度
 	float Gravity = -30.0f;
+
 };
 
 
@@ -125,10 +126,11 @@ private:
 	// 最後の入力方向
 	Vector3 m_LastInputDir{};
 
-
-
 	// 入力方向を保存
 	Vector3 SetInputDir(float inputX, float inputZ);
+
+	//歩いているかどうか
+	bool m_IsMoving = false;
 };
 
 // 入力方向をワールド座標系に変換する関数

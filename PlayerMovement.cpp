@@ -5,18 +5,18 @@
 #include <algorithm>
 #include "Camera.h"
 #include "Ray.h"
+#include "EventSystem.h"
 #include "Time.h"
-
 
 Vector3 PlayerMovement::SetInputDir(float inputX, float inputZ)
 {
-	// “ü—Í•ûŒüƒxƒNƒgƒ‹‚ğì¬
+	// å…¥åŠ›æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’ä½œæˆ
 	Vector3 inputVec{ inputX, 0.0f, inputZ };
 
-	// “ü—Í•ûŒü‚ğƒJƒƒ‰‚ÌŒü‚«‚É‡‚í‚¹‚Ä•ÏŠ·
+	// å…¥åŠ›æ–¹å‘ã‚’ã‚«ãƒ¡ãƒ©ã®å‘ãã«åˆã‚ã›ã¦å¤‰æ›
 	Vector3 convertedVec = ConvertToWorldFromInput(inputVec, m_Camera);
 
-	// ÅŒã‚Ì“ü—Í•ûŒü‚ğ•Û‘¶
+	// æœ€å¾Œã®å…¥åŠ›æ–¹å‘ã‚’ä¿å­˜
 	m_LastInputDir = convertedVec;
 
 	return convertedVec;
@@ -32,14 +32,14 @@ bool PlayerMovement::IsOnGround() const
 
 void PlayerMovement::UpdateRayCast()
 {
-	// ƒŒƒC‚Ìn“_‚ğİ’è
+	// ãƒ¬ã‚¤ã®å§‹ç‚¹ã‚’è¨­å®š
 	Vector3 from = gameObject().transform().position();
 	from.y -= m_Ctx.RayCastOffset;
 
-	// ƒŒƒC‚Ìì¬
+	// ãƒ¬ã‚¤ã®ä½œæˆ
 	m_GroundRay = Ray(from, { 0.0f, -1.0f, 0.0f });
 
-	// ƒŒƒCƒLƒƒƒXƒgÀs
+	// ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆå®Ÿè¡Œ
 	physics().RayCast(m_GroundRay, m_Ctx.RayLength);
 }
 
@@ -50,12 +50,25 @@ void PlayerMovement::ApplyGravity()
 
 void PlayerMovement::GroundMove(float inputX, float inputZ, float speed)
 {
-	// “ü—Í•ûŒüƒxƒNƒgƒ‹‚ğì¬
+	// å…¥åŠ›æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’ä½œæˆ
 	Vector3 vec = ConvertToXZPlane(SetInputDir(inputX, inputZ));
 
-	// ˆÚ“®•ûŒü‚ªƒ[ƒƒxƒNƒgƒ‹‚Å‚È‚¯‚ê‚ÎˆÚ“®ƒxƒNƒgƒ‹‚ğXV
+	bool nowMoving = !vec.IsZero() && IsOnGround();
+
+	if (nowMoving && !m_IsMoving)
+	{
+		EventSystem::Send("Player_MoveStart");
+		m_IsMoving = true;
+	}
+	else if (!nowMoving && m_IsMoving)
+	{
+		EventSystem::Send("Player_MoveStop");
+		m_IsMoving = false;
+	}
+
+	// ç§»å‹•æ–¹å‘ãŒã‚¼ãƒ­ãƒ™ã‚¯ãƒˆãƒ«ã§ãªã‘ã‚Œã°ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ›´æ–°
 	if (!vec.IsZero())
-		// V‚µ‚¢ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰ÁZ
+		// æ–°ã—ã„ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã‚’åŠ ç®—
 		MoveVec += vec * speed;
 }
 
@@ -89,110 +102,112 @@ void PlayerMovement::AirMove(float inputX, float inputZ)
 
 void PlayerMovement::Jump(float inputX, float inputZ, float force)
 {
-	// “ü—Í•ûŒüƒxƒNƒgƒ‹‚ğì¬
+	// å…¥åŠ›æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’ä½œæˆ
 	Vector3 inputDir = ConvertToXZPlane(SetInputDir(inputX, inputZ));
 
 	ImpulseVec += inputDir * force + Vector3{ 0.0f, force, 0.0f };
+
+	EventSystem::Send("Player_Jump");
 }
 
 void PlayerMovement::GroundJump(float inputX, float inputZ)
 {
-	// ƒWƒƒƒ“ƒvˆ—‚ğŒÄ‚Ño‚µ
+	// ã‚¸ãƒ£ãƒ³ãƒ—å‡¦ç†ã‚’å‘¼ã³å‡ºã—
 	Jump(inputX, inputZ, m_Ctx.JumpForce);
 }
 
 void PlayerMovement::ElectricJump(float inputX, float inputZ)
 {
-	// ƒWƒƒƒ“ƒvˆ—‚ğŒÄ‚Ño‚µ
+	// ã‚¸ãƒ£ãƒ³ãƒ—å‡¦ç†ã‚’å‘¼ã³å‡ºã—
 	Jump(inputX, inputZ, m_Ctx.ElectricJumpForce);
 }
 
 void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 {
-	// “dü‚ğæ“¾
+	// é›»ç·šã‚’å–å¾—
 	PowerLine* powerLine = m_PoleManager->GetPowerLine(lineID);
 
-	// “düƒxƒNƒgƒ‹‚ğæ“¾
+	// é›»ç·šãƒ™ã‚¯ãƒˆãƒ«ã‚’å–å¾—
 	Vector3 lineVec = powerLine->GetLineVector();
 
-	// Œ»İ‚Ì‘¬“xƒxƒNƒgƒ‹‚ğæ“¾
+	// ç¾åœ¨ã®é€Ÿåº¦ãƒ™ã‚¯ãƒˆãƒ«ã‚’å–å¾—
 	Vector3 vec = VelocityVec;
 
-	// ‘¬“xƒxƒNƒgƒ‹‚ªƒ[ƒƒxƒNƒgƒ‹‚Ìê‡
+	// é€Ÿåº¦ãƒ™ã‚¯ãƒˆãƒ«ãŒã‚¼ãƒ­ãƒ™ã‚¯ãƒˆãƒ«ã®å ´åˆ
 	if (vec.IsZero())
 	{
-		// ˆÚ“®ƒxƒNƒgƒ‹‚ğg—p
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã‚’ä½¿ç”¨
 		vec = MoveVec;
 
-		// ˆÚ“®ƒxƒNƒgƒ‹‚àƒ[ƒƒxƒNƒgƒ‹‚Ìê‡
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã‚‚ã‚¼ãƒ­ãƒ™ã‚¯ãƒˆãƒ«ã®å ´åˆ
 		if (MoveVec.IsZero())
 		{
-			// ƒJƒƒ‰•ûŒü‚ğİ’è
+			// ã‚«ãƒ¡ãƒ©æ–¹å‘ã‚’è¨­å®š
 			vec = ConvertToWorldFromInput({ 0.0f, 0.0f, 1.0f }, m_Camera);
 		}
 	}
 
 
-	// ‘¬“xƒxƒNƒgƒ‹‚Æ“düƒxƒNƒgƒ‹‚Ì“àÏ‚ğŒvZ
+	// é€Ÿåº¦ãƒ™ã‚¯ãƒˆãƒ«ã¨é›»ç·šãƒ™ã‚¯ãƒˆãƒ«ã®å†…ç©ã‚’è¨ˆç®—
 	float dot = lineVec.Normalize().Dot(vec.Normalize());
 
-	// “àÏ‚Ì•„†‚ÉŠî‚Ã‚¢‚ÄŠJn“d’Œ‚Æ–Ú“I’n“d’Œ‚ğİ’è
+	// å†…ç©ã®ç¬¦å·ã«åŸºã¥ã„ã¦é–‹å§‹é›»æŸ±ã¨ç›®çš„åœ°é›»æŸ±ã‚’è¨­å®š
 	m_StartPole = dot >= 0.0f ? powerLine->GetPoles().first : powerLine->GetPoles().second;
 	m_DestPole = dot >= 0.0f ? powerLine->GetPoles().second : powerLine->GetPoles().first;
 
-	// “düID‚ğİ’è
+	// é›»ç·šIDã‚’è¨­å®š
 	m_LineID = lineID;
 
 
-	// “düƒxƒNƒgƒ‹‚Ì”¼•ª‚Ì’·‚³‚ğæ“¾
+	// é›»ç·šãƒ™ã‚¯ãƒˆãƒ«ã®åŠåˆ†ã®é•·ã•ã‚’å–å¾—
 	Vector3 halfVec = lineVec * 0.5f;
 
-	// “dü‚Ì’†‰›ˆÊ’u‚ğæ“¾
+	// é›»ç·šã®ä¸­å¤®ä½ç½®ã‚’å–å¾—
 	Vector3 lineMidPos = powerLine->gameObject().transform().position();
 
-	// ŠJnˆÊ’u‚ğİ’èi“àÏ‚Ì•„†‚ÉŠî‚Ã‚­j
+	// é–‹å§‹ä½ç½®ã‚’è¨­å®šï¼ˆå†…ç©ã®ç¬¦å·ã«åŸºã¥ãï¼‰
 	Vector3 startPos = dot >= 0.0f ? lineMidPos - halfVec : lineMidPos + halfVec;
 
-	// ƒvƒŒƒCƒ„[‚ÌŒ»İˆÊ’u‚ğæ“¾
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç¾åœ¨ä½ç½®ã‚’å–å¾—
 	Vector3 playerPos = gameObject().transform().position();
 
-	// ŠJnˆÊ’u‚©‚çƒvƒŒƒCƒ„[ˆÊ’u‚Ö‚ÌƒxƒNƒgƒ‹‚ğæ“¾
+	// é–‹å§‹ä½ç½®ã‹ã‚‰ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ä½ç½®ã¸ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’å–å¾—
 	Vector3 toPlayerVec = playerPos - startPos;
 	
-	// “düƒxƒNƒgƒ‹‚Ì’·‚³‚ğæ“¾
+	// é›»ç·šãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’å–å¾—
 	float lineLength = powerLine->GetLength();
 
-	// “düã‚ÌˆÊ’uƒpƒ‰ƒ[ƒ^t‚ğİ’èi0.0f ~ 1.0f‚Ì”ÍˆÍ‚ÉƒNƒ‰ƒ“ƒvj
+	// é›»ç·šä¸Šã®ä½ç½®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿tã‚’è¨­å®šï¼ˆ0.0f ~ 1.0fã®ç¯„å›²ã«ã‚¯ãƒ©ãƒ³ãƒ—ï¼‰
 	m_LineParam = std::clamp(toPlayerVec.Dot(lineVec) / lineLength, 0.0f, 1.0f);
 
-	// “düã‘¬“x‚ğİ’è
+	// é›»ç·šä¸Šé€Ÿåº¦ã‚’è¨­å®š
 	m_LineMoveSpeed = std::max(m_Ctx.LineMoveSpeed, m_Ctx.LineMoveSpeedMin);
 }
 
 void PlayerMovement::Turn(float inputX, float inputZ)
 {
-	// Œ»İ‚Ì“dü‚ğæ“¾
+	// ç¾åœ¨ã®é›»ç·šã‚’å–å¾—
 	PowerLine* powerLine = m_PoleManager->GetPowerLine(m_LineID);
 
-	// Ú‘±‚³‚ê‚Ä‚¢‚é“d’ŒIDƒyƒA‚ğæ“¾
+	// æ¥ç¶šã•ã‚Œã¦ã„ã‚‹é›»æŸ±IDãƒšã‚¢ã‚’å–å¾—
 	std::pair<PoleID, PoleID> poles = powerLine->GetPoles();
 
-	// “düƒxƒNƒgƒ‹‚ğæ“¾
+	// é›»ç·šãƒ™ã‚¯ãƒˆãƒ«ã‚’å–å¾—
 	Vector3 lineVec = m_StartPole == poles.first ? powerLine->GetLineVector() : powerLine->GetLineVector() * -1.0f;
 
-	// “ü—Í•ûŒüƒxƒNƒgƒ‹‚ğì¬
+	// å…¥åŠ›æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’ä½œæˆ
 	Vector3 vec = SetInputDir(inputX, inputZ);
 
-	// “düƒxƒNƒgƒ‹‚Æ“ü—Í•ûŒüƒxƒNƒgƒ‹‚Ì“àÏ‚ğŒvZ
+	// é›»ç·šãƒ™ã‚¯ãƒˆãƒ«ã¨å…¥åŠ›æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã®å†…ç©ã‚’è¨ˆç®—
 	float dot = lineVec.Normalize().Dot(vec.Normalize());
 
-	// “àÏ‚ª•‰‚Ìê‡A•ûŒü‚ğ”½“]
+	// å†…ç©ãŒè² ã®å ´åˆã€æ–¹å‘ã‚’åè»¢
 	if (dot < 0.0f)
 	{
-		// –Ú“I’n‚ÆŠJn’n“_‚ğ“ü‚ê‘Ö‚¦
+		// ç›®çš„åœ°ã¨é–‹å§‹åœ°ç‚¹ã‚’å…¥ã‚Œæ›¿ãˆ
 		std::swap(m_StartPole, m_DestPole);
 
-		// ƒpƒ‰ƒ[ƒ^t‚ğ”½“]
+		// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿tã‚’åè»¢
 		m_LineParam = 1.0f - m_LineParam;
 	}
 }
@@ -203,77 +218,77 @@ void PlayerMovement::LineMove()
 	if (deltaTime <= 0.0f)
 		return;
 
-	// Ÿ‚Ì“d’Œ‚É“’B‚µ‚½‚©”»’è
+	// æ¬¡ã®é›»æŸ±ã«åˆ°é”ã—ãŸã‹åˆ¤å®š
 	if (m_LineParam >= 1.0f)
 	{
-		// “’B‚µ‚½‚ç–Ú“I’n‚Ì“d’Œ‚ğŠJn“d’Œ‚Éİ’è
+		// åˆ°é”ã—ãŸã‚‰ç›®çš„åœ°ã®é›»æŸ±ã‚’é–‹å§‹é›»æŸ±ã«è¨­å®š
 		m_StartPole = m_DestPole;
-		// Ÿ‚Ì–Ú“I’n‚Ì“d’Œ‚ğæ“¾
+		// æ¬¡ã®ç›®çš„åœ°ã®é›»æŸ±ã‚’å–å¾—
 		m_DestPole = m_PoleManager->GetDirectionalPole(m_StartPole, m_LastInputDir);
-		// t‚ğƒŠƒZƒbƒg
+		// tã‚’ãƒªã‚»ãƒƒãƒˆ
 		m_LineParam = 0.0f;
-		// V‚µ‚¢“düID‚ğæ“¾
+		// æ–°ã—ã„é›»ç·šIDã‚’å–å¾—
 		m_LineID = m_PoleManager->GetPowerLineID(m_StartPole, m_DestPole);
 	}
 
-	// t‚ği‚ß‚é
+	// tã‚’é€²ã‚ã‚‹
 	float lineLength = m_PoleManager->GetPowerLineLength(m_LineID);
 	if (lineLength <= 0.0f)
 		return;
 	m_LineParam += (m_LineMoveSpeed * deltaTime / lineLength);
 
-	// “düã‚ÌˆÊ’u‚ğæ“¾
+	// é›»ç·šä¸Šã®ä½ç½®ã‚’å–å¾—
 	Vector3 newPos;
 	newPos = m_PoleManager->GetPositionOnPowerLine(m_StartPole, m_DestPole, m_LineParam);
 
-	// ˆÊ’u‚ğ’¼ÚXV‚µ‚ÄƒKƒ^‚Â‚«‚ğ—}‚¦‚é
+	// ä½ç½®ã‚’ç›´æ¥æ›´æ–°ã—ã¦ã‚¬ã‚¿ã¤ãã‚’æŠ‘ãˆã‚‹
 	gameObject().transform().position() = newPos;
 	VelocityVec = { 0.0f, 0.0f, 0.0f };
 }
 
 void PlayerMovement::Eject(float inputX, float inputZ)
 {
-	// “düã‚©‚ç‚ÌËoˆ—
+	// é›»ç·šä¸Šã‹ã‚‰ã®å°„å‡ºå‡¦ç†
 	ElectricJump(inputX, inputZ);
 }
 
 void PlayerMovement::PostUpdate()
 {
-	// ƒŒƒCƒLƒƒƒXƒg‚ÌXV
+	// ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆã®æ›´æ–°
 	UpdateRayCast();
-	// Šî’êƒNƒ‰ƒX‚ÌXVˆ—‚ğŒÄ‚Ño‚µ
+	// åŸºåº•ã‚¯ãƒ©ã‚¹ã®æ›´æ–°å‡¦ç†ã‚’å‘¼ã³å‡ºã—
 	Movement::PostUpdate();
 }
 
 
 Vector3 ConvertToWorldFromInput(const Vector3& inputDir, const Camera* camera)
 {
-	// “ü—Í•ûŒüƒxƒNƒgƒ‹‚ğ‰ñ“]‚³‚¹‚Äƒ[ƒ‹ƒhÀ•WŒn‚É•ÏŠ·
+	// å…¥åŠ›æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’å›è»¢ã•ã›ã¦ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ç³»ã«å¤‰æ›
 	return inputDir.Rotate(camera->gameObject().transform().rotation());
 }
 
 Vector3 ConvertToXZPlane(const Vector3& worldDir)
 {
-	// ƒ[ƒƒxƒNƒgƒ‹‚Ìê‡‚Í‚»‚Ì‚Ü‚Ü•Ô‚·
+	// ã‚¼ãƒ­ãƒ™ã‚¯ãƒˆãƒ«ã®å ´åˆã¯ãã®ã¾ã¾è¿”ã™
 	if (worldDir.IsZero())
 		return Vector3(0.0f, 0.0f, 0.0f);
 
 
-	// Œ³‚ÌƒxƒNƒgƒ‹‚Ì’·‚³‚ğ•Û‘¶
+	// å…ƒã®ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’ä¿å­˜
 	float originalLength = worldDir.Length();
 	
 
-	// Y¬•ª‚ğ0‚É‚µ‚ÄXZ•½–Ê‚É“Š‰e
+	// Yæˆåˆ†ã‚’0ã«ã—ã¦XZå¹³é¢ã«æŠ•å½±
 	Vector3 xzDir = worldDir;
 	xzDir.y = 0.0f;
 	
 
-	// XZ¬•ª‚ªƒ[ƒ‚Ìê‡iY²‚É•½s‚Èê‡j‚Íƒ[ƒƒxƒNƒgƒ‹‚ğ•Ô‚·
+	// XZæˆåˆ†ãŒã‚¼ãƒ­ã®å ´åˆï¼ˆYè»¸ã«å¹³è¡Œãªå ´åˆï¼‰ã¯ã‚¼ãƒ­ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã™
 	if (xzDir.IsZero())
 		return Vector3(0.0f, 0.0f, 0.0f);
 
 
 
-	// Œ³‚Ì’·‚³‚ğ•Û‚µ‚½‚Ü‚ÜXZ•½–Êã‚É“Š‰e
+	// å…ƒã®é•·ã•ã‚’ä¿æŒã—ãŸã¾ã¾XZå¹³é¢ä¸Šã«æŠ•å½±
 	return xzDir.Normalize() * originalLength;
 }
