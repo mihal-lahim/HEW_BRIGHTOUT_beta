@@ -22,6 +22,8 @@ void Title::Initialize()
 
 	 //BGM再生（ループ）
 	PlayAudio(g_TitleBgm, true);
+
+	SetAudioVolume(g_TitleBgm, 0.0f);
 }
 
 void Title::Finalize()

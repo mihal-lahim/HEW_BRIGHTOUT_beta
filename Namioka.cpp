@@ -21,6 +21,9 @@ void Namioka::Initialize()
 	// BGM再生（ループ）
 	PlayAudio(g_GameBgm, true);
 
+	SetAudioVolume(g_GameBgm, 0.0f);
+
+
 	//Player
 	PlayerPrefab playerPrefab{};
 	Instantiate(playerPrefab)->transform().position() += Vector3(0.0f, 0.0f, 10.0f);
