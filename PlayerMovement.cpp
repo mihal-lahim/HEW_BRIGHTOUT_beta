@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "Camera.h"
 #include "Ray.h"
+#include "EventSystem.h"
 
 
 Vector3 PlayerMovement::SetInputDir(float inputX, float inputZ)
@@ -52,6 +53,19 @@ void PlayerMovement::GroundMove(float inputX, float inputZ, float speed)
 	// 入力方向ベクトルを作成
 	Vector3 vec = ConvertToXZPlane(SetInputDir(inputX, inputZ));
 
+	bool nowMoving = !vec.IsZero() && IsOnGround();
+
+	if (nowMoving && !m_IsMoving)
+	{
+		EventSystem::Send("Player_MoveStart");
+		m_IsMoving = true;
+	}
+	else if (!nowMoving && m_IsMoving)
+	{
+		EventSystem::Send("Player_MoveStop");
+		m_IsMoving = false;
+	}
+
 	// 移動方向がゼロベクトルでなければ移動ベクトルを更新
 	if (!vec.IsZero())
 		// 新しい移動ベクトルを加算
@@ -75,6 +89,8 @@ void PlayerMovement::Jump(float inputX, float inputZ, float force)
 	Vector3 inputDir = ConvertToXZPlane(SetInputDir(inputX, inputZ));
 
 	ImpulseVec += inputDir * force + Vector3{ 0.0f, force, 0.0f };
+
+	EventSystem::Send("Player_Jump");
 }
 
 void PlayerMovement::GroundJump(float inputX, float inputZ)

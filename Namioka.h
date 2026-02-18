@@ -7,5 +7,6 @@ class Namioka : public Scene
 {
 public:
 	void Initialize() override;
+	void Finalize() override;
 };
 #endif

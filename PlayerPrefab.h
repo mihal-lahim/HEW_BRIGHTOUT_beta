@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "Texture.h"
 #include "GameObject.h"
+#include "PlayerAudio.h"
 
 class PlayerPrefab : public Prefab
 {
@@ -49,6 +50,9 @@ public:
 
 		// PlayerMovementコンポーネント設定
 		player->movement = gameObject.AddComponent<PlayerMovement>(cam);
+
+		// PlayerAudio 追加
+		gameObject.AddComponent<PlayerAudio>();
 
 		// PlayerMorphSystemコンポーネント設定
 		player->morphSystem = gameObject.AddComponent<PlayerMorphSystem>();

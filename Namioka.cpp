@@ -5,28 +5,42 @@
 #include "Texture.h"
 #include "PowerPlant.h"
 #include "GameClearChecker.h"
+#include "audio.h"
 
-	using namespace DirectX;
+using namespace DirectX;
+
+static int g_GameBgm{};
 
 void Namioka::Initialize()
 {
+	// „Ç™„Éº„Éá„Ç£„Ç™ÂàùÊúüÂåñ
+	InitAudio();
+
+	g_GameBgm = LoadAudio("sound/GameBGM_01.wav");
+
+	// BGMÂÜçÁîüÔºà„É´„Éº„ÉóÔºâ
+	PlayAudio(g_GameBgm, true);
+
+	SetAudioVolume(g_GameBgm, 0.0f);
+
+
 	//Player
 	PlayerPrefab playerPrefab{};
 	Instantiate(playerPrefab)->transform().position() += Vector3(0.0f, 0.0f, 10.0f);
-
+  
 	//Road
 	ModelPrefab roadPrefab{ "model/intersection.glb" };
 	std::vector<Vector3> roadPositions =
 	{
-		{    0.0f, 0.0f,    0.0f},   //á@
-		{    0.0f, 0.0f,  -60.0f},   //áA
-		{  -60.0f, 0.0f,  -60.0f},   //áB
-		{  -60.0f, 0.0f, -120.0f},   //áC
-		{    0.0f, 0.0f, -120.0f},   //áD
-		{ -120.0f, 0.0f, -120.0f},   //áE
-		{ -120.0f, 0.0f, -180.0f},   //áF
-		{ -120.0f, 0.0f, -240.0f},   //áG
-		{ -180.0f, 0.0f, -240.0f},   //áH
+		{    0.0f, 0.0f,    0.0f},   //‚ë†
+		{    0.0f, 0.0f,  -60.0f},   //‚ë°
+		{  -60.0f, 0.0f,  -60.0f},   //‚ë¢
+		{  -60.0f, 0.0f, -120.0f},   //‚ë£
+		{    0.0f, 0.0f, -120.0f},   //‚ë§
+		{ -120.0f, 0.0f, -120.0f},   //‚ë•
+		{ -120.0f, 0.0f, -180.0f},   //‚ë¶
+		{ -120.0f, 0.0f, -240.0f},   //‚ëß
+		{ -180.0f, 0.0f, -240.0f},   //‚ë®
 	};
 	for (const auto& pos : roadPositions)
 	{
@@ -50,60 +64,60 @@ void Namioka::Initialize()
 	struct HouseData
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab housePrefab{ "model/house.glb" };
 	std::vector<HouseData> houseList =
 	{
-		//á@
+		//‚ë†
 		{ {  -6.0f, 0.0f,  -6.0f },   0.0f },
 		{ { -18.0f, 0.0f,  -6.0f },	  0.0f },
 		{ {  -6.0f, 0.0f, -18.0f },	  0.0f },
 		{ { -18.0f, 0.0f, -18.0f },	  0.0f },
 								
-		//áA					
+		//‚ë°					
 		{ {  -6.0f, 0.0f, -66.0f },	  0.0f },
 		{ { -18.0f, 0.0f, -66.0f },	  0.0f },
 		{ {  -6.0f, 0.0f, -78.0f },	  0.0f },
 		{ { -18.0f, 0.0f, -78.0f },	  0.0f },
 		 					
-		//áB						
+		//‚ë¢						
 		{ { -66.0f, 0.0f, -66.0f },	  0.0f },
 		{ { -78.0f, 0.0f, -66.0f },	  0.0f },
 		{ { -66.0f, 0.0f, -78.0f },	  0.0f },
 		{ { -78.0f, 0.0f, -78.0f },	  0.0f },
 							
-		//áC						
+		//‚ë£						
 		{ { -66.0f, 0.0f, -126.0f },  0.0f },
 		{ { -78.0f, 0.0f, -126.0f },  0.0f },
 		{ { -66.0f, 0.0f, -138.0f },  0.0f },
 		{ { -78.0f, 0.0f, -138.0f },  0.0f },
 		 						
-		//áD						
+		//‚ë§						
 		{ {  -6.0f, 0.0f, -126.0f },  0.0f },
 		{ { -18.0f, 0.0f, -126.0f },  0.0f },
 		{ {  -6.0f, 0.0f, -138.0f },  0.0f },
 		{ { -18.0f, 0.0f, -138.0f },  0.0f },
 		 							
-		//áE						
+		//‚ë•						
 		{ { -126.0f, 0.0f, -126.0f }, 0.0f },
 		{ { -138.0f, 0.0f, -126.0f }, 0.0f },
 		{ { -126.0f, 0.0f, -138.0f }, 0.0f },
 		{ { -138.0f, 0.0f, -138.0f }, 0.0f },
 								
-		//áF						
+		//‚ë¶						
 		{ { -126.0f, 0.0f, -186.0f }, 0.0f },
 		{ { -138.0f, 0.0f, -186.0f }, 0.0f },
 		{ { -126.0f, 0.0f, -198.0f }, 0.0f },
 		{ { -138.0f, 0.0f, -198.0f }, 0.0f },
 		 						
-		//áG						
+		//‚ëß						
 		{ { -126.0f, 0.0f, -246.0f }, 0.0f },
 		{ { -138.0f, 0.0f, -246.0f }, 0.0f },
 		{ { -126.0f, 0.0f, -258.0f }, 0.0f },
 		{ { -138.0f, 0.0f, -258.0f }, 0.0f },
 		 							
-		//áH							
+		//‚ë®							
 		{ { -186.0f, 0.0f, -246.0f }, 0.0f },
 		{ { -198.0f, 0.0f, -246.0f }, 0.0f },
 		{ { -186.0f, 0.0f, -258.0f }, 0.0f },
@@ -139,44 +153,44 @@ void Namioka::Initialize()
 	struct ConvenienceData
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab conveniencePrefab{ "model/convenience.glb" };
 	std::vector<ConvenienceData> convenienceList =
 	{
-		//á@
+		//‚ë†
 		{ { 6.0f, 0.0f,   6.0f },     0.0f },
 		{ { 6.0f, 0.0f, -16.0f },	  0.0f },
 	 							
-		//áA						
+		//‚ë°						
 		{ { 6.0f, 0.0f, -54.0f },	  0.0f },
 		{ { 6.0f, 0.0f, -76.0f },	  0.0f },
 	 								
-		//áB						
+		//‚ë¢						
 		{ { -54.0f, 0.0f, -54.0f },	  0.0f },
 		{ { -54.0f, 0.0f, -76.0f },	  0.0f },
 								
-		//áC						
+		//‚ë£						
 		{ { -54.0f, 0.0f, -114.0f },  0.0f },
 		{ { -54.0f, 0.0f, -136.0f },  0.0f },
 								
-		//áD							
+		//‚ë§							
 		{ { 6.0f, 0.0f, -114.0f },	  0.0f },
 		{ { 6.0f, 0.0f, -136.0f },	  0.0f },
 									
-		//áE						
+		//‚ë•						
 		{ { -114.0f, 0.0f, -114.0f }, 0.0f },
 		{ { -114.0f, 0.0f, -136.0f }, 0.0f },
 		 						
-		//áF						
+		//‚ë¶						
 		{ { -114.0f, 0.0f, -174.0f }, 0.0f },
 		{ { -114.0f, 0.0f, -196.0f }, 0.0f },
 									
-		//áG							
+		//‚ëß							
 		{ { -114.0f, 0.0f, -234.0f }, 0.0f },
 		{ { -114.0f, 0.0f, -256.0f }, 0.0f },
 		 							
-		//áH						
+		//‚ë®						
 		{ { -174.0f, 0.0f, -234.0f }, 0.0f },
 		{ { -174.0f, 0.0f, -256.0f }, 0.0f },
 	};
@@ -209,52 +223,52 @@ void Namioka::Initialize()
 	struct Mansion01Data
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab mansion01Prefab{ "model/mansion01.glb" };
 	std::vector<Mansion01Data> mansion01List =
 	{
-		//á@
+		//‚ë†
 		{ {  -8.0f, 0.0f, 18.0f },    0.0f },
 		{ { -16.0f, 0.0f,  8.0f },	  0.0f },
 		{ {   6.0f, 0.0f, -6.0f },	  0.0f },
 		 						
-		//áA						
+		//‚ë°						
 		{ {  -8.0f, 0.0f, -42.0f },	  0.0f },
 		{ { -16.0f, 0.0f, -52.0f },	  0.0f },
 		{ {   6.0f, 0.0f, -66.0f },	  0.0f },
 		 						
-		//áB						
+		//‚ë¢						
 		{ { -68.0f, 0.0f, -42.0f },	  0.0f },
 		{ { -76.0f, 0.0f, -52.0f },	  0.0f },
 		{ { -54.0f, 0.0f, -66.0f },	  0.0f },
 		 						
-		//áC					
+		//‚ë£					
 		{ { -68.0f, 0.0f, -102.0f },  0.0f },
 		{ { -76.0f, 0.0f, -112.0f },  0.0f },
 		{ { -54.0f, 0.0f, -126.0f },  0.0f },
 		 							
-		//áD							
+		//‚ë§							
 		{ {  -8.0f, 0.0f, -102.0f },  0.0f },
 		{ { -16.0f, 0.0f, -112.0f },  0.0f },
 		{ {   6.0f, 0.0f, -126.0f },  0.0f },
 								
-		//áE						
+		//‚ë•						
 		{ { -128.0f, 0.0f, -102.0f }, 0.0f },
 		{ { -136.0f, 0.0f, -112.0f }, 0.0f },
 		{ { -114.0f, 0.0f, -126.0f }, 0.0f },
 		 							
-		//áF						
+		//‚ë¶						
 		{ { -128.0f, 0.0f, -162.0f }, 0.0f },
 		{ { -136.0f, 0.0f, -172.0f }, 0.0f },
 		{ { -114.0f, 0.0f, -186.0f }, 0.0f },
 		 						
-		//áG						
+		//‚ëß						
 		{ { -128.0f, 0.0f, -222.0f }, 0.0f },
 		{ { -136.0f, 0.0f, -232.0f }, 0.0f },
 		{ { -114.0f, 0.0f, -246.0f }, 0.0f },
 									
-		//áH						
+		//‚ë®						
 		{ { -188.0f, 0.0f, -222.0f }, 0.0f },
 		{ { -196.0f, 0.0f, -232.0f }, 0.0f },
 		{ { -174.0f, 0.0f, -246.0f }, 0.0f },
@@ -287,36 +301,36 @@ void Namioka::Initialize()
 	struct Mansion02Data
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab mansion02Prefab{ "model/mansion02.glb" };
 	std::vector<Mansion02Data> mansion02List =
 	{
-		//á@
+		//‚ë†
 		{ { 8.0f, 0.0f, 18.0f },      0.0f },
 	 								 
-		//áA							
+		//‚ë°							
 		{ { 8.0f, 0.0f, -42.0f },	  0.0f },
 									
-		//áB						
+		//‚ë¢						
 		{ { -52.0f, 0.0f, -42.0f },	  0.0f },
 		 							
-		//áC						
+		//‚ë£						
 		{ { -52.0f, 0.0f, -102.0f },  0.0f },
 									
-		//áD						
+		//‚ë§						
 		{ { 8.0f, 0.0f, -102.0f },	  0.0f },
 		 						
-		//áE						
+		//‚ë•						
 		{ { -112.0f, 0.0f, -102.0f }, 0.0f },
 		 							
-		//áF						
+		//‚ë¶						
 		{ { -112.0f, 0.0f, -162.0f }, 0.0f },
 								
-		//áG						
+		//‚ëß						
 		{ { -112.0f, 0.0f, -222.0f }, 0.0f },
 								
-		//áH						
+		//‚ë®						
 		{ { -172.0f, 0.0f, -222.0f }, 0.0f },
 	};
 	for (const auto& data : mansion02List)
@@ -348,36 +362,36 @@ void Namioka::Initialize()
 	struct KaraokeData
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab karaokePrefab{ "model/karaoke.glb" };
 	std::vector<KaraokeData> karaokeList =
 	{
-		//á@
+		//‚ë†
 		{ { 16.0f, 0.0f, 8.0f },      0.0f },
 								
-		//áA					
+		//‚ë°					
 		{ { 16.0f, 0.0f, -52.0f },	  0.0f },
 		 							
-		//áB							
+		//‚ë¢							
 		{ { -44.0f, 0.0f, -52.0f },	  0.0f },
 		 						
-		//áC						
+		//‚ë£						
 		{ { -44.0f, 0.0f, -112.0f },  0.0f },
 		 							
-		//áD						
+		//‚ë§						
 		{ { 16.0f, 0.0f, -112.0f },	  0.0f },
 		 							
-		//áE						
+		//‚ë•						
 		{ { -104.0f, 0.0f, -112.0f }, 0.0f },
 		 							
-		//áF						
+		//‚ë¶						
 		{ { -104.0f, 0.0f, -172.0f }, 0.0f },
 								
-		//áG						
+		//‚ëß						
 		{ { -104.0f, 0.0f, -232.0f }, 0.0f },
 								
-		//áH							
+		//‚ë®							
 		{ { -164.0f, 0.0f, -232.0f }, 0.0f },
 	};
 	for (const auto& data : karaokeList)
@@ -409,44 +423,44 @@ void Namioka::Initialize()
 	struct ApartmnetData
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab apartmentPrefab{ "model/apartment.glb" };
 	std::vector<ApartmnetData> apartmentList =
 	{
-		//á@
+		//‚ë†
 		{ { -8.0f, 0.0f,   8.0f },    0.0f },
 		{ { 16.0f, 0.0f, -16.0f },	  0.0f },
 		 					
-		//áA						
+		//‚ë°						
 		{ { -8.0f, 0.0f, -52.0f },	  0.0f },
 		{ { 16.0f, 0.0f, -76.0f },	  0.0f },
 								
-		//áB						
+		//‚ë¢						
 		{ { -68.0f, 0.0f, -52.0f },	  0.0f },
 		{ { -44.0f, 0.0f, -76.0f },	  0.0f },
 								
-		//áC						
+		//‚ë£						
 		{ { -68.0f, 0.0f, -112.0f },  0.0f },
 		{ { -44.0f, 0.0f, -136.0f },  0.0f },
 								
-		//áD						
+		//‚ë§						
 		{ { -8.0f, 0.0f, -112.0f },	  0.0f },
 		{ { 16.0f, 0.0f, -136.0f },	  0.0f },
 									
-		//áE						
+		//‚ë•						
 		{ { -128.0f, 0.0f, -112.0f }, 0.0f },
 		{ { -104.0f, 0.0f, -136.0f }, 0.0f },
 								
-		//áF						
+		//‚ë¶						
 		{ { -128.0f, 0.0f, -172.0f }, 0.0f },
 		{ { -104.0f, 0.0f, -196.0f }, 0.0f },
 									
-		//áG						
+		//‚ëß						
 		{ { -128.0f, 0.0f, -232.0f }, 0.0f },
 		{ { -104.0f, 0.0f, -256.0f }, 0.0f },
 									
-		//áH						
+		//‚ë®						
 		{ { -188.0f, 0.0f, -232.0f }, 0.0f },
 		{ { -164.0f, 0.0f, -256.0f }, 0.0f },
 	};
@@ -479,36 +493,36 @@ void Namioka::Initialize()
 	struct ClockTowerData
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab clocktowerPrefab{ "model/clocktower01.glb" };
 	std::vector<ClockTowerData> clocktowerList =
 	{
-		//á@
+		//‚ë†
 		{ { -11.0f, 0.0f, -11.0f },   0.0f },
 								
-		//áA							
+		//‚ë°							
 		{ { -11.0f, 0.0f, -71.0f },	  0.0f },
 		 							
-		//áB							
+		//‚ë¢							
 		{ { -71.0f, 0.0f, -71.0f },	  0.0f },
 		 							  
-		//áC							
+		//‚ë£							
 		{ { -71.0f, 0.0f, -131.0f },  0.0f },
 		 							
-		//áD							
+		//‚ë§							
 		{ { -11.0f, 0.0f, -131.0f },  0.0f },
 		 							
-		//áE							
+		//‚ë•							
 		{ { -131.0f, 0.0f, -131.0f }, 0.0f },
 									
-		//áF							
+		//‚ë¶							
 		{ { -131.0f, 0.0f, -191.0f }, 0.0f },
 									 
-		//áG							
+		//‚ëß							
 		{ { -131.0f, 0.0f, -251.0f }, 0.0f },
 		 							
-		//áH							
+		//‚ë®							
 		{ { -191.0f, 0.0f, -251.0f }, 0.0f },
 	};
 	for (const auto& data : clocktowerList)
@@ -539,36 +553,36 @@ void Namioka::Initialize()
 	struct WacdonaldData
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab wacdonaldPrefab{ "model/wacdonald.glb" };
 	std::vector<WacdonaldData> wacdonaldList =
 	{
-		//á@
+		//‚ë†
 		{ { 14.0f, 0.0f, -6.0f },	  180.0f },
 		 							 
-		//áA						  
+		//‚ë°						  
 		{ { 14.0f, 0.0f, -66.0f },	  180.0f },
 									
-		//áB						
+		//‚ë¢						
 		{ { -46.0f, 0.0f, -66.0f },	  180.0f },
 		 							
-		//áC					
+		//‚ë£					
 		{ { -46.0f, 0.0f, -126.0f },  180.0f },
 		 							
-		//áD						
+		//‚ë§						
 		{ { 14.0f, 0.0f, -126.0f },	  180.0f },
 		 							
-		//áE						 
+		//‚ë•						 
 		{ { -106.0f, 0.0f, -126.0f }, 180.0f },
 		 							
-		//áF						  
+		//‚ë¶						  
 		{ { -106.0f, 0.0f, -186.0f }, 180.0f },
 		 							
-		//áG						
+		//‚ëß						
 		{ { -106.0f, 0.0f, -246.0f }, 180.0f },
 									
-		//áH						
+		//‚ë®						
 		{ { -166.0f, 0.0f, -246.0f }, 180.0f },
 	};
 	for (const auto& data : wacdonaldList)
@@ -600,43 +614,43 @@ void Namioka::Initialize()
 	ModelPrefab powerplant_brokenPrefab{ "model/powerplant_broken.glb" };
 	std::vector<Vector3> powerplantPositions =
 	{
-		//á@
+		//‚ë†
 		{ 0.0f, 0.0f, 0.0f },
 
-		//áA
+		//‚ë°
 		{ 0.0f, 0.0f, -60.0f },
 
-		//áB
+		//‚ë¢
 		{ -60.0f, 0.0f, -60.0f },
 
-		//áC
+		//‚ë£
 		{ -60.0f, 0.0f, -120.0f },
 
-		//áD
+		//‚ë§
 		{ 0.0f, 0.0f, -120.0f },
 
-		//áE
+		//‚ë•
 		{ -120.0f, 0.0f, -120.0f },
 
-		//áF
+		//‚ë¶
 		{ -120.0f, 0.0f, -180.0f },
 
-		//áG
+		//‚ëß
 		{ -120.0f, 0.0f, -240.0f},
 
-		//áH
+		//‚ë®
 		{ -180.0f, 0.0f, -240.0f },
 	};
 	for (const auto& pos : powerplantPositions)
 	{
-		// êeÉIÉuÉWÉFÉNÉgÅiPowerPlantÉRÉìÉ|Å[ÉlÉìÉgïtÇ´Åj
+		// Ë¶™„Ç™„Éñ„Ç∏„Çß„ÇØ„ÉàÔºàPowerPlant„Ç≥„É≥„Éù„Éº„Éç„É≥„Éà‰ªò„ÅçÔºâ
 		GameObject* plantObj = CreateGameObject();
 		plantObj->SetName("PowerPlant");
 		plantObj->SetTag("PowerPlant");
 		plantObj->transform().position() = pos;
 		auto* plant = plantObj->AddComponent<PowerPlant>(10.0f);
 
-		// ìñÇΩÇËîªíËÇÕêeÉIÉuÉWÉFÉNÉgÇ…ê›íË
+		// ÂΩì„Åü„ÇäÂà§ÂÆö„ÅØË¶™„Ç™„Éñ„Ç∏„Çß„ÇØ„Éà„Å´Ë®≠ÂÆö
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 5.0f;
 		shapeDesc.SizeY = 6.0f;
@@ -647,15 +661,15 @@ void Namioka::Initialize()
 		bodyDesc.Type = BodyType::STATIC;
 		plantObj->AddComponent<PhysicsBody>(bodyDesc);
 
-		// ïúãåçœÇ›ÉÇÉfÉãÅiStart()Ç≈îÒï\é¶Ç…Ç∑ÇÈÅj
+		// Âæ©ÊóßÊ∏à„Åø„É¢„Éá„É´ÔºàStart()„ÅßÈùûË°®Á§∫„Å´„Åô„ÇãÔºâ
 		GameObject* restored = Instantiate(powerplantPrefab);
 		restored->transform().position() = pos;
 
-		// åÃè·ÉÇÉfÉãÅièâä˙ÇÕï\é¶Åj
+		// ÊïÖÈöú„É¢„Éá„É´ÔºàÂàùÊúü„ÅØË°®Á§∫Ôºâ
 		GameObject* broken = Instantiate(powerplant_brokenPrefab);
 		broken->transform().position() = pos;
 
-		// PowerPlantÇ…ÉÇÉfÉãéQè∆Çê›íË
+		// PowerPlant„Å´„É¢„Éá„É´ÂèÇÁÖß„ÇíË®≠ÂÆö
 		plant->restoredModel = restored;
 		plant->brokenModel = broken;
 	}
@@ -664,7 +678,7 @@ void Namioka::Initialize()
 	ModelPrefab dentyuuPrefab{ "model/dentyuu.glb" };
 	std::vector<Vector3> dentyuuPositions =
 	{
-		//á@
+		//‚ë†
 		{   3.0f, 2.0f,  10.0f },
 		{   3.0f, 2.0f,  20.0f },
 		{  -3.0f, 2.0f,  10.0f },
@@ -682,7 +696,7 @@ void Namioka::Initialize()
 		{  -9.0f, 2.0f,  -3.0f },
 		{ -18.0f, 2.0f,  -3.0f },
 
-		//áA
+		//‚ë°
 		{   3.0f, 2.0f, -50.0f },
 		{   3.0f, 2.0f, -40.0f },
 		{  -3.0f, 2.0f, -50.0f },
@@ -700,7 +714,7 @@ void Namioka::Initialize()
 		{  -9.0f, 2.0f, -63.0f },
 		{ -18.0f, 2.0f, -63.0f },
 
-		//áB
+		//‚ë¢
 		{ -57.0f, 2.0f, -50.0f },
 		{ -57.0f, 2.0f, -40.0f },
 		{ -63.0f, 2.0f, -50.0f },
@@ -718,7 +732,7 @@ void Namioka::Initialize()
 		{ -69.0f, 2.0f, -63.0f },
 		{ -78.0f, 2.0f, -63.0f },
 
-		//áC
+		//‚ë£
 		{ -57.0f, 2.0f, -110.0f },
 		{ -57.0f, 2.0f, -100.0f },
 		{ -63.0f, 2.0f, -110.0f },
@@ -736,7 +750,7 @@ void Namioka::Initialize()
 		{ -69.0f, 2.0f, -123.0f },
 		{ -78.0f, 2.0f, -123.0f },
 
-		//áD
+		//‚ë§
 		{   3.0f, 2.0f, -110.0f },
 		{   3.0f, 2.0f, -100.0f },
 		{  -3.0f, 2.0f, -110.0f },
@@ -754,7 +768,7 @@ void Namioka::Initialize()
 		{  -9.0f, 2.0f, -123.0f },
 		{ -18.0f, 2.0f, -123.0f },
 
-		//áE
+		//‚ë•
 		{ -117.0f, 2.0f, -110.0f },
 		{ -117.0f, 2.0f, -100.0f },
 		{ -123.0f, 2.0f, -110.0f },
@@ -772,7 +786,7 @@ void Namioka::Initialize()
 		{ -129.0f, 2.0f, -123.0f },
 		{ -138.0f, 2.0f, -123.0f },
 
-		//áF
+		//‚ë¶
 		{ -117.0f, 2.0f, -170.0f },
 		{ -117.0f, 2.0f, -160.0f },
 		{ -123.0f, 2.0f, -170.0f },
@@ -790,7 +804,7 @@ void Namioka::Initialize()
 		{ -129.0f, 2.0f, -183.0f },
 		{ -138.0f, 2.0f, -183.0f },
 
-		//áG
+		//‚ëß
 		{ -117.0f, 2.0f, -230.0f },
 		{ -117.0f, 2.0f, -220.0f },
 		{ -123.0f, 2.0f, -230.0f },
@@ -808,7 +822,7 @@ void Namioka::Initialize()
 		{ -129.0f, 2.0f, -243.0f },
 		{ -138.0f, 2.0f, -243.0f },
 
-		//áH
+		//‚ë®
 		{ -177.0f, 2.0f, -230.0f },
 		{ -177.0f, 2.0f, -220.0f },
 		{ -183.0f, 2.0f, -230.0f },
@@ -848,57 +862,57 @@ void Namioka::Initialize()
 	struct SpedenData
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab spedentyuPrefab{ "model/special_dentyu.glb" };
 	std::vector<SpedenData> spedentyuList =
 	{
-		//á@Å®áA
+		//‚ë†‚Üí‚ë°
 		{ { 0.0f, 0.0f, -18.0f},       0.0f },
 		
-		//áAÅ®á@
+		//‚ë°‚Üí‚ë†
 		{ { 0.0f, 0.0f, -42.0f },      0.0f },
 
-		//áAÅ®áB						.
+		//‚ë°‚Üí‚ë¢						.
 		{ { -18.0f, 0.0f, -60.0f },	   0.0f },
 									
-		//áBÅ®áA					
+		//‚ë¢‚Üí‚ë°					
 		{ { -42.0f, 0.0f, -60.0f },	   0.0f },
 									 
-		//áBÅ®áC						
+		//‚ë¢‚Üí‚ë£						
 		{ { -60.0f, 0.0f, -78.0f },	   0.0f },
 									
-		//áCÅ®áB					
+		//‚ë£‚Üí‚ë¢					
 		{ { -60.0f, 0.0f, -102.0f },   0.0f },
 									
-		//áCÅ®áD					
+		//‚ë£‚Üí‚ë§					
 		{ { -42.0f, 0.0f, -120.0f },   0.0f },
 									
-		//áDÅ®áC					
+		//‚ë§‚Üí‚ë£					
 		{ { -18.0f, 0.0f, -120.0f },   0.0f },
 									  
-		//áCÅ®áE						
+		//‚ë£‚Üí‚ë•						
 		{ { -102.0f, 0.0f, -120.0f },  0.0f },
 								
-		//áEÅ®áC						
+		//‚ë•‚Üí‚ë£						
 		{ { -78.0f, 0.0f, -120.0f },   0.0f },
 									
-		//áEÅ®áF					
+		//‚ë•‚Üí‚ë¶					
 		{ { -120.0f, 0.0f, -138.0f },  0.0f },
 								
-		//áFÅ®áE					
+		//‚ë¶‚Üí‚ë•					
 		{ { -120.0f, 0.0f, -162.0f },  0.0f },
 									
-		//áFÅ®áG						
+		//‚ë¶‚Üí‚ëß						
 		{ { -120.0f, 0.0f, -198.0f },  0.0f },
 									 
-		//áGÅ®áF					
+		//‚ëß‚Üí‚ë¶					
 		{ { -120.0f, 0.0f, -222.0f },  0.0f },
 		 						
-		//áGÅ®áH					
+		//‚ëß‚Üí‚ë®					
 		{ { -162.0f, 0.0f, -240.0f },  0.0f },
 		 							
-		//áHÅ®áG						
+		//‚ë®‚Üí‚ëß						
 		{ { -138.0f, 0.0f, -240.0f },  0.0f },
 
 
@@ -931,33 +945,33 @@ void Namioka::Initialize()
 	struct DensenData
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab spedensenPrefab{ "model/special_densen.glb" };
 	std::vector<DensenData> spedensenList =
 	{
-		// á@Å®áA
+		// ‚ë†‚Üí‚ë°
 		{ { 0.0f, 10.0f, -18.0f },  0.0f },
 
-		// áAÅ®áB
+		// ‚ë°‚Üí‚ë¢
 		{ { -18.0f, 10.0f, -60.0f },  90.0f },
 
-		// áBÅ®áC
+		// ‚ë¢‚Üí‚ë£
 		{ { -60.0f, 10.0f, -78.0f },  0.0f },
 
-		// áCÅ®áD
+		// ‚ë£‚Üí‚ë§
 		{ { -18.0f, 10.0f, -120.0f },  90.0f },
 
-		// áCÅ®áE
+		// ‚ë£‚Üí‚ë•
 		{ { -78.0f, 10.0f, -120.0f },  90.0f },
 
-		// áEÅ®áF
+		// ‚ë•‚Üí‚ë¶
 		{ { -120.0f, 10.0f, -138.0f },  0.0f },
 
-		// áFÅ®áG
+		// ‚ë¶‚Üí‚ëß
 		{ { -120.0f, 10.0f, -198.0f },  0.0f },
 
-		// áGÅ®áH
+		// ‚ëß‚Üí‚ë®
 		{ { -138.0f, 10.0f, -240.0f },  90.0f },
 	};
 
@@ -990,7 +1004,7 @@ void Namioka::Initialize()
 	struct Building01Data
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab building01Prefab{ "model/building01.glb" };
 	std::vector<Building01Data> building01List =
@@ -1026,7 +1040,7 @@ void Namioka::Initialize()
 	struct Building02Data
 	{
 		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
 	ModelPrefab building02Prefab{ "model/building02.glb" };
 	std::vector<Building02Data> building02List =
@@ -1058,7 +1072,16 @@ void Namioka::Initialize()
 		building02->AddComponent<PhysicsBody>(bodyDesc);
 	}
 
-	// ëSî≠ìdèäÇÃïúãåÉ`ÉFÉbÉNópGameObjectÇçÏê¨
+	// ÂÖ®Áô∫ÈõªÊâÄ„ÅÆÂæ©Êóß„ÉÅ„Çß„ÉÉ„ÇØÁî®GameObject„Çí‰ΩúÊàê
 	GameObject* checker = CreateGameObject();
 	checker->AddComponent<GameClearChecker>();
+}
+
+void Namioka::Finalize()
+{
+	// Èü≥Â£∞Ëß£Êîæ
+	UnloadAudio(g_GameBgm);
+
+	// XAudioÁµÇ‰∫Ü
+	UninitAudio();
 }
