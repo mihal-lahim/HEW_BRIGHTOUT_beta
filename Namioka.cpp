@@ -13,12 +13,12 @@ static int g_GameBgm{};
 
 void Namioka::Initialize()
 {
-	// ÉIÅ[ÉfÉBÉIèâä˙âª
+	// „Ç™„Éº„Éá„Ç£„Ç™ÂàùÊúüÂåñ
 	InitAudio();
 
 	g_GameBgm = LoadAudio("sound/GameBGM_01.wav");
 
-	// BGMçƒê∂ÅiÉãÅ[ÉvÅj
+	// BGMÂÜçÁîüÔºà„É´„Éº„ÉóÔºâ
 	PlayAudio(g_GameBgm, true);
 
 	SetAudioVolume(g_GameBgm, 0.0f);
@@ -27,21 +27,20 @@ void Namioka::Initialize()
 	//Player
 	PlayerPrefab playerPrefab{};
 	Instantiate(playerPrefab)->transform().position() += Vector3(0.0f, 0.0f, 10.0f);
-
-
+  
 	//Road
 	ModelPrefab roadPrefab{ "model/intersection.glb" };
 	std::vector<Vector3> roadPositions =
 	{
-		{    0.0f, 0.0f,    0.0f},   //á@
-		{    0.0f, 0.0f,  -60.0f},   //áA
-		{  -60.0f, 0.0f,  -60.0f},   //áB
-		{  -60.0f, 0.0f, -120.0f},   //áC
-		{    0.0f, 0.0f, -120.0f},   //áD
-		{ -120.0f, 0.0f, -120.0f},   //áE
-		{ -120.0f, 0.0f, -180.0f},   //áF
-		{ -120.0f, 0.0f, -240.0f},   //áG
-		{ -180.0f, 0.0f, -240.0f},   //áH
+		{    0.0f, 0.0f,    0.0f},   //‚ë†
+		{    0.0f, 0.0f,  -60.0f},   //‚ë°
+		{  -60.0f, 0.0f,  -60.0f},   //‚ë¢
+		{  -60.0f, 0.0f, -120.0f},   //‚ë£
+		{    0.0f, 0.0f, -120.0f},   //‚ë§
+		{ -120.0f, 0.0f, -120.0f},   //‚ë•
+		{ -120.0f, 0.0f, -180.0f},   //‚ë¶
+		{ -120.0f, 0.0f, -240.0f},   //‚ëß
+		{ -180.0f, 0.0f, -240.0f},   //‚ë®
 	};
 	for (const auto& pos : roadPositions)
 	{
@@ -52,7 +51,7 @@ void Namioka::Initialize()
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 40.0f;
-		shapeDesc.SizeY = 2.0f;
+		shapeDesc.SizeY = 1.0f;
 		shapeDesc.SizeZ = 40.0f;
 		road->AddComponent<ColliderShape>(shapeDesc);
 
@@ -62,69 +61,82 @@ void Namioka::Initialize()
 	}
 
 	//House
-	ModelPrefab housePrefab{ "model/house.glb" };
-	std::vector<Vector3> housePositions =
+	struct HouseData
 	{
-		//á@
-		{  -6.0f, 0.0f,  -6.0f },
-		{ -18.0f, 0.0f,  -6.0f },
-		{  -6.0f, 0.0f, -18.0f },
-		{ -18.0f, 0.0f, -18.0f },
-
-		//áA
-		{  -6.0f, 0.0f, -66.0f },
-		{ -18.0f, 0.0f, -66.0f },
-		{  -6.0f, 0.0f, -78.0f },
-		{ -18.0f, 0.0f, -78.0f },
-
-		//áB
-		{ -66.0f, 0.0f, -66.0f },
-		{ -78.0f, 0.0f, -66.0f },
-		{ -66.0f, 0.0f, -78.0f },
-		{ -78.0f, 0.0f, -78.0f },
-
-		//áC
-		{ -66.0f, 0.0f, -126.0f },
-		{ -78.0f, 0.0f, -126.0f },
-		{ -66.0f, 0.0f, -138.0f },
-		{ -78.0f, 0.0f, -138.0f },
-
-		//áD
-		{  -6.0f, 0.0f, -126.0f },
-		{ -18.0f, 0.0f, -126.0f },
-		{  -6.0f, 0.0f, -138.0f },
-		{ -18.0f, 0.0f, -138.0f },
-
-		//áE
-		{ -126.0f, 0.0f, -126.0f },
-		{ -138.0f, 0.0f, -126.0f },
-		{ -126.0f, 0.0f, -138.0f },
-		{ -138.0f, 0.0f, -138.0f },
-
-		//áF
-		{ -126.0f, 0.0f, -186.0f },
-		{ -138.0f, 0.0f, -186.0f },
-		{ -126.0f, 0.0f, -198.0f },
-		{ -138.0f, 0.0f, -198.0f },
-
-		//áG
-		{ -126.0f, 0.0f, -246.0f },
-		{ -138.0f, 0.0f, -246.0f },
-		{ -126.0f, 0.0f, -258.0f },
-		{ -138.0f, 0.0f, -258.0f },
-
-		//áH
-		{ -186.0f, 0.0f, -246.0f },
-		{ -198.0f, 0.0f, -246.0f },
-		{ -186.0f, 0.0f, -258.0f },
-		{ -198.0f, 0.0f, -258.0f },
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
-	for (const auto& pos : housePositions)
+	ModelPrefab housePrefab{ "model/house.glb" };
+	std::vector<HouseData> houseList =
+	{
+		//‚ë†
+		{ {  -6.0f, 0.0f,  -6.0f },   0.0f },
+		{ { -18.0f, 0.0f,  -6.0f },	  0.0f },
+		{ {  -6.0f, 0.0f, -18.0f },	  0.0f },
+		{ { -18.0f, 0.0f, -18.0f },	  0.0f },
+								
+		//‚ë°					
+		{ {  -6.0f, 0.0f, -66.0f },	  0.0f },
+		{ { -18.0f, 0.0f, -66.0f },	  0.0f },
+		{ {  -6.0f, 0.0f, -78.0f },	  0.0f },
+		{ { -18.0f, 0.0f, -78.0f },	  0.0f },
+		 					
+		//‚ë¢						
+		{ { -66.0f, 0.0f, -66.0f },	  0.0f },
+		{ { -78.0f, 0.0f, -66.0f },	  0.0f },
+		{ { -66.0f, 0.0f, -78.0f },	  0.0f },
+		{ { -78.0f, 0.0f, -78.0f },	  0.0f },
+							
+		//‚ë£						
+		{ { -66.0f, 0.0f, -126.0f },  0.0f },
+		{ { -78.0f, 0.0f, -126.0f },  0.0f },
+		{ { -66.0f, 0.0f, -138.0f },  0.0f },
+		{ { -78.0f, 0.0f, -138.0f },  0.0f },
+		 						
+		//‚ë§						
+		{ {  -6.0f, 0.0f, -126.0f },  0.0f },
+		{ { -18.0f, 0.0f, -126.0f },  0.0f },
+		{ {  -6.0f, 0.0f, -138.0f },  0.0f },
+		{ { -18.0f, 0.0f, -138.0f },  0.0f },
+		 							
+		//‚ë•						
+		{ { -126.0f, 0.0f, -126.0f }, 0.0f },
+		{ { -138.0f, 0.0f, -126.0f }, 0.0f },
+		{ { -126.0f, 0.0f, -138.0f }, 0.0f },
+		{ { -138.0f, 0.0f, -138.0f }, 0.0f },
+								
+		//‚ë¶						
+		{ { -126.0f, 0.0f, -186.0f }, 0.0f },
+		{ { -138.0f, 0.0f, -186.0f }, 0.0f },
+		{ { -126.0f, 0.0f, -198.0f }, 0.0f },
+		{ { -138.0f, 0.0f, -198.0f }, 0.0f },
+		 						
+		//‚ëß						
+		{ { -126.0f, 0.0f, -246.0f }, 0.0f },
+		{ { -138.0f, 0.0f, -246.0f }, 0.0f },
+		{ { -126.0f, 0.0f, -258.0f }, 0.0f },
+		{ { -138.0f, 0.0f, -258.0f }, 0.0f },
+		 							
+		//‚ë®							
+		{ { -186.0f, 0.0f, -246.0f }, 0.0f },
+		{ { -198.0f, 0.0f, -246.0f }, 0.0f },
+		{ { -186.0f, 0.0f, -258.0f }, 0.0f },
+		{ { -198.0f, 0.0f, -258.0f }, 0.0f },
+	};
+	for (const auto& data : houseList)
 	{
 		GameObject* house = Instantiate(housePrefab);
 
-		house->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		house->transform().position() = pos;
+		house->transform().scale() = { 1.3f, 1.3f, 1.3f };
+		house->transform().position() = data.position;
+
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		house->transform().rotation().FromXMVECTOR(q);
+
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 2.0f;
@@ -138,51 +150,63 @@ void Namioka::Initialize()
 	}
 
 	//Convenience
-	ModelPrefab conveniencePrefab{ "model/convenience.glb" };
-	std::vector<Vector3> conveniencePositions =
+	struct ConvenienceData
 	{
-		//á@
-		{ 6.0f, 0.0f,   6.0f },
-		{ 6.0f, 0.0f, -16.0f },
-
-		//áA
-		{ 6.0f, 0.0f, -54.0f },
-		{ 6.0f, 0.0f, -76.0f },
-
-		//áB
-		{ -54.0f, 0.0f, -54.0f },
-		{ -54.0f, 0.0f, -76.0f },
-
-		//áC
-		{ -54.0f, 0.0f, -114.0f },
-		{ -54.0f, 0.0f, -136.0f },
-
-		//áD
-		{ 6.0f, 0.0f, -114.0f },
-		{ 6.0f, 0.0f, -136.0f },
-
-		//áE
-		{ -114.0f, 0.0f, -114.0f },
-		{ -114.0f, 0.0f, -136.0f },
-
-		//áF
-		{ -114.0f, 0.0f, -174.0f },
-		{ -114.0f, 0.0f, -196.0f },
-
-		//áG
-		{ -114.0f, 0.0f, -234.0f },
-		{ -114.0f, 0.0f, -256.0f },
-
-		//áH
-		{ -174.0f, 0.0f, -234.0f },
-		{ -174.0f, 0.0f, -256.0f },
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
-	for (const auto& pos : conveniencePositions)
+	ModelPrefab conveniencePrefab{ "model/convenience.glb" };
+	std::vector<ConvenienceData> convenienceList =
+	{
+		//‚ë†
+		{ { 6.0f, 0.0f,   6.0f },     0.0f },
+		{ { 6.0f, 0.0f, -16.0f },	  0.0f },
+	 							
+		//‚ë°						
+		{ { 6.0f, 0.0f, -54.0f },	  0.0f },
+		{ { 6.0f, 0.0f, -76.0f },	  0.0f },
+	 								
+		//‚ë¢						
+		{ { -54.0f, 0.0f, -54.0f },	  0.0f },
+		{ { -54.0f, 0.0f, -76.0f },	  0.0f },
+								
+		//‚ë£						
+		{ { -54.0f, 0.0f, -114.0f },  0.0f },
+		{ { -54.0f, 0.0f, -136.0f },  0.0f },
+								
+		//‚ë§							
+		{ { 6.0f, 0.0f, -114.0f },	  0.0f },
+		{ { 6.0f, 0.0f, -136.0f },	  0.0f },
+									
+		//‚ë•						
+		{ { -114.0f, 0.0f, -114.0f }, 0.0f },
+		{ { -114.0f, 0.0f, -136.0f }, 0.0f },
+		 						
+		//‚ë¶						
+		{ { -114.0f, 0.0f, -174.0f }, 0.0f },
+		{ { -114.0f, 0.0f, -196.0f }, 0.0f },
+									
+		//‚ëß							
+		{ { -114.0f, 0.0f, -234.0f }, 0.0f },
+		{ { -114.0f, 0.0f, -256.0f }, 0.0f },
+		 							
+		//‚ë®						
+		{ { -174.0f, 0.0f, -234.0f }, 0.0f },
+		{ { -174.0f, 0.0f, -256.0f }, 0.0f },
+	};
+	for (const auto& data : convenienceList)
 	{
 		GameObject* convenience = Instantiate(conveniencePrefab);
 
 		convenience->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		convenience->transform().position() = pos;
+		convenience->transform().position() = data.position;
+
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		convenience->transform().rotation().FromXMVECTOR(q);
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 4.0f;
@@ -196,60 +220,71 @@ void Namioka::Initialize()
 	}
 
 	//Mansion01
-	ModelPrefab mansion01Prefab{ "model/mansion01.glb" };
-	std::vector<Vector3> mansion01Positions =
+	struct Mansion01Data
 	{
-		//á@
-		{  -8.0f, 0.0f, 18.0f },
-		{ -16.0f, 0.0f,  8.0f },
-		{   6.0f, 0.0f, -6.0f },
-
-		//áA
-		{  -8.0f, 0.0f, -42.0f },
-		{ -16.0f, 0.0f, -52.0f },
-		{   6.0f, 0.0f, -66.0f },
-
-		//áB
-		{ -68.0f, 0.0f, -42.0f },
-		{ -76.0f, 0.0f, -52.0f },
-		{ -54.0f, 0.0f, -66.0f },
-
-		//áC
-		{ -68.0f, 0.0f, -102.0f },
-		{ -76.0f, 0.0f, -112.0f },
-		{ -54.0f, 0.0f, -126.0f },
-
-		//áD
-		{  -8.0f, 0.0f, -102.0f },
-		{ -16.0f, 0.0f, -112.0f },
-		{   6.0f, 0.0f, -126.0f },
-
-		//áE
-		{ -128.0f, 0.0f, -102.0f },
-		{ -136.0f, 0.0f, -112.0f },
-		{ -114.0f, 0.0f, -126.0f },
-
-		//áF
-		{ -128.0f, 0.0f, -162.0f },
-		{ -136.0f, 0.0f, -172.0f },
-		{ -114.0f, 0.0f, -186.0f },
-
-		//áG
-		{ -128.0f, 0.0f, -222.0f },
-		{ -136.0f, 0.0f, -232.0f },
-		{ -114.0f, 0.0f, -246.0f },
-
-		//áH
-		{ -188.0f, 0.0f, -222.0f },
-		{ -196.0f, 0.0f, -232.0f },
-		{ -174.0f, 0.0f, -246.0f },
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
-	for (const auto& pos : mansion01Positions)
+	ModelPrefab mansion01Prefab{ "model/mansion01.glb" };
+	std::vector<Mansion01Data> mansion01List =
+	{
+		//‚ë†
+		{ {  -8.0f, 0.0f, 18.0f },    0.0f },
+		{ { -16.0f, 0.0f,  8.0f },	  0.0f },
+		{ {   6.0f, 0.0f, -6.0f },	  0.0f },
+		 						
+		//‚ë°						
+		{ {  -8.0f, 0.0f, -42.0f },	  0.0f },
+		{ { -16.0f, 0.0f, -52.0f },	  0.0f },
+		{ {   6.0f, 0.0f, -66.0f },	  0.0f },
+		 						
+		//‚ë¢						
+		{ { -68.0f, 0.0f, -42.0f },	  0.0f },
+		{ { -76.0f, 0.0f, -52.0f },	  0.0f },
+		{ { -54.0f, 0.0f, -66.0f },	  0.0f },
+		 						
+		//‚ë£					
+		{ { -68.0f, 0.0f, -102.0f },  0.0f },
+		{ { -76.0f, 0.0f, -112.0f },  0.0f },
+		{ { -54.0f, 0.0f, -126.0f },  0.0f },
+		 							
+		//‚ë§							
+		{ {  -8.0f, 0.0f, -102.0f },  0.0f },
+		{ { -16.0f, 0.0f, -112.0f },  0.0f },
+		{ {   6.0f, 0.0f, -126.0f },  0.0f },
+								
+		//‚ë•						
+		{ { -128.0f, 0.0f, -102.0f }, 0.0f },
+		{ { -136.0f, 0.0f, -112.0f }, 0.0f },
+		{ { -114.0f, 0.0f, -126.0f }, 0.0f },
+		 							
+		//‚ë¶						
+		{ { -128.0f, 0.0f, -162.0f }, 0.0f },
+		{ { -136.0f, 0.0f, -172.0f }, 0.0f },
+		{ { -114.0f, 0.0f, -186.0f }, 0.0f },
+		 						
+		//‚ëß						
+		{ { -128.0f, 0.0f, -222.0f }, 0.0f },
+		{ { -136.0f, 0.0f, -232.0f }, 0.0f },
+		{ { -114.0f, 0.0f, -246.0f }, 0.0f },
+									
+		//‚ë®						
+		{ { -188.0f, 0.0f, -222.0f }, 0.0f },
+		{ { -196.0f, 0.0f, -232.0f }, 0.0f },
+		{ { -174.0f, 0.0f, -246.0f }, 0.0f },
+	};
+	for (const auto& data : mansion01List)
 	{
 		GameObject* mansion01 = Instantiate(mansion01Prefab);
 
 		mansion01->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		mansion01->transform().position() = pos;
+		mansion01->transform().position() = data.position;
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		mansion01->transform().rotation().FromXMVECTOR(q);
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 5.0f;
@@ -263,42 +298,54 @@ void Namioka::Initialize()
 	}
 
 	//Mansion02
-	ModelPrefab mansion02Prefab{ "model/mansion02.glb" };
-	std::vector<Vector3> mansion02Positions =
+	struct Mansion02Data
 	{
-		//á@
-		{ 8.0f, 0.0f, 18.0f },
-
-		//áA
-		{ 8.0f, 0.0f, -42.0f },
-
-		//áB
-		{ -52.0f, 0.0f, -42.0f },
-
-		//áC
-		{ -52.0f, 0.0f, -102.0f },
-
-		//áD
-		{ 8.0f, 0.0f, -102.0f },
-
-		//áE
-		{ -112.0f, 0.0f, -102.0f },
-
-		//áF
-		{ -112.0f, 0.0f, -162.0f },
-
-		//áG
-		{ -112.0f, 0.0f, -222.0f },
-
-		//áH
-		{ -172.0f, 0.0f, -222.0f },
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
-	for (const auto& pos : mansion02Positions)
+	ModelPrefab mansion02Prefab{ "model/mansion02.glb" };
+	std::vector<Mansion02Data> mansion02List =
+	{
+		//‚ë†
+		{ { 8.0f, 0.0f, 18.0f },      0.0f },
+	 								 
+		//‚ë°							
+		{ { 8.0f, 0.0f, -42.0f },	  0.0f },
+									
+		//‚ë¢						
+		{ { -52.0f, 0.0f, -42.0f },	  0.0f },
+		 							
+		//‚ë£						
+		{ { -52.0f, 0.0f, -102.0f },  0.0f },
+									
+		//‚ë§						
+		{ { 8.0f, 0.0f, -102.0f },	  0.0f },
+		 						
+		//‚ë•						
+		{ { -112.0f, 0.0f, -102.0f }, 0.0f },
+		 							
+		//‚ë¶						
+		{ { -112.0f, 0.0f, -162.0f }, 0.0f },
+								
+		//‚ëß						
+		{ { -112.0f, 0.0f, -222.0f }, 0.0f },
+								
+		//‚ë®						
+		{ { -172.0f, 0.0f, -222.0f }, 0.0f },
+	};
+	for (const auto& data : mansion02List)
 	{
 		GameObject* mansion02 = Instantiate(mansion02Prefab);
 
 		mansion02->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		mansion02->transform().position() = pos;
+		mansion02->transform().position() = data.position;
+
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		mansion02->transform().rotation().FromXMVECTOR(q);
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 2.0f;
@@ -312,47 +359,59 @@ void Namioka::Initialize()
 	}
 
 	//karaoke
-	ModelPrefab karaokePrefab{ "model/karaoke.glb" };
-	std::vector<Vector3> karaokePositions =
+	struct KaraokeData
 	{
-		//á@
-		{ 16.0f, 0.0f, 8.0f },
-
-		//áA
-		{ 16.0f, 0.0f, -52.0f },
-
-		//áB
-		{ -44.0f, 0.0f, -52.0f },
-
-		//áC
-		{ -44.0f, 0.0f, -112.0f },
-
-		//áD
-		{ 16.0f, 0.0f, -112.0f },
-
-		//áE
-		{ -104.0f, 0.0f, -112.0f },
-
-		//áF
-		{ -104.0f, 0.0f, -172.0f },
-
-		//áG
-		{ -104.0f, 0.0f, -232.0f },
-
-		//áH
-		{ -164.0f, 0.0f, -232.0f },
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
-	for (const auto& pos : karaokePositions)
+	ModelPrefab karaokePrefab{ "model/karaoke.glb" };
+	std::vector<KaraokeData> karaokeList =
+	{
+		//‚ë†
+		{ { 16.0f, 0.0f, 8.0f },      0.0f },
+								
+		//‚ë°					
+		{ { 16.0f, 0.0f, -52.0f },	  0.0f },
+		 							
+		//‚ë¢							
+		{ { -44.0f, 0.0f, -52.0f },	  0.0f },
+		 						
+		//‚ë£						
+		{ { -44.0f, 0.0f, -112.0f },  0.0f },
+		 							
+		//‚ë§						
+		{ { 16.0f, 0.0f, -112.0f },	  0.0f },
+		 							
+		//‚ë•						
+		{ { -104.0f, 0.0f, -112.0f }, 0.0f },
+		 							
+		//‚ë¶						
+		{ { -104.0f, 0.0f, -172.0f }, 0.0f },
+								
+		//‚ëß						
+		{ { -104.0f, 0.0f, -232.0f }, 0.0f },
+								
+		//‚ë®							
+		{ { -164.0f, 0.0f, -232.0f }, 0.0f },
+	};
+	for (const auto& data : karaokeList)
 	{
 		GameObject* karaoke = Instantiate(karaokePrefab);
 
 		karaoke->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		karaoke->transform().position() = pos;
+		karaoke->transform().position() = data.position;
+
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		karaoke->transform().rotation().FromXMVECTOR(q);
 
 		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 3.0f;
+		shapeDesc.SizeX = 4.0f;
 		shapeDesc.SizeY = 3.0f;
-		shapeDesc.SizeZ = 3.0f;
+		shapeDesc.SizeZ = 4.0f;
 		karaoke->AddComponent<ColliderShape>(shapeDesc);
 
 		PhysicsBodyDesc bodyDesc{};
@@ -361,51 +420,62 @@ void Namioka::Initialize()
 	}
 
 	//apartment
-	ModelPrefab apartmentPrefab{ "model/apartment.glb" };
-	std::vector<Vector3> apartmentPositions =
+	struct ApartmnetData
 	{
-		//á@
-		{ -8.0f, 0.0f,   8.0f },
-		{ 16.0f, 0.0f, -16.0f },
-
-		//áA
-		{ -8.0f, 0.0f, -52.0f },
-		{ 16.0f, 0.0f, -76.0f },
-
-		//áB
-		{ -68.0f, 0.0f, -52.0f },
-		{ -44.0f, 0.0f, -76.0f },
-
-		//áC
-		{ -68.0f, 0.0f, -112.0f },
-		{ -44.0f, 0.0f, -136.0f },
-
-		//áD
-		{ -8.0f, 0.0f, -112.0f },
-		{ 16.0f, 0.0f, -136.0f },
-
-		//áE
-		{ -128.0f, 0.0f, -112.0f },
-		{ -104.0f, 0.0f, -136.0f },
-
-		//áF
-		{ -128.0f, 0.0f, -172.0f },
-		{ -104.0f, 0.0f, -196.0f },
-
-		//áG
-		{ -128.0f, 0.0f, -232.0f },
-		{ -104.0f, 0.0f, -256.0f },
-
-		//áH
-		{ -188.0f, 0.0f, -232.0f },
-		{ -164.0f, 0.0f, -256.0f },
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
-	for (const auto& pos : apartmentPositions)
+	ModelPrefab apartmentPrefab{ "model/apartment.glb" };
+	std::vector<ApartmnetData> apartmentList =
+	{
+		//‚ë†
+		{ { -8.0f, 0.0f,   8.0f },    0.0f },
+		{ { 16.0f, 0.0f, -16.0f },	  0.0f },
+		 					
+		//‚ë°						
+		{ { -8.0f, 0.0f, -52.0f },	  0.0f },
+		{ { 16.0f, 0.0f, -76.0f },	  0.0f },
+								
+		//‚ë¢						
+		{ { -68.0f, 0.0f, -52.0f },	  0.0f },
+		{ { -44.0f, 0.0f, -76.0f },	  0.0f },
+								
+		//‚ë£						
+		{ { -68.0f, 0.0f, -112.0f },  0.0f },
+		{ { -44.0f, 0.0f, -136.0f },  0.0f },
+								
+		//‚ë§						
+		{ { -8.0f, 0.0f, -112.0f },	  0.0f },
+		{ { 16.0f, 0.0f, -136.0f },	  0.0f },
+									
+		//‚ë•						
+		{ { -128.0f, 0.0f, -112.0f }, 0.0f },
+		{ { -104.0f, 0.0f, -136.0f }, 0.0f },
+								
+		//‚ë¶						
+		{ { -128.0f, 0.0f, -172.0f }, 0.0f },
+		{ { -104.0f, 0.0f, -196.0f }, 0.0f },
+									
+		//‚ëß						
+		{ { -128.0f, 0.0f, -232.0f }, 0.0f },
+		{ { -104.0f, 0.0f, -256.0f }, 0.0f },
+									
+		//‚ë®						
+		{ { -188.0f, 0.0f, -232.0f }, 0.0f },
+		{ { -164.0f, 0.0f, -256.0f }, 0.0f },
+	};
+	for (const auto& data : apartmentList)
 	{
 		GameObject* apartment = Instantiate(apartmentPrefab);
 
 		apartment->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		apartment->transform().position() = pos;
+		apartment->transform().position() = data.position;
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		apartment->transform().rotation().FromXMVECTOR(q);
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 8.0f;
@@ -420,42 +490,53 @@ void Namioka::Initialize()
 
 
 	//clocktower
-	ModelPrefab clocktowerPrefab{ "model/clocktower01.glb" };
-	std::vector<Vector3> clocktowerPositions =
+	struct ClockTowerData
 	{
-		//á@
-		{ -11.0f, 0.0f, -11.0f },
-
-		//áA
-		{ -11.0f, 0.0f, -71.0f },
-
-		//áB
-		{ -71.0f, 0.0f, -71.0f },
-
-		//áC
-		{ -71.0f, 0.0f, -131.0f },
-
-		//áD
-		{ -11.0f, 0.0f, -131.0f },
-
-		//áE
-		{ -131.0f, 0.0f, -131.0f },
-
-		//áF
-		{ -131.0f, 0.0f, -191.0f },
-
-		//áG
-		{ -131.0f, 0.0f, -251.0f },
-
-		//áH
-		{ -191.0f, 0.0f, -251.0f },
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
-	for (const auto& pos : clocktowerPositions)
+	ModelPrefab clocktowerPrefab{ "model/clocktower01.glb" };
+	std::vector<ClockTowerData> clocktowerList =
+	{
+		//‚ë†
+		{ { -11.0f, 0.0f, -11.0f },   0.0f },
+								
+		//‚ë°							
+		{ { -11.0f, 0.0f, -71.0f },	  0.0f },
+		 							
+		//‚ë¢							
+		{ { -71.0f, 0.0f, -71.0f },	  0.0f },
+		 							  
+		//‚ë£							
+		{ { -71.0f, 0.0f, -131.0f },  0.0f },
+		 							
+		//‚ë§							
+		{ { -11.0f, 0.0f, -131.0f },  0.0f },
+		 							
+		//‚ë•							
+		{ { -131.0f, 0.0f, -131.0f }, 0.0f },
+									
+		//‚ë¶							
+		{ { -131.0f, 0.0f, -191.0f }, 0.0f },
+									 
+		//‚ëß							
+		{ { -131.0f, 0.0f, -251.0f }, 0.0f },
+		 							
+		//‚ë®							
+		{ { -191.0f, 0.0f, -251.0f }, 0.0f },
+	};
+	for (const auto& data : clocktowerList)
 	{
 		GameObject* clocktower = Instantiate(clocktowerPrefab);
 
 		clocktower->transform().scale() = { 0.5f, 0.5f, 0.5f };
-		clocktower->transform().position() = pos;
+		clocktower->transform().position() = data.position;
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		clocktower->transform().rotation().FromXMVECTOR(q);
 
 		BoxColliderDesc shapeDesc{};
 		shapeDesc.SizeX = 4.0f;
@@ -469,52 +550,56 @@ void Namioka::Initialize()
 	}
 
 	//wacdonald
-	ModelPrefab wacdonaldPrefab{ "model/wacdonald.glb" };
-	std::vector<Vector3> wacdonaldPositions =
+	struct WacdonaldData
 	{
-		//á@
-		{ 14.0f, 0.0f, -6.0f },
-
-		//áA
-		{ 14.0f, 0.0f, -66.0f },
-
-		//áB
-		{ -46.0f, 0.0f, -66.0f },
-
-		//áC
-		{ -46.0f, 0.0f, -126.0f },
-
-		//áD
-		{ 14.0f, 0.0f, -126.0f },
-
-		//áE
-		{ -106.0f, 0.0f, -126.0f },
-
-		//áF
-		{ -106.0f, 0.0f, -186.0f },
-
-		//áG
-		{ -106.0f, 0.0f, -246.0f },
-
-		//áH
-		{ -166.0f, 0.0f, -246.0f },
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
 	};
-	for (const auto& pos : wacdonaldPositions)
+	ModelPrefab wacdonaldPrefab{ "model/wacdonald.glb" };
+	std::vector<WacdonaldData> wacdonaldList =
+	{
+		//‚ë†
+		{ { 14.0f, 0.0f, -6.0f },	  180.0f },
+		 							 
+		//‚ë°						  
+		{ { 14.0f, 0.0f, -66.0f },	  180.0f },
+									
+		//‚ë¢						
+		{ { -46.0f, 0.0f, -66.0f },	  180.0f },
+		 							
+		//‚ë£					
+		{ { -46.0f, 0.0f, -126.0f },  180.0f },
+		 							
+		//‚ë§						
+		{ { 14.0f, 0.0f, -126.0f },	  180.0f },
+		 							
+		//‚ë•						 
+		{ { -106.0f, 0.0f, -126.0f }, 180.0f },
+		 							
+		//‚ë¶						  
+		{ { -106.0f, 0.0f, -186.0f }, 180.0f },
+		 							
+		//‚ëß						
+		{ { -106.0f, 0.0f, -246.0f }, 180.0f },
+									
+		//‚ë®						
+		{ { -166.0f, 0.0f, -246.0f }, 180.0f },
+	};
+	for (const auto& data : wacdonaldList)
 	{
 		GameObject* wacdonald = Instantiate(wacdonaldPrefab);
 
 		wacdonald->transform().scale() = { 1.0f, 1.0f, 1.0f };
-		wacdonald->transform().position() = pos;
+		wacdonald->transform().position() = data.position;
 		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
-			XMConvertToRadians(0.0f),     // Xé≤
-			XMConvertToRadians(180.0f),   // Yé≤
-			XMConvertToRadians(0.0f)      // Zé≤
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
 		);
-
 		wacdonald->transform().rotation().FromXMVECTOR(q);
 
 		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 4.0f;
+		shapeDesc.SizeX = 7.0f;
 		shapeDesc.SizeY = 4.0f;
 		shapeDesc.SizeZ = 4.0f;
 		wacdonald->AddComponent<ColliderShape>(shapeDesc);
@@ -529,45 +614,45 @@ void Namioka::Initialize()
 	ModelPrefab powerplant_brokenPrefab{ "model/powerplant_broken.glb" };
 	std::vector<Vector3> powerplantPositions =
 	{
-		//á@
+		//‚ë†
 		{ 0.0f, 0.0f, 0.0f },
 
-		//áA
+		//‚ë°
 		{ 0.0f, 0.0f, -60.0f },
 
-		//áB
+		//‚ë¢
 		{ -60.0f, 0.0f, -60.0f },
 
-		//áC
+		//‚ë£
 		{ -60.0f, 0.0f, -120.0f },
 
-		//áD
+		//‚ë§
 		{ 0.0f, 0.0f, -120.0f },
 
-		//áE
+		//‚ë•
 		{ -120.0f, 0.0f, -120.0f },
 
-		//áF
+		//‚ë¶
 		{ -120.0f, 0.0f, -180.0f },
 
-		//áG
+		//‚ëß
 		{ -120.0f, 0.0f, -240.0f},
 
-		//áH
+		//‚ë®
 		{ -180.0f, 0.0f, -240.0f },
 	};
 	for (const auto& pos : powerplantPositions)
 	{
-		// êeÉIÉuÉWÉFÉNÉgÅiPowerPlantÉRÉìÉ|Å[ÉlÉìÉgïtÇ´Åj
+		// Ë¶™„Ç™„Éñ„Ç∏„Çß„ÇØ„ÉàÔºàPowerPlant„Ç≥„É≥„Éù„Éº„Éç„É≥„Éà‰ªò„ÅçÔºâ
 		GameObject* plantObj = CreateGameObject();
 		plantObj->SetName("PowerPlant");
 		plantObj->SetTag("PowerPlant");
 		plantObj->transform().position() = pos;
 		auto* plant = plantObj->AddComponent<PowerPlant>(10.0f);
 
-		// ìñÇΩÇËîªíËÇÕêeÉIÉuÉWÉFÉNÉgÇ…ê›íË
+		// ÂΩì„Åü„ÇäÂà§ÂÆö„ÅØË¶™„Ç™„Éñ„Ç∏„Çß„ÇØ„Éà„Å´Ë®≠ÂÆö
 		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 6.0f;
+		shapeDesc.SizeX = 5.0f;
 		shapeDesc.SizeY = 6.0f;
 		shapeDesc.SizeZ = 6.0f;
 		plantObj->AddComponent<ColliderShape>(shapeDesc);
@@ -576,15 +661,15 @@ void Namioka::Initialize()
 		bodyDesc.Type = BodyType::STATIC;
 		plantObj->AddComponent<PhysicsBody>(bodyDesc);
 
-		// ïúãåçœÇ›ÉÇÉfÉãÅiStart()Ç≈îÒï\é¶Ç…Ç∑ÇÈÅj
+		// Âæ©ÊóßÊ∏à„Åø„É¢„Éá„É´ÔºàStart()„ÅßÈùûË°®Á§∫„Å´„Åô„ÇãÔºâ
 		GameObject* restored = Instantiate(powerplantPrefab);
 		restored->transform().position() = pos;
 
-		// åÃè·ÉÇÉfÉãÅièâä˙ÇÕï\é¶Åj
+		// ÊïÖÈöú„É¢„Éá„É´ÔºàÂàùÊúü„ÅØË°®Á§∫Ôºâ
 		GameObject* broken = Instantiate(powerplant_brokenPrefab);
 		broken->transform().position() = pos;
 
-		// PowerPlantÇ…ÉÇÉfÉãéQè∆Çê›íË
+		// PowerPlant„Å´„É¢„Éá„É´ÂèÇÁÖß„ÇíË®≠ÂÆö
 		plant->restoredModel = restored;
 		plant->brokenModel = broken;
 	}
@@ -593,7 +678,7 @@ void Namioka::Initialize()
 	ModelPrefab dentyuuPrefab{ "model/dentyuu.glb" };
 	std::vector<Vector3> dentyuuPositions =
 	{
-		//á@
+		//‚ë†
 		{   3.0f, 2.0f,  10.0f },
 		{   3.0f, 2.0f,  20.0f },
 		{  -3.0f, 2.0f,  10.0f },
@@ -611,7 +696,7 @@ void Namioka::Initialize()
 		{  -9.0f, 2.0f,  -3.0f },
 		{ -18.0f, 2.0f,  -3.0f },
 
-		//áA
+		//‚ë°
 		{   3.0f, 2.0f, -50.0f },
 		{   3.0f, 2.0f, -40.0f },
 		{  -3.0f, 2.0f, -50.0f },
@@ -629,7 +714,7 @@ void Namioka::Initialize()
 		{  -9.0f, 2.0f, -63.0f },
 		{ -18.0f, 2.0f, -63.0f },
 
-		//áB
+		//‚ë¢
 		{ -57.0f, 2.0f, -50.0f },
 		{ -57.0f, 2.0f, -40.0f },
 		{ -63.0f, 2.0f, -50.0f },
@@ -647,7 +732,7 @@ void Namioka::Initialize()
 		{ -69.0f, 2.0f, -63.0f },
 		{ -78.0f, 2.0f, -63.0f },
 
-		//áC
+		//‚ë£
 		{ -57.0f, 2.0f, -110.0f },
 		{ -57.0f, 2.0f, -100.0f },
 		{ -63.0f, 2.0f, -110.0f },
@@ -665,7 +750,7 @@ void Namioka::Initialize()
 		{ -69.0f, 2.0f, -123.0f },
 		{ -78.0f, 2.0f, -123.0f },
 
-		//áD
+		//‚ë§
 		{   3.0f, 2.0f, -110.0f },
 		{   3.0f, 2.0f, -100.0f },
 		{  -3.0f, 2.0f, -110.0f },
@@ -683,7 +768,7 @@ void Namioka::Initialize()
 		{  -9.0f, 2.0f, -123.0f },
 		{ -18.0f, 2.0f, -123.0f },
 
-		//áE
+		//‚ë•
 		{ -117.0f, 2.0f, -110.0f },
 		{ -117.0f, 2.0f, -100.0f },
 		{ -123.0f, 2.0f, -110.0f },
@@ -701,7 +786,7 @@ void Namioka::Initialize()
 		{ -129.0f, 2.0f, -123.0f },
 		{ -138.0f, 2.0f, -123.0f },
 
-		//áF
+		//‚ë¶
 		{ -117.0f, 2.0f, -170.0f },
 		{ -117.0f, 2.0f, -160.0f },
 		{ -123.0f, 2.0f, -170.0f },
@@ -719,7 +804,7 @@ void Namioka::Initialize()
 		{ -129.0f, 2.0f, -183.0f },
 		{ -138.0f, 2.0f, -183.0f },
 
-		//áG
+		//‚ëß
 		{ -117.0f, 2.0f, -230.0f },
 		{ -117.0f, 2.0f, -220.0f },
 		{ -123.0f, 2.0f, -230.0f },
@@ -737,7 +822,7 @@ void Namioka::Initialize()
 		{ -129.0f, 2.0f, -243.0f },
 		{ -138.0f, 2.0f, -243.0f },
 
-		//áH
+		//‚ë®
 		{ -177.0f, 2.0f, -230.0f },
 		{ -177.0f, 2.0f, -220.0f },
 		{ -183.0f, 2.0f, -230.0f },
@@ -774,118 +859,70 @@ void Namioka::Initialize()
 	}
 
 	//Special_Dentyuu
-	ModelPrefab spedentyuPrefab{ "model/special_dentyu.glb" };
-	std::vector<Vector3> spedentyuPositions =
+	struct SpedenData
 	{
-		//á@Å®áA
-		{ 0.0f, 0.0f, -18.0f},
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
+	};
+	ModelPrefab spedentyuPrefab{ "model/special_dentyu.glb" };
+	std::vector<SpedenData> spedentyuList =
+	{
+		//‚ë†‚Üí‚ë°
+		{ { 0.0f, 0.0f, -18.0f},       0.0f },
+		
+		//‚ë°‚Üí‚ë†
+		{ { 0.0f, 0.0f, -42.0f },      0.0f },
 
-		//áAÅ®á@
-		{ 0.0f, 0.0f, -42.0f },
-
-		//áAÅ®áB
-		{ -18.0f, 0.0f, -60.0f },
-
-		//áBÅ®áA
-		{ -42.0f, 0.0f, -60.0f },
-
-		//áBÅ®áC
-		{ -60.0f, 0.0f, -78.0f },
-
-		//áCÅ®áB
-		{ -60.0f, 0.0f, -102.0f },
-
-		//áCÅ®áD
-		{ -42.0f, 0.0f, -120.0f },
-
-		//áDÅ®áC
-		{ -18.0f, 0.0f, -120.0f },
-
-		//áCÅ®áE
-		{ -102.0f, 0.0f, -120.0f },
-
-		//áEÅ®áC
-		{ -78.0f, 0.0f, -120.0f },
-
-		//áEÅ®áF
-		{ -120.0f, 0.0f, -138.0f },
-
-		//áFÅ®áE
-		{ -120.0f, 0.0f, -162.0f },
-
-		//áFÅ®áG
-		{ -120.0f, 0.0f, -198.0f },
-
-		//áGÅ®áF
-		{ -120.0f, 0.0f, -222.0f },
-
-		//áGÅ®áH
-		{ -162.0f, 0.0f, -240.0f },
-
-		//áHÅ®áG
-		{ -138.0f, 0.0f, -240.0f },
+		//‚ë°‚Üí‚ë¢						.
+		{ { -18.0f, 0.0f, -60.0f },	   0.0f },
+									
+		//‚ë¢‚Üí‚ë°					
+		{ { -42.0f, 0.0f, -60.0f },	   0.0f },
+									 
+		//‚ë¢‚Üí‚ë£						
+		{ { -60.0f, 0.0f, -78.0f },	   0.0f },
+									
+		//‚ë£‚Üí‚ë¢					
+		{ { -60.0f, 0.0f, -102.0f },   0.0f },
+									
+		//‚ë£‚Üí‚ë§					
+		{ { -42.0f, 0.0f, -120.0f },   0.0f },
+									
+		//‚ë§‚Üí‚ë£					
+		{ { -18.0f, 0.0f, -120.0f },   0.0f },
+									  
+		//‚ë£‚Üí‚ë•						
+		{ { -102.0f, 0.0f, -120.0f },  0.0f },
+								
+		//‚ë•‚Üí‚ë£						
+		{ { -78.0f, 0.0f, -120.0f },   0.0f },
+									
+		//‚ë•‚Üí‚ë¶					
+		{ { -120.0f, 0.0f, -138.0f },  0.0f },
+								
+		//‚ë¶‚Üí‚ë•					
+		{ { -120.0f, 0.0f, -162.0f },  0.0f },
+									
+		//‚ë¶‚Üí‚ëß						
+		{ { -120.0f, 0.0f, -198.0f },  0.0f },
+									 
+		//‚ëß‚Üí‚ë¶					
+		{ { -120.0f, 0.0f, -222.0f },  0.0f },
+		 						
+		//‚ëß‚Üí‚ë®					
+		{ { -162.0f, 0.0f, -240.0f },  0.0f },
+		 							
+		//‚ë®‚Üí‚ëß						
+		{ { -138.0f, 0.0f, -240.0f },  0.0f },
 
 
 	};
-	for (const auto& pos : spedentyuPositions)
+	for (const auto& data : spedentyuList)
 	{
 		GameObject* spedentyuu = Instantiate(spedentyuPrefab);
 
-		spedentyuu->transform().scale() = { 0.1f, 0.1f, 0.1f };
-		spedentyuu->transform().position() = pos;
-
-		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 1.0f;
-		shapeDesc.SizeY = 1.0f;
-		shapeDesc.SizeZ = 1.0f;
-		spedentyuu->AddComponent<ColliderShape>(shapeDesc);
-
-		PhysicsBodyDesc bodyDesc{};
-		bodyDesc.Type = BodyType::STATIC;
-		spedentyuu->AddComponent<PhysicsBody>(bodyDesc);
-	}
-
-	//Special_Densen
-	struct DensenData
-	{
-		Vector3 position;
-		float yRotation; // Yé≤âÒì]ÅiìxÅj
-	};
-	ModelPrefab spedensenPrefab{ "model/special_densen.glb" };
-	std::vector<DensenData> spedensenList =
-	{
-		// á@Å®áA
-		{ { 0.0f, 5.0f, -18.0f },  0.0f },
-
-		// áAÅ®áB
-		{ { -18.0f, 5.0f, -60.0f },  90.0f },
-
-		// áBÅ®áC
-		{ { -60.0f, 5.0f, -78.0f },  0.0f },
-
-		// áCÅ®áD
-		{ { -18.0f, 5.0f, -120.0f },  90.0f },
-
-		// áCÅ®áE
-		{ { -78.0f, 5.0f, -120.0f },  90.0f },
-
-		// áEÅ®áF
-		{ { -120.0f, 5.0f, -138.0f },  0.0f },
-
-		// áFÅ®áG
-		{ { -120.0f, 5.0f, -198.0f },  0.0f },
-
-		// áGÅ®áH
-		{ { -138.0f, 5.0f, -240.0f },  90.0f },
-	};
-
-	for (const auto& data : spedensenList)
-	{
-		GameObject* spedentyuu = Instantiate(spedensenPrefab);
-
-		spedentyuu->transform().scale() = { 0.2f,0.2f,0.18f };
+		spedentyuu->transform().scale() = { 0.2f, 0.2f, 0.2f };
 		spedentyuu->transform().position() = data.position;
-
 		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
 			0.0f,
 			XMConvertToRadians(data.yRotation),
@@ -904,16 +941,147 @@ void Namioka::Initialize()
 		spedentyuu->AddComponent<PhysicsBody>(bodyDesc);
 	}
 
-	// ëSî≠ìdèäÇÃïúãåÉ`ÉFÉbÉNópGameObjectÇçÏê¨
+	//Special_Densen
+	struct DensenData
+	{
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
+	};
+	ModelPrefab spedensenPrefab{ "model/special_densen.glb" };
+	std::vector<DensenData> spedensenList =
+	{
+		// ‚ë†‚Üí‚ë°
+		{ { 0.0f, 10.0f, -18.0f },  0.0f },
+
+		// ‚ë°‚Üí‚ë¢
+		{ { -18.0f, 10.0f, -60.0f },  90.0f },
+
+		// ‚ë¢‚Üí‚ë£
+		{ { -60.0f, 10.0f, -78.0f },  0.0f },
+
+		// ‚ë£‚Üí‚ë§
+		{ { -18.0f, 10.0f, -120.0f },  90.0f },
+
+		// ‚ë£‚Üí‚ë•
+		{ { -78.0f, 10.0f, -120.0f },  90.0f },
+
+		// ‚ë•‚Üí‚ë¶
+		{ { -120.0f, 10.0f, -138.0f },  0.0f },
+
+		// ‚ë¶‚Üí‚ëß
+		{ { -120.0f, 10.0f, -198.0f },  0.0f },
+
+		// ‚ëß‚Üí‚ë®
+		{ { -138.0f, 10.0f, -240.0f },  90.0f },
+	};
+
+	for (const auto& data : spedensenList)
+	{
+		GameObject* spedensen = Instantiate(spedensenPrefab);
+
+		spedensen->transform().scale() = { 0.2f,0.2f,0.18f };
+		spedensen->transform().position() = data.position;
+
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		spedensen->transform().rotation().FromXMVECTOR(q);
+
+		BoxColliderDesc shapeDesc{};
+		shapeDesc.SizeX = 1.0f;
+		shapeDesc.SizeY = 1.0f;
+		shapeDesc.SizeZ = 1.0f;
+		spedensen->AddComponent<ColliderShape>(shapeDesc);
+
+		PhysicsBodyDesc bodyDesc{};
+		bodyDesc.Type = BodyType::STATIC;
+		spedensen->AddComponent<PhysicsBody>(bodyDesc);
+	}
+
+	//Building01
+	struct Building01Data
+	{
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
+	};
+	ModelPrefab building01Prefab{ "model/building01.glb" };
+	std::vector<Building01Data> building01List =
+	{
+	};
+	for (const auto& data : building01List)
+	{
+		GameObject* building01 = Instantiate(building01Prefab);
+
+		building01->transform().scale() = { 30.0f, 30.0f, 30.0f };
+		building01->transform().position() = data.position;
+
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		building01->transform().rotation().FromXMVECTOR(q);
+
+
+		BoxColliderDesc shapeDesc{};
+		shapeDesc.SizeX = 0.15f;
+		shapeDesc.SizeY = 0.1f;
+		shapeDesc.SizeZ = 0.1f;
+		building01->AddComponent<ColliderShape>(shapeDesc);
+
+		PhysicsBodyDesc bodyDesc{};
+		bodyDesc.Type = BodyType::STATIC;
+		building01->AddComponent<PhysicsBody>(bodyDesc);
+	}
+
+	//Building02
+	struct Building02Data
+	{
+		Vector3 position;
+		float yRotation; // YËª∏ÂõûËª¢ÔºàÂ∫¶Ôºâ
+	};
+	ModelPrefab building02Prefab{ "model/building02.glb" };
+	std::vector<Building02Data> building02List =
+	{
+	};
+	for (const auto& data : building02List)
+	{
+		GameObject* building02 = Instantiate(building02Prefab);
+
+		building02->transform().scale() = { 60.0f, 60.0f, 60.0f };
+		building02->transform().position() = data.position;
+
+		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+			0.0f,
+			XMConvertToRadians(data.yRotation),
+			0.0f
+		);
+		building02->transform().rotation().FromXMVECTOR(q);
+
+
+		BoxColliderDesc shapeDesc{};
+		shapeDesc.SizeX = 0.1f;
+		shapeDesc.SizeY = 10.0f;
+		shapeDesc.SizeZ = 0.1f;
+		building02->AddComponent<ColliderShape>(shapeDesc);
+
+		PhysicsBodyDesc bodyDesc{};
+		bodyDesc.Type = BodyType::STATIC;
+		building02->AddComponent<PhysicsBody>(bodyDesc);
+	}
+
+	// ÂÖ®Áô∫ÈõªÊâÄ„ÅÆÂæ©Êóß„ÉÅ„Çß„ÉÉ„ÇØÁî®GameObject„Çí‰ΩúÊàê
 	GameObject* checker = CreateGameObject();
 	checker->AddComponent<GameClearChecker>();
 }
 
 void Namioka::Finalize()
 {
-	// âπê∫âï˙
+	// Èü≥Â£∞Ëß£Êîæ
 	UnloadAudio(g_GameBgm);
 
-	// XAudioèIóπ
+	// XAudioÁµÇ‰∫Ü
 	UninitAudio();
 }
