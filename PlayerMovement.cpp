@@ -176,9 +176,18 @@ void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 	
 	// 電線ベクトルの長さを取得
 	float lineLength = powerLine->GetLength();
+	if (lineLength <= 0.0f)
+	{
+		m_LineParam = 0.0f;
+		m_LineMoveSpeed = std::max(m_Ctx.LineMoveSpeed, m_Ctx.LineMoveSpeedMin);
+		return;
+	}
 
 	// 電線上の位置パラメータtを設定（0.0f ~ 1.0fの範囲にクランプ）
-	m_LineParam = std::clamp(toPlayerVec.Dot(lineVec) / lineLength, 0.0f, 1.0f);
+	float lineLengthSq = lineLength * lineLength;
+	// start→dest方向のベクトルで射影する（dot < 0の場合は方向が逆）
+	Vector3 dirVec = dot >= 0.0f ? lineVec : lineVec * -1.0f;
+	m_LineParam = std::clamp(toPlayerVec.Dot(dirVec) / lineLengthSq, 0.0f, 1.0f);
 
 	// 電線上速度を設定
 	m_LineMoveSpeed = std::max(m_Ctx.LineMoveSpeed, m_Ctx.LineMoveSpeedMin);
