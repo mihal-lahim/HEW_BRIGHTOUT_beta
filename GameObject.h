@@ -125,6 +125,12 @@ public:
 		requires std::is_base_of<Component, T>::value
 	T* AddComponent(Args&&... args);
 
+	// 現在の GameObject が属する Scene を返すポインタ取得メソッド
+	Scene* scenePtr() const
+	{
+		return m_scene;
+	}
+
 private:
 	// 現在のゲームコンテキスト
 	GameContext m_gameContext{};

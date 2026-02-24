@@ -22,6 +22,12 @@
 #include "PoleManager.h"
 #include "Pole.h"
 #include "PowerLine.h"
+#include "RenderingSystem.h"
+#include "UIQuad.h"
+#include "UIDrawer.h"
+#include "TimerUI.h"
+#include "HPBarUI.h"
+#include "MorphUI.h"
 
 using namespace DirectX;
 
@@ -29,7 +35,6 @@ static int g_GameBgm{};
 
 void Namioka::Initialize()
 {
-
 	// オーディオ初期化
 	InitAudio();
 
@@ -1143,6 +1148,74 @@ void Namioka::Initialize()
 	// 全発電所の復旧チェック用GameObjectを作成
 	GameObject* checker = CreateGameObject();
 	checker->AddComponent<GameClearChecker>();
+
+
+	// UI表示
+	GameObject* uiRoot = CreateGameObject();
+	uiRoot->SetName("UIRoot");
+
+	UI::CreateUI(
+		uiRoot,
+		L"texture/BRIGHTOUT_UI_TAIMA-kl.png", // テクスチャパス
+		Vector3(700.0f, -100.0f, 0.0f),          // 位置
+		Vector3(500.0f, 500.0f, 1.0f),        // スケール
+		"UiVS.cso",                           // 頂点シェーダ（例）
+		"UiPS.cso"                            // ピクセルシェーダ（例）
+	);
+
+	GameObject* timerRoot = uiRoot->scenePtr()->CreateGameObject();
+	timerRoot->SetName("TimerRoot");
+	timerRoot->transform().position() = Vector3(925.0f, 100.0f, 0.0f);
+	timerRoot->transform().scale() = Vector3(60.0f, 60.0f, 60.0f);
+
+	timerRoot->AddComponent<TimerUI>();
+
+	// HP バー用オブジェクトを作成して HPBarUI を追加
+	GameObject* hpRoot = uiRoot->scenePtr()->CreateGameObject();
+	hpRoot->SetName("HPBarRoot");
+	hpRoot->transform().position() = Vector3(50.0f, 800.0f, 0.0f);
+	hpRoot->transform().scale() = Vector3(400.0f, 400.0f, 1.0f);
+
+	auto* hpUi = hpRoot->AddComponent<HPBarUI>();
+	hpUi->backgroundTexture = L"texture/BRIGHTOUT_battery_kara.png";
+	hpUi->fillTexture = L"texture/BRIGHTOUT_battery_ge-ji.png";
+	hpUi->position = hpRoot->transform().position();
+	hpUi->scale = hpRoot->transform().scale();
+	hpUi->vsPath = "UiVS.cso";
+	hpUi->psPath = "UiPS.cso";
+
+
+	//変身UI
+	GameObject* transAvailable = UI::CreateUI(
+		uiRoot,
+		L"texture/trans02.png",
+		Vector3(900.0f, 400.0f, 0.0f),
+		Vector3(1500.0f, 1000.0f, 1.0f),
+		"UiVS.cso",
+		"UiPS.cso"
+	);
+	if (transAvailable) transAvailable->SetName("TransAvailableUI");
+
+	GameObject* transActive = UI::CreateUI(
+		uiRoot,
+		L"texture/transcd01.png",
+		Vector3(900.0f, 400.0f, 0.0f),
+		Vector3(1500.0f, 1000.0f, 1.0f),
+		"UiVS.cso",
+		"UiPS.cso"
+	);
+	if (transActive) transActive->SetName("TransActiveUI");
+
+	// transActive を非表示にするのも安全に
+	if (transActive) transActive->SetActive(false);
+
+	// コントローラ用 GameObject を作成してコンポーネントを追加
+	GameObject* morphController = uiRoot->scenePtr()->CreateGameObject();
+	morphController->SetName("MorphUIController");
+	auto* morphUI = morphController->AddComponent<MorphUI>();
+	morphUI->uiAvailable = transAvailable;
+	morphUI->uiActive = transActive;
+	morphUI->cooldownSeconds = 3.0f;
 }
 
 void Namioka::Finalize()

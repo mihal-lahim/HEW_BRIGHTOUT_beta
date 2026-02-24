@@ -11,6 +11,7 @@
 #include "Animation.h"
 #include <algorithm>
 #include <vector>
+#include "UIQuad.h"
 
 using namespace DirectX;
 
@@ -85,6 +86,10 @@ void RenderingSystem::Render(const Scene& scene)
 			{
 				continue;
 			}
+
+			if (renderer->renderQueue == RenderQueue::UI)
+				continue; 
+
 			// レンダーキューの適用
 			RenderQueue currentQueue = renderer->renderQueue;
 			ApplyRenderQueue(currentQueue);
@@ -115,6 +120,39 @@ void RenderingSystem::Render(const Scene& scene)
 			// レンダー
 			renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
 		}
+	}
+
+	// 正射影行列を作る
+	PerCameraConstants perCamera = {};
+	auto width = (float)m_graphicsDevice->GetBackBufferWidth();
+	auto height = (float)m_graphicsDevice->GetBackBufferHeight();
+
+	XMMATRIX view = XMMatrixIdentity();
+	XMMATRIX projection = XMMatrixOrthographicOffCenterLH(
+		0.0f, width,
+		height, 0.0f,
+		0.0f, 1.0f);
+
+	XMStoreFloat4x4(&perCamera.view, XMMatrixTranspose(view));
+	XMStoreFloat4x4(&perCamera.projection, XMMatrixTranspose(projection));
+
+	m_perCameraBuffer.UpdateBuffer(*m_graphicsDevice, &perCamera, sizeof(perCamera));
+	m_perCameraBuffer.BindVS(*m_graphicsDevice, 1);
+	m_perCameraBuffer.BindPS(*m_graphicsDevice, 1);
+
+	auto meshRenderers = scene.GetComponents<MeshRenderer>();
+
+	for (auto& renderer : meshRenderers)
+	{
+		if (!renderer->IsEnable())
+			continue;
+
+		if (renderer->renderQueue != RenderQueue::UI)
+			continue;
+
+		ApplyRenderQueue(RenderQueue::UI);
+		MaterialLoadingProcess(renderer->material);
+		renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
 	}
 
 	m_graphicsDevice->Present();
@@ -178,10 +216,26 @@ void RenderingSystem::ApplyRenderQueue(RenderQueue queue)
 		m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);
 		m_graphicsDevice->SetDepthTest(true);
 		break;
+
+	case RenderQueue::UI:   
+		m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);
+		m_graphicsDevice->SetDepthTest(false);   
+		break;
+
 	case RenderQueue::Opaque:
 	default:
 		m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_OPAQUE);
 		m_graphicsDevice->SetDepthTest(true);
 		break;
 	}
+}
+
+std::shared_ptr<Mesh> RenderingSystem::CreateUIQuad()
+{
+	if (!m_uiQuad)
+	{
+		m_uiQuad = ::CreateUIQuad(*m_graphicsDevice);
+	}
+
+	return m_uiQuad;
 }

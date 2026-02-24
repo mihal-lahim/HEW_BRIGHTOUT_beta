@@ -5,6 +5,8 @@
 #include "GraphicsDevice.h"
 #include "ConstantBuffer.h"
 #include <DirectXMath.h>
+#include <memory>
+#include "Mesh.h"
 
 class EngineCore;
 class Scene;
@@ -69,6 +71,8 @@ public:
 		DirectX::XMFLOAT4X4 world = {};
 	};
 
+	std::shared_ptr<Mesh> CreateUIQuad();
+
 private:
 
 	// 各種定数バッファ
@@ -88,6 +92,8 @@ private:
 
 	// グラフィックスデバイス
 	GraphicsDevice* m_graphicsDevice = nullptr;
+
+	std::shared_ptr<Mesh> m_uiQuad;
 };
 
 
