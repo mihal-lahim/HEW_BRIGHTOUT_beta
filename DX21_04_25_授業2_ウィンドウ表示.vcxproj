@@ -173,6 +173,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Apartment.cpp" />
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Billboard.cpp" />
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Clocktower.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -254,6 +255,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Billboard.h" />
     <ClInclude Include="BillboardPrefab.h" />
+    <ClInclude Include="Bullet.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraPrefab.h" />
     <ClInclude Include="Clocktower.h" />

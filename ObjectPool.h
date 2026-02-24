@@ -56,8 +56,11 @@ public:
 		std::swap(m_pool.at(idx), m_pool.back());
 		m_pool.pop_back();
 
-		// 入れ替えたオブジェクトのallocationIDを更新
-		m_pool.at(idx)->m_allocationID = idx;
+		// 入れ替えたオブジェクトのallocationIDを更新（idxが最後の要素だった場合はスキップ）
+		if (idx < static_cast<uint32_t>(m_pool.size()))
+		{
+			m_pool.at(idx)->m_allocationID = idx;
+		}
 	}
 };
 

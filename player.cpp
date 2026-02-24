@@ -4,6 +4,9 @@
 #include "Camera.h"
 #include "PhysicsBody.h"
 #include "ColliderShape.h"
+#include "Model.h"
+#include "Bullet.h"
+#include "Time.h"
 
 using namespace DirectX;
 
@@ -19,6 +22,50 @@ void Player::Update()
 {
 	// 状態管理コンポーネント更新
 	stateMachine->Update(*this);
+	HandleFire();
+}
+
+void Player::HandleFire()
+{
+	float dt = (float)Time::DeltaTime();
+	if (m_FireTimer > 0.0f)
+	{
+		m_FireTimer -= dt;
+	}
+
+	if (!inputHandler || m_FireTimer > 0.0f)
+		return;
+
+	if (inputHandler->IsIssued<PlayerCommand_Fire>())
+	{
+		m_FireTimer = FireInterval;
+		FireBullet();
+	}
+}
+
+void Player::FireBullet()
+{
+	Vector3 forward = Vector3(0.0f, 0.0f, 1.0f).Rotate(gameObject().transform().rotation());
+	if (forward.IsZero())
+	{
+		forward = Vector3(0.0f, 0.0f, 1.0f);
+	}
+	forward = forward.Normalize();
+
+	GameObject* bulletObject = CreateGameObject();
+	bulletObject->SetTag("Bullet");
+	bulletObject->transform().position() = gameObject().transform().position() + forward * 1.0f;
+	bulletObject->transform().rotation() = gameObject().transform().rotation();
+
+	ModelPrefab bulletModel{ "model/cube.glb" };
+	GameObject* bulletVisual = bulletObject->Instantiate(bulletModel);
+	bulletObject->SetChild(*bulletVisual);
+	bulletVisual->transform().scale() = Vector3(0.2f, 0.2f, 0.2f);
+
+	auto* bullet = bulletObject->AddComponent<Bullet>();
+	bullet->Direction = forward;
+	bullet->Speed = BulletSpeed;
+	bullet->LifeTime = BulletLifeTime;
 }
 
 static void SetActiveRecursive(GameObject* obj, bool active)
