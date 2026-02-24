@@ -1163,11 +1163,12 @@ void Namioka::Initialize()
 		"UiPS.cso"                            // ピクセルシェーダ（例）
 	);
 
+
+	//タイマー
 	GameObject* timerRoot = uiRoot->scenePtr()->CreateGameObject();
 	timerRoot->SetName("TimerRoot");
 	timerRoot->transform().position() = Vector3(925.0f, 100.0f, 0.0f);
 	timerRoot->transform().scale() = Vector3(60.0f, 60.0f, 60.0f);
-
 	timerRoot->AddComponent<TimerUI>();
 
 	// HP バー用オブジェクトを作成して HPBarUI を追加
