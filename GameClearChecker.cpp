@@ -17,6 +17,7 @@ void GameClearChecker::Update()
 	for (auto* plant : plants)
 	{
 		if (!plant->IsRestored())
+
 			return;
 	}
 

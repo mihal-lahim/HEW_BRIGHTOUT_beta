@@ -1,5 +1,6 @@
 
 #include "Player.h"
+#include "Time.h"
 
 using namespace DirectX;
 
@@ -50,5 +51,6 @@ void PlayerState_Human_Walk::HandleInput(Player& player)
 
 void PlayerState_Human_Walk::Update(Player& player)
 {
+	player.AdvanceWalkAnimation((float)Time::DeltaTime());
 	PlayerState_Human_Ground::Update(player);
 }

@@ -1,4 +1,4 @@
-#ifndef PLAYER_PREFAB_H
+ï»¿#ifndef PLAYER_PREFAB_H
 #define PLAYER_PREFAB_H
 
 #include "Prefab.h"
@@ -11,65 +11,85 @@
 #include "Texture.h"
 #include "GameObject.h"
 #include "PlayerAudio.h"
+#include <string>
+#include <vector>
 
 class PlayerPrefab : public Prefab
 {
 public:
 	PlayerPrefab() = default;
 	virtual ~PlayerPrefab() = default;
-	// ƒCƒ“ƒXƒ^ƒ“ƒX‰»ƒƒ\ƒbƒh
+	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–ãƒ¡ã‚½ãƒƒãƒ‰
 	virtual void Instantiate(GameObject& gameObject) override
 	{
-		// PlayerƒRƒ“ƒ|[ƒlƒ“ƒgì¬
+		// Playerã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆä½œæˆ
 		auto* player = gameObject.AddComponent<Player>();
 		gameObject.SetTag("Player");
 
-		// TPSCameraì¬
+		// TPSCameraä½œæˆ
 		GameObject* cameraObject = gameObject.CreateGameObject();
 		auto* cam = cameraObject->AddComponent<Camera>();
 		player->camera = cameraObject->AddComponent<TPSCamera>(&gameObject);
 		cameraObject->SetTag("MainCamera");
 
-		// ƒvƒŒƒCƒ„[—pƒRƒ}ƒ“ƒhƒZƒbƒgì¬
+		// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç”¨ã‚³ãƒãƒ³ãƒ‰ã‚»ãƒƒãƒˆä½œæˆ
 		auto* commandSet = gameObject.AddComponent<PlayerCommandSet>();
 
-		// InputSystemİ’è
+		// InputSystemè¨­å®š
 		player->inputHandler = gameObject.AddComponent<InputHandler>(&gameObject.input().gamePad(), commandSet);
 
-		// ƒ‚ƒfƒ‹İ’è
-		ModelPrefab modelPrefab{ "model/model_dake.fbx" };
-		GameObject* modelObject = gameObject.Instantiate(modelPrefab);
-		gameObject.SetChild(*modelObject);
-		modelObject->transform().scale() = Vector3(0.01f, 0.01f, 0.01f);
-		modelObject->transform().rotation() = Quaternion::SetEulerY(180.0f);
-		player->modelObject = modelObject;
+		// ãƒ¢ãƒ‡ãƒ«è¨­å®š
+		std::vector<std::string> walkModelPaths =
+		{
+			"model/run_hidari.fbx",
+			"model/run_migi.fbx"
+		};
+		GameObject* modelRoot = gameObject.CreateGameObject();
+		gameObject.SetChild(*modelRoot);
+		player->modelObject = modelRoot;
+		player->walkModelObjects.clear();
+		player->walkModelObjects.reserve(walkModelPaths.size());
+		player->walkAnimationInterval = 0.1f;
+		for (size_t i = 0; i < walkModelPaths.size(); ++i)
+		{
+			ModelPrefab modelPrefab{ walkModelPaths[i] };
+			GameObject* modelObject = modelRoot->Instantiate(modelPrefab);
+			modelRoot->SetChild(*modelObject);
+			modelObject->SetActive(i == 0);
+			player->walkModelObjects.push_back(modelObject);
+		}
+		modelRoot->transform().scale() = Vector3(0.01f, 0.01f, 0.01f);
+		modelRoot->transform().rotation() = Quaternion::SetEulerY(180.0f);
 
-		// HealthƒRƒ“ƒ|[ƒlƒ“ƒgİ’è
+		// Healthã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¨­å®š
 		gameObject.AddComponent<Health>(100.0f);
 
 
-		// PlayerMovementƒRƒ“ƒ|[ƒlƒ“ƒgİ’è
+		// PlayerMovementã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¨­å®š
 		player->movement = gameObject.AddComponent<PlayerMovement>(cam);
 
-		// PlayerAudio ’Ç‰Á
+		// PlayerAudio è¿½åŠ 
 		gameObject.AddComponent<PlayerAudio>();
 
-		// PlayerMorphSystemƒRƒ“ƒ|[ƒlƒ“ƒgİ’è
+		// PlayerMorphSystemã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¨­å®š
 		player->morphSystem = gameObject.AddComponent<PlayerMorphSystem>();
 
 
-		// PlayerStateMachineƒRƒ“ƒ|[ƒlƒ“ƒgİ’è
+		// PlayerStateMachineã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¨­å®š
 		player->stateMachine = gameObject.AddComponent<PlayerStateMachine>();
 
 
-		// ColliderShapeİ’è
+		// ColliderShapeè¨­å®š
 		CapsuleColliderDesc shapeDesc{};
 		shapeDesc.Radius = 0.5f;
 		shapeDesc.Height = 1.0f;
 		gameObject.AddComponent<ColliderShape>(shapeDesc);
 
+		// ãƒ¢ãƒ‡ãƒ«ã®è¶³å…ƒã‚’åœ°é¢ã«åˆã‚ã›ã‚‹
+		modelRoot->transform().position().y = -(shapeDesc.Radius + (shapeDesc.Height * 0.5f));
 
-		// PhysicsBodyİ’è
+
+		// PhysicsBodyè¨­å®š
 		PhysicsBodyDesc bodyDesc{};
 		bodyDesc.Mass = 1.0f;
 		bodyDesc.Type = BodyType::DYNAMIC;
