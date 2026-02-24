@@ -28,10 +28,12 @@
 #include "TimerUI.h"
 #include "HPBarUI.h"
 #include "MorphUI.h"
+#include "BgmSwitcher.h"
 
 using namespace DirectX;
 
 static int g_GameBgm{};
+static int g_GameBgm2{};
 
 void Namioka::Initialize()
 {
@@ -39,11 +41,19 @@ void Namioka::Initialize()
 	InitAudio();
 
 	g_GameBgm = LoadAudio("sound/GameBGM_01.wav");
+	g_GameBgm2 = LoadAudio("sound/GameBGM_02.wav");
 
 	// BGM再生（ループ）
 	PlayAudio(g_GameBgm, true);
-
 	SetAudioVolume(g_GameBgm, 0.2f);
+
+	//残り60秒になったらBGM切り替え
+	GameObject* bgmObj = CreateGameObject();
+	bgmObj->SetName("BgmSwitcher");
+	auto* switcher = bgmObj->AddComponent<BgmSwitcher>();
+	switcher->currentIndex = g_GameBgm;
+	switcher->nextIndex = g_GameBgm2;
+	switcher->switchAtSeconds = 60.0f;
 
 	// PoleManager
 	GameObject* poleManagerObject = CreateGameObject();

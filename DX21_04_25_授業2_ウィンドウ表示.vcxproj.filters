@@ -93,6 +93,7 @@
     <ClCompile Include="TimerUI.cpp" />
     <ClCompile Include="HPBarUI.cpp" />
     <ClCompile Include="MorphUI.cpp" />
+    <ClCompile Include="BgmSwitcher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
@@ -203,6 +204,7 @@
     <ClInclude Include="TimerUI.h" />
     <ClInclude Include="HPBarUI.h" />
     <ClInclude Include="MorphUI.h" />
+    <ClInclude Include="BgmSwitcher.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />

@@ -16,6 +16,9 @@ public:
     void Start() override;
     void Update() override;
 
+	// 残り秒数を外部から参照するためのゲッター
+	float GetRemainingSeconds() const { return m_totalSeconds; }
+
 private:
     // カウントダウン秒数
     float m_totalSeconds = 240.0f;
