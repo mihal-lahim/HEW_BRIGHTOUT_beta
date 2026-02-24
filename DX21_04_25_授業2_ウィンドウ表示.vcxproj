@@ -264,6 +264,8 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="Convenience.h" />
     <ClInclude Include="DebugCameraPrefab.h" />
+    <ClInclude Include="EnemySpawner.h" />
+    <ClInclude Include="EnemySpawnerPrefab.h" />
     <ClInclude Include="EventSystem.h" />
     <ClInclude Include="Dentyuu.h" />
     <ClInclude Include="Enemy.h" />

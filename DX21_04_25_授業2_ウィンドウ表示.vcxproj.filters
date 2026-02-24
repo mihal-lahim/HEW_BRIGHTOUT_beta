@@ -1,759 +1,215 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="リソース ファイル">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="SorceFile">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="SorceFile\Player">
-      <UniqueIdentifier>{fd3203e7-421d-42f1-9cc6-b194f3f530d6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\ScriptComponent">
-      <UniqueIdentifier>{b1415811-8c83-4a47-9af3-748cb9a401c8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\Input">
-      <UniqueIdentifier>{4d01d11f-4346-4ebe-8c58-ac9e08586c46}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\Rendering">
-      <UniqueIdentifier>{18a09341-120d-405b-ab8f-d5032e1224c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\Audio">
-      <UniqueIdentifier>{2dc27b41-2303-4fa3-befa-67f0b4314b69}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\Debug">
-      <UniqueIdentifier>{82ae1953-6a9b-42d1-806d-63709ba9d453}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\Scene">
-      <UniqueIdentifier>{8fbc3800-6fd6-44c6-835d-d271af847d50}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\Physics">
-      <UniqueIdentifier>{1f986eb8-a036-42c7-923c-8f35cb374d29}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\LifeCycle">
-      <UniqueIdentifier>{e6e28322-1e5d-4f2a-9a69-71a8b0785ffb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\Math">
-      <UniqueIdentifier>{b0742a15-e54d-46db-84cd-aace891b9400}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="HeaderFile\Player">
-      <UniqueIdentifier>{501e1f77-b1a7-4528-bc7d-9f5a7c0e8cf1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Player\ステート">
-      <UniqueIdentifier>{e14126e3-412a-4c92-8d18-6dbbdb3b5dc8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Input">
-      <UniqueIdentifier>{f4b48a2d-6c88-454f-a48b-3dc9c53e3227}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Rendering">
-      <UniqueIdentifier>{b49ab068-b48e-437a-bf8f-292441bab8ab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Audio">
-      <UniqueIdentifier>{d3c6db4d-0dbf-4448-af0d-6ba53d100fd8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Debug">
-      <UniqueIdentifier>{a9400362-d1ea-4d83-a596-b27313543114}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Scene">
-      <UniqueIdentifier>{a5f15219-e23b-464f-8cb7-62e2a42f35d3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Physics">
-      <UniqueIdentifier>{f9aea0b4-d74c-4b78-8ccf-48884fe753af}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\LifeCycle">
-      <UniqueIdentifier>{3c003e23-9024-4f01-9e25-1fb77c3759cf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Math">
-      <UniqueIdentifier>{3a76c6cf-c5de-4fac-9092-66399edca2d2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ShaderFile">
-      <UniqueIdentifier>{297c81cb-dd1e-4d64-88d3-139df9292f17}</UniqueIdentifier>
-      <Extensions>hlsl</Extensions>
-    </Filter>
-    <Filter Include="inlFile">
-      <UniqueIdentifier>{a8739d02-af51-4c63-b665-45a9ec25ea7c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\ScriptComponent">
-      <UniqueIdentifier>{5fb83f26-4833-4ad8-af28-a22e1e52c1dd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\GameObject">
-      <UniqueIdentifier>{abd9e297-4897-4168-85f0-c9a28e60d27e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\GameObject">
-      <UniqueIdentifier>{cce24c45-dcaa-4883-9a27-7e3ee233f5e8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\ScriptComponent\Base">
-      <UniqueIdentifier>{eb60c095-eebf-424a-a346-7798b372b645}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\GameObject\Base">
-      <UniqueIdentifier>{c828bf50-7c99-4940-926b-b575c389b5b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\Player\State">
-      <UniqueIdentifier>{e2a41019-bdb4-4219-84a2-37a374af6423}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\Electric">
-      <UniqueIdentifier>{aeb7fedc-9a5c-4d2e-acbd-f4cb2209ad26}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Electric">
-      <UniqueIdentifier>{5a289fa2-a435-480a-b705-45138b174742}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="inlFile\GameObject">
-      <UniqueIdentifier>{e41f5bd2-fa30-41d6-a2fe-c5c65d637813}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\GameObject\Base">
-      <UniqueIdentifier>{14ca4498-d214-41fa-82cd-763fd086c7d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Component">
-      <UniqueIdentifier>{f40b12ef-afed-4113-a46a-9152181d41cf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="inlFile\Component">
-      <UniqueIdentifier>{30f9ad49-4cc2-4d9e-b959-6da0fbdf6d5d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="inlFile\Scene">
-      <UniqueIdentifier>{ea021800-abc7-436e-825e-adcda6beb065}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Scene\Base">
-      <UniqueIdentifier>{e71489d0-0d70-48c2-9181-89d80d9c3783}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\Scene\Base">
-      <UniqueIdentifier>{c03883dc-c11d-4058-9535-dad4c7ef2700}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\OS">
-      <UniqueIdentifier>{432a01f2-9a61-4d5a-95d3-39d69f32b0fc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\OS">
-      <UniqueIdentifier>{0b802805-8b36-4f1f-ae40-156ba6cb321a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Prefab">
-      <UniqueIdentifier>{7e1b3767-5359-4705-8479-87903ed7be58}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Prefab\Base">
-      <UniqueIdentifier>{07209d3e-138d-4c57-8709-7a7483794c3d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HeaderFile\Resource">
-      <UniqueIdentifier>{b86bf006-f75e-448f-b8d2-8407f2061e0e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="inlFile\Resource">
-      <UniqueIdentifier>{4ea4a34f-e614-4c50-987e-73e10995729c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SorceFile\Resource">
-      <UniqueIdentifier>{f650b9e1-c623-4ddc-9930-35743198f40a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Context">
-      <UniqueIdentifier>{3ab2d589-0847-413c-bc17-bed187c64455}</UniqueIdentifier>
-    </Filter>
+    <FxCompile Include="SkinnedMeshVS.hlsl" />
+    <FxCompile Include="SpritePS.hlsl" />
+    <FxCompile Include="MeshPS.hlsl" />
+    <FxCompile Include="SpriteVS.hlsl" />
+    <FxCompile Include="MeshVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemTimer.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="WICTextureLoader11.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="PowerLine.cpp">
-      <Filter>SorceFile\Electric</Filter>
-    </ClCompile>
-    <ClCompile Include="Pole.cpp">
-      <Filter>SorceFile\Electric</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>SorceFile\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerStateHumanWalk.cpp">
-      <Filter>SorceFile\Player\State</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerMovement.cpp">
-      <Filter>SorceFile\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="health.cpp">
-      <Filter>SorceFile\ScriptComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="movement.cpp">
-      <Filter>SorceFile\ScriptComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerState.cpp">
-      <Filter>SorceFile\Player\State</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerStateHumanIdle.cpp">
-      <Filter>SorceFile\Player\State</Filter>
-    </ClCompile>
-    <ClCompile Include="keyboard.cpp">
-      <Filter>SorceFile\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="mouse.cpp">
-      <Filter>SorceFile\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio.cpp">
-      <Filter>SorceFile\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerStateHuman.cpp">
-      <Filter>SorceFile\Player\State</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerStateHumanGround.cpp">
-      <Filter>SorceFile\Player\State</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerStateHumanMidAir.cpp">
-      <Filter>SorceFile\Player\State</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerStateElectric.cpp">
-      <Filter>SorceFile\Player\State</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerMorphSystem.cpp">
-      <Filter>SorceFile\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsSystem.cpp">
-      <Filter>SorceFile\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugCamera.cpp">
-      <Filter>SorceFile\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>SorceFile\ScriptComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>SorceFile\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Quaternion.cpp">
-      <Filter>SorceFile\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector2.cpp">
-      <Filter>SorceFile\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector3.cpp">
-      <Filter>SorceFile\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector4.cpp">
-      <Filter>SorceFile\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="PoleManager.cpp">
-      <Filter>SorceFile\Electric</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugOstream.cpp">
-      <Filter>SorceFile\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugText.cpp">
-      <Filter>SorceFile\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GamePad.cpp">
-      <Filter>SorceFile\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="TPSCamera.cpp">
-      <Filter>SorceFile\ScriptComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderingSystem.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>SorceFile\GameObject\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneSystem.cpp">
-      <Filter>SorceFile\Scene\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineCore.cpp">
-      <Filter>SorceFile\LifeCycle</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.cpp">
-      <Filter>SorceFile\OS</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowSystem.cpp">
-      <Filter>SorceFile\OS</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsBody.cpp">
-      <Filter>SorceFile\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>SorceFile\Scene\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="InputSystem.cpp">
-      <Filter>SorceFile\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceSystem.cpp">
-      <Filter>SorceFile\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Resource.cpp">
-      <Filter>SorceFile\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>SorceFile\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Billboard.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsDevice.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="ConstantBuffer.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>SorceFile\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>SorceFile\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>SorceFile\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>SorceFile\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="StructuredBuffer.cpp">
-      <Filter>SorceFile\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>SorceFile\GameObject\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>SorceFile\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Namioka.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="PowerPlant.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="Title.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="Result.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="ResultController.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="GameClearChecker.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="TitleController.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="EventSystem.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerAudio.cpp">
-    <ClCompile Include="SpecialDensen.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="Apartment.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="Dentyuu.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="Mansion01.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="SpecialDentyuu.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="Karaoke.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="Mansion02.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="Clocktower.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="Wacdonald.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="Road.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="House.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
-    <ClCompile Include="Convenience.cpp">
-      <Filter>SorceFile</Filter>
-    </ClCompile>
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Apartment.cpp" />
+    <ClCompile Include="Audio.cpp" />
+    <ClCompile Include="Billboard.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Clocktower.cpp" />
+    <ClCompile Include="Component.cpp" />
+    <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="Convenience.cpp" />
+    <ClCompile Include="Dentyuu.cpp" />
+    <ClCompile Include="EngineCore.cpp" />
+    <ClCompile Include="EventSystem.cpp" />
+    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GraphicsDevice.cpp" />
+    <ClCompile Include="House.cpp" />
+    <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="Karaoke.cpp" />
+    <ClCompile Include="Mansion01.cpp" />
+    <ClCompile Include="Mansion02.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Namioka.cpp" />
+    <ClCompile Include="PlayerAudio.cpp" />
+    <ClCompile Include="Road.cpp" />
+    <ClCompile Include="SpecialDensen.cpp" />
+    <ClCompile Include="SpecialDentyuu.cpp" />
+    <ClCompile Include="Title.cpp" />
+    <ClCompile Include="Result.cpp" />
+    <ClCompile Include="ResultController.cpp" />
+    <ClCompile Include="GameClearChecker.cpp" />
+    <ClCompile Include="TitleController.cpp" />
+    <ClCompile Include="PhysicsBody.cpp" />
+    <ClCompile Include="PoleManager.cpp" />
+    <ClCompile Include="PowerPlant.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Resource.cpp" />
+    <ClCompile Include="ResourceSystem.cpp" />
+    <ClCompile Include="SceneSystem.cpp" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="StructuredBuffer.cpp" />
+    <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Vector2.cpp" />
+    <ClCompile Include="Vector3.cpp" />
+    <ClCompile Include="Vector4.cpp" />
+    <ClCompile Include="Wacdonald.cpp" />
+    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="WindowSystem.cpp" />
+    <ClCompile Include="GamePad.cpp" />
+    <ClCompile Include="DebugCamera.cpp" />
+    <ClCompile Include="DebugOstream.cpp" />
+    <ClCompile Include="DebugText.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Health.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="Movement.cpp" />
+    <ClCompile Include="PhysicsSystem.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerMorphSystem.cpp" />
+    <ClCompile Include="PlayerMovement.cpp" />
+    <ClCompile Include="PlayerState.cpp" />
+    <ClCompile Include="PlayerStateElectric.cpp" />
+    <ClCompile Include="PlayerStateHuman.cpp" />
+    <ClCompile Include="PlayerStateHumanGround.cpp" />
+    <ClCompile Include="PlayerStateHumanIdle.cpp" />
+    <ClCompile Include="PlayerStateHumanMidAir.cpp" />
+    <ClCompile Include="PlayerStateHumanWalk.cpp" />
+    <ClCompile Include="Pole.cpp" />
+    <ClCompile Include="PowerLine.cpp" />
+    <ClCompile Include="Quaternion.cpp" />
+    <ClCompile Include="RenderingSystem.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SystemTimer.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TPSCamera.cpp" />
+    <ClCompile Include="WICTextureLoader11.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SystemTimer.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="WICTextureLoader11.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="PowerLine.h">
-      <Filter>HeaderFile\Electric</Filter>
-    </ClInclude>
-    <ClInclude Include="Pole.h">
-      <Filter>HeaderFile\Electric</Filter>
-    </ClInclude>
-    <ClInclude Include="PoleManager.h">
-      <Filter>HeaderFile\Electric</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>HeaderFile\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerState.h">
-      <Filter>HeaderFile\Player\ステート</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerState_Human.h">
-      <Filter>HeaderFile\Player\ステート</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerState_Electric.h">
-      <Filter>HeaderFile\Player\ステート</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerState_Human_Idle.h">
-      <Filter>HeaderFile\Player\ステート</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerMovement.h">
-      <Filter>HeaderFile\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerState_Human_MidAir.h">
-      <Filter>HeaderFile\Player\ステート</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerState_Human_Walk.h">
-      <Filter>HeaderFile\Player\ステート</Filter>
-    </ClInclude>
-    <ClInclude Include="health.h">
-      <Filter>HeaderFile\ScriptComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="movement.h">
-      <Filter>HeaderFile\ScriptComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="keyboard.h">
-      <Filter>HeaderFile\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="mouse.h">
-      <Filter>HeaderFile\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Audio.h">
-      <Filter>HeaderFile\Audio</Filter>
-    </ClInclude>
-    <ClInclude Include="command.h">
-      <Filter>HeaderFile\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerCommand.h">
-      <Filter>HeaderFile\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerCommandSet.h">
-      <Filter>HeaderFile\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerState_Human_Ground.h">
-      <Filter>HeaderFile\Player\ステート</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerMorphSystem.h">
-      <Filter>HeaderFile\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsSystem.h">
-      <Filter>HeaderFile\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugCamera.h">
-      <Filter>HeaderFile\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="Ray.h">
-      <Filter>HeaderFile\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Time.h">
-      <Filter>HeaderFile\LifeCycle</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>HeaderFile\LifeCycle</Filter>
-    </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>HeaderFile\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="InputSystem.h">
-      <Filter>HeaderFile\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugCounter.h">
-      <Filter>HeaderFile\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector2.h">
-      <Filter>HeaderFile\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3.h">
-      <Filter>HeaderFile\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector4.h">
-      <Filter>HeaderFile\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Quaternion.h">
-      <Filter>HeaderFile\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugConsole.h">
-      <Filter>HeaderFile\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugOstream.h">
-      <Filter>HeaderFile\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="InputHandler.h">
-      <Filter>HeaderFile\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugText.h">
-      <Filter>HeaderFile\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="GameContext.h">
-      <Filter>HeaderFile\LifeCycle</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandSet.h">
-      <Filter>HeaderFile\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="GamePad.h">
-      <Filter>HeaderFile\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="InputDevice.h">
-      <Filter>HeaderFile\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineCore.h">
-      <Filter>HeaderFile\LifeCycle</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderingSystem.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>HeaderFile\GameObject\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>HeaderFile\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="ScriptComponent.h">
-      <Filter>HeaderFile\ScriptComponent\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="ScriptComponentSystem.h">
-      <Filter>HeaderFile\ScriptComponent\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectPool.h">
-      <Filter>HeaderFile\LifeCycle</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>HeaderFile\Scene\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneSystem.h">
-      <Filter>HeaderFile\Scene\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowSystem.h">
-      <Filter>HeaderFile\OS</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.h">
-      <Filter>HeaderFile\OS</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsBody.h">
-      <Filter>HeaderFile\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="ColliderShape.h">
-      <Filter>HeaderFile\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="UniqueQueue.h">
-      <Filter>HeaderFile\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Prefab.h">
-      <Filter>HeaderFile\Prefab\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="UniqueVector.h">
-      <Filter>HeaderFile\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="TPSCamera.h">
-      <Filter>HeaderFile\ScriptComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="CameraPrefab.h">
-      <Filter>HeaderFile\Prefab</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugCameraPrefab.h">
-      <Filter>HeaderFile\Prefab</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerPrefab.h">
-      <Filter>HeaderFile\Prefab</Filter>
-    </ClInclude>
-    <ClInclude Include="TPSCameraPrefab.h">
-      <Filter>HeaderFile\Prefab</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>HeaderFile\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceSystem.h">
-      <Filter>HeaderFile\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>HeaderFile\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Billboard.h">
-      <Filter>HeaderFile\ScriptComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="BillboardPrefab.h">
-      <Filter>HeaderFile\Prefab</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsDevice.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>HeaderFile\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>HeaderFile\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>HeaderFile\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>HeaderFile\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>HeaderFile\GameObject\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="StructuredBuffer.h">
-      <Filter>HeaderFile\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation.h">
-      <Filter>HeaderFile\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Namioka.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="PowerPlant.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Title.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Result.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="ResultController.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="GameClearChecker.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="TitleController.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="EventSystem.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerAudio.h">
-    <ClInclude Include="Enemy.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="EnemyPrefab.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Apartment.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Dentyuu.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Karaoke.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="SpecialDensen.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Wacdonald.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Clocktower.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="SpecialDentyuu.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Convenience.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="House.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Mansion01.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Mansion02.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Road.h">
-      <Filter>HeaderFile</Filter>
-    </ClInclude>
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="Apartment.h" />
+    <ClInclude Include="Audio.h" />
+    <ClInclude Include="Billboard.h" />
+    <ClInclude Include="BillboardPrefab.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraPrefab.h" />
+    <ClInclude Include="Clocktower.h" />
+    <ClInclude Include="ColliderShape.h" />
+    <ClInclude Include="Command.h" />
+    <ClInclude Include="CommandSet.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="Convenience.h" />
+    <ClInclude Include="DebugCameraPrefab.h" />
+    <ClInclude Include="EventSystem.h" />
+    <ClInclude Include="Dentyuu.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyPrefab.h" />
+    <ClInclude Include="GraphicsDevice.h" />
+    <ClInclude Include="House.h" />
+    <ClInclude Include="Karaoke.h" />
+    <ClInclude Include="Mansion01.h" />
+    <ClInclude Include="Mansion02.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="Namioka.h" />
+    <ClInclude Include="PlayerAudio.h" />
+    <ClInclude Include="Road.h" />
+    <ClInclude Include="SpecialDensen.h" />
+    <ClInclude Include="SpecialDentyuu.h" />
+    <ClInclude Include="Title.h" />
+    <ClInclude Include="Result.h" />
+    <ClInclude Include="ResultController.h" />
+    <ClInclude Include="GameClearChecker.h" />
+    <ClInclude Include="TitleController.h" />
+    <ClInclude Include="PlayerPrefab.h" />
+    <ClInclude Include="DebugCounter.h" />
+    <ClInclude Include="GameContext.h" />
+    <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="ObjectPool.h" />
+    <ClInclude Include="PhysicsBody.h" />
+    <ClInclude Include="PowerPlant.h" />
+    <ClInclude Include="Prefab.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="ResourceSystem.h" />
+    <ClInclude Include="SceneSystem.h" />
+    <ClInclude Include="ScriptComponent.h" />
+    <ClInclude Include="ScriptComponentSystem.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="StructuredBuffer.h" />
+    <ClInclude Include="TPSCameraPrefab.h" />
+    <ClInclude Include="UniqueQueue.h" />
+    <ClInclude Include="UniqueVector.h" />
+    <ClInclude Include="Vector2.h" />
+    <ClInclude Include="Vector3.h" />
+    <ClInclude Include="Vector4.h" />
+    <ClInclude Include="Wacdonald.h" />
+    <ClInclude Include="Window.h" />
+    <ClInclude Include="WindowSystem.h" />
+    <ClInclude Include="GamePad.h" />
+    <ClInclude Include="DebugCamera.h" />
+    <ClInclude Include="DebugConsole.h" />
+    <ClInclude Include="DebugOstream.h" />
+    <ClInclude Include="DebugText.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Health.h" />
+    <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="InputDevice.h" />
+    <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Mouse.h" />
+    <ClInclude Include="Movement.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="PhysicsSystem.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerCommand.h" />
+    <ClInclude Include="PlayerCommandSet.h" />
+    <ClInclude Include="PlayerMorphSystem.h" />
+    <ClInclude Include="PlayerMovement.h" />
+    <ClInclude Include="PlayerState.h" />
+    <ClInclude Include="PlayerState_Electric.h" />
+    <ClInclude Include="PlayerState_Human_Ground.h" />
+    <ClInclude Include="PlayerState_Human.h" />
+    <ClInclude Include="PlayerState_Human_Idle.h" />
+    <ClInclude Include="PlayerState_Human_MidAir.h" />
+    <ClInclude Include="PlayerState_Human_Walk.h" />
+    <ClInclude Include="Pole.h" />
+    <ClInclude Include="PoleManager.h" />
+    <ClInclude Include="PowerLine.h" />
+    <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="Ray.h" />
+    <ClInclude Include="RenderingSystem.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="EngineCore.h" />
+    <ClInclude Include="SystemTimer.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="Time.h" />
+    <ClInclude Include="TPSCamera.h" />
+    <ClInclude Include="Transform.h" />
+    <ClInclude Include="WICTextureLoader11.h" />
+    <ClInclude Include="EnemySpawner.h" />
+    <ClInclude Include="EnemySpawnerPrefab.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="SpriteVS.hlsl">
-      <Filter>ShaderFile</Filter>
-    </FxCompile>
-    <FxCompile Include="SpritePS.hlsl">
-      <Filter>ShaderFile</Filter>
-    </FxCompile>
-    <FxCompile Include="MeshVS.hlsl">
-      <Filter>ShaderFile</Filter>
-    </FxCompile>
-    <FxCompile Include="MeshPS.hlsl">
-      <Filter>ShaderFile</Filter>
-    </FxCompile>
-    <FxCompile Include="SkinnedMeshVS.hlsl">
-      <Filter>ShaderFile</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="GameObject.inl">
-      <Filter>inlFile\GameObject</Filter>
-    </None>
-    <None Include="Component.inl">
-      <Filter>inlFile\Component</Filter>
-    </None>
-    <None Include="Scene.inl">
-      <Filter>inlFile\Scene</Filter>
-    </None>
-    <None Include="SceneSystem.inl">
-      <Filter>inlFile\Scene</Filter>
-    </None>
-    <None Include="ResourceSystem.inl">
-      <Filter>inlFile\Resource</Filter>
-    </None>
-    <None Include="context\GameObject.md">
-      <Filter>Context</Filter>
-    </None>
-    <None Include="context\Component.md">
-      <Filter>Context</Filter>
-    </None>
-    <None Include="context\Prefab.md">
-      <Filter>Context</Filter>
-    </None>
-    <None Include="context\Scene.md">
-      <Filter>Context</Filter>
-    </None>
-    <None Include="context\ScriptComponent.md">
-      <Filter>Context</Filter>
-    </None>
     <None Include=".github\copilot-instructions.md" />
-    <None Include="context\Math.md">
-      <Filter>Context</Filter>
-    </None>
-    <None Include="context\System.md">
-      <Filter>Context</Filter>
-    </None>
-    <None Include="context\Time.md">
-      <Filter>Context</Filter>
-    </None>
-    <None Include="context\Physics.md">
-      <Filter>Context</Filter>
-    </None>
+    <None Include="Component.inl" />
+    <None Include="context\Component.md" />
+    <None Include="context\GameObject.md" />
+    <None Include="context\Math.md" />
+    <None Include="context\Physics.md" />
     <None Include="context\Player.md" />
+    <None Include="context\Prefab.md" />
+    <None Include="context\Scene.md" />
+    <None Include="context\ScriptComponent.md" />
+    <None Include="context\System.md" />
+    <None Include="context\Time.md" />
+    <None Include="GameObject.inl" />
+    <None Include="ResourceSystem.inl" />
+    <None Include="Scene.inl" />
+    <None Include="SceneSystem.inl" />
   </ItemGroup>
 </Project>
