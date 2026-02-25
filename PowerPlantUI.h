@@ -1,0 +1,40 @@
+#pragma once
+
+#include "ScriptComponent.h"
+#include "Vector3.h"
+#include <memory>
+#include <unordered_map>
+
+class Mesh;
+class MeshRenderer;
+class GameObject;
+class PowerPlant;
+class GraphicsDevice;
+
+class PowerPlantUI : public ScriptComponent
+{
+public:
+	PowerPlantUI() = default;
+	void Start() override;
+	void Update() override;
+
+	// テクスチャパス（必要に応じて編集）
+	std::wstring backgroundTexture = L"texture/ui_charge_bg.png";
+	std::wstring fillTexture = L"texture/ui_charge_fill.png";
+	Vector3 localOffset{ 2.0f, 1.5f, 0.0f }; // プラント基準のオフセット位置
+	Vector3 uiScale{ 0.6f, 1.2f, 1.0f }; // 幅，高さ（ワールドスケール）
+
+private:
+	MeshRenderer* m_bgRenderer = nullptr;
+	MeshRenderer* m_fillRenderer = nullptr;
+	GameObject* m_bgObj = nullptr;
+	GameObject* m_fillObj = nullptr;
+
+	PowerPlant* m_powerPlant = nullptr;
+
+	// メッシュキャッシュ（進捗 % -> mesh）
+	std::unordered_map<int, std::shared_ptr<Mesh>> m_meshCache;
+
+	// 元スケール保持
+	Vector3 m_originalScale{};
+};
