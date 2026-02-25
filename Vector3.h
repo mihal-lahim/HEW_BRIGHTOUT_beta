@@ -1,6 +1,3 @@
-
-
-
 #ifndef VECTOR3_H
 #define VECTOR3_H
 
@@ -49,6 +46,16 @@ public:
 	Vector3& operator+=(const Vector3& other);
 	Vector3& operator-=(const Vector3& other);
 	Vector3& operator*=(float scalar);
+
+	bool operator==(const Vector3& other) const
+	{
+		return x == other.x && y == other.y && z == other.z;
+	}
+
+	bool operator!=(const Vector3& other) const
+	{
+		return !(*this == other);
+	}
 
 
 	// 0ƒxƒNƒgƒ‹‚©‚Ç‚¤‚©‚Ì”»’è

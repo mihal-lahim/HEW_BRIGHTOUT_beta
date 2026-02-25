@@ -52,6 +52,12 @@ public:
 	// クオータニオンの乗算
 	Quaternion operator*(const Quaternion& other) const;
 	Quaternion& operator*=(const Quaternion& other);
+
+	// Quaternion からオイラー角 (ラジアン) を取得するメソッドを追加
+	Vector3 ToEulerAngles() const;
+
+	// Euler角(Vector3: x=Pitch, y=Yaw, z=Roll [度])からQuaternionを生成
+	static Quaternion FromEulerAngles(const Vector3& eulerAngles);
 };
 
 

@@ -11,7 +11,10 @@ void Result::Initialize()
 	//オーディオ初期化
 	InitAudio();
 
-	g_ResultBgm = LoadAudio("sound/GameResult_01.wav");
+	g_ResultBgm = LoadAudio("sound/Result_01.wav");
+
+	PlayAudio(g_ResultBgm, true);
+	SetAudioVolume(g_ResultBgm, 0.2f);
 
 	// リザルトシーンの背景色を変更（青系の色で区別しやすくする）
 	rendering().GetGraphicsDevice().SetClearColor(0.1f, 0.2f, 0.5f);

@@ -172,6 +172,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Apartment.cpp" />
     <ClCompile Include="Audio.cpp" />
+    <ClCompile Include="BgmSwitcher.cpp" />
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Clocktower.cpp" />
@@ -184,6 +185,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
     <ClCompile Include="House.cpp" />
+    <ClCompile Include="HPBarUI.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="Karaoke.cpp" />
     <ClCompile Include="Mansion01.cpp" />
@@ -191,11 +193,14 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="MorphUI.cpp" />
     <ClCompile Include="Namioka.cpp" />
     <ClCompile Include="PlayerAudio.cpp" />
+    <ClCompile Include="PowerPlantUI.cpp" />
     <ClCompile Include="Road.cpp" />
     <ClCompile Include="SpecialDensen.cpp" />
     <ClCompile Include="SpecialDentyuu.cpp" />
+    <ClCompile Include="TimerUI.cpp" />
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="Result.cpp" />
     <ClCompile Include="ResultController.cpp" />
@@ -211,6 +216,8 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="StructuredBuffer.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="UIDrawer.cpp" />
+    <ClCompile Include="UIQuad.cpp" />
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Vector4.cpp" />
@@ -252,6 +259,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Apartment.h" />
     <ClInclude Include="Audio.h" />
+    <ClInclude Include="BgmSwitcher.h" />
     <ClInclude Include="Billboard.h" />
     <ClInclude Include="BillboardPrefab.h" />
     <ClInclude Include="Camera.h" />
@@ -272,17 +280,21 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="EnemyPrefab.h" />
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="House.h" />
+    <ClInclude Include="HPBarUI.h" />
     <ClInclude Include="Karaoke.h" />
     <ClInclude Include="Mansion01.h" />
     <ClInclude Include="Mansion02.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="MorphUI.h" />
     <ClInclude Include="Namioka.h" />
     <ClInclude Include="PlayerAudio.h" />
+    <ClInclude Include="PowerPlantUI.h" />
     <ClInclude Include="Road.h" />
     <ClInclude Include="SpecialDensen.h" />
     <ClInclude Include="SpecialDentyuu.h" />
+    <ClInclude Include="TimerUI.h" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="Result.h" />
     <ClInclude Include="ResultController.h" />
@@ -304,6 +316,8 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Shader.h" />
     <ClInclude Include="StructuredBuffer.h" />
     <ClInclude Include="TPSCameraPrefab.h" />
+    <ClInclude Include="UIDrawer.h" />
+    <ClInclude Include="UIQuad.h" />
     <ClInclude Include="UniqueQueue.h" />
     <ClInclude Include="UniqueVector.h" />
     <ClInclude Include="Vector2.h" />
@@ -389,6 +403,18 @@ for %%F in ("$(TargetDir)*.cso") do (
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="UiPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="UiVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
