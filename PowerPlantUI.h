@@ -21,8 +21,8 @@ public:
 	// テクスチャパス（必要に応じて編集）
 	std::wstring backgroundTexture = L"texture/ui_charge_bg.png";
 	std::wstring fillTexture = L"texture/ui_charge_fill.png";
-	Vector3 localOffset{ 2.0f, 1.5f, 0.0f }; // プラント基準のオフセット位置
-	Vector3 uiScale{ 0.6f, 1.2f, 1.0f }; // 幅，高さ（ワールドスケール）
+	Vector3 localOffset{ 5.0f, 3.0f, 0.0f }; // プラント基準のオフセット位置（ワールド単位）
+	Vector3 uiScale{ 1.5f, 4.0f, 1.0f }; // 幅，高さ（ワールドスケール）
 
 private:
 	MeshRenderer* m_bgRenderer = nullptr;

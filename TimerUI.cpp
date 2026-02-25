@@ -5,6 +5,7 @@
 #include "RenderingSystem.h"
 #include "UIQuad.h"
 #include "Mesh.h"
+#include "Result.h"
 
 
 #include <chrono>
@@ -19,7 +20,6 @@ TimerUI::TimerUI()
 
 void TimerUI::Start()
 {
-    // シーン / レンダリング / グラフィックスデバイス取得
     auto* scene = gameObject().scenePtr();
     auto& rendering = gameObject().rendering();
     GraphicsDevice& device = rendering.GetGraphicsDevice();
@@ -60,18 +60,23 @@ void TimerUI::Start()
         digitObj->transform().scale() = Vector3(digitWidth, digitHeight, 1.0f);
 
         MeshRenderer* renderer = digitObj->AddComponent<MeshRenderer>();
-        // 初期は 0 表示（ただし最終的に Update で正しく差し替わる）
+        // 初期メッシュ
         renderer->mesh = m_digitMeshes[0].get();
         renderer->renderQueue = RenderQueue::UI;
 
+        // 既存の UiVS を使い、スクリーンスペースモードを有効化する（UiVS が UseScreenSpace を扱う前提）
         renderer->material.vsPath = "UiVS.cso";
         renderer->material.psPath = "UiPS.cso";
         renderer->material.texturePath = L"texture/BRIGHTOUT_Number_0-9.png";
 
+        // 画面サイズを渡す + スクリーンスペースフラグ
+        renderer->material.SetFloat("ScreenWidth", static_cast<float>(device.GetBackBufferWidth()));
+        renderer->material.SetFloat("ScreenHeight", static_cast<float>(device.GetBackBufferHeight()));
+        renderer->material.SetFloat("UseScreenSpace", 1.0f);
+
         m_digitRenderers[i] = renderer;
     }
 
-    // 時間管理用
     m_lastTime = steady_clock::now();
 }
 
@@ -84,7 +89,15 @@ void TimerUI::Update()
     m_lastTime = now;
 
     m_totalSeconds -= delta.count();
-    if (m_totalSeconds < 0.0f) m_totalSeconds = 0.0f;
+  if (m_totalSeconds < 0.0f) m_totalSeconds = 0.0f;
+
+    // タイマーが0になったらリザルトシーンに遷移
+    if (m_totalSeconds <= 0.0f && !m_hasTransitioned)
+    {
+ m_hasTransitioned = true;
+        scene().ChangeScene<Result>();
+        return;
+    }
 
     int totalSec = static_cast<int>(std::floor(m_totalSeconds + 0.0001f));
 
@@ -92,9 +105,9 @@ void TimerUI::Update()
     int seconds = totalSec % 60;
 
     int m10 = (minutes / 10) % 10;
-    int m1  = minutes % 10;
+    int m1 = minutes % 10;
     int s10 = (seconds / 10) % 10;
-    int s1  = seconds % 10;
+    int s1 = seconds % 10;
 
     int digits[4] = { m10, m1, s10, s1 };
 

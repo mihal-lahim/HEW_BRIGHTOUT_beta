@@ -17,13 +17,14 @@ using namespace DirectX;
 
 void RenderingSystem::Initialize(GraphicsDevice& graphicsDevice)
 {
-	// グラフィックスデバイスの設定
-	m_graphicsDevice = &graphicsDevice;
+    m_graphicsDevice = &graphicsDevice;
 
-	// 各種定数バッファの作成
-	m_perFrameBuffer.CreateBuffer(*m_graphicsDevice, sizeof(PerFrameConstants));
-	m_perCameraBuffer.CreateBuffer(*m_graphicsDevice, sizeof(PerCameraConstants));
-	m_perObjectBuffer.CreateBuffer(*m_graphicsDevice, sizeof(PerObjectConstants));
+    m_perFrameBuffer.CreateBuffer(*m_graphicsDevice, sizeof(PerFrameConstants));
+    m_perCameraBuffer.CreateBuffer(*m_graphicsDevice, sizeof(PerCameraConstants));
+    m_perObjectBuffer.CreateBuffer(*m_graphicsDevice, sizeof(PerObjectConstants));
+
+    // ★ UI用 b4
+    m_uiParamsBuffer.CreateBuffer(*m_graphicsDevice, sizeof(UIParamsConstants));
 }
 
 void RenderingSystem::Finalize()
@@ -32,210 +33,199 @@ void RenderingSystem::Finalize()
 
 void RenderingSystem::Render(const Scene& scene)
 {
-	if (!m_graphicsDevice)
-	{
-		return;
-	}
+    if (!m_graphicsDevice)
+        return;
 
-	m_graphicsDevice->Clear();
+    m_graphicsDevice->Clear();
 
-	// フレーム毎の更新
-	UpdatePerFrame();
+    UpdatePerFrame();
 
-	
-	// アニメーションコントローラーの取得
-	auto animControllers = scene.GetComponents<Animator>();
-	for (auto& controller : animControllers)
-	{
-		if (!controller->IsEnable())
-		{
-			continue;
-		}
-		// アニメーションの更新
-		controller->UpdateAnimation();
-		controller->Bind(*m_graphicsDevice);
-	}
-	
+    // -------------------------
+    // アニメーション更新
+    // -------------------------
+    auto animControllers = scene.GetComponents<Animator>();
+    for (auto& controller : animControllers)
+    {
+        if (!controller->IsEnable())
+            continue;
 
+        controller->UpdateAnimation();
+        controller->Bind(*m_graphicsDevice);
+    }
 
-	// カメラの取得
-	auto cameras = scene.GetComponents<Camera>();
+    // -------------------------
+    // 3D描画
+    // -------------------------
+    auto cameras = scene.GetComponents<Camera>();
 
-	std::sort(cameras.begin(), cameras.end(),
-		[](const Camera* a, const Camera* b)
-		{
-			return a->Priority < b->Priority;
-		}
-	);
+    std::sort(cameras.begin(), cameras.end(),
+        [](const Camera* a, const Camera* b)
+        {
+            return a->Priority < b->Priority;
+        });
 
-	for (auto& camera : cameras)
-	{
-		if (!camera->IsEnable())
-		{
-			continue;
-		}
-		// カメラ毎の更新
-		UpdatePerCamera(*camera);
+    for (auto& camera : cameras)
+    {
+        if (!camera->IsEnable())
+            continue;
 
-		// メッシュレンダラーの取得
-		auto meshRenderers = scene.GetComponents<MeshRenderer>();
+        UpdatePerCamera(*camera);
 
-		for (auto& renderer : meshRenderers)
-		{
-			if (!renderer->IsEnable())
-			{
-				continue;
-			}
+        auto meshRenderers = scene.GetComponents<MeshRenderer>();
 
-			if (renderer->renderQueue == RenderQueue::UI)
-				continue; 
+        for (auto& renderer : meshRenderers)
+        {
+            if (!renderer->IsEnable())
+                continue;
 
-			// レンダーキューの適用
-			RenderQueue currentQueue = renderer->renderQueue;
-			ApplyRenderQueue(currentQueue);
+            if (renderer->renderQueue == RenderQueue::UI)
+                continue;
 
-			// マテリアルの遅延ロード処理
-			MaterialLoadingProcess(renderer->material);
+            ApplyRenderQueue(renderer->renderQueue);
+            MaterialLoadingProcess(renderer->material);
+            renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
+        }
 
-			// レンダー
-			renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
-		}
+        auto skinnedMeshRenderers = scene.GetComponents<SkinnedMeshRenderer>();
 
-		// スキンドメッシュレンダラーの取得
-		auto skinnedMeshRenderers = scene.GetComponents<SkinnedMeshRenderer>();
+        for (auto& renderer : skinnedMeshRenderers)
+        {
+            if (!renderer->IsEnable())
+                continue;
 
-		for (auto& renderer : skinnedMeshRenderers)
-		{
-			if (!renderer->IsEnable())
-			{
-				continue;
-			}
-			// レンダーキューの適用
-			RenderQueue currentQueue = renderer->renderQueue;
-			ApplyRenderQueue(currentQueue);
+            ApplyRenderQueue(renderer->renderQueue);
+            MaterialLoadingProcess(renderer->material);
+            renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
+        }
+    }
 
-			// マテリアルの遅延ロード処理
-			MaterialLoadingProcess(renderer->material);
+    // =============================
+    // UI描画（正射影 + b4設定）
+    // =============================
 
-			// レンダー
-			renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
-		}
-	}
+    float width = (float)m_graphicsDevice->GetBackBufferWidth();
+    float height = (float)m_graphicsDevice->GetBackBufferHeight();
 
-	// 正射影行列を作る
-	PerCameraConstants perCamera = {};
-	auto width = (float)m_graphicsDevice->GetBackBufferWidth();
-	auto height = (float)m_graphicsDevice->GetBackBufferHeight();
+    PerCameraConstants perCamera = {};
 
-	XMMATRIX view = XMMatrixIdentity();
-	XMMATRIX projection = XMMatrixOrthographicOffCenterLH(
-		0.0f, width,
-		height, 0.0f,
-		0.0f, 1.0f);
+    XMMATRIX view = XMMatrixIdentity();
+    XMMATRIX projection = XMMatrixOrthographicOffCenterLH(
+        0.0f, width,
+        height, 0.0f,
+        0.0f, 1.0f);
 
-	XMStoreFloat4x4(&perCamera.view, XMMatrixTranspose(view));
-	XMStoreFloat4x4(&perCamera.projection, XMMatrixTranspose(projection));
+    XMStoreFloat4x4(&perCamera.view, XMMatrixTranspose(view));
+    XMStoreFloat4x4(&perCamera.projection, XMMatrixTranspose(projection));
 
-	m_perCameraBuffer.UpdateBuffer(*m_graphicsDevice, &perCamera, sizeof(perCamera));
-	m_perCameraBuffer.BindVS(*m_graphicsDevice, 1);
-	m_perCameraBuffer.BindPS(*m_graphicsDevice, 1);
+    m_perCameraBuffer.UpdateBuffer(*m_graphicsDevice, &perCamera, sizeof(perCamera));
+    m_perCameraBuffer.BindVS(*m_graphicsDevice, 1);
+    m_perCameraBuffer.BindPS(*m_graphicsDevice, 1);
 
-	auto meshRenderers = scene.GetComponents<MeshRenderer>();
+    // ★ UiVS の b4 に対応
+    UIParamsConstants uiParams{};
+    uiParams.ScreenWidth = width;
+    uiParams.ScreenHeight = height;
+    uiParams.UseScreenSpace = 1.0f;
 
-	for (auto& renderer : meshRenderers)
-	{
-		if (!renderer->IsEnable())
-			continue;
+    m_uiParamsBuffer.UpdateBuffer(*m_graphicsDevice, &uiParams, sizeof(uiParams));
+    m_uiParamsBuffer.BindVS(*m_graphicsDevice, 4);
+    m_uiParamsBuffer.BindPS(*m_graphicsDevice, 4);
 
-		if (renderer->renderQueue != RenderQueue::UI)
-			continue;
+    auto meshRenderers = scene.GetComponents<MeshRenderer>();
 
-		ApplyRenderQueue(RenderQueue::UI);
-		MaterialLoadingProcess(renderer->material);
-		renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
-	}
+    for (auto& renderer : meshRenderers)
+    {
+        if (!renderer->IsEnable())
+            continue;
 
-	m_graphicsDevice->Present();
+        if (renderer->renderQueue != RenderQueue::UI)
+            continue;
+
+        ApplyRenderQueue(RenderQueue::UI);
+        MaterialLoadingProcess(renderer->material);
+        renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
+    }
+
+    m_graphicsDevice->Present();
 }
 
 void RenderingSystem::MaterialLoadingProcess(Material& material)
 {
-	// シェーダープログラムの設定
-	if (!material.shaderProgram)
-	{
-		auto* resourceSystem = m_engineCore->GetGameContext().resourceSystem;
-		auto* shader = resourceSystem->Load<ShaderProgram>(material.vsPath, material.psPath);
-		material.CreateBuffer(*m_graphicsDevice, shader);
-	}
-	// テクスチャの設定
-	if (!material.texture)
-	{
-		auto* resourceSystem = m_engineCore->GetGameContext().resourceSystem;
-		auto* texture = resourceSystem->Load<Texture>(material.texturePath);
-		material.texture = texture;
-	}
+    if (!material.shaderProgram)
+    {
+        auto* resourceSystem = m_engineCore->GetGameContext().resourceSystem;
+        auto* shader = resourceSystem->Load<ShaderProgram>(material.vsPath, material.psPath);
+        material.CreateBuffer(*m_graphicsDevice, shader);
+    }
+
+    if (!material.texture)
+    {
+        auto* resourceSystem = m_engineCore->GetGameContext().resourceSystem;
+        auto* texture = resourceSystem->Load<Texture>(material.texturePath);
+        material.texture = texture;
+    }
 }
 
 void RenderingSystem::UpdatePerFrame()
 {
-	PerFrameConstants perFrame = {};
-	perFrame.ambient_light_color = { 0.3f, 0.3f, 0.3f, 1.0f };
-	perFrame.directional_light_color = { 0.4f, 0.4f, 0.4f, 1.0f };
-	perFrame.directional_light_vector = { 0.4f, -1.0f, 2.0f, 0.0f };
+    PerFrameConstants perFrame = {};
+    perFrame.ambient_light_color = { 0.3f, 0.3f, 0.3f, 1.0f };
+    perFrame.directional_light_color = { 0.4f, 0.4f, 0.4f, 1.0f };
+    perFrame.directional_light_vector = { 0.4f, -1.0f, 2.0f, 0.0f };
 
-	m_perFrameBuffer.UpdateBuffer(*m_graphicsDevice, &perFrame, sizeof(perFrame));
-	m_perFrameBuffer.BindVS(*m_graphicsDevice, 0);
-	m_perFrameBuffer.BindPS(*m_graphicsDevice, 0);
+    m_perFrameBuffer.UpdateBuffer(*m_graphicsDevice, &perFrame, sizeof(perFrame));
+    m_perFrameBuffer.BindVS(*m_graphicsDevice, 0);
+    m_perFrameBuffer.BindPS(*m_graphicsDevice, 0);
 }
 
 void RenderingSystem::UpdatePerCamera(const Camera& camera)
 {
-	// カメラ毎構造体の更新
-	PerCameraConstants perCamera = {};
-	XMMATRIX view = camera.GetViewMatrix();
-	XMMATRIX projection = camera.GetProjectionMatrix(
-		static_cast<float>(m_graphicsDevice->GetBackBufferWidth()),
-		static_cast<float>(m_graphicsDevice->GetBackBufferHeight())
-	);
+    PerCameraConstants perCamera = {};
 
-	// 行列を転置して格納
-	XMStoreFloat4x4(&perCamera.view, XMMatrixTranspose(view));
-	XMStoreFloat4x4(&perCamera.projection, XMMatrixTranspose(projection));
+    XMMATRIX view = camera.GetViewMatrix();
+    XMMATRIX projection = camera.GetProjectionMatrix(
+        (float)m_graphicsDevice->GetBackBufferWidth(),
+        (float)m_graphicsDevice->GetBackBufferHeight());
 
-	// 定数バッファの更新とバインド
-	m_perCameraBuffer.UpdateBuffer(*m_graphicsDevice, &perCamera, sizeof(perCamera));
-	m_perCameraBuffer.BindVS(*m_graphicsDevice, 1);
-	m_perCameraBuffer.BindPS(*m_graphicsDevice, 1);
+    XMStoreFloat4x4(&perCamera.view, XMMatrixTranspose(view));
+    XMStoreFloat4x4(&perCamera.projection, XMMatrixTranspose(projection));
+
+    m_perCameraBuffer.UpdateBuffer(*m_graphicsDevice, &perCamera, sizeof(perCamera));
+    m_perCameraBuffer.BindVS(*m_graphicsDevice, 1);
+    m_perCameraBuffer.BindPS(*m_graphicsDevice, 1);
 }
 
 void RenderingSystem::ApplyRenderQueue(RenderQueue queue)
 {
-	switch (queue)
-	{
-	case RenderQueue::Transparent:
-		m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);
-		m_graphicsDevice->SetDepthTest(true);
-		break;
+    switch (queue)
+    {
+    case RenderQueue::Transparent:
+        m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);
+        m_graphicsDevice->SetDepthTest(true);
+        break;
 
-	case RenderQueue::UI:   
-		m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);
-		m_graphicsDevice->SetDepthTest(false);   
-		break;
+    case RenderQueue::UI:
+        m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);
+        m_graphicsDevice->SetDepthTest(false);
+        break;
 
-	case RenderQueue::Opaque:
-	default:
-		m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_OPAQUE);
-		m_graphicsDevice->SetDepthTest(true);
-		break;
-	}
+    case RenderQueue::Opaque:
+    default:
+        m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_OPAQUE);
+        m_graphicsDevice->SetDepthTest(true);
+        break;
+    }
 }
 
 std::shared_ptr<Mesh> RenderingSystem::CreateUIQuad()
 {
-	if (!m_uiQuad)
-	{
-		m_uiQuad = ::CreateUIQuad(*m_graphicsDevice);
-	}
+    if (!m_uiQuad)
+        m_uiQuad = ::CreateUIQuad(*m_graphicsDevice);
 
-	return m_uiQuad;
+    return m_uiQuad;
+}
+
+std::shared_ptr<Mesh> RenderingSystem::CreateUIQuadWithUV(float u0, float u1)
+{
+    return ::CreateUIQuadWithUV(*m_graphicsDevice, u0, u1);
 }

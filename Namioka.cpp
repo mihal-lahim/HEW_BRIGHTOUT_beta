@@ -41,6 +41,8 @@ void Namioka::Initialize()
 	InitAudio();
 
 	g_GameBgm = LoadAudio("sound/GameBGM_01.wav");
+
+	//ラストスパート用BGM
 	g_GameBgm2 = LoadAudio("sound/GameBGM_02.wav");
 
 	// BGM再生（ループ）
@@ -1164,44 +1166,46 @@ void Namioka::Initialize()
 	GameObject* uiRoot = CreateGameObject();
 	uiRoot->SetName("UIRoot");
 
+	// 画面中央に 500x500 の UI（y は負にしない）
 	UI::CreateUI(
 		uiRoot,
-		L"texture/BRIGHTOUT_UI_TAIMA-kl.png", // テクスチャパス
-		Vector3(700.0f, -100.0f, 0.0f),          // 位置
-		Vector3(500.0f, 500.0f, 1.0f),        // スケール
-		"UiVS.cso",                           // 頂点シェーダ（例）
-		"UiPS.cso"                            // ピクセルシェーダ（例）
+		L"texture/BRIGHTOUT_UI_TAIMA-kl.png",
+		Vector3(700.0f, -100.0f, 0.0f),   // ピクセル座標 (x, y)
+		Vector3(500.0f, 500.0f, 1.0f),   // 幅=500px, 高さ=500px
+		"UiVS.cso",
+		"UiPS.cso"
 	);
 
-
-	//タイマー
+	// タイマー（位置はピクセル、スケールは TimerUI が内部で使うので 1,1,1 に）
 	GameObject* timerRoot = uiRoot->scenePtr()->CreateGameObject();
 	timerRoot->SetName("TimerRoot");
-	timerRoot->transform().position() = Vector3(925.0f, 100.0f, 0.0f);
-	timerRoot->transform().scale() = Vector3(60.0f, 60.0f, 60.0f);
+	timerRoot->transform().position() = Vector3(925.0f, 100.0f, 0.0f); 
+	timerRoot->transform().scale() = Vector3(1.0f, 1.0f, 1.0f);
 	timerRoot->AddComponent<TimerUI>();
 
-	// HP バー用オブジェクトを作成して HPBarUI を追加
+	// HP バー（HPBarUI の既定 scale は 400x400 を想定）
 	GameObject* hpRoot = uiRoot->scenePtr()->CreateGameObject();
 	hpRoot->SetName("HPBarRoot");
-	hpRoot->transform().position() = Vector3(50.0f, 800.0f, 0.0f);
-	hpRoot->transform().scale() = Vector3(400.0f, 400.0f, 1.0f);
+	hpRoot->transform().position() = Vector3(50.0f, 800.0f, 0.0f); // 画面の下寄せ例
+	hpRoot->transform().scale() = Vector3(800.0f, 800.0f, 1.0f); 
 
 	auto* hpUi = hpRoot->AddComponent<HPBarUI>();
 	hpUi->backgroundTexture = L"texture/BRIGHTOUT_battery_kara.png";
 	hpUi->fillTexture = L"texture/BRIGHTOUT_battery_ge-ji.png";
-	hpUi->position = hpRoot->transform().position();
-	hpUi->scale = hpRoot->transform().scale();
+	hpUi->backgroundPosition = hpRoot->transform().position();
+	hpUi->fillPosition = Vector3(hpRoot->transform().position().x + 10.0f, hpRoot->transform().position().y, 0.0f);
+	hpUi->backgroundScale = Vector3(400.0f, 400.0f, 1.0f);
+	hpUi->fillScale = Vector3(400.0f, 400.0f, 1.0f);
 	hpUi->vsPath = "UiVS.cso";
 	hpUi->psPath = "UiPS.cso";
 
 
-	//変身UI
+	// 変身UI
 	GameObject* transAvailable = UI::CreateUI(
 		uiRoot,
 		L"texture/trans02.png",
-		Vector3(900.0f, 400.0f, 0.0f),
-		Vector3(1500.0f, 1000.0f, 1.0f),
+		Vector3(1100.0f, 450.0f, 0.0f),   // ピクセル座標
+		Vector3(1200.0f, 900.0f, 1.0f),   // スケール
 		"UiVS.cso",
 		"UiPS.cso"
 	);
@@ -1210,17 +1214,16 @@ void Namioka::Initialize()
 	GameObject* transActive = UI::CreateUI(
 		uiRoot,
 		L"texture/transcd01.png",
-		Vector3(900.0f, 400.0f, 0.0f),
-		Vector3(1500.0f, 1000.0f, 1.0f),
+		Vector3(1100.0f, 450.0f, 0.0f),
+		Vector3(1200.0f, 900.0f, 1.0f),
 		"UiVS.cso",
 		"UiPS.cso"
 	);
 	if (transActive) transActive->SetName("TransActiveUI");
 
-	// transActive を非表示にするのも安全に
 	if (transActive) transActive->SetActive(false);
 
-	// コントローラ用 GameObject を作成してコンポーネントを追加
+	// MorphUI コントローラ
 	GameObject* morphController = uiRoot->scenePtr()->CreateGameObject();
 	morphController->SetName("MorphUIController");
 	auto* morphUI = morphController->AddComponent<MorphUI>();

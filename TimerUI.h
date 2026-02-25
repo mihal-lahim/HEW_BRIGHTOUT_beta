@@ -21,7 +21,10 @@ public:
 
 private:
     // カウントダウン秒数
-    float m_totalSeconds = 240.0f;
+    float m_totalSeconds = 10.0f;
+
+    // シーン遷移済みフラグ（二重遷移防止）
+    bool m_hasTransitioned = false;
 
     // 0..9 の切り出しメッシュ（shared_ptr で保持しておく）
     std::vector<std::shared_ptr<Mesh>> m_digitMeshes;

@@ -1,6 +1,7 @@
 #include "PlayerState_Human_Ground.h"
 #include "Player.h"
 #include "PowerPlant.h"
+#include "Time.h"
 
 
 using namespace DirectX;
@@ -19,21 +20,27 @@ void PlayerState_Human_Ground::HandleInput(Player& player)
 	// 入力システム取得
 	InputHandler* inputHandler = player.inputHandler;
 
-	// ジャンプ処理は無効化
+	// インタラクト入力（発電所の復旧 ? 長押しゲージ方式）
+	bool isHolding = inputHandler->IsIssued<PlayerCommand_Interact>();
+	float deltaTime = static_cast<float>(Time::DeltaTime());
+	Vector3 playerPos = player.gameObject().transform().position();
+	auto powerPlants = player.GetGameObjectsByTag("PowerPlant");
 
-	// インタラクト処理（発電所の復旧）
-	if (inputHandler->IsIssued<PlayerCommand_Interact>())
+	for (auto* obj : powerPlants)
 	{
-		Vector3 playerPos = player.gameObject().transform().position();
-		auto powerPlants = player.GetGameObjectsByTag("PowerPlant");
-		for (auto* obj : powerPlants)
+		PowerPlant* plant = obj->GetComponent<PowerPlant>();
+		if (!plant || plant->IsRestored())
+			continue;
+
+		if (plant->IsInRange(playerPos))
 		{
-			PowerPlant* plant = obj->GetComponent<PowerPlant>();
-			if (plant && !plant->IsRestored() && plant->IsInRange(playerPos))
-			{
-				plant->Restore();
-				break;
-			}
+			// 範囲内: Bボタンの押下状態に応じてホールドタイマーを更新
+			plant->UpdateHold(deltaTime, isHolding);
+		}
+		else
+		{
+			// 範囲外: ホールドタイマーをリセット
+			plant->ResetHold();
 		}
 	}
 

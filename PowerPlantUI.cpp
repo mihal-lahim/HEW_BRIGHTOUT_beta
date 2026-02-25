@@ -32,10 +32,10 @@ void PowerPlantUI::Start()
 
 	m_bgRenderer = m_bgObj->AddComponent<MeshRenderer>();
 	m_bgRenderer->mesh = gameObject().rendering().CreateUIQuad().get();
-	m_bgRenderer->renderQueue = RenderQueue::UI;
+	m_bgRenderer->renderQueue = RenderQueue::Transparent;
 	m_bgRenderer->material.texturePath = backgroundTexture;
-	m_bgRenderer->material.vsPath = "UiVS.cso";
-	m_bgRenderer->material.psPath = "UiPS.cso";
+	m_bgRenderer->material.vsPath = "MeshVS.cso";
+	m_bgRenderer->material.psPath = "MeshPS.cso";
 
 	// フィルオブジェクト（背景の前面に重ねる）
 	m_fillObj = scene->CreateGameObject();
@@ -47,10 +47,10 @@ void PowerPlantUI::Start()
 	// 初期は 0% 伸長（縦方向）
 	m_meshCache[0] = CreateUIQuadWithVRange(device, 0.0f, 0.0f);
 	m_fillRenderer->mesh = m_meshCache[0].get();
-	m_fillRenderer->renderQueue = RenderQueue::UI;
+	m_fillRenderer->renderQueue = RenderQueue::Transparent;
 	m_fillRenderer->material.texturePath = fillTexture;
-	m_fillRenderer->material.vsPath = "UiVS.cso";
-	m_fillRenderer->material.psPath = "UiPS.cso";
+	m_fillRenderer->material.vsPath = "MeshVS.cso";
+	m_fillRenderer->material.psPath = "MeshPS.cso";
 }
 
 void PowerPlantUI::Update()
@@ -63,10 +63,9 @@ void PowerPlantUI::Update()
 	Vector3 basePos = gameObject().transform().position();
 	Vector3 worldPos = basePos + localOffset;
 	m_bgObj->transform().position() = worldPos;
-	m_fillObj->transform().position() = worldPos;
 
 	// プレイヤー方向に向ける（Y 軸のみ回転）
-	// Scene の Health を参照して、最初の Health の位置をプレイヤーと見なす
+	Vector3 forwardDir = { 0.0f, 0.0f, 0.0f }; // プレイヤー方向ベクトル
 	auto scene = gameObject().scenePtr();
 	if (scene)
 	{
@@ -82,15 +81,27 @@ void PowerPlantUI::Update()
 				float yaw = atan2f(dir.x, dir.z); // ラジアン
 				float yawDeg = yaw * (180.0f / 3.14159265358979323846f);
 
-				Quaternion rotQ = m_bgObj->transform().rotation();
-				Vector3 rot = { 0.0f, 0.0f, 0.0f };
-				rot.y = rotQ.ToEulerAngles().y;
-				rot.y = yawDeg;
+				Vector3 rot = { 0.0f, yawDeg, 0.0f };
 				m_bgObj->transform().rotation() = Quaternion::FromEulerAngles(rot);
 				m_fillObj->transform().rotation() = Quaternion::FromEulerAngles(rot);
+
+				// XZ平面上の正規化された方向ベクトル
+				float len = sqrtf(dir.x * dir.x + dir.z * dir.z);
+				if (len > 0.001f)
+				{
+					forwardDir.x = dir.x / len;
+					forwardDir.z = dir.z / len;
+				}
 			}
 		}
 	}
+
+	// フィルを背景より少し手前（プレイヤー方向）にオフセットしてZファイティング防止
+	const float fillZOffset = 0.05f;
+	Vector3 fillPos = worldPos;
+	fillPos.x += forwardDir.x * fillZOffset;
+	fillPos.z += forwardDir.z * fillZOffset;
+	m_fillObj->transform().position() = fillPos;
 
 	// 進捗取得（0..1）
 	float progress = m_powerPlant->GetHoldProgress();

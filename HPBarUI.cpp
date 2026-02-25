@@ -5,105 +5,165 @@
 #include "Mesh.h"
 #include "RenderingSystem.h"
 #include "Health.h"
+#include "Player.h"
 #include <algorithm>
+#include <sstream>
+#include <string>
+#include <Windows.h>
+#include <iomanip>
 
 using namespace std;
 
+static inline std::string Narrow(const std::wstring& ws)
+{
+    if (ws.empty()) return std::string();
+    int required = ::WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    if (required <= 0) return std::string();
+    std::string result;
+    result.resize(required - 1); // required は終端ヌルを含む
+    ::WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), -1, &result[0], required, nullptr, nullptr);
+    return result;
+};
+
 void HPBarUI::Start()
 {
-	// シーン / レンダリング / グラフィックスデバイス取得
-	auto* scene = gameObject().scenePtr();
-	auto& rendering = gameObject().rendering();
-	GraphicsDevice& device = rendering.GetGraphicsDevice();
+    auto* scene = gameObject().scenePtr();
+    auto& rendering = gameObject().rendering();
 
-	// 元スケール記録
-	m_originalScale = scale;
+    // GraphicsDevice を取得
+    GraphicsDevice& device = rendering.GetGraphicsDevice();
+    float screenW = static_cast<float>(device.GetBackBufferWidth());
+    float screenH = static_cast<float>(device.GetBackBufferHeight());
 
-	// 背景オブジェクト（空フレーム）
-	m_bgObj = scene->CreateGameObject();
-	m_bgObj->SetName("HPBar_Background");
-	m_bgObj->transform().position() = position;
-	m_bgObj->transform().scale() = scale;
+    // レガシー互換: ユーザーが position のみを設定している場合のフォールバック
+    // （背景・ゲージ両方が position と等しいときに既存の単一 position を尊重）
+    if (backgroundPosition == position && fillPosition == position)
+    {
+        backgroundPosition = position;
+        fillPosition = position;
+    }
 
-	m_bgRenderer = m_bgObj->AddComponent<MeshRenderer>();
-	m_bgRenderer->mesh = rendering.CreateUIQuad().get();
-	m_bgRenderer->renderQueue = RenderQueue::UI;
-	m_bgRenderer->material.texturePath = backgroundTexture;
-	m_bgRenderer->material.vsPath = vsPath;
-	m_bgRenderer->material.psPath = psPath;
+    // =========================
+    // 背景
+    // =========================
+    m_bgObj = scene->CreateGameObject();
+    m_bgObj->SetName("HPBar_Background");
+    m_bgObj->transform().position() = backgroundPosition;
+    m_bgObj->transform().scale() =
+        (!backgroundScale.IsZero()) ? backgroundScale : scale;
 
-	// 前景オブジェクト（ゲージ） - 初期はフル
-	m_fillObj = scene->CreateGameObject();
-	m_fillObj->SetName("HPBar_Fill");
-	m_fillObj->transform().position() = position;
-	m_fillObj->transform().scale() = scale;
+    m_bgRenderer = m_bgObj->AddComponent<MeshRenderer>();
 
-	m_fillRenderer = m_fillObj->AddComponent<MeshRenderer>();
-	// フル幅のメッシュをひとつ生成しておく
-	m_meshCache[100] = CreateUIQuadWithUV(device, 0.0f, 1.0f);
-	m_fillRenderer->mesh = m_meshCache[100].get();
-	m_fillRenderer->renderQueue = RenderQueue::UI;
-	m_fillRenderer->material.texturePath = fillTexture;
-	m_fillRenderer->material.vsPath = vsPath;
-	m_fillRenderer->material.psPath = psPath;
+    // CreateUIQuad の shared_ptr を保持しておく（以前は .get() のみで一時が破棄されていた）
+    m_fullMesh = rendering.CreateUIQuad();
+    m_bgRenderer->mesh = m_fullMesh.get();
 
-	// Health コンポーネントを探す（シーン内の最初の Health を利用）
-	auto healths = scene->GetComponents<Health>();
-	if (!healths.empty())
-	{
-		m_playerHealth = healths.front();
-	}
-	// 初回パーセントをセット
-	m_lastPercent = -1;
+    m_bgRenderer->renderQueue = RenderQueue::UI;
+    m_bgRenderer->material.texturePath = backgroundTexture;
+    m_bgRenderer->material.vsPath = vsPath;
+    m_bgRenderer->material.psPath = psPath;
+
+    // スクリーンスペースフラグと画面サイズを設定
+    m_bgRenderer->material.SetFloat("UseScreenSpace", 1.0f);
+    m_bgRenderer->material.SetFloat("ScreenWidth", screenW);
+    m_bgRenderer->material.SetFloat("ScreenHeight", screenH);
+
+    // =========================
+    // ゲージ
+    // =========================
+    m_fillObj = scene->CreateGameObject();
+    m_fillObj->SetName("HPBar_Fill");
+    m_fillObj->transform().position() = fillPosition;
+    m_fillObj->transform().scale() =
+        (!fillScale.IsZero()) ? fillScale : scale;
+
+    m_fillRenderer = m_fillObj->AddComponent<MeshRenderer>();
+
+    m_fillMesh = rendering.CreateUIQuad();
+    m_fillRenderer->mesh = m_fillMesh.get();
+
+    m_fillRenderer->renderQueue = RenderQueue::UI;
+    m_fillRenderer->material.texturePath = fillTexture;
+    m_fillRenderer->material.vsPath = vsPath;
+    m_fillRenderer->material.psPath = psPath;
+
+    m_fillRenderer->material.SetFloat("UseScreenSpace", 1.0f);
+    m_fillRenderer->material.SetFloat("ScreenWidth", screenW);
+    m_fillRenderer->material.SetFloat("ScreenHeight", screenH);
+
+    // 初期位置を保持（Update で左端固定する補正に使う）
+    m_fillOriginalPosition = m_fillObj->transform().position();
+
+    // m_fillObj を作成して位置・スケールを設定した直後に追加
+    m_fillObj->transform().position() = fillPosition;
+    m_fillObj->transform().scale() =
+        (!fillScale.IsZero()) ? fillScale : scale;
+
+    // 左に10移動（必要なだけ値を変更）
+    m_fillObj->transform().position().x -= 10.0f;
+
+    // 元位置も更新しておく（Update での補正に使う）
+    m_fillOriginalPosition = m_fillObj->transform().position();
+
+    auto healths = scene->GetComponents<Health>();
+    for (auto* h : healths)
+    {
+        if (!h) continue;
+        if (h->gameObject().GetComponent<Player>() != nullptr)
+        {
+            m_playerHealth = h;
+            break;
+        }
+    }
+    if (!m_playerHealth && !healths.empty())
+        m_playerHealth = healths.front();
+
+    m_bgOriginalScale = m_bgObj->transform().scale();
+    m_fillOriginalScale = m_fillObj->transform().scale();
 }
 
 void HPBarUI::Update()
 {
-	// Health が見つからない場合は何もしない
-	if (!m_playerHealth || !m_fillRenderer || !m_fillObj)
-		return;
+    if (!m_playerHealth || !m_fillObj)
+        return;
 
-	// 割合を計算
-	float cur = m_playerHealth->GetCurrentHealth();
-	float max = m_playerHealth->GetMaxHealth();
-	float percent = (max > 0.0f) ? std::clamp(cur / max, 0.0f, 1.0f) : 0.0f;
+    float cur = m_playerHealth->GetCurrentHealth();
+    float max = m_playerHealth->GetMaxHealth();
 
-	// 整数パーセンテージ（0..100）
-	int p = static_cast<int>(std::lround(percent * 100.0f));
-	if (p < 0) p = 0;
-	if (p > 100) p = 100;
+    float percent = (max > 0.0f)
+        ? std::clamp(cur / max, 0.0f, 1.0f)
+        : 0.0f;
 
-	// 前回と同じなら更新しない（メッシュ再生成コストを抑える）
-	if (p == m_lastPercent)
-		return;
+    // 左固定で右側だけ縮める
+    // UIQuadの頂点は (0,0)~(1,1) で左端が原点なので、
+    // スケールを変えるだけで左端は固定される。位置補正は不要。
+    Vector3 newScale = m_fillOriginalScale;
+    newScale.x = m_fillOriginalScale.x * percent;
 
-	m_lastPercent = p;
+    m_fillObj->transform().scale() = newScale;
+    m_fillObj->transform().position() = m_fillOriginalPosition;
 
-	// グラフィックスデバイス取得（メッシュ生成に必要）
-	auto& rendering = gameObject().rendering();
-	GraphicsDevice& device = rendering.GetGraphicsDevice();
+    // HP0で完全に消す
+    m_fillRenderer->SetEnable(percent > 0.0f);
+}
 
-	// UV 範囲を 0..percent にしてメッシュを生成またはキャッシュから取得
-	float u1 = percent; // 0.0 .. 1.0
-	if (u1 < 0.0f) u1 = 0.0f;
-	if (u1 > 1.0f) u1 = 1.0f;
+// ランタイムで背景位置を変更（インスペクタから変更された直後に呼ぶ場合やスクリプトから変更する場合に使用）
+void HPBarUI::SetBackgroundPosition(const Vector3& pos)
+{
+    backgroundPosition = pos;
+    if (m_bgObj)
+    {
+        m_bgObj->transform().position() = pos;
+    }
+}
 
-	// キャッシュ参照
-	auto it = m_meshCache.find(p);
-	if (it == m_meshCache.end())
-	{
-		// CreateUIQuadWithUV は device と u0,u1 を渡す
-		m_meshCache[p] = CreateUIQuadWithUV(device, 0.0f, u1);
-		it = m_meshCache.find(p);
-	}
-
-	if (it != m_meshCache.end())
-	{
-		m_fillRenderer->mesh = it->second.get();
-	}
-
-	// スケールは元スケールの X を percent 倍して、幅を縮める（左揃え）
-	Vector3 newScale = m_originalScale;
-	newScale.x = m_originalScale.x * percent;
-	m_fillObj->transform().scale() = newScale;
+// ランタイムでゲージ位置を変更（左端固定の基準位置も更新）
+void HPBarUI::SetFillPosition(const Vector3& pos)
+{
+    fillPosition = pos;
+    if (m_fillObj)
+    {
+        m_fillObj->transform().position() = pos;
+        m_fillOriginalPosition = m_fillObj->transform().position();
+    }
 }
