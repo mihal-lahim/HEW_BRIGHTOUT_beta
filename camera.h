@@ -36,6 +36,8 @@ public:
 
 	// プロジェクション行列取得メソッド
 	DirectX::XMMATRIX GetProjectionMatrix(float defaultWidth, float defaultHeight) const;
+
+	DirectX::XMMATRIX GetUIProjectionMatrix(float width, float height) const;
 };
 
 #endif

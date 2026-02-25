@@ -11,8 +11,8 @@ class Health : public Component
 {
 private:
 	// Å‘å‘Ì—Í‚ÆŒ»İ‘Ì—Í
-	float m_MaxHealth = 0.0f;
-	float m_CurrentHealth = 0.0f;
+	float m_MaxHealth = 100.0f;
+	float m_CurrentHealth = 100.0f;
 
 public:
 

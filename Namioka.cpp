@@ -23,23 +23,40 @@
 #include "PoleManager.h"
 #include "Pole.h"
 #include "PowerLine.h"
+#include "RenderingSystem.h"
+#include "UIQuad.h"
+#include "UIDrawer.h"
+#include "TimerUI.h"
+#include "HPBarUI.h"
+#include "MorphUI.h"
+#include "BgmSwitcher.h"
 
 using namespace DirectX;
 
 static int g_GameBgm{};
+static int g_GameBgm2{};
 
 void Namioka::Initialize()
 {
-
 	// オーディオ初期化
 	InitAudio();
 
 	g_GameBgm = LoadAudio("sound/GameBGM_01.wav");
 
+	//ラストスパート用BGM
+	g_GameBgm2 = LoadAudio("sound/GameBGM_02.wav");
+
 	// BGM再生（ループ）
 	PlayAudio(g_GameBgm, true);
-
 	SetAudioVolume(g_GameBgm, 0.2f);
+
+	//残り60秒になったらBGM切り替え
+	GameObject* bgmObj = CreateGameObject();
+	bgmObj->SetName("BgmSwitcher");
+	auto* switcher = bgmObj->AddComponent<BgmSwitcher>();
+	switcher->currentIndex = g_GameBgm;
+	switcher->nextIndex = g_GameBgm2;
+	switcher->switchAtSeconds = 60.0f;
 
 	// PoleManager
 	GameObject* poleManagerObject = CreateGameObject();
@@ -1150,6 +1167,76 @@ void Namioka::Initialize()
 	// 全発電所の復旧チェック用GameObjectを作成
 	GameObject* checker = CreateGameObject();
 	checker->AddComponent<GameClearChecker>();
+
+
+	// UI表示
+	GameObject* uiRoot = CreateGameObject();
+	uiRoot->SetName("UIRoot");
+
+	// 画面中央に 500x500 の UI（y は負にしない）
+	UI::CreateUI(
+		uiRoot,
+		L"texture/BRIGHTOUT_UI_TAIMA-kl.png",
+		Vector3(700.0f, -100.0f, 0.0f),   // ピクセル座標 (x, y)
+		Vector3(500.0f, 500.0f, 1.0f),   // 幅=500px, 高さ=500px
+		"UiVS.cso",
+		"UiPS.cso"
+	);
+
+	// タイマー（位置はピクセル、スケールは TimerUI が内部で使うので 1,1,1 に）
+	GameObject* timerRoot = uiRoot->scenePtr()->CreateGameObject();
+	timerRoot->SetName("TimerRoot");
+	timerRoot->transform().position() = Vector3(925.0f, 100.0f, 0.0f); 
+	timerRoot->transform().scale() = Vector3(1.0f, 1.0f, 1.0f);
+	timerRoot->AddComponent<TimerUI>();
+
+	// HP バー（HPBarUI の既定 scale は 400x400 を想定）
+	GameObject* hpRoot = uiRoot->scenePtr()->CreateGameObject();
+	hpRoot->SetName("HPBarRoot");
+	hpRoot->transform().position() = Vector3(50.0f, 800.0f, 0.0f); // 画面の下寄せ例
+	hpRoot->transform().scale() = Vector3(800.0f, 800.0f, 1.0f); 
+
+	auto* hpUi = hpRoot->AddComponent<HPBarUI>();
+	hpUi->backgroundTexture = L"texture/BRIGHTOUT_battery_kara.png";
+	hpUi->fillTexture = L"texture/BRIGHTOUT_battery_ge-ji.png";
+	hpUi->backgroundPosition = hpRoot->transform().position();
+	hpUi->fillPosition = Vector3(hpRoot->transform().position().x + 10.0f, hpRoot->transform().position().y, 0.0f);
+	hpUi->backgroundScale = Vector3(400.0f, 400.0f, 1.0f);
+	hpUi->fillScale = Vector3(400.0f, 400.0f, 1.0f);
+	hpUi->vsPath = "UiVS.cso";
+	hpUi->psPath = "UiPS.cso";
+
+
+	// 変身UI
+	GameObject* transAvailable = UI::CreateUI(
+		uiRoot,
+		L"texture/trans02.png",
+		Vector3(1100.0f, 450.0f, 0.0f),   // ピクセル座標
+		Vector3(1200.0f, 900.0f, 1.0f),   // スケール
+		"UiVS.cso",
+		"UiPS.cso"
+	);
+	if (transAvailable) transAvailable->SetName("TransAvailableUI");
+
+	GameObject* transActive = UI::CreateUI(
+		uiRoot,
+		L"texture/transcd01.png",
+		Vector3(1100.0f, 450.0f, 0.0f),
+		Vector3(1200.0f, 900.0f, 1.0f),
+		"UiVS.cso",
+		"UiPS.cso"
+	);
+	if (transActive) transActive->SetName("TransActiveUI");
+
+	if (transActive) transActive->SetActive(false);
+
+	// MorphUI コントローラ
+	GameObject* morphController = uiRoot->scenePtr()->CreateGameObject();
+	morphController->SetName("MorphUIController");
+	auto* morphUI = morphController->AddComponent<MorphUI>();
+	morphUI->uiAvailable = transAvailable;
+	morphUI->uiActive = transActive;
+	morphUI->cooldownSeconds = 3.0f;
 }
 
 void Namioka::Finalize()

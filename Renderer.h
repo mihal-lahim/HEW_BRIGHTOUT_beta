@@ -13,7 +13,8 @@
 enum class RenderQueue
 {
 	Opaque = 0,
-	Transparent = 1
+	Transparent = 1,
+	UI = 2
 };
 
 enum class RendererType

@@ -1,5 +1,3 @@
-
-
 #ifndef PLAYER_COMMAND_SET_H
 #define PLAYER_COMMAND_SET_H
 
@@ -32,7 +30,7 @@ public:
 		RegisterCommand<GamePadButton, PlayerCommand_Fire>(BUTTON_RB, InputCondition::STARTED);
 
 		// インタラクトコマンドを登録
-		RegisterCommand<GamePadButton, PlayerCommand_Interact>(BUTTON_B, InputCondition::STARTED);
+		RegisterCommand<GamePadButton, PlayerCommand_Interact>(BUTTON_B, InputCondition::NONE);
 	}
 
 	virtual ~PlayerCommandSet()
