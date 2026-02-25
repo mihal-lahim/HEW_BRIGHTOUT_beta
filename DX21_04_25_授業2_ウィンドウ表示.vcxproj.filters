@@ -92,6 +92,9 @@
     <ClCompile Include="TPSCamera.cpp" />
     <ClCompile Include="WICTextureLoader11.cpp" />
 
+    <ClCompile Include="Bullet.cpp" />
+
+
     <ClCompile Include="UIQuad.cpp" />
     <ClCompile Include="UIDrawer.cpp" />
     <ClCompile Include="TimerUI.cpp" />
@@ -217,6 +220,10 @@
 
     <ClInclude Include="EnemySpawner.h" />
     <ClInclude Include="EnemySpawnerPrefab.h" />
+
+    <ClInclude Include="Bullet.h" />
+
+
 
   </ItemGroup>
   <ItemGroup>

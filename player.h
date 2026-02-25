@@ -81,11 +81,20 @@ public:
 	// 歩行アニメーションインデックス
 	size_t walkAnimationIndex = 0;
 
+	float FireInterval = 0.3f;
+	float BulletSpeed = 20.0f;
+	float BulletLifeTime = 3.0f;
+
 
 	void Start() override;
 	void Update() override;
+	void HandleFire();
+	void FireBullet();
 	void ResetWalkAnimation();
 	void AdvanceWalkAnimation(float deltaTime);
+
+private:
+	float m_FireTimer = 0.0f;
 };
 
 
