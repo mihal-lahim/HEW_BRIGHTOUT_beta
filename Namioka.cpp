@@ -8,6 +8,7 @@
 #include "Road.h"
 #include "House.h"
 #include "Convenience.h"
+#include "EnemySpawner.h"
 #include "Mansion01.h"
 #include "Mansion02.h"
 #include "Karaoke.h"
@@ -242,6 +243,12 @@ void Namioka::Initialize()
 	{
 		GameObject* convenience = Instantiate(conveniencePrefab);
 		convenience->AddComponent<Convenience>();
+		auto* spawner = convenience->AddComponent<EnemySpawner>();
+		spawner->InitialInterval = 5.0f;
+		spawner->MinInterval = 1.0f;
+		spawner->IntervalDecreaseRate = 0.1f;
+		spawner->MaxEnemies = 10;
+		spawner->SpawnRadius = 3.0f;
 
 		convenience->transform().scale() = { 1.0f, 1.0f, 1.0f };
 		convenience->transform().position() = data.position;

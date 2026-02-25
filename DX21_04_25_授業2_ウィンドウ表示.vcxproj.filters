@@ -6,8 +6,11 @@
     <FxCompile Include="MeshPS.hlsl" />
     <FxCompile Include="SpriteVS.hlsl" />
     <FxCompile Include="MeshVS.hlsl" />
+
     <FxCompile Include="UiVS.hlsl" />
     <FxCompile Include="UiPS.hlsl" />
+
+
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
@@ -88,6 +91,7 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TPSCamera.cpp" />
     <ClCompile Include="WICTextureLoader11.cpp" />
+
     <ClCompile Include="UIQuad.cpp" />
     <ClCompile Include="UIDrawer.cpp" />
     <ClCompile Include="TimerUI.cpp" />
@@ -95,6 +99,8 @@
     <ClCompile Include="MorphUI.cpp" />
     <ClCompile Include="BgmSwitcher.cpp" />
     <ClCompile Include="PowerPlantUI.cpp" />
+
+
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
@@ -200,6 +206,7 @@
     <ClInclude Include="TPSCamera.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="WICTextureLoader11.h" />
+
     <ClInclude Include="UIQuad.h" />
     <ClInclude Include="UIDrawer.h" />
     <ClInclude Include="TimerUI.h" />
@@ -207,6 +214,10 @@
     <ClInclude Include="MorphUI.h" />
     <ClInclude Include="BgmSwitcher.h" />
     <ClInclude Include="PowerPlantUI.h" />
+
+    <ClInclude Include="EnemySpawner.h" />
+    <ClInclude Include="EnemySpawnerPrefab.h" />
+
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />
