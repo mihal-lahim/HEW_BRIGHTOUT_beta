@@ -4,6 +4,7 @@
 #include "Health.h"
 #include <algorithm>
 #include "Player.h"
+#include "ScoreData.h"
 
  // GameObjectとその全子孫を再帰的にSetActiveする
 static void SetActiveRecursive(GameObject* obj, bool active)
@@ -68,6 +69,7 @@ void PowerPlant::Restore()
 
 				// 発電機を復旧状態にし、モデル切替
 				m_isRestored = true;
+				ScoreData::Instance().restoredPlants++;
 				SetActiveRecursive(brokenModel, false);
 				SetActiveRecursive(restoredModel, true);
 				return;

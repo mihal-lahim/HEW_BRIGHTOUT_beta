@@ -30,6 +30,7 @@
 #include "HPBarUI.h"
 #include "MorphUI.h"
 #include "BgmSwitcher.h"
+#include "ScoreData.h"
 
 using namespace DirectX;
 
@@ -38,6 +39,9 @@ static int g_GameBgm2{};
 
 void Namioka::Initialize()
 {
+	// スコアデータリセット
+	ScoreData::Instance().Reset();
+
 	// オーディオ初期化
 	InitAudio();
 

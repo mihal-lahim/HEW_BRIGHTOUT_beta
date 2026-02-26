@@ -198,6 +198,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="Namioka.cpp" />
     <ClCompile Include="PlayerAudio.cpp" />
     <ClCompile Include="PowerPlantUI.cpp" />
+    <ClCompile Include="ResultScoreUI.cpp" />
     <ClCompile Include="Road.cpp" />
     <ClCompile Include="SpecialDensen.cpp" />
     <ClCompile Include="SpecialDentyuu.cpp" />
@@ -293,7 +294,9 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="Namioka.h" />
     <ClInclude Include="PlayerAudio.h" />
     <ClInclude Include="PowerPlantUI.h" />
+    <ClInclude Include="ResultScoreUI.h" />
     <ClInclude Include="Road.h" />
+    <ClInclude Include="ScoreData.h" />
     <ClInclude Include="SpecialDensen.h" />
     <ClInclude Include="SpecialDentyuu.h" />
     <ClInclude Include="TimerUI.h" />
