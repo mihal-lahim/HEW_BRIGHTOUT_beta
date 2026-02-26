@@ -91,14 +91,15 @@ public:
 		modelRoot->transform().scale() = Vector3(0.01f, 0.01f, 0.01f);
 		modelRoot->transform().rotation() = Quaternion::SetEulerY(180.0f);
 
-		ModelPrefab electricEffectPrefab{ "model/Cube.glb" };
 		GameObject* electricEffectObject = gameObject.CreateGameObject();
 		gameObject.SetChild(*electricEffectObject);
+		// MeshRenderer に Quad メッシュを直接割り当て
+		auto* renderer = electricEffectObject->AddComponent<MeshRenderer>();
+		renderer->material.texturePath = L"texture/kaminari_ball_kontakutosi-to_30fps.png";
+		renderer->material.texture = nullptr;
+		renderer->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
+		// Billboard コンポーネントが Awake() でシェーダーとメッシュを自動設定
 		electricEffectObject->AddComponent<Billboard>();
-		GameObject* electricEffectModel = electricEffectObject->Instantiate(electricEffectPrefab);
-		electricEffectObject->SetChild(*electricEffectModel);
-		electricEffectModel->transform().scale() = Vector3(1.0f, 1.0f, 0.02f);
-		ApplyTextureRecursive(electricEffectModel, L"texture/kaminari_ball_kontakutosi-to_30fps.png");
 		electricEffectObject->transform().scale() = Vector3(1.5f, 1.5f, 1.5f);
 		electricEffectObject->transform().position() = Vector3(0.0f, 0.5f, 0.0f);
 		electricEffectObject->SetActive(false);

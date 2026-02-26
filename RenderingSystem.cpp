@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <vector>
 #include "UIQuad.h"
+#include "BillboardQuad.h"
 
 using namespace DirectX;
 
@@ -228,4 +229,12 @@ std::shared_ptr<Mesh> RenderingSystem::CreateUIQuad()
 std::shared_ptr<Mesh> RenderingSystem::CreateUIQuadWithUV(float u0, float u1)
 {
     return ::CreateUIQuadWithUV(*m_graphicsDevice, u0, u1);
+}
+
+std::shared_ptr<Mesh> RenderingSystem::CreateBillboardQuad()
+{
+    if (!m_billboardQuad)
+        m_billboardQuad = ::CreateBillboardQuad(*m_graphicsDevice);
+
+    return m_billboardQuad;
 }

@@ -1,40 +1,74 @@
 #include "Billboard.h"
 #include <DirectXMath.h>
 #include "GameObject.h"
-#include "InputSystem.h"
+#include "Renderer.h"
+#include "RenderingSystem.h"
 
 using namespace DirectX;
+
+namespace
+{
+	void ApplyBillboardShaderRecursive(GameObject* gameObject)
+	{
+		if (!gameObject) return;
+
+		auto meshRenderers = gameObject->GetComponents<MeshRenderer>();
+		for (auto* renderer : meshRenderers)
+		{
+			renderer->material.vsPath = "BillboardVS.cso";
+			renderer->material.psPath = "BillboardPS.cso";
+			renderer->material.shaderProgram = nullptr;
+			renderer->renderQueue = RenderQueue::Transparent;
+			renderer->material.SetFloat4("uv_rect", { 0.0f, 0.0f, 1.0f, 1.0f });
+		}
+
+		for (auto* child : gameObject->GetChildren())
+		{
+			ApplyBillboardShaderRecursive(child);
+		}
+	}
+}
 
 void Billboard::Awake()
 {
 	m_mainCamera = GetGameObjectByTag("MainCamera");
+
+	// Quadメッシュを取得（キャッシュ済み）
+	m_quadMesh = gameObject().rendering().CreateBillboardQuad();
+
+	// 既存の MeshRenderer があればシェーダーとメッシュを差し替え
+	auto* renderer = gameObject().GetComponent<MeshRenderer>();
+	if (renderer)
+	{
+		renderer->mesh = m_quadMesh.get();
+		renderer->material.vsPath = "BillboardVS.cso";
+		renderer->material.psPath = "BillboardPS.cso";
+		renderer->material.shaderProgram = nullptr;
+		renderer->renderQueue = RenderQueue::Transparent;
+		renderer->material.SetFloat4("uv_rect", { 0.0f, 0.0f, 1.0f, 1.0f });
+	}
+	else
+	{
+		// MeshRenderer が無い場合は自動で追加
+		renderer = gameObject().AddComponent<MeshRenderer>();
+		renderer->mesh = m_quadMesh.get();
+		renderer->material.vsPath = "BillboardVS.cso";
+		renderer->material.psPath = "BillboardPS.cso";
+		renderer->material.shaderProgram = nullptr;
+		renderer->renderQueue = RenderQueue::Transparent;
+		renderer->material.SetFloat4("uv_rect", { 0.0f, 0.0f, 1.0f, 1.0f });
+	}
 }
 
 void Billboard::Update()
 {
-	if (!m_mainCamera) return;
+	if (!m_mainCamera)
+	{
+		m_mainCamera = GetGameObjectByTag("MainCamera");
+	}
 
-	// 自身のTransform取得
-	Transform& myTransform = gameObject().transform();
-	// カメラのTransform取得
-	Transform& camTransform = m_mainCamera->transform();
-
-	// カメラの位置と自身の位置から向きを計算
-	Vector3 direction = myTransform.position() - camTransform.position();
-
-	float dx = direction.x;
-	float dz = direction.z;
-
-	// 左右回転
-	float rotY = atan2f(dx, dz);
-
-	float dy = direction.y;
-	float horizonal = sqrtf(dx * dx + dz * dz);
-
-	// 上下回転
-	float rotX = atan2f(dy, horizonal) + XM_PIDIV2;
-
-	XMMATRIX rotYMat = XMMatrixRotationX(-rotX) * XMMatrixRotationY(rotY);
-
-	myTransform.rotation().FromXMMATRIX(rotYMat);
+	if (!m_mainCamera)
+	{
+		return;
+	}
 }
