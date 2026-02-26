@@ -26,7 +26,7 @@ public:
 	ScoreRowConfig configRestoredScore  = { { 900.0f, 320.0f, 0.0f }, { 80.0f, 160.0f, 1.0f }, 90.0f, 4 };
 	ScoreRowConfig configKilledCount    = { { 950.0f, 430.0f, 0.0f }, { 90.0f, 180.0f, 1.0f }, 90.0f, 3 };
 	ScoreRowConfig configKilledScore    = { { 880.0f, 520.0f, 0.0f }, { 80.0f, 160.0f, 1.0f }, 90.0f, 5 };
-	ScoreRowConfig configTotalScore  = { { 500.0f, 750.0f, 0.0f }, { 150.0f, 300.0f, 1.0f }, 120.0f, 6 };
+	ScoreRowConfig configTotalScore     = { { 500.0f, 750.0f, 0.0f }, { 150.0f, 300.0f, 1.0f }, 120.0f, 6 };
 
 	void Start() override;
 
