@@ -1,9 +1,13 @@
 #include "Player.h"
+#include "Time.h"
 
 void PlayerState_Electric::Enter(Player& player)
 {
 	// 剛体を無効化
 	player.physicsBody->SetEnable(false);
+	player.SetHumanVisualActive(false);
+	player.SetElectricEffectActive(true);
+	player.ResetElectricAnimation();
 
 	// モデルを電気形態に設定
 	//player.meshRenderer->SetModel(player.electricModel);
@@ -66,6 +70,7 @@ void PlayerState_Electric::Update(Player& player)
 
 	// 電線上移動処理
 	movement->LineMove();
+	player.AdvanceElectricAnimation((float)Time::DeltaTime());
 
 	PlayerState::Update(player);
 }

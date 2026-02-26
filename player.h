@@ -71,6 +71,8 @@ public:
 
 	// モデルオブジェクト
 	GameObject* modelObject = nullptr;
+	// 電線移動時の画像エフェクトオブジェクト
+	GameObject* electricEffectObject = nullptr;
 
 	// 歩行アニメーション用モデル
 	std::vector<GameObject*> walkModelObjects{};
@@ -81,6 +83,18 @@ public:
 	// 歩行アニメーションインデックス
 	size_t walkAnimationIndex = 0;
 
+	// 電線移動画像アニメーションの更新間隔
+	float electricAnimationInterval = 0.08f;
+	// 電線移動画像アニメーションタイマー
+	float electricAnimationTimer = 0.0f;
+	// 電線移動画像アニメーションインデックス
+	size_t electricAnimationIndex = 0;
+	// 電線移動画像アニメーションの分割数
+	int electricSheetColumns = 4;
+	int electricSheetRows = 4;
+	int electricSheetFrameCount = 16;
+
+
 	float FireInterval = 0.3f;
 	float BulletSpeed = 20.0f;
 	float BulletLifeTime = 3.0f;
@@ -90,8 +104,13 @@ public:
 	void Update() override;
 	void HandleFire();
 	void FireBullet();
+	void SetHumanVisualActive(bool active);
+	void SetElectricEffectActive(bool active);
 	void ResetWalkAnimation();
 	void AdvanceWalkAnimation(float deltaTime);
+	void ResetElectricAnimation();
+	void AdvanceElectricAnimation(float deltaTime);
+	void ApplyElectricFrameUV(size_t frameIndex);
 
 private:
 	float m_FireTimer = 0.0f;

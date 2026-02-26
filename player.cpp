@@ -7,8 +7,12 @@
 #include "Model.h"
 #include "Bullet.h"
 #include "Time.h"
+#include <algorithm>
 
 using namespace DirectX;
+
+static void SetActiveRecursive(GameObject* obj, bool active);
+static void SetUVRectRecursive(GameObject* obj, const DirectX::XMFLOAT4& uvRect);
 
 
 void Player::Start()
@@ -16,6 +20,8 @@ void Player::Start()
 	// ‰Šúó‘ÔÝ’è
 	stateMachine->ChangeState(&PlayerStates::HumanIdle, *this);
 	ResetWalkAnimation();
+	ResetElectricAnimation();
+	SetElectricEffectActive(false);
 }
 
 void Player::Update()
@@ -68,6 +74,16 @@ void Player::FireBullet()
 	bullet->LifeTime = BulletLifeTime;
 }
 
+void Player::SetHumanVisualActive(bool active)
+{
+	SetActiveRecursive(modelObject, active);
+}
+
+void Player::SetElectricEffectActive(bool active)
+{
+	SetActiveRecursive(electricEffectObject, active);
+}
+
 static void SetActiveRecursive(GameObject* obj, bool active)
 {
 	if (!obj) return;
@@ -75,6 +91,28 @@ static void SetActiveRecursive(GameObject* obj, bool active)
 	for (auto* child : obj->GetChildren())
 	{
 		SetActiveRecursive(child, active);
+	}
+}
+
+static void SetUVRectRecursive(GameObject* obj, const DirectX::XMFLOAT4& uvRect)
+{
+	if (!obj) return;
+
+	auto renderers = obj->GetComponents<MeshRenderer>();
+	for (auto* renderer : renderers)
+	{
+		renderer->material.SetFloat4("uv_rect", uvRect);
+	}
+
+	auto skinnedRenderers = obj->GetComponents<SkinnedMeshRenderer>();
+	for (auto* renderer : skinnedRenderers)
+	{
+		renderer->material.SetFloat4("uv_rect", uvRect);
+	}
+
+	for (auto* child : obj->GetChildren())
+	{
+		SetUVRectRecursive(child, uvRect);
 	}
 }
 
@@ -111,4 +149,43 @@ void Player::AdvanceWalkAnimation(float deltaTime)
 
 	if (walkModelObjects[walkAnimationIndex])
 		SetActiveRecursive(walkModelObjects[walkAnimationIndex], true);
+}
+
+void Player::ResetElectricAnimation()
+{
+	electricAnimationTimer = 0.0f;
+	electricAnimationIndex = 0;
+	ApplyElectricFrameUV(electricAnimationIndex);
+}
+
+void Player::AdvanceElectricAnimation(float deltaTime)
+{
+	if (electricAnimationInterval <= 0.0f || electricSheetFrameCount <= 1)
+		return;
+
+	electricAnimationTimer += deltaTime;
+	if (electricAnimationTimer < electricAnimationInterval)
+		return;
+
+	electricAnimationTimer -= electricAnimationInterval;
+	electricAnimationIndex = (electricAnimationIndex + 1) % (size_t)(std::max)(1, electricSheetFrameCount);
+	ApplyElectricFrameUV(electricAnimationIndex);
+}
+
+void Player::ApplyElectricFrameUV(size_t frameIndex)
+{
+	if (!electricEffectObject || electricSheetColumns <= 0 || electricSheetRows <= 0)
+		return;
+
+	const int totalFrames = (std::max)(1, electricSheetFrameCount);
+	const int frame = (int)(frameIndex % (size_t)totalFrames);
+	const int column = frame % electricSheetColumns;
+	const int row = frame / electricSheetColumns;
+
+	const float width = 1.0f / (float)electricSheetColumns;
+	const float height = 1.0f / (float)electricSheetRows;
+	const float offsetX = width * (float)column;
+	const float offsetY = height * (float)row;
+
+	SetUVRectRecursive(electricEffectObject, { offsetX, offsetY, width, height });
 }
