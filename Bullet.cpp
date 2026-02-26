@@ -5,6 +5,7 @@
 #include "Bullet.h"
 #include "Time.h"
 #include "GameObject.h"
+#include "ScoreData.h"
 
 void Bullet::Update()
 {
@@ -27,6 +28,7 @@ void Bullet::Update()
 		Vector3 diff = enemy->transform().position() - nextPos;
 		if (diff.Length() <= HitRadius)
 		{
+			ScoreData::Instance().killedEnemies++;
 			enemy->Destroy();
 			gameObject().Destroy();
 			return;

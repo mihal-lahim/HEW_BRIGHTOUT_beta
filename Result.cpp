@@ -2,7 +2,9 @@
 #include "GameObject.h"
 #include "ResultController.h"
 #include "RenderingSystem.h"
-#include "audio.h"	
+#include "audio.h"
+#include "UIDrawer.h"
+#include "ResultScoreUI.h"
 
 static int g_ResultBgm{};
 
@@ -22,6 +24,24 @@ void Result::Initialize()
 	// リザルトシーンの制御用GameObjectを作成
 	GameObject* controller = CreateGameObject();
 	controller->AddComponent<ResultController>();
+
+	// リザルトUI表示
+	GameObject* uiRoot = CreateGameObject();
+	uiRoot->SetName("ResultUIRoot");
+
+	UI::CreateUI(
+		uiRoot,
+		L"texture/Result.png",
+		Vector3(0.0f, 0.0f, 0.0f),
+		Vector3(1920.0f, 1080.0f, 1.0f),
+		"UiVS.cso",
+		"UiPS.cso"
+	);
+
+	// スコア表示UI
+	GameObject* scoreObj = CreateGameObject();
+	scoreObj->SetName("ResultScoreUI");
+	scoreObj->AddComponent<ResultScoreUI>();
 }
 
 void Result::Finalize()
