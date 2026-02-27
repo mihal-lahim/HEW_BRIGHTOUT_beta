@@ -32,6 +32,7 @@
 #include "BgmSwitcher.h"
 #include "ScoreData.h"
 #include "SkyDome.h"
+#include "FadeController.h"
 
 using namespace DirectX;
 
@@ -40,6 +41,9 @@ static int g_GameBgm2{};
 
 void Namioka::Initialize()
 {
+	// フェードイン前に画面を黒くしておく（灰色が一瞬映るのを防ぐ）
+	rendering().GetGraphicsDevice().SetClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
 	// スコアデータリセット
 	ScoreData::Instance().Reset();
 
@@ -54,6 +58,7 @@ void Namioka::Initialize()
 	// BGM再生（ループ）
 	PlayAudio(g_GameBgm, true);
 	SetAudioVolume(g_GameBgm, 0.2f);
+	SetAudioVolume(g_GameBgm2, 0.5f);
 
 	// スカイドーム
 	ModelPrefab skyPrefab{ "model/sky.fbx" };
@@ -1249,6 +1254,12 @@ void Namioka::Initialize()
 	morphUI->uiAvailable = transAvailable;
 	morphUI->uiActive = transActive;
 	morphUI->cooldownSeconds = 3.0f;
+
+	// フェードイン演出
+	GameObject* fadeObj = CreateGameObject();
+	fadeObj->SetName("FadeController");
+	auto* fadeCtrl = fadeObj->AddComponent<FadeController>();
+	fadeCtrl->StartFadeIn(2.0f);
 }
 
 void Namioka::Finalize()
