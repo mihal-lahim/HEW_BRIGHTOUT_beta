@@ -91,7 +91,6 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TPSCamera.cpp" />
     <ClCompile Include="WICTextureLoader11.cpp" />
-    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="UIQuad.cpp" />
     <ClCompile Include="UIDrawer.cpp" />
     <ClCompile Include="TimerUI.cpp" />
@@ -101,7 +100,11 @@
     <ClCompile Include="PowerPlantUI.cpp" />
     <ClCompile Include="ResultScoreUI.cpp" />
     <ClCompile Include="BillboardQuad.cpp" />
+
     <ClCompile Include="SkyDome.cpp" />
+
+    <ClCompile Include="Bullet.cpp" />
+
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />

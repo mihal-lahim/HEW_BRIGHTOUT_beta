@@ -86,6 +86,7 @@ GameObject* GameObject::FindChildByName(const std::string& name) const
 void GameObject::Destroy()
 {
 	if (!m_scene || m_isDestroyed) return;
+	m_isDestroyed = true;
 
 	// 自身を所有しているシーンに破壊を依頼
 	m_scene->DestroyGameObject(this);

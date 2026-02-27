@@ -8,14 +8,17 @@ class Bullet : public ScriptComponent
 {
 public:
 	float Speed = 20.0f;
-	float LifeTime = 3.0f;
-	float HitRadius = 0.5f;
+	float LifeTime = 1.5f;
+	float MaxDistance = 30.0f;
+	float HitRadius = 2.0f;
 	Vector3 Direction{ 0.0f, 0.0f, 1.0f };
 
+	void Start() override;
 	void Update() override;
 
 private:
 	float m_LifeTimer = 0.0f;
+	Vector3 m_StartPos{};
 };
 
 #endif
