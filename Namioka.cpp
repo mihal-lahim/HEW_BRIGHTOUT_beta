@@ -31,6 +31,7 @@
 #include "MorphUI.h"
 #include "BgmSwitcher.h"
 #include "ScoreData.h"
+#include "SkyDome.h"
 
 using namespace DirectX;
 
@@ -53,6 +54,13 @@ void Namioka::Initialize()
 	// BGM再生（ループ）
 	PlayAudio(g_GameBgm, true);
 	SetAudioVolume(g_GameBgm, 0.2f);
+
+	// スカイドーム
+	ModelPrefab skyPrefab{ "model/sky.fbx" };
+	GameObject* skyDome = Instantiate(skyPrefab);
+	skyDome->AddComponent<SkyDome>();
+	skyDome->transform().scale() = { 5.0f, 5.0f, 5.0f };
+	skyDome->transform().position() = { 0.0f, 0.0f, 0.0f };
 
 	//残り60秒になったらBGM切り替え
 	GameObject* bgmObj = CreateGameObject();

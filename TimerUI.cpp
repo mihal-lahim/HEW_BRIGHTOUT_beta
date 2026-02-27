@@ -87,7 +87,7 @@ void TimerUI::Start()
 	timeUpRoot->SetName("TimeUpUIRoot");
 	m_timeUpUI = UI::CreateUI(
 		timeUpRoot,
-		L"texture/TimeUp.png",
+		L"texture/time-up.png",
 		Vector3(500.0f, 270.0f, 0.0f),
 		Vector3(960.0f, 540.0f, 1.0f),
 		"UiVS.cso",

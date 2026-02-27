@@ -10,6 +10,7 @@
     <FxCompile Include="UiPS.hlsl" />
     <FxCompile Include="BillboardVS.hlsl" />
     <FxCompile Include="BillboardPS.hlsl" />
+    <FxCompile Include="SkyPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
@@ -99,7 +100,11 @@
     <ClCompile Include="PowerPlantUI.cpp" />
     <ClCompile Include="ResultScoreUI.cpp" />
     <ClCompile Include="BillboardQuad.cpp" />
+
+    <ClCompile Include="SkyDome.cpp" />
+
     <ClCompile Include="Bullet.cpp" />
+
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
@@ -218,6 +223,7 @@
     <ClInclude Include="ScoreData.h" />
     <ClInclude Include="ResultScoreUI.h" />
     <ClInclude Include="BillboardQuad.h" />
+    <ClInclude Include="SkyDome.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />
