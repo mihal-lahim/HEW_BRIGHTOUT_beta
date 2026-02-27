@@ -2,13 +2,49 @@
 #include "SceneSystem.h"
 #include "Renderer.h"
 #include "RenderingSystem.h"
-#include "UIQuad.h"
+#include "BillboardQuad.h"
 #include "Mesh.h"
 #include "PowerPlant.h"
-#include "Health.h"
 #include <cmath>
 
 using namespace std;
+
+// 下揃えビルボード用クワッド（Y: 0?1, X: -0.5?0.5）
+static std::shared_ptr<Mesh> CreateBottomAlignedBillboardQuad(GraphicsDevice& device)
+{
+	using VA = Mesh::VertexAttribute;
+	std::vector<VA> vertices(4);
+
+	// 左上
+	vertices[0].position = { -0.5f, 1.0f, 0.0f };
+	vertices[0].color    = {  1.0f, 1.0f, 1.0f, 1.0f };
+	vertices[0].normal   = {  0.0f, 0.0f, -1.0f };
+	vertices[0].uv       = {  0.0f, 0.0f };
+
+	// 右上
+	vertices[1].position = {  0.5f, 1.0f, 0.0f };
+	vertices[1].color    = {  1.0f, 1.0f, 1.0f, 1.0f };
+	vertices[1].normal   = {  0.0f, 0.0f, -1.0f };
+	vertices[1].uv       = {  1.0f, 0.0f };
+
+	// 左下
+	vertices[2].position = { -0.5f, 0.0f, 0.0f };
+	vertices[2].color    = {  1.0f, 1.0f, 1.0f, 1.0f };
+	vertices[2].normal   = {  0.0f, 0.0f, -1.0f };
+	vertices[2].uv       = {  0.0f, 1.0f };
+
+	// 右下
+	vertices[3].position = {  0.5f, 0.0f, 0.0f };
+	vertices[3].color    = {  1.0f, 1.0f, 1.0f, 1.0f };
+	vertices[3].normal   = {  0.0f, 0.0f, -1.0f };
+	vertices[3].uv       = {  1.0f, 1.0f };
+
+	std::vector<UINT> indices = { 0, 1, 2, 1, 3, 2 };
+
+	auto mesh = std::make_shared<Mesh>();
+	mesh->CreateBuffer(device, vertices, indices);
+	return mesh;
+}
 
 void PowerPlantUI::Start()
 {
@@ -22,35 +58,39 @@ void PowerPlantUI::Start()
 	// 元スケールを保持
 	m_originalScale = uiScale;
 
+	// 下揃えビルボード用メッシュ作成
+	m_billboardQuad = CreateBottomAlignedBillboardQuad(device);
+
 	// 背景オブジェクト
 	m_bgObj = scene->CreateGameObject();
 	m_bgObj->SetName("PowerPlantUI_BG");
-	// ワールド座標：プラントの位置 + localOffset（プラントと同じ高さや向きに配置）
 	Vector3 basePos = gameObject().transform().position();
 	m_bgObj->transform().position() = basePos + localOffset;
 	m_bgObj->transform().scale() = uiScale;
 
 	m_bgRenderer = m_bgObj->AddComponent<MeshRenderer>();
-	m_bgRenderer->mesh = gameObject().rendering().CreateUIQuad().get();
+	m_bgRenderer->mesh = m_billboardQuad.get();
 	m_bgRenderer->renderQueue = RenderQueue::Transparent;
 	m_bgRenderer->material.texturePath = backgroundTexture;
-	m_bgRenderer->material.vsPath = "MeshVS.cso";
-	m_bgRenderer->material.psPath = "MeshPS.cso";
+	m_bgRenderer->material.vsPath = "BillboardVS.cso";
+	m_bgRenderer->material.psPath = "BillboardPS.cso";
+	m_bgRenderer->material.shaderProgram = nullptr;
+	m_bgRenderer->material.SetFloat4("uv_rect", { 0.0f, 0.0f, 1.0f, 1.0f });
 
 	// フィルオブジェクト（背景の前面に重ねる）
 	m_fillObj = scene->CreateGameObject();
 	m_fillObj->SetName("PowerPlantUI_Fill");
 	m_fillObj->transform().position() = basePos + localOffset;
-	m_fillObj->transform().scale() = uiScale;
+	m_fillObj->transform().scale() = Vector3(uiScale.x, 0.0f, uiScale.z);
 
 	m_fillRenderer = m_fillObj->AddComponent<MeshRenderer>();
-	// 初期は 0% 伸長（縦方向）
-	m_meshCache[0] = CreateUIQuadWithVRange(device, 0.0f, 0.0f);
-	m_fillRenderer->mesh = m_meshCache[0].get();
+	m_fillRenderer->mesh = m_billboardQuad.get();
 	m_fillRenderer->renderQueue = RenderQueue::Transparent;
 	m_fillRenderer->material.texturePath = fillTexture;
-	m_fillRenderer->material.vsPath = "MeshVS.cso";
-	m_fillRenderer->material.psPath = "MeshPS.cso";
+	m_fillRenderer->material.vsPath = "BillboardVS.cso";
+	m_fillRenderer->material.psPath = "BillboardPS.cso";
+	m_fillRenderer->material.shaderProgram = nullptr;
+	m_fillRenderer->material.SetFloat4("uv_rect", { 0.0f, 1.0f, 1.0f, 0.0f });
 }
 
 void PowerPlantUI::Update()
@@ -64,43 +104,9 @@ void PowerPlantUI::Update()
 	Vector3 worldPos = basePos + localOffset;
 	m_bgObj->transform().position() = worldPos;
 
-	// プレイヤー方向に向ける（Y 軸のみ回転）
-	Vector3 forwardDir = { 0.0f, 0.0f, 0.0f }; // プレイヤー方向ベクトル
-	auto scene = gameObject().scenePtr();
-	if (scene)
-	{
-		auto healths = scene->GetComponents<Health>();
-		if (!healths.empty())
-		{
-			GameObject* playerObj = &(healths.front()->gameObject());
-			if (playerObj)
-			{
-				Vector3 playerPos = playerObj->transform().position();
-				Vector3 dir = playerPos - worldPos;
-				// XZ 平面で角度
-				float yaw = atan2f(dir.x, dir.z); // ラジアン
-				float yawDeg = yaw * (180.0f / 3.14159265358979323846f);
-
-				Vector3 rot = { 0.0f, yawDeg, 0.0f };
-				m_bgObj->transform().rotation() = Quaternion::FromEulerAngles(rot);
-				m_fillObj->transform().rotation() = Quaternion::FromEulerAngles(rot);
-
-				// XZ平面上の正規化された方向ベクトル
-				float len = sqrtf(dir.x * dir.x + dir.z * dir.z);
-				if (len > 0.001f)
-				{
-					forwardDir.x = dir.x / len;
-					forwardDir.z = dir.z / len;
-				}
-			}
-		}
-	}
-
-	// フィルを背景より少し手前（プレイヤー方向）にオフセットしてZファイティング防止
-	const float fillZOffset = 0.05f;
+	// フィルを背景より少し上にオフセットしてZファイティング防止
 	Vector3 fillPos = worldPos;
-	fillPos.x += forwardDir.x * fillZOffset;
-	fillPos.z += forwardDir.z * fillZOffset;
+	fillPos.y += 0.01f;
 	m_fillObj->transform().position() = fillPos;
 
 	// 進捗取得（0..1）
@@ -110,30 +116,15 @@ void PowerPlantUI::Update()
 		progress = 1.0f;
 	}
 
-	// percent 0..100
-	int p = static_cast<int>(std::lround(progress * 100.0f));
-	if (p < 0) p = 0;
-	if (p > 100) p = 100;
-
-	// メッシュキャッシュを使い、V 範囲を 0..progress にしてメッシュ差し替え
-	auto& rendering = gameObject().rendering();
-	GraphicsDevice& device = rendering.GetGraphicsDevice();
-
-	if (m_meshCache.find(p) == m_meshCache.end())
-	{
-		// CreateUIQuadWithVRange は v0..v1 指定（ここでは下=0 上=progress）
-		m_meshCache[p] = CreateUIQuadWithVRange(device, 0.0f, progress);
-	}
-
-	if (m_meshCache[p])
-	{
-		m_fillRenderer->mesh = m_meshCache[p].get();
-	}
-
-	// 見た目上、オブジェクトのスケールも縦方向に合わせる（フィルがメッシュで上下マスクされるので補助的）
+	// フィルのスケールとUVを進捗に合わせる
 	Vector3 newScale = m_originalScale;
 	newScale.y = m_originalScale.y * progress;
 	m_fillObj->transform().scale() = newScale;
+
+	// uv_rect で表示するテクスチャ範囲を制御（下部分から伸びる）
+	float vOffset = 1.0f - progress;
+	float vScale = progress;
+	m_fillRenderer->material.SetFloat4("uv_rect", { 0.0f, vOffset, 1.0f, vScale });
 
 	// 背景は常に元スケール
 	m_bgObj->transform().scale() = m_originalScale;

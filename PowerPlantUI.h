@@ -3,13 +3,11 @@
 #include "ScriptComponent.h"
 #include "Vector3.h"
 #include <memory>
-#include <unordered_map>
 
 class Mesh;
 class MeshRenderer;
 class GameObject;
 class PowerPlant;
-class GraphicsDevice;
 
 class PowerPlantUI : public ScriptComponent
 {
@@ -32,8 +30,8 @@ private:
 
 	PowerPlant* m_powerPlant = nullptr;
 
-	// メッシュキャッシュ（進捗 % -> mesh）
-	std::unordered_map<int, std::shared_ptr<Mesh>> m_meshCache;
+	// ビルボード用クワッドメッシュ
+	std::shared_ptr<Mesh> m_billboardQuad;
 
 	// 元スケール保持
 	Vector3 m_originalScale{};
