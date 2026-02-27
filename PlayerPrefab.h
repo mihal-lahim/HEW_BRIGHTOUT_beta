@@ -11,8 +11,38 @@
 #include "Texture.h"
 #include "GameObject.h"
 #include "PlayerAudio.h"
+#include "Billboard.h"
 #include <string>
 #include <vector>
+
+inline void ApplyTextureRecursive(GameObject* gameObject, const std::wstring& texturePath)
+{
+	if (!gameObject)
+		return;
+
+	auto renderers = gameObject->GetComponents<MeshRenderer>();
+	for (auto* renderer : renderers)
+	{
+		renderer->material.texturePath = texturePath;
+		renderer->material.texture = nullptr;
+		renderer->renderQueue = RenderQueue::Transparent;
+		renderer->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
+	}
+
+	auto skinnedRenderers = gameObject->GetComponents<SkinnedMeshRenderer>();
+	for (auto* renderer : skinnedRenderers)
+	{
+		renderer->material.texturePath = texturePath;
+		renderer->material.texture = nullptr;
+		renderer->renderQueue = RenderQueue::Transparent;
+		renderer->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
+	}
+
+	for (auto* child : gameObject->GetChildren())
+	{
+		ApplyTextureRecursive(child, texturePath);
+	}
+}
 
 class PlayerPrefab : public Prefab
 {
@@ -60,6 +90,24 @@ public:
 		}
 		modelRoot->transform().scale() = Vector3(0.01f, 0.01f, 0.01f);
 		modelRoot->transform().rotation() = Quaternion::SetEulerY(180.0f);
+
+		GameObject* electricEffectObject = gameObject.CreateGameObject();
+		gameObject.SetChild(*electricEffectObject);
+		// MeshRenderer に Quad メッシュを直接割り当て
+		auto* renderer = electricEffectObject->AddComponent<MeshRenderer>();
+		renderer->material.texturePath = L"texture/kaminari_ball_kontakutosi-to_30fps.png";
+		renderer->material.texture = nullptr;
+		renderer->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
+		// Billboard コンポーネントが Awake() でシェーダーとメッシュを自動設定
+		electricEffectObject->AddComponent<Billboard>();
+		electricEffectObject->transform().scale() = Vector3(1.5f, 1.5f, 1.5f);
+		electricEffectObject->transform().position() = Vector3(0.0f, 0.5f, 0.0f);
+		electricEffectObject->SetActive(false);
+		player->electricEffectObject = electricEffectObject;
+		player->electricAnimationInterval = 0.08f;
+		player->electricSheetColumns = 5;
+		player->electricSheetRows = 6;
+		player->electricSheetFrameCount = 30;
 
 		// Healthコンポーネント設定
 		gameObject.AddComponent<Health>(100.0f);

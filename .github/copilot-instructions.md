@@ -25,5 +25,4 @@
 - System�ˑ���Component��System��Scene����`GetComponents`���A�X�V���s���B
 - GameObject��Component�������A�ǉ�/�폜/�擾�̊֐���񋟂���B
 - Prefab��GameObject�̃e���v���[�g�Ƃ��ċ@�\���A�C���X�^���X�����\�B
-- Prefab��GameObject�̃e���v���[�g�Ƃ��ċ@�\���A�C���X�^���X�����\�B
-- Prefab��GameObject�̃e���v���[�g�Ƃ��ċ@�\���A�C���X�^���X�����\�B
+- ユーザーは『画像ファイル表示（ビルボード演出）を削除しない』ことを希望している。- Prefab��GameObject�̃e���v���[�g�Ƃ��ċ@�\���A�C���X�^���X�����\�B

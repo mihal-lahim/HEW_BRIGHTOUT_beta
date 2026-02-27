@@ -4,7 +4,7 @@
 #include "Prefab.h"
 #include "Billboard.h"
 #include "GameObject.h"
-#include "SpriteRenderer.h"
+#include "Renderer.h"
 #include "ResourceSystem.h"
 
 class BillboardPrefab : public Prefab
@@ -15,8 +15,9 @@ public:
 	// インスタンス化メソッド
 	virtual void Instantiate(GameObject& gameObject) override
 	{
-		auto* renderer = gameObject.AddComponent<SpriteRenderer>();
-		renderer->SetTexture(gameObject.resource().Load<Texture>(L"texture/crystal.png"));
+		auto* renderer = gameObject.AddComponent<MeshRenderer>();
+		renderer->material.texturePath = L"texture/crystal.png";
+		// Billboard::Awake() で Quad メッシュとシェーダーが自動設定される
 		gameObject.AddComponent<Billboard>();
 	}
 };

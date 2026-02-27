@@ -17,6 +17,7 @@ public:
 	Material()
 	{
 		SetColor({ 1.0f,1.0f,1.0f,1.0f });
+		SetFloat4("uv_rect", { 0.0f, 0.0f, 1.0f, 1.0f });
 	}
 
 	// 使用シェーダープログラムの設定と定数バッファの作成

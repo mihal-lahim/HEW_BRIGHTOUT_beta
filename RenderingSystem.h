@@ -73,6 +73,7 @@ public:
 
     std::shared_ptr<Mesh> CreateUIQuad();
     std::shared_ptr<Mesh> CreateUIQuadWithUV(float u0, float u1);
+    std::shared_ptr<Mesh> CreateBillboardQuad();
 
 private:
 
@@ -90,6 +91,7 @@ private:
     GraphicsDevice* m_graphicsDevice = nullptr;
 
     std::shared_ptr<Mesh> m_uiQuad;
+    std::shared_ptr<Mesh> m_billboardQuad;
 };
 
 #endif

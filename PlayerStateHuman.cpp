@@ -6,6 +6,8 @@ void PlayerState_Human::Enter(Player& player)
 	// 剛体を有効化
 	player.physicsBody->SetEnable(true);
 	player.physicsBody->SyncTransformToGameObject();
+	player.SetHumanVisualActive(true);
+	player.SetElectricEffectActive(false);
 
 	// モデルを人間形態に設定
 	//player.meshRenderer->SetModel(player.humanModel);

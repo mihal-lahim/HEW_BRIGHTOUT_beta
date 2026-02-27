@@ -8,6 +8,8 @@
     <FxCompile Include="MeshVS.hlsl" />
     <FxCompile Include="UiVS.hlsl" />
     <FxCompile Include="UiPS.hlsl" />
+    <FxCompile Include="BillboardVS.hlsl" />
+    <FxCompile Include="BillboardPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
@@ -97,6 +99,8 @@
     <ClCompile Include="BgmSwitcher.cpp" />
     <ClCompile Include="PowerPlantUI.cpp" />
     <ClCompile Include="ResultScoreUI.cpp" />
+    <ClCompile Include="billboard_f.cpp" />
+    <ClCompile Include="BillboardQuad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
@@ -214,6 +218,8 @@
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="ScoreData.h" />
     <ClInclude Include="ResultScoreUI.h" />
+    <ClInclude Include="billboard_f.h" />
+    <ClInclude Include="BillboardQuad.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />
