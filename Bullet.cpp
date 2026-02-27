@@ -6,6 +6,7 @@
 #include "Time.h"
 #include "GameObject.h"
 #include "ScoreData.h"
+#include "Enemy.h"
 
 namespace
 {
@@ -68,8 +69,21 @@ void Bullet::Update()
 
 		if (toEnemy.Length() <= HitRadius)
 		{
+			auto* enemyComponent = enemy->GetComponent<Enemy>();
+			if (enemyComponent && enemyComponent->IsDefeated())
+			{
+				continue;
+			}
+
 			ScoreData::Instance().killedEnemies++;
-			DestroyWithChildren(*enemy);
+			if (enemyComponent)
+			{
+				enemyComponent->OnDefeated();
+			}
+			else
+			{
+				DestroyWithChildren(*enemy);
+			}
 			DestroyWithChildren(gameObject());
 			return;
 		}

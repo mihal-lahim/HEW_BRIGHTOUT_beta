@@ -5,24 +5,44 @@
 #include "audio.h"
 #include "UIDrawer.h"
 #include "ResultScoreUI.h"
+#include "FadeController.h"
+
+#include <optional>
 
 static int g_ResultBgm{};
+static std::optional<std::string> g_resultBgmPath = std::nullopt;
+
+void SetResultBgm(const std::string& path)
+{
+	g_resultBgmPath = path;
+}
 
 void Result::Initialize()
 {
 	g_ResultBgm = LoadAudio("sound/Result_01.wav");
+	// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³å‰ã«ç”»é¢ã‚’é»’ãã—ã¦ãŠãï¼ˆç°è‰²ãŒä¸€ç¬æ˜ ã‚‹ã®ã‚’é˜²ãï¼‰
+	rendering().GetGraphicsDevice().SetClearColor(0.0f,0.0f,0.0f,1.0f);
+
+	// ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªåˆæœŸåŒ–
+	InitAudio();
+
+	// ä½¿ç”¨ã™ã‚‹ BGM ã‚’æ±ºå®šï¼ˆãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¾ãŸã¯å¤–éƒ¨ã§æŒ‡å®šã•ã‚ŒãŸãƒ‘ã‚¹ï¼‰
+	const char* bgmPath = "sound/Result_01.wav";
+	if (g_resultBgmPath.has_value())
+	{
+		bgmPath = g_resultBgmPath->c_str();
+	}
+
+	g_ResultBgm = LoadAudio(bgmPath);
 
 	PlayAudio(g_ResultBgm, true);
-	SetAudioVolume(g_ResultBgm, 0.2f);
+	SetAudioVolume(g_ResultBgm,0.2f);
 
-	// ƒŠƒUƒ‹ƒgƒV[ƒ“‚Ì”wŒiF‚ğ•ÏXiÂŒn‚ÌF‚Å‹æ•Ê‚µ‚â‚·‚­‚·‚éj
-	rendering().GetGraphicsDevice().SetClearColor(0.1f, 0.2f, 0.5f);
-
-	// ƒŠƒUƒ‹ƒgƒV[ƒ“‚Ì§Œä—pGameObject‚ğì¬
+	// ãƒªã‚¶ãƒ«ãƒˆã‚·ãƒ¼ãƒ³ã®åˆ¶å¾¡ç”¨GameObjectã‚’ä½œæˆ
 	GameObject* controller = CreateGameObject();
 	controller->AddComponent<ResultController>();
 
-	// ƒŠƒUƒ‹ƒgUI•\¦
+	// ãƒªã‚¶ãƒ«ãƒˆUIè¡¨ç¤º
 	GameObject* uiRoot = CreateGameObject();
 	uiRoot->SetName("ResultUIRoot");
 
@@ -38,21 +58,30 @@ void Result::Initialize()
 	UI::CreateUI(
 		uiRoot,
 		L"texture/Result.png",
-		Vector3(0.0f, 0.0f, 0.0f),
-		Vector3(1920.0f, 1080.0f, 1.0f),
+		Vector3(0.0f,0.0f,0.0f),
+		Vector3(1920.0f,1080.0f,1.0f),
 		"UiVS.cso",
 		"UiPS.cso"
 	);
 
-	// ƒXƒRƒA•\¦UI
+	// ã‚¹ã‚³ã‚¢è¡¨ç¤ºUI
 	GameObject* scoreObj = CreateGameObject();
 	scoreObj->SetName("ResultScoreUI");
 	scoreObj->AddComponent<ResultScoreUI>();
+
+	// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³æ¼”å‡º
+	GameObject* fadeObj = CreateGameObject();
+	fadeObj->SetName("FadeController");
+	auto* fadeCtrl = fadeObj->AddComponent<FadeController>();
+	fadeCtrl->StartFadeIn(1.0f);
+
+	// Reset the optional path after using it
+	g_resultBgmPath = std::nullopt;
 }
 
 void Result::Finalize()
 {
-	// ‰¹º‰ğ•ú
+	// éŸ³å£°è§£æ”¾
 	StopAudio(g_ResultBgm);
 	UnloadAudio(g_ResultBgm);
 }

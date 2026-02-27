@@ -35,11 +35,13 @@ struct AUDIO
 
 	int						Length{};
 	int						PlayLength{};
+
+	// 追加: フォーマット情報を保持しておく（ワンショット用に必要）
+	WAVEFORMATEX wfx{};
 };
 
 #define AUDIO_MAX 100
 static AUDIO g_Audio[AUDIO_MAX]{};
-
 
 
 int LoadAudio(const char* FileName)
@@ -112,9 +114,11 @@ int LoadAudio(const char* FileName)
 		mmioClose(hmmio, 0);
 	}
 
+	// フォーマット情報を保存
+	g_Audio[index].wfx = wfx;
 
-	// サウンドソース生成
-	g_Xaudio->CreateSourceVoice(&g_Audio[index].SourceVoice, &wfx);
+	// ソースボイス生成（既存の単一再生用に）
+	g_Xaudio->CreateSourceVoice(&g_Audio[index].SourceVoice, &g_Audio[index].wfx);
 	assert(g_Audio[index].SourceVoice);
 
 
@@ -183,5 +187,72 @@ void SetAudioVolume(int Index, float volume)
 	{
 		g_Audio[Index].SourceVoice->SetVolume(volume);
 	}
+}
+
+// コールバッククラス（再生終了時に自身で SourceVoice を破棄して delete する）
+class OneShotVoiceCallback : public IXAudio2VoiceCallback
+{
+public:
+	IXAudio2SourceVoice* m_voice = nullptr;
+	explicit OneShotVoiceCallback(IXAudio2SourceVoice* v) : m_voice(v) {}
+	virtual ~OneShotVoiceCallback() = default;
+
+	// IXAudio2VoiceCallback の仮想関数を空実装
+	STDMETHOD_(void, OnVoiceProcessingPassStart)(UINT32) override {}
+	STDMETHOD_(void, OnVoiceProcessingPassEnd)() override {}
+	STDMETHOD_(void, OnStreamEnd)() override {}
+	STDMETHOD_(void, OnBufferStart)(void* pBufferContext) override { (void)pBufferContext; }
+	STDMETHOD_(void, OnBufferEnd)(void* pBufferContext) override { (void)pBufferContext;
+		{
+			// バッファ再生終了 → ボイス破棄してコールバックオブジェクトを削除
+			if (m_voice)
+			{
+				m_voice->Stop();
+				m_voice->FlushSourceBuffers();
+				m_voice->DestroyVoice();
+				m_voice = nullptr;
+			}
+			// self-delete
+			delete this;
+		}
+	}
+	STDMETHOD_(void, OnLoopEnd)(void* pBufferContext) override { (void)pBufferContext; }
+	STDMETHOD_(void, OnVoiceError)(void* pBufferContext, HRESULT error) override { (void)pBufferContext; (void)error; }
+};
+
+
+void PlayAudioOneShot(int Index, float volume)
+{
+	if (Index < 0)
+		return;
+
+	// 必要なフォーマット/データは g_Audio[Index] に保持している
+	if (g_Audio[Index].SoundData == nullptr)
+		return;
+
+	IXAudio2SourceVoice* oneVoice = nullptr;
+	// コールバックをセット（delete は OnBufferEnd 内で行う）
+	OneShotVoiceCallback* cb = new OneShotVoiceCallback(nullptr);
+	HRESULT hr = g_Xaudio->CreateSourceVoice(&oneVoice, &g_Audio[Index].wfx, 0, XAUDIO2_DEFAULT_FREQ_RATIO, cb);
+	if (FAILED(hr) || oneVoice == nullptr) {
+		delete cb; // 失敗時はコールバックも解放
+		return;
+	}
+	// コールバックにoneVoiceをセット
+	cb->m_voice = oneVoice;
+
+	// ボリューム設定
+	oneVoice->SetVolume(volume);
+
+	XAUDIO2_BUFFER bufinfo;
+	memset(&bufinfo, 0x00, sizeof(bufinfo));
+	bufinfo.AudioBytes = g_Audio[Index].Length;
+	bufinfo.pAudioData = g_Audio[Index].SoundData;
+	bufinfo.PlayBegin = 0;
+	bufinfo.PlayLength = g_Audio[Index].PlayLength;
+
+	// ワンショットなのでループは設定しない
+	oneVoice->SubmitSourceBuffer(&bufinfo, NULL);
+	oneVoice->Start();
 }
 
