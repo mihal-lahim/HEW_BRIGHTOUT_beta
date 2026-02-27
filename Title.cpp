@@ -9,9 +9,6 @@ static int g_TitleBgm{};
 
 void Title::Initialize()
 {
-	 //オーディオ初期化
-	InitAudio();
-
 	g_TitleBgm = LoadAudio("sound/GameTitle_02.wav");
 
 	// デフォルトの背景色に戻す
@@ -27,6 +24,15 @@ void Title::Initialize()
 
 	UI::CreateUI(
 		uiRoot,
+		L"texture/BackGround.png",
+		Vector3(0.0f, 0.0f, 0.0f),
+		Vector3(1920.0f, 1080.0f, 1.0f),
+		"UiVS.cso",
+		"UiPS.cso"
+	);
+
+	UI::CreateUI(
+		uiRoot,
 		L"texture/Title.png",
 		Vector3(0.0f, 0.0f, 0.0f),
 		Vector3(1920.0f, 1080.0f, 1.0f),
@@ -34,7 +40,7 @@ void Title::Initialize()
 		"UiPS.cso"
 	);
 
-	 //BGM再生（ループ）
+	//BGM再生（ループ）
 	PlayAudio(g_TitleBgm, true);
 
 	SetAudioVolume(g_TitleBgm, 0.5f);
@@ -43,8 +49,6 @@ void Title::Initialize()
 void Title::Finalize()
 {
 	// 音声解放
+	StopAudio(g_TitleBgm);
 	UnloadAudio(g_TitleBgm);
-
-	// XAudio終了
-	UninitAudio();
 }

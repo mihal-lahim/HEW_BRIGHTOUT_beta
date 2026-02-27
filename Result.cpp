@@ -19,13 +19,14 @@ void SetResultBgm(const std::string& path)
 
 void Result::Initialize()
 {
-	// ƒtƒF[ƒhƒCƒ“‘O‚É‰æ–Ê‚ğ•‚­‚µ‚Ä‚¨‚­iŠDF‚ªˆêu‰f‚é‚Ì‚ğ–h‚®j
+	g_ResultBgm = LoadAudio("sound/Result_01.wav");
+	// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³å‰ã«ç”»é¢ã‚’é»’ãã—ã¦ãŠãï¼ˆç°è‰²ãŒä¸€ç¬æ˜ ã‚‹ã®ã‚’é˜²ãï¼‰
 	rendering().GetGraphicsDevice().SetClearColor(0.0f,0.0f,0.0f,1.0f);
 
-	// ƒI[ƒfƒBƒI‰Šú‰»
+	// ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªåˆæœŸåŒ–
 	InitAudio();
 
-	// g—p‚·‚é BGM ‚ğŒˆ’èiƒfƒtƒHƒ‹ƒg‚Ü‚½‚ÍŠO•”‚Åw’è‚³‚ê‚½ƒpƒXj
+	// ä½¿ç”¨ã™ã‚‹ BGM ã‚’æ±ºå®šï¼ˆãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¾ãŸã¯å¤–éƒ¨ã§æŒ‡å®šã•ã‚ŒãŸãƒ‘ã‚¹ï¼‰
 	const char* bgmPath = "sound/Result_01.wav";
 	if (g_resultBgmPath.has_value())
 	{
@@ -37,13 +38,22 @@ void Result::Initialize()
 	PlayAudio(g_ResultBgm, true);
 	SetAudioVolume(g_ResultBgm,0.2f);
 
-	// ƒŠƒUƒ‹ƒgƒV[ƒ“‚Ì§Œä—pGameObject‚ğì¬
+	// ãƒªã‚¶ãƒ«ãƒˆã‚·ãƒ¼ãƒ³ã®åˆ¶å¾¡ç”¨GameObjectã‚’ä½œæˆ
 	GameObject* controller = CreateGameObject();
 	controller->AddComponent<ResultController>();
 
-	// ƒŠƒUƒ‹ƒgUI•\¦
+	// ãƒªã‚¶ãƒ«ãƒˆUIè¡¨ç¤º
 	GameObject* uiRoot = CreateGameObject();
 	uiRoot->SetName("ResultUIRoot");
+
+	UI::CreateUI(
+		uiRoot,
+		L"texture/BackGround.png",
+		Vector3(0.0f, 0.0f, 0.0f),
+		Vector3(1920.0f, 1080.0f, 1.0f),
+		"UiVS.cso",
+		"UiPS.cso"
+	);
 
 	UI::CreateUI(
 		uiRoot,
@@ -54,12 +64,12 @@ void Result::Initialize()
 		"UiPS.cso"
 	);
 
-	// ƒXƒRƒA•\¦UI
+	// ã‚¹ã‚³ã‚¢è¡¨ç¤ºUI
 	GameObject* scoreObj = CreateGameObject();
 	scoreObj->SetName("ResultScoreUI");
 	scoreObj->AddComponent<ResultScoreUI>();
 
-	// ƒtƒF[ƒhƒCƒ“‰‰o
+	// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³æ¼”å‡º
 	GameObject* fadeObj = CreateGameObject();
 	fadeObj->SetName("FadeController");
 	auto* fadeCtrl = fadeObj->AddComponent<FadeController>();
@@ -71,9 +81,7 @@ void Result::Initialize()
 
 void Result::Finalize()
 {
-	// ‰¹º‰ğ•ú
+	// éŸ³å£°è§£æ”¾
+	StopAudio(g_ResultBgm);
 	UnloadAudio(g_ResultBgm);
-
-	// XAudioI—¹
-	UninitAudio();
 }
