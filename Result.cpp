@@ -10,9 +10,6 @@ static int g_ResultBgm{};
 
 void Result::Initialize()
 {
-	//オーディオ初期化
-	InitAudio();
-
 	g_ResultBgm = LoadAudio("sound/Result_01.wav");
 
 	PlayAudio(g_ResultBgm, true);
@@ -28,6 +25,15 @@ void Result::Initialize()
 	// リザルトUI表示
 	GameObject* uiRoot = CreateGameObject();
 	uiRoot->SetName("ResultUIRoot");
+
+	UI::CreateUI(
+		uiRoot,
+		L"texture/BackGround.png",
+		Vector3(0.0f, 0.0f, 0.0f),
+		Vector3(1920.0f, 1080.0f, 1.0f),
+		"UiVS.cso",
+		"UiPS.cso"
+	);
 
 	UI::CreateUI(
 		uiRoot,
@@ -47,8 +53,6 @@ void Result::Initialize()
 void Result::Finalize()
 {
 	// 音声解放
+	StopAudio(g_ResultBgm);
 	UnloadAudio(g_ResultBgm);
-
-	// XAudio終了
-	UninitAudio();
 }

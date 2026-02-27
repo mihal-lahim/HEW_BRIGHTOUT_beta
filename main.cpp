@@ -17,6 +17,7 @@
 #include "Kasiwagi.h"
 #include "Namioka.h"
 #include "Title.h"
+#include "Audio.h"
 
 using namespace DirectX;
 
@@ -74,6 +75,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	ctx.windowSystem->RegisterWindow(&window);
 	ctx.renderingSystem->Initialize(graphicsDevice);
 
+	InitAudio();
 
 	// デフォルトシーン
 	//engineCore.GetGameContext().sceneSystem->ChangeScene<Game>();
@@ -106,6 +108,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 		} while (msg.message != WM_QUIT);
 
 	// 終了処理
+	UninitAudio();
 	Mouse_Finalize();       // マウスの終了処理
 	graphicsDevice.Finalize(); // Direct3Dの終了処理
 

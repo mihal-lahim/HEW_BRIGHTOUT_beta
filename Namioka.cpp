@@ -1254,8 +1254,8 @@ void Namioka::Initialize()
 void Namioka::Finalize()
 {
 	// 音声解放
+	StopAudio(g_GameBgm);
 	UnloadAudio(g_GameBgm);
-
-	// XAudio終了
-	UninitAudio();
+	StopAudio(g_GameBgm2);
+	UnloadAudio(g_GameBgm2);
 }
