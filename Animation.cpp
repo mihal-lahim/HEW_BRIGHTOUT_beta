@@ -1,4 +1,8 @@
-﻿#include "Animation.h"
+﻿////////////////////////////////////////////
+//アニメーションシステムの実装
+////////////////////////////////////////////
+
+#include "Animation.h"
 #include "Model.h"
 #include "GameObject.h"
 #include "Time.h"

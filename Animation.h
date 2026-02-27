@@ -1,4 +1,8 @@
-﻿#ifndef ANIMATION_H
+﻿///////////////////////////////////
+//アニメーションシステムの実装
+///////////////////////////////////
+
+#ifndef ANIMATION_H
 #define ANIMATION_H
 
 #include <DirectXMath.h>

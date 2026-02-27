@@ -33,7 +33,7 @@ void Title::Initialize()
 
 	UI::CreateUI(
 		uiRoot,
-		L"texture/Title.png",
+		L"texture/Title2.png",
 		Vector3(0.0f, 0.0f, 0.0f),
 		Vector3(1920.0f, 1080.0f, 1.0f),
 		"UiVS.cso",
