@@ -1,4 +1,4 @@
-#include "Result.h"
+﻿#include "Result.h"
 #include "GameObject.h"
 #include "ResultController.h"
 #include "RenderingSystem.h"
