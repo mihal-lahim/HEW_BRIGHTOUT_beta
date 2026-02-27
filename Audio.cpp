@@ -123,11 +123,18 @@ int LoadAudio(const char* FileName)
 
 void UnloadAudio(int Index)
 {
-	g_Audio[Index].SourceVoice->Stop();
-	g_Audio[Index].SourceVoice->DestroyVoice();
+	if (g_Audio[Index].SourceVoice)
+	{
+		g_Audio[Index].SourceVoice->Stop();
+		g_Audio[Index].SourceVoice->DestroyVoice();
+		g_Audio[Index].SourceVoice = nullptr; 
+	}
 
 	delete[] g_Audio[Index].SoundData;
 	g_Audio[Index].SoundData = nullptr;
+
+	g_Audio[Index].Length = 0;
+	g_Audio[Index].PlayLength = 0;
 }
 
 void PlayAudio(int Index, bool Loop)
