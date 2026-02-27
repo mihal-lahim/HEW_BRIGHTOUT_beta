@@ -52,15 +52,8 @@ public:
 	{
 		if (m_pool.size() <= idx) return;
 
-		// 最後の要素と入れ替えてから削除
-		std::swap(m_pool.at(idx), m_pool.back());
-		m_pool.pop_back();
-
-		// 入れ替えたオブジェクトのallocationIDを更新（idxが最後の要素だった場合はスキップ）
-		if (idx < static_cast<uint32_t>(m_pool.size()))
-		{
-			m_pool.at(idx)->m_allocationID = idx;
-		}
+		// allocationID の安定性を優先して、要素を詰めずに破棄
+		m_pool.at(idx).reset();
 	}
 };
 
