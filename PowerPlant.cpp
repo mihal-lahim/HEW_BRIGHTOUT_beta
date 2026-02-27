@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "Player.h"
 #include "ScoreData.h"
+#include "Audio.h" 
 
  // GameObjectとその全子孫を再帰的にSetActiveする
 static void SetActiveRecursive(GameObject* obj, bool active)
@@ -17,15 +18,30 @@ static void SetActiveRecursive(GameObject* obj, bool active)
 	}
 }
 
+// 全 PowerPlant で共有するホールドSE
+static int s_holdSE = -1;
+static bool s_holdSELoaded = false;
+
 void PowerPlant::Start()
 {
 	// コンポーネント初期化後に復旧モデルを非表示にする
 	SetActiveRecursive(restoredModel, false);
 	m_holdTimer = 0.0f;
+	m_wasHolding = false;
 
-	// 同じ GameObject に UI コンポーネントを追加して表示させる
-	// PowerPlantUI は Start() で自身の子として背景とフィルを生成します
+	// PowerPlantUI を追加
 	gameObject().AddComponent<PowerPlantUI>();
+
+	// SE を一度だけロード（
+	if (!s_holdSELoaded)
+	{
+		s_holdSE = LoadAudio("sound/gauge_restore.wav"); 
+		if (s_holdSE >= 0)
+		{
+			SetAudioVolume(s_holdSE, 0.7f); 
+		}
+		s_holdSELoaded = true;
+	}
 }
 
 void PowerPlant::Restore()
@@ -72,6 +88,13 @@ void PowerPlant::Restore()
 				ScoreData::Instance().restoredPlants++;
 				SetActiveRecursive(brokenModel, false);
 				SetActiveRecursive(restoredModel, true);
+
+				// 復旧したらホールドSEは停止
+				if (s_holdSELoaded && s_holdSE >= 0)
+				{
+					StopAudio(s_holdSE);
+				}
+
 				return;
 			}
 		}
@@ -87,21 +110,57 @@ void PowerPlant::UpdateHold(float deltaTime, bool isHolding)
 
 	if (isHolding)
 	{
+		// 長押しが開始された瞬間にループSEを再生
+		if (!m_wasHolding)
+		{
+			if (s_holdSELoaded && s_holdSE >= 0)
+			{
+				PlayAudio(s_holdSE, true); // ループ再生
+			}
+		}
+
 		m_holdTimer += deltaTime;
+		m_wasHolding = true;
+
 		if (m_holdTimer >= m_holdThreshold)
 		{
 			Restore();
-			// タイマーは閾値で止めておく（必要なら続けて増やしてもよい）
+			// 復旧で SE を停止（
+			if (s_holdSELoaded && s_holdSE >= 0)
+			{
+				StopAudio(s_holdSE);
+			}
 			m_holdTimer = m_holdThreshold;
+			m_wasHolding = false;
 		}
 	}
-	// ボタンを離してもタイマーは保持（一時停止）
-	// 範囲外に出た場合のみ ResetHold() でリセットされる
+	else
+	{
+		// 長押しが解除された瞬間にループSEを停止
+		if (m_wasHolding)
+		{
+			if (s_holdSELoaded && s_holdSE >= 0)
+			{
+				StopAudio(s_holdSE);
+			}
+			m_wasHolding = false;
+		}
+	}
 }
 
 void PowerPlant::ResetHold()
 {
 	m_holdTimer = 0.0f;
+
+	// ホールドがリセットされたら SE を停止
+	if (m_wasHolding)
+	{
+		if (s_holdSELoaded && s_holdSE >= 0)
+		{
+			StopAudio(s_holdSE);
+		}
+		m_wasHolding = false;
+	}
 }
 
 bool PowerPlant::IsInRange(const Vector3& position) const

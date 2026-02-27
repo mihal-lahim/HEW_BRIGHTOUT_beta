@@ -12,3 +12,5 @@ void PlayAudio(int Index, bool Loop = false);
 void StopAudio(int Index);
 void SetAudioVolume(int Index, float volume);
 
+void PlayAudioOneShot(int Index, float volume = 1.0f);
+
