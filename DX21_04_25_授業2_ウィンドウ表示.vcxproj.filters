@@ -103,7 +103,10 @@
     <ClCompile Include="BillboardQuad.cpp" />
     <ClCompile Include="SkyDome.cpp" />
     <ClCompile Include="Bullet.cpp" />
+
     <ClCompile Include="FadeController.cpp" />
+
+
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
@@ -143,7 +146,6 @@
     <ClInclude Include="ResultController.h" />
     <ClInclude Include="GameClearChecker.h" />
     <ClInclude Include="TitleController.h" />
-    <ClInclude Include="PlayerPrefab.h" />
     <ClInclude Include="DebugCounter.h" />
     <ClInclude Include="GameContext.h" />
     <ClInclude Include="InputSystem.h" />
@@ -223,7 +225,11 @@
     <ClInclude Include="ResultScoreUI.h" />
     <ClInclude Include="BillboardQuad.h" />
     <ClInclude Include="SkyDome.h" />
+
     <ClInclude Include="FadeController.h" />
+
+    <ClInclude Include="PlayerPrefab.h" />
+
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />

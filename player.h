@@ -73,6 +73,10 @@ public:
 	GameObject* modelObject = nullptr;
 	// 電線移動時の画像エフェクトオブジェクト
 	GameObject* electricEffectObject = nullptr;
+	// 移動速度バフ表示テキストのルート
+	GameObject* moveSpeedTextRoot = nullptr;
+	// 復旧速度バフ表示テキストのルート
+	GameObject* repairSpeedTextRoot = nullptr;
 
 	// 歩行アニメーション用モデル
 	std::vector<GameObject*> walkModelObjects{};
@@ -133,11 +137,27 @@ public:
 	void ResetElectricAnimation();
 	void AdvanceElectricAnimation(float deltaTime);
 	void ApplyElectricFrameUV(size_t frameIndex);
+	void ApplyPermanentMoveSpeedBuff();
+	void ApplyPermanentRestoreSpeedBuff();
+	float GetRestoreSpeedMultiplier() const;
+	void ShowMoveSpeedBuffText();
+	void UpdateMoveSpeedBuffText(float deltaTime);
+	void ShowRepairSpeedBuffText();
+	void UpdateRepairSpeedBuffText(float deltaTime);
+
+	int MoveSpeedBuffStack = 0;
+	float MoveSpeedBuffPerRestore = 0.5f;
+	int RestoreSpeedBuffStack = 0;
+	float RestoreSpeedBuffPerRestore = 0.2f;
+	float MoveSpeedBuffTextDuration = 1.2f;
+	float RepairSpeedBuffTextDuration = 1.2f;
 
 private:
 	float m_FireTimer = 0.0f;
 	float m_FireAnimationTimer = 0.0f;
 	float m_LastFacingYaw = 0.0f;
+	float m_MoveSpeedBuffTextTimer = 0.0f;
+	float m_RepairSpeedBuffTextTimer = 0.0f;
 	enum class HumanPseudoAnimationMode
 	{
 		Idle,
