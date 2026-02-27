@@ -10,6 +10,7 @@
 #include "Time.h"
 #include "SceneSystem.h"
 #include <algorithm>
+#include <cmath>
 
 using namespace DirectX;
 
@@ -22,6 +23,9 @@ void Player::Start()
 	// 初期状態設定
 	stateMachine->ChangeState(&PlayerStates::HumanIdle, *this);
 	ResetWalkAnimation();
+	ResetHumanPseudoAnimationGroup(idleModelObjects, idleAnimationIndex, idleAnimationTimer);
+	ResetHumanPseudoAnimationGroup(fireModelObjects, fireAnimationIndex, fireAnimationTimer);
+	m_HumanPseudoAnimationMode = HumanPseudoAnimationMode::Idle;
 	ResetElectricAnimation();
 	SetElectricEffectActive(false);
 }
@@ -37,7 +41,17 @@ void Player::Update()
 
 	// 状態管理コンポーネント更新
 	stateMachine->Update(*this);
+	if (modelObject && modelObject->IsActiveInHierarchy() && inputHandler)
+	{
+		const float moveX = inputHandler->GetValue<PlayerCommand_MoveX>();
+		const float moveZ = inputHandler->GetValue<PlayerCommand_MoveZ>();
+		if (std::fabs(moveX) <= 0.01f && std::fabs(moveZ) <= 0.01f)
+		{
+			ApplyFacingYaw();
+		}
+	}
 	HandleFire();
+	UpdateHumanPseudoAnimation((float)Time::DeltaTime());
 }
 
 void Player::HandleFire()
@@ -54,6 +68,7 @@ void Player::HandleFire()
 	if (inputHandler->IsIssued<PlayerCommand_Fire>())
 	{
 		m_FireTimer = FireInterval;
+		m_FireAnimationTimer = FireAnimationDuration;
 		FireBullet();
 	}
 }
@@ -85,7 +100,28 @@ void Player::FireBullet()
 
 void Player::SetHumanVisualActive(bool active)
 {
-	SetActiveRecursive(modelObject, active);
+	if (!modelObject)
+		return;
+
+	if (!active)
+	{
+		SetActiveRecursive(modelObject, false);
+		return;
+	}
+
+	modelObject->SetActive(true);
+	HideAllHumanPseudoAnimationModels();
+	m_HumanPseudoAnimationMode = HumanPseudoAnimationMode::Idle;
+
+	if (!idleModelObjects.empty())
+	{
+		ResetHumanPseudoAnimationGroup(idleModelObjects, idleAnimationIndex, idleAnimationTimer);
+	}
+	else
+	{
+		ResetHumanPseudoAnimationGroup(walkModelObjects, walkAnimationIndex, walkAnimationTimer);
+		m_HumanPseudoAnimationMode = HumanPseudoAnimationMode::Walk;
+	}
 }
 
 void Player::SetElectricEffectActive(bool active)
@@ -158,6 +194,140 @@ void Player::AdvanceWalkAnimation(float deltaTime)
 
 	if (walkModelObjects[walkAnimationIndex])
 		SetActiveRecursive(walkModelObjects[walkAnimationIndex], true);
+}
+
+void Player::SetFacingYaw(float yaw)
+{
+	m_LastFacingYaw = yaw;
+}
+
+void Player::ApplyFacingYaw()
+{
+	gameObject().transform().rotation() = Quaternion::SetEulerY(m_LastFacingYaw);
+	if (physicsBody && physicsBody->IsEnable())
+	{
+		physicsBody->SyncTransformToGameObject();
+	}
+}
+
+void Player::HideAllHumanPseudoAnimationModels()
+{
+	for (auto* model : walkModelObjects)
+	{
+		if (model) SetActiveRecursive(model, false);
+	}
+	for (auto* model : idleModelObjects)
+	{
+		if (model) SetActiveRecursive(model, false);
+	}
+	for (auto* model : fireModelObjects)
+	{
+		if (model) SetActiveRecursive(model, false);
+	}
+}
+
+void Player::ResetHumanPseudoAnimationGroup(std::vector<GameObject*>& models, size_t& index, float& timer)
+{
+	timer = 0.0f;
+	index = 0;
+	for (size_t i = 0; i < models.size(); ++i)
+	{
+		if (models[i])
+			SetActiveRecursive(models[i], i == 0);
+	}
+}
+
+void Player::AdvanceHumanPseudoAnimationGroup(std::vector<GameObject*>& models, size_t& index, float& timer, float interval, float deltaTime)
+{
+	if (models.size() <= 1 || interval <= 0.0f)
+		return;
+
+	timer += deltaTime;
+	if (timer < interval)
+		return;
+
+	timer -= interval;
+
+	if (models[index])
+		SetActiveRecursive(models[index], false);
+
+	index = (index + 1) % models.size();
+
+	if (models[index])
+		SetActiveRecursive(models[index], true);
+}
+
+void Player::UpdateHumanPseudoAnimation(float deltaTime)
+{
+	if (deltaTime <= 0.0f)
+		return;
+
+	if (!modelObject || !modelObject->IsActiveInHierarchy())
+		return;
+
+	if (m_FireAnimationTimer > 0.0f)
+	{
+		m_FireAnimationTimer -= deltaTime;
+	}
+
+	bool isMovingInput = false;
+	if (inputHandler)
+	{
+		const float moveX = inputHandler->GetValue<PlayerCommand_MoveX>();
+		const float moveZ = inputHandler->GetValue<PlayerCommand_MoveZ>();
+		isMovingInput = std::fabs(moveX) > 0.01f || std::fabs(moveZ) > 0.01f;
+	}
+
+	HumanPseudoAnimationMode nextMode = HumanPseudoAnimationMode::Idle;
+	if (m_FireAnimationTimer > 0.0f)
+	{
+		nextMode = HumanPseudoAnimationMode::Fire;
+	}
+	else if (isMovingInput)
+	{
+		nextMode = HumanPseudoAnimationMode::Walk;
+	}
+
+	std::vector<GameObject*>* activeModels = &idleModelObjects;
+	size_t* activeIndex = &idleAnimationIndex;
+	float* activeTimer = &idleAnimationTimer;
+	float activeInterval = IdleAnimationInterval;
+
+	if (nextMode == HumanPseudoAnimationMode::Walk)
+	{
+		activeModels = &walkModelObjects;
+		activeIndex = &walkAnimationIndex;
+		activeTimer = &walkAnimationTimer;
+		activeInterval = walkAnimationInterval;
+	}
+	else if (nextMode == HumanPseudoAnimationMode::Fire)
+	{
+		activeModels = &fireModelObjects;
+		activeIndex = &fireAnimationIndex;
+		activeTimer = &fireAnimationTimer;
+		activeInterval = FireAnimationInterval;
+	}
+
+	if (activeModels->empty())
+	{
+		activeModels = &walkModelObjects;
+		activeIndex = &walkAnimationIndex;
+		activeTimer = &walkAnimationTimer;
+		activeInterval = walkAnimationInterval;
+		nextMode = HumanPseudoAnimationMode::Walk;
+	}
+
+	if (activeModels->empty())
+		return;
+
+	if (m_HumanPseudoAnimationMode != nextMode)
+	{
+		HideAllHumanPseudoAnimationModels();
+		ResetHumanPseudoAnimationGroup(*activeModels, *activeIndex, *activeTimer);
+		m_HumanPseudoAnimationMode = nextMode;
+	}
+
+	AdvanceHumanPseudoAnimationGroup(*activeModels, *activeIndex, *activeTimer, activeInterval, deltaTime);
 }
 
 void Player::ResetElectricAnimation()

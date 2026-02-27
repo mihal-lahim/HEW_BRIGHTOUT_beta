@@ -76,12 +76,24 @@ public:
 
 	// 歩行アニメーション用モデル
 	std::vector<GameObject*> walkModelObjects{};
+	// 待機アニメーション用モデル
+	std::vector<GameObject*> idleModelObjects{};
+	// 射撃アニメーション用モデル
+	std::vector<GameObject*> fireModelObjects{};
 	// 歩行アニメーションの更新間隔
 	float walkAnimationInterval = 1.0f;
 	// 歩行アニメーションタイマー
 	float walkAnimationTimer = 0.0f;
 	// 歩行アニメーションインデックス
 	size_t walkAnimationIndex = 0;
+	// 待機アニメーションタイマー
+	float idleAnimationTimer = 0.0f;
+	// 待機アニメーションインデックス
+	size_t idleAnimationIndex = 0;
+	// 射撃アニメーションタイマー
+	float fireAnimationTimer = 0.0f;
+	// 射撃アニメーションインデックス
+	size_t fireAnimationIndex = 0;
 
 	// 電線移動画像アニメーションの更新間隔
 	float electricAnimationInterval = 0.08f;
@@ -99,6 +111,9 @@ public:
 	float BulletSpeed = 20.0f;
 	float BulletLifeTime = 3.0f;
 	float FallReturnY = -20.0f;
+	float IdleAnimationInterval = 0.35f;
+	float FireAnimationInterval = 0.06f;
+	float FireAnimationDuration = 0.12f;
 
 
 	void Start() override;
@@ -109,12 +124,27 @@ public:
 	void SetElectricEffectActive(bool active);
 	void ResetWalkAnimation();
 	void AdvanceWalkAnimation(float deltaTime);
+	void UpdateHumanPseudoAnimation(float deltaTime);
+	void SetFacingYaw(float yaw);
+	void ApplyFacingYaw();
+	void HideAllHumanPseudoAnimationModels();
+	void ResetHumanPseudoAnimationGroup(std::vector<GameObject*>& models, size_t& index, float& timer);
+	void AdvanceHumanPseudoAnimationGroup(std::vector<GameObject*>& models, size_t& index, float& timer, float interval, float deltaTime);
 	void ResetElectricAnimation();
 	void AdvanceElectricAnimation(float deltaTime);
 	void ApplyElectricFrameUV(size_t frameIndex);
 
 private:
 	float m_FireTimer = 0.0f;
+	float m_FireAnimationTimer = 0.0f;
+	float m_LastFacingYaw = 0.0f;
+	enum class HumanPseudoAnimationMode
+	{
+		Idle,
+		Walk,
+		Fire,
+	};
+	HumanPseudoAnimationMode m_HumanPseudoAnimationMode = HumanPseudoAnimationMode::Idle;
 	bool m_IsReturningToTitle = false;
 };
 

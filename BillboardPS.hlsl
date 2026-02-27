@@ -22,5 +22,6 @@ float4 main(PS_INPUT psin) : SV_TARGET
 {
     float2 uv = psin.uv * uv_rect.zw + uv_rect.xy;
     float4 color = major_texture.Sample(major_sampler, uv) * psin.color * diffuse_color;
+    clip(color.a - 0.01f);
     return color;
 }

@@ -16,7 +16,7 @@ bool Texture::CreateBuffer(GraphicsDevice& device, const std::wstring& filePath)
 	ScratchImage image{};
 
 	// WICを使用して画像ファイルを読み込む
-	HRESULT hr = LoadFromWICFile(m_filePath.c_str(), WIC_FLAGS_NONE, &metadata, image);
+	HRESULT hr = LoadFromWICFile(m_filePath.c_str(), WIC_FLAGS_FORCE_RGB | WIC_FLAGS_NO_16BPP, &metadata, image);
 	if (FAILED(hr)) 
 	{
 		return false;
