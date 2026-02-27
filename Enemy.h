@@ -2,6 +2,7 @@
 #define ENEMY_H
 
 #include "Movement.h"
+
 #include "GameObject.h"
 #include "Time.h"
 #include "Ray.h"
@@ -29,6 +30,9 @@ inline void DestroyEnemyRecursive(GameObject* obj)
 	obj->SetActive(false);
 	obj->Destroy();
 }
+
+#include "audio.h"
+
 
 class Enemy : public Movement
 {
@@ -63,7 +67,24 @@ public:
 	{
 		Movement::Start();
 		m_target = GetGameObjectByTag("Player");
+
 		SetAnimationMode(AnimationMode::Idle);
+
+
+		// 死亡SE読み込み
+		m_DeathSE = LoadAudio("sound/enemy_die.wav"); 
+		if (m_DeathSE >= 0)
+		{
+			SetAudioVolume(m_DeathSE, 0.7f);
+		}
+
+		// （必要なら足音もここで読み込む）
+		// m_MoveSE = LoadAudio("sound/enemy_step.wav");
+		if (m_MoveSE >= 0)
+		{
+			SetAudioVolume(m_MoveSE, 0.4f);
+		}
+
 	}
 
 	void Update() override
@@ -111,15 +132,50 @@ public:
 		if (length <= 0.1f)
 		{
 			MoveVec = { 0.0f, 0.0f, 0.0f };
+
 			SetAnimationMode(AnimationMode::Idle);
 			UpdateAnimation((float)Time::DeltaTime());
+
+			// 停止したらSEを止める
+			if (m_isMoving && m_MoveSE >= 0)
+			{
+				StopAudio(m_MoveSE);
+				m_isMoving = false;
+			}
+
 			return;
+		}
+
+		// 移動開始時にSEをループで再生
+		if (!m_isMoving && m_MoveSE >= 0)
+		{
+			PlayAudio(m_MoveSE, true);
+			m_isMoving = true;
 		}
 
 		MoveVec = direction.Normalize() * MoveSpeed;
 		RotateByMoveVec();
 		SetAnimationMode(AnimationMode::Move);
 		UpdateAnimation((float)Time::DeltaTime());
+	}
+
+	// 倒された/Destroy時に呼ばれる
+	void OnDestroy() override
+	{
+		// 移動中のループSEを止める
+		if (m_isMoving && m_MoveSE >= 0)
+		{
+			StopAudio(m_MoveSE);
+			m_isMoving = false;
+		}
+
+		// 死亡SEをワンショットで再生
+		if (m_DeathSE >= 0)
+		{
+			PlayAudioOneShot(m_DeathSE, 0.9f);
+		}
+
+		Movement::OnDestroy();
 	}
 
 private:
@@ -131,6 +187,7 @@ private:
 	};
 
 	GameObject* m_target = nullptr;
+
 	AnimationMode m_AnimationMode = AnimationMode::Idle;
 	bool m_IsDefeated = false;
 	float m_DeadTimer = 0.0f;
@@ -237,6 +294,13 @@ private:
 		physics().RayCast(ray, GroundRayLength);
 		return ray.IsHit && ray.HitDistance >= 0.0f && ray.HitDistance <= GroundDetectOffset;
 	}
+
+	int m_MoveSE = -1;
+	bool m_isMoving = false;
+
+	// 倒されたときのSE
+	int m_DeathSE = -1;
+
 };
 
 #endif

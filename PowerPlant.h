@@ -55,6 +55,9 @@ private:
 	// 長押し判定用
 	float m_holdTimer = 0.0f;
 	float m_holdThreshold = 1.5f; // 長押し秒数
+
+	// 長押し中かどうかを追跡（SEの制御に使用）
+	bool m_wasHolding = false;
 };
 
 #endif

@@ -11,6 +11,7 @@
     <FxCompile Include="BillboardVS.hlsl" />
     <FxCompile Include="BillboardPS.hlsl" />
     <FxCompile Include="SkyPS.hlsl" />
+    <FxCompile Include="FadePS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
@@ -102,6 +103,10 @@
     <ClCompile Include="BillboardQuad.cpp" />
     <ClCompile Include="SkyDome.cpp" />
     <ClCompile Include="Bullet.cpp" />
+
+    <ClCompile Include="FadeController.cpp" />
+
+
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
@@ -220,7 +225,11 @@
     <ClInclude Include="ResultScoreUI.h" />
     <ClInclude Include="BillboardQuad.h" />
     <ClInclude Include="SkyDome.h" />
+
+    <ClInclude Include="FadeController.h" />
+
     <ClInclude Include="PlayerPrefab.h" />
+
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />

@@ -7,6 +7,7 @@
 #include "UIDrawer.h"
 #include "Mesh.h"
 #include "Result.h"
+#include "FadeController.h"
 
 #include <chrono>
 #include <cmath>
@@ -26,6 +27,9 @@ void TimerUI::Start()
 	auto* scene = gameObject().scenePtr();
 	auto& rendering = gameObject().rendering();
 	GraphicsDevice& device = rendering.GetGraphicsDevice();
+
+	// フェードコントローラを自分のGameObjectに追加
+	m_fadeController = gameObject().AddComponent<FadeController>();
 
 	// 番号テクスチャは 0..9 を横に並べた1枚画像。U幅は 1/10
 	const float digitCount = 10.0f;
@@ -117,7 +121,11 @@ void TimerUI::Update()
 		if (m_timeUpElapsed >= m_timeUpDelay && !m_hasTransitioned)
 		{
 			m_hasTransitioned = true;
-			scene().ChangeScene<Result>();
+			// フェードアウト後にリザルトシーンへ遷移
+			m_fadeController->StartFadeOut(1.0f, [this]()
+			{
+				scene().ChangeScene<Result>();
+			});
 		}
 		return;
 	}
@@ -151,6 +159,9 @@ void TimerUI::Update()
 		{
 			m_timeUpUI->SetActive(true);
 		}
+
+		// タイムアップ由来のリザルトなので再生するBGMを差し替え
+		SetResultBgm("sound/Result_02.wav");
 
 		return;
 	}
