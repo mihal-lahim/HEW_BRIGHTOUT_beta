@@ -1,4 +1,4 @@
-#include "PowerPlant.h"
+ï»¿#include "PowerPlant.h"
 #include "GameObject.h"
 #include "PowerPlantUI.h"
 #include "Health.h"
@@ -6,8 +6,9 @@
 #include <cstdlib>
 #include "Player.h"
 #include "ScoreData.h"
+#include "Audio.h" 
 
- // GameObject‚Æ‚»‚Ì‘Sq‘·‚ğÄ‹A“I‚ÉSetActive‚·‚é
+ // GameObjectã¨ãã®å…¨å­å­«ã‚’å†å¸°çš„ã«SetActiveã™ã‚‹
 static void SetActiveRecursive(GameObject* obj, bool active)
 {
 	if (!obj) return;
@@ -18,15 +19,30 @@ static void SetActiveRecursive(GameObject* obj, bool active)
 	}
 }
 
+// å…¨ PowerPlant ã§å…±æœ‰ã™ã‚‹ãƒ›ãƒ¼ãƒ«ãƒ‰SE
+static int s_holdSE = -1;
+static bool s_holdSELoaded = false;
+
 void PowerPlant::Start()
 {
-	// ƒRƒ“ƒ|[ƒlƒ“ƒg‰Šú‰»Œã‚É•œ‹Œƒ‚ƒfƒ‹‚ğ”ñ•\¦‚É‚·‚é
+	// ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆåˆæœŸåŒ–å¾Œã«å¾©æ—§ãƒ¢ãƒ‡ãƒ«ã‚’éè¡¨ç¤ºã«ã™ã‚‹
 	SetActiveRecursive(restoredModel, false);
 	m_holdTimer = 0.0f;
+	m_wasHolding = false;
 
-	// “¯‚¶ GameObject ‚É UI ƒRƒ“ƒ|[ƒlƒ“ƒg‚ğ’Ç‰Á‚µ‚Ä•\¦‚³‚¹‚é
-	// PowerPlantUI ‚Í Start() ‚Å©g‚Ìq‚Æ‚µ‚Ä”wŒi‚ÆƒtƒBƒ‹‚ğ¶¬‚µ‚Ü‚·
+	// PowerPlantUI ã‚’è¿½åŠ 
 	gameObject().AddComponent<PowerPlantUI>();
+
+	// SE ã‚’ä¸€åº¦ã ã‘ãƒ­ãƒ¼ãƒ‰ï¼ˆ
+	if (!s_holdSELoaded)
+	{
+		s_holdSE = LoadAudio("sound/gauge_restore.wav"); 
+		if (s_holdSE >= 0)
+		{
+			SetAudioVolume(s_holdSE, 0.7f); 
+		}
+		s_holdSELoaded = true;
+	}
 }
 
 void PowerPlant::Restore()
@@ -34,10 +50,10 @@ void PowerPlant::Restore()
 	if (m_isRestored)
 		return;
 
-	// ƒvƒŒƒCƒ„[‚ª•œ‹Œ‚³‚¹‚éÛ‚ÌÁ”ï—Êi“d‹C—Êj‚ğŒÅ’è
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒå¾©æ—§ã•ã›ã‚‹éš›ã®æ¶ˆè²»é‡ï¼ˆé›»æ°—é‡ï¼‰ã‚’å›ºå®š
 	const float cost = 5.0f;
 
-	// ƒvƒŒƒCƒ„[‚Ì Health ‚ğ’T‚µ‚ÄÁ”ï‚·‚é
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã® Health ã‚’æ¢ã—ã¦æ¶ˆè²»ã™ã‚‹
 	auto scene = gameObject().scenePtr();
 	if (scene)
 	{
@@ -62,20 +78,29 @@ void PowerPlant::Restore()
 			if (playerHealth)
 			{
 				float cur = playerHealth->GetCurrentHealth();
-				// HP ‚ª cost –¢–‚È‚ç•œ‹Œ•s‰ÂiÁ”ï‚à‚µ‚È‚¢j
+				// HP ãŒ cost æœªæº€ãªã‚‰å¾©æ—§ä¸å¯ï¼ˆæ¶ˆè²»ã‚‚ã—ãªã„ï¼‰
 				if (cur < cost)
 				{
 					return;
 				}
 
-				// •K—v•ª‚ğÁ”ï‚µ‚Ä•œ‹Œ
+				// å¿…è¦åˆ†ã‚’æ¶ˆè²»ã—ã¦å¾©æ—§
 				playerHealth->SetCurrentHealth(cur - cost);
 
-				// ”­“d‹@‚ğ•œ‹Œó‘Ô‚É‚µAƒ‚ƒfƒ‹Ø‘Ö
+				// ç™ºé›»æ©Ÿã‚’å¾©æ—§çŠ¶æ…‹ã«ã—ã€ãƒ¢ãƒ‡ãƒ«åˆ‡æ›¿
 				m_isRestored = true;
 				ScoreData::Instance().restoredPlants++;
 				SetActiveRecursive(brokenModel, false);
 				SetActiveRecursive(restoredModel, true);
+
+
+				// å¾©æ—§ã—ãŸã‚‰ãƒ›ãƒ¼ãƒ«ãƒ‰SEã¯åœæ­¢
+				if (s_holdSELoaded && s_holdSE >= 0)
+				{
+					StopAudio(s_holdSE);
+				}
+
+
 				if (targetPlayer)
 				{
 					if ((std::rand() % 2) == 0)
@@ -87,12 +112,13 @@ void PowerPlant::Restore()
 						targetPlayer->ApplyPermanentRestoreSpeedBuff();
 					}
 				}
+
 				return;
 			}
 		}
 	}
 
-	// Health ‚ªŒ©‚Â‚©‚ç‚È‚¯‚ê‚Î‰½‚à‚µ‚È‚¢
+	// Health ãŒè¦‹ã¤ã‹ã‚‰ãªã‘ã‚Œã°ä½•ã‚‚ã—ãªã„
 }
 
 void PowerPlant::UpdateHold(float deltaTime, bool isHolding)
@@ -102,6 +128,20 @@ void PowerPlant::UpdateHold(float deltaTime, bool isHolding)
 
 	if (isHolding)
 	{
+
+		// é•·æŠ¼ã—ãŒé–‹å§‹ã•ã‚ŒãŸç¬é–“ã«ãƒ«ãƒ¼ãƒ—SEã‚’å†ç”Ÿ
+		if (!m_wasHolding)
+		{
+			if (s_holdSELoaded && s_holdSE >= 0)
+			{
+				PlayAudio(s_holdSE, true); // ãƒ«ãƒ¼ãƒ—å†ç”Ÿ
+			}
+		}
+
+		m_holdTimer += deltaTime;
+		m_wasHolding = true;
+
+
 		float restoreSpeedMultiplier = 1.0f;
 		auto scene = gameObject().scenePtr();
 		if (scene)
@@ -120,20 +160,46 @@ void PowerPlant::UpdateHold(float deltaTime, bool isHolding)
 		}
 
 		m_holdTimer += deltaTime * restoreSpeedMultiplier;
+
 		if (m_holdTimer >= m_holdThreshold)
 		{
 			Restore();
-			// ƒ^ƒCƒ}[‚Íè‡’l‚Å~‚ß‚Ä‚¨‚­i•K—v‚È‚ç‘±‚¯‚Ä‘‚â‚µ‚Ä‚à‚æ‚¢j
+			// å¾©æ—§ã§ SE ã‚’åœæ­¢ï¼ˆ
+			if (s_holdSELoaded && s_holdSE >= 0)
+			{
+				StopAudio(s_holdSE);
+			}
 			m_holdTimer = m_holdThreshold;
+			m_wasHolding = false;
 		}
 	}
-	// ƒ{ƒ^ƒ“‚ğ—£‚µ‚Ä‚àƒ^ƒCƒ}[‚Í•Ûiˆê’â~j
-	// ”ÍˆÍŠO‚Éo‚½ê‡‚Ì‚İ ResetHold() ‚ÅƒŠƒZƒbƒg‚³‚ê‚é
+	else
+	{
+		// é•·æŠ¼ã—ãŒè§£é™¤ã•ã‚ŒãŸç¬é–“ã«ãƒ«ãƒ¼ãƒ—SEã‚’åœæ­¢
+		if (m_wasHolding)
+		{
+			if (s_holdSELoaded && s_holdSE >= 0)
+			{
+				StopAudio(s_holdSE);
+			}
+			m_wasHolding = false;
+		}
+	}
 }
 
 void PowerPlant::ResetHold()
 {
 	m_holdTimer = 0.0f;
+
+	// ãƒ›ãƒ¼ãƒ«ãƒ‰ãŒãƒªã‚»ãƒƒãƒˆã•ã‚ŒãŸã‚‰ SE ã‚’åœæ­¢
+	if (m_wasHolding)
+	{
+		if (s_holdSELoaded && s_holdSE >= 0)
+		{
+			StopAudio(s_holdSE);
+		}
+		m_wasHolding = false;
+	}
 }
 
 bool PowerPlant::IsInRange(const Vector3& position) const

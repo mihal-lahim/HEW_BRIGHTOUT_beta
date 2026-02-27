@@ -14,7 +14,7 @@ struct TPSCameraCtx
     float SensitivityX = 0.8f; // 水平回転感度
 	float SensitivityY = 0.8f; // 垂直（高さ）調整感度
 	float FollowSpeed = 3.0f; // 自動追従の速度
-	float Distance = 5.0f;
+	float Distance = 4.5f;
 };
 
 

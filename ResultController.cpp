@@ -3,9 +3,26 @@
 #include "SceneSystem.h"
 #include "InputSystem.h"
 #include "Title.h"
+#include "FadeController.h"
+
+void ResultController::Start()
+{
+	// フェードコントローラを自分のGameObjectに追加
+	m_fadeController = gameObject().AddComponent<FadeController>();
+
+	// リザルト画面表示時にフェードインを開始
+	m_fadeController->StartFadeIn(1.0f, [this]()
+	{
+		// フェードイン完了後に入力受付開始
+		m_fadeReady = true;
+	});
+}
 
 void ResultController::Update()
 {
+	// フェードイン完了前、または遷移中は入力を無視
+	if (!m_fadeReady || m_isTransitioning) return;
+
 	auto& pad = input().gamePad(0);
 
 	// コントローラーのいずれかのボタンが押されたらタイトルシーンへ遷移
@@ -20,7 +37,12 @@ void ResultController::Update()
 			pad.IsDown(BUTTON_LB) ||
 			pad.IsDown(BUTTON_RB))
 		{
-			scene().ChangeScene<Title>();
+			m_isTransitioning = true;
+			m_fadeController->StartFadeOut(1.0f, [this]()
+			{
+				// フェードアウト完了後にシーン切り替え
+				scene().ChangeScene<Title>();
+			});
 			return;
 		}
 	}
@@ -29,7 +51,12 @@ void ResultController::Update()
 	auto& kb = input().keyboard();
 	if (kb.IsDown(KK_ENTER))
 	{
-		scene().ChangeScene<Title>();
+		m_isTransitioning = true;
+		m_fadeController->StartFadeOut(1.0f, [this]()
+		{
+			// フェードアウト完了後にシーン切り替え
+			scene().ChangeScene<Title>();
+		});
 		return;
 	}
 }
