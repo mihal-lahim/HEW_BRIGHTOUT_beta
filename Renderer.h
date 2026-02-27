@@ -1,4 +1,3 @@
-
 #ifndef RENDERER_H
 #define RENDERER_H
 
@@ -12,6 +11,7 @@
 
 enum class RenderQueue
 {
+	Background = -1,
 	Opaque = 0,
 	Transparent = 1,
 	UI = 2

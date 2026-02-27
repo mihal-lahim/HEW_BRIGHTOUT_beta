@@ -146,6 +146,24 @@ void GraphicsDevice::SetDepthTest(bool bEnable)
 	}
 }
 
+void GraphicsDevice::SetCullMode(CullMode mode)
+{
+	ID3D11RasterizerState* rs = nullptr;
+	switch (mode)
+	{
+	case CULL_BACK:
+		rs = m_rsCullBack.Get();
+		break;
+	case CULL_FRONT:
+		rs = m_rsCullFront.Get();
+		break;
+	case CULL_NONE:
+		rs = m_rsCullNone.Get();
+		break;
+	}
+	m_deviceContext->RSSetState(rs);
+}
+
 bool GraphicsDevice::CreateBackBuffers()
 {
 	HRESULT hr{};
@@ -279,6 +297,23 @@ bool GraphicsDevice::CreateBackBuffers()
 	if (FAILED(hr)) {
 		return false;
 	}
+
+	// ラスタライザーステートの作成
+	D3D11_RASTERIZER_DESC rd{};
+	rd.FillMode = D3D11_FILL_SOLID;
+	rd.CullMode = D3D11_CULL_BACK;
+	rd.FrontCounterClockwise = FALSE;
+	rd.DepthClipEnable = TRUE;
+	m_device->CreateRasterizerState(&rd, m_rsCullBack.GetAddressOf());
+
+	rd.CullMode = D3D11_CULL_FRONT;
+	m_device->CreateRasterizerState(&rd, m_rsCullFront.GetAddressOf());
+
+	rd.CullMode = D3D11_CULL_NONE;
+	m_device->CreateRasterizerState(&rd, m_rsCullNone.GetAddressOf());
+
+	// デフォルトはバックフェースカリング
+	m_deviceContext->RSSetState(m_rsCullBack.Get());
 
 	return true;
 }

@@ -41,6 +41,15 @@ public:
 	void SetAlphaBlend(AlphaBlendMode blend);
 	void SetDepthTest(bool bEnable);
 
+	enum CullMode
+	{
+		CULL_BACK,
+		CULL_FRONT,
+		CULL_NONE
+	};
+
+	void SetCullMode(CullMode mode);
+
 	// デバイスとコンテキストの取得
 	ID3D11Device* const GetDevice() const { return m_device.Get(); }
 	ID3D11DeviceContext* const GetDeviceContext() const { return m_deviceContext.Get(); }
@@ -84,6 +93,11 @@ private:
 
 	// クリア色
 	float m_clearColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+
+	// ラスタライザーステート
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rsCullBack;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rsCullFront;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rsCullNone;
 
 };
 

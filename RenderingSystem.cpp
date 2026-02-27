@@ -74,12 +74,27 @@ void RenderingSystem::Render(const Scene& scene)
 
         auto meshRenderers = scene.GetComponents<MeshRenderer>();
 
+        // Background キュー（スカイドーム等）を最初に描画
         for (auto& renderer : meshRenderers)
         {
             if (!renderer->IsEnable())
                 continue;
 
-            if (renderer->renderQueue == RenderQueue::UI)
+            if (renderer->renderQueue != RenderQueue::Background)
+                continue;
+
+            ApplyRenderQueue(renderer->renderQueue);
+            MaterialLoadingProcess(renderer->material);
+            renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
+        }
+
+        // Opaque / Transparent キューを描画
+        for (auto& renderer : meshRenderers)
+        {
+            if (!renderer->IsEnable())
+                continue;
+
+            if (renderer->renderQueue == RenderQueue::UI || renderer->renderQueue == RenderQueue::Background)
                 continue;
 
             ApplyRenderQueue(renderer->renderQueue);
@@ -200,20 +215,29 @@ void RenderingSystem::ApplyRenderQueue(RenderQueue queue)
 {
     switch (queue)
     {
+    case RenderQueue::Background:
+        m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_OPAQUE);
+        m_graphicsDevice->SetDepthTest(false);
+        m_graphicsDevice->SetCullMode(GraphicsDevice::CULL_NONE);
+        break;
+
     case RenderQueue::Transparent:
         m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);
         m_graphicsDevice->SetDepthTest(true);
+        m_graphicsDevice->SetCullMode(GraphicsDevice::CULL_BACK);
         break;
 
     case RenderQueue::UI:
         m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_TRANSPARENT);
         m_graphicsDevice->SetDepthTest(false);
+        m_graphicsDevice->SetCullMode(GraphicsDevice::CULL_BACK);
         break;
 
     case RenderQueue::Opaque:
     default:
         m_graphicsDevice->SetAlphaBlend(GraphicsDevice::BLEND_OPAQUE);
         m_graphicsDevice->SetDepthTest(true);
+        m_graphicsDevice->SetCullMode(GraphicsDevice::CULL_BACK);
         break;
     }
 }

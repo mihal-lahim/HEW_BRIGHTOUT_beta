@@ -12,7 +12,7 @@ void Title::Initialize()
 	 //オーディオ初期化
 	InitAudio();
 
-	g_TitleBgm = LoadAudio("sound/GameTitle_01.wav");
+	g_TitleBgm = LoadAudio("sound/GameTitle_02.wav");
 
 	// デフォルトの背景色に戻す
 	rendering().GetGraphicsDevice().SetClearColor(0.5f, 0.5f, 0.5f);
