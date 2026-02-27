@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////
 //  オーディオ処理	 
 // Author: Namisyo
 //////////////////////
@@ -256,8 +256,7 @@ void SetAudioVolume(int Index, float volume)
 class OneShotVoiceCallback : public IXAudio2VoiceCallback
 {
 public:
-	IXAudio2SourceVoice* m_voice = nullptr;
-	explicit OneShotVoiceCallback(IXAudio2SourceVoice* v) : m_voice(v) {}
+	OneShotVoiceCallback() = default;
 	virtual ~OneShotVoiceCallback() = default;
 
 	// IXAudio2VoiceCallback の仮想関数を空実装
@@ -265,28 +264,29 @@ public:
 	STDMETHOD_(void, OnVoiceProcessingPassEnd)() override {}
 	STDMETHOD_(void, OnStreamEnd)() override {}
 	STDMETHOD_(void, OnBufferStart)(void* pBufferContext) override { (void)pBufferContext; }
-	STDMETHOD_(void, OnBufferEnd)(void* pBufferContext) override { (void)pBufferContext;
+	STDMETHOD_(void, OnBufferEnd)(void* pBufferContext) override
+	{
+		auto* voice = static_cast<IXAudio2SourceVoice*>(pBufferContext);
+		if (voice)
 		{
-			// バッファ再生終了 → ボイス破棄してコールバックオブジェクトを削除
-			if (m_voice)
-			{
-				m_voice->Stop();
-				m_voice->FlushSourceBuffers();
-				m_voice->DestroyVoice();
-				m_voice = nullptr;
-			}
-			// self-delete
-			delete this;
+			voice->Stop();
+			voice->FlushSourceBuffers();
+			voice->DestroyVoice();
 		}
 	}
 	STDMETHOD_(void, OnLoopEnd)(void* pBufferContext) override { (void)pBufferContext; }
 	STDMETHOD_(void, OnVoiceError)(void* pBufferContext, HRESULT error) override { (void)pBufferContext; (void)error; }
 };
 
+static OneShotVoiceCallback g_OneShotVoiceCallback;
+
 
 void PlayAudioOneShot(int Index, float volume)
 {
-	if (Index < 0)
+	if (Index < 0 || Index >= AUDIO_MAX)
+		return;
+
+	if (!g_Xaudio)
 		return;
 
 	// 必要なフォーマット/データは g_Audio[Index] に保持している
@@ -294,15 +294,10 @@ void PlayAudioOneShot(int Index, float volume)
 		return;
 
 	IXAudio2SourceVoice* oneVoice = nullptr;
-	// コールバックをセット（delete は OnBufferEnd 内で行う）
-	OneShotVoiceCallback* cb = new OneShotVoiceCallback(nullptr);
-	HRESULT hr = g_Xaudio->CreateSourceVoice(&oneVoice, &g_Audio[Index].wfx, 0, XAUDIO2_DEFAULT_FREQ_RATIO, cb);
+	HRESULT hr = g_Xaudio->CreateSourceVoice(&oneVoice, &g_Audio[Index].wfx, 0, XAUDIO2_DEFAULT_FREQ_RATIO, &g_OneShotVoiceCallback);
 	if (FAILED(hr) || oneVoice == nullptr) {
-		delete cb; // 失敗時はコールバックも解放
 		return;
 	}
-	// コールバックにoneVoiceをセット
-	cb->m_voice = oneVoice;
 
 	// ボリューム設定
 	oneVoice->SetVolume(volume);
@@ -313,6 +308,8 @@ void PlayAudioOneShot(int Index, float volume)
 	bufinfo.pAudioData = g_Audio[Index].SoundData;
 	bufinfo.PlayBegin = 0;
 	bufinfo.PlayLength = g_Audio[Index].PlayLength;
+	bufinfo.Flags = XAUDIO2_END_OF_STREAM;
+	bufinfo.pContext = oneVoice;
 
 	// ワンショットなのでループは設定しない
 	oneVoice->SubmitSourceBuffer(&bufinfo, NULL);

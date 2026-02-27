@@ -18,15 +18,21 @@ class EnemyPrefab : public Prefab
 public:
 	std::vector<std::string> IdleModelPaths =
 	{
-		"model/model_dake.fbx"
+		"model/E_run_01.fbx"
 	};
 	std::vector<std::string> MoveModelPaths =
 	{
-		"model/model_dake.fbx"
+		"model/E_run_01.fbx",
+		"model/E_run_02.fbx",
+		"model/E_run_03.fbx",
+		"model/E_run_04.fbx",
+		"model/E_run_05.fbx",
 	};
 	std::vector<std::string> DeadModelPaths =
 	{
-		"model/model_dake.fbx",
+		"model/E_HP0_01.fbx",
+		"model/E_HP0_02.fbx",
+		"model/E_HP0_03.fbx",
 
 	};
 	float IdleAnimationInterval = 0.35f;

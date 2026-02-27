@@ -91,6 +91,7 @@ public:
 	{
 		if (gameObject().transform().position().y < FallDestroyY)
 		{
+			m_DestroyedByFall = true;
 			DestroyEnemyRecursive(&gameObject());
 			return;
 		}
@@ -170,7 +171,7 @@ public:
 		}
 
 		// 死亡SEをワンショットで再生
-		if (m_DeathSE >= 0)
+		if (!m_DestroyedByFall && m_DeathSE >= 0)
 		{
 			PlayAudioOneShot(m_DeathSE, 0.9f);
 		}
@@ -300,6 +301,7 @@ private:
 
 	// 倒されたときのSE
 	int m_DeathSE = -1;
+	bool m_DestroyedByFall = false;
 
 };
 
