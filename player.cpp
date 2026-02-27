@@ -6,7 +6,9 @@
 #include "ColliderShape.h"
 #include "Model.h"
 #include "Bullet.h"
+#include "Title.h"
 #include "Time.h"
+#include "SceneSystem.h"
 #include <algorithm>
 
 using namespace DirectX;
@@ -26,6 +28,13 @@ void Player::Start()
 
 void Player::Update()
 {
+	if (!m_IsReturningToTitle && gameObject().transform().position().y < FallReturnY)
+	{
+		m_IsReturningToTitle = true;
+		scene().ChangeScene<Title>();
+		return;
+	}
+
 	// 状態管理コンポーネント更新
 	stateMachine->Update(*this);
 	HandleFire();

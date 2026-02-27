@@ -98,6 +98,7 @@ public:
 	float FireInterval = 0.3f;
 	float BulletSpeed = 20.0f;
 	float BulletLifeTime = 3.0f;
+	float FallReturnY = -20.0f;
 
 
 	void Start() override;
@@ -114,6 +115,7 @@ public:
 
 private:
 	float m_FireTimer = 0.0f;
+	bool m_IsReturningToTitle = false;
 };
 
 
