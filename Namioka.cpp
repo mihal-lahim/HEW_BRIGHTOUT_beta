@@ -49,6 +49,7 @@ void Namioka::Initialize()
 
 	// オーディオ初期化
 	InitAudio();
+	PowerPlant::ResetAudioState();
 
 	g_GameBgm = LoadAudio("sound/GameBGM_01.wav");
 

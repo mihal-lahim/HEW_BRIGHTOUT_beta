@@ -1,4 +1,4 @@
-#include "Result.h"
+﻿#include "Result.h"
 #include "GameObject.h"
 #include "ResultController.h"
 #include "RenderingSystem.h"
@@ -19,7 +19,6 @@ void SetResultBgm(const std::string& path)
 
 void Result::Initialize()
 {
-	g_ResultBgm = LoadAudio("sound/Result_01.wav");
 	// フェードイン前に画面を黒くしておく（灰色が一瞬映るのを防ぐ）
 	rendering().GetGraphicsDevice().SetClearColor(0.0f,0.0f,0.0f,1.0f);
 

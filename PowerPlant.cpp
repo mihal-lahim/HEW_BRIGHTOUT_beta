@@ -23,6 +23,12 @@ static void SetActiveRecursive(GameObject* obj, bool active)
 static int s_holdSE = -1;
 static bool s_holdSELoaded = false;
 
+void PowerPlant::ResetAudioState()
+{
+	s_holdSE = -1;
+	s_holdSELoaded = false;
+}
+
 void PowerPlant::Start()
 {
 	// コンポーネント初期化後に復旧モデルを非表示にする
@@ -33,8 +39,8 @@ void PowerPlant::Start()
 	// PowerPlantUI を追加
 	gameObject().AddComponent<PowerPlantUI>();
 
-	// SE を一度だけロード（
-	if (!s_holdSELoaded)
+	// SE を一度だけロード（シーンごとにリロード）
+	if (!s_holdSELoaded || s_holdSE < 0)
 	{
 		s_holdSE = LoadAudio("sound/gauge_restore.wav"); 
 		if (s_holdSE >= 0)
