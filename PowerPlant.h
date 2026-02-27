@@ -48,6 +48,9 @@ public:
 		return std::clamp(m_holdTimer / m_holdThreshold, 0.0f, 1.0f);
 	}
 
+	// オーディオ状態リセット（シーン切り替え時に呼ぶ）
+	static void ResetAudioState();
+
 private:
 	bool m_isRestored = false;
 	float m_interactRadius = 5.0f;
