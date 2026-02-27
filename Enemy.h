@@ -6,7 +6,7 @@
 class Enemy : public Movement
 {
 public:
-	float MoveSpeed = 5.0f;
+	float MoveSpeed = 3.0f;
 
 	void Start() override
 	{

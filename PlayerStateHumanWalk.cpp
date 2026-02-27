@@ -35,6 +35,7 @@ void PlayerState_Human_Walk::HandleInput(Player& player)
 		{
 			float yaw = XMConvertToDegrees(atan2f(moveDir.x, moveDir.z));
 			player.modelObject->transform().rotation() = Quaternion::SetEulerY(yaw + 180.0f);
+			player.gameObject().transform().rotation() = Quaternion::SetEulerY(yaw);
 		}
 	}
 
