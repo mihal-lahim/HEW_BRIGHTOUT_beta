@@ -52,6 +52,8 @@ void Player::Update()
 	}
 	HandleFire();
 	UpdateHumanPseudoAnimation((float)Time::DeltaTime());
+	UpdateMoveSpeedBuffText((float)Time::DeltaTime());
+	UpdateRepairSpeedBuffText((float)Time::DeltaTime());
 }
 
 void Player::HandleFire()
@@ -367,4 +369,79 @@ void Player::ApplyElectricFrameUV(size_t frameIndex)
 	const float offsetY = height * (float)row;
 
 	SetUVRectRecursive(electricEffectObject, { offsetX, offsetY, width, height });
+}
+
+void Player::ApplyPermanentMoveSpeedBuff()
+{
+	if (!movement)
+		return;
+
+	PlayerMoveCtx moveCtx = movement->GetMoveCtx();
+	moveCtx.WalkSpeed += MoveSpeedBuffPerRestore;
+	movement->SetMoveCtx(moveCtx);
+	++MoveSpeedBuffStack;
+	ShowMoveSpeedBuffText();
+}
+
+void Player::ApplyPermanentRestoreSpeedBuff()
+{
+	++RestoreSpeedBuffStack;
+	ShowRepairSpeedBuffText();
+}
+
+float Player::GetRestoreSpeedMultiplier() const
+{
+	return 1.0f + (RestoreSpeedBuffPerRestore * (float)RestoreSpeedBuffStack);
+}
+
+void Player::ShowMoveSpeedBuffText()
+{
+	m_MoveSpeedBuffTextTimer = MoveSpeedBuffTextDuration;
+	if (moveSpeedTextRoot)
+		SetActiveRecursive(moveSpeedTextRoot, true);
+}
+
+void Player::UpdateMoveSpeedBuffText(float deltaTime)
+{
+	if (m_MoveSpeedBuffTextTimer <= 0.0f)
+	{
+		if (moveSpeedTextRoot)
+			SetActiveRecursive(moveSpeedTextRoot, false);
+		return;
+	}
+
+	m_MoveSpeedBuffTextTimer -= deltaTime;
+
+	if (m_MoveSpeedBuffTextTimer <= 0.0f)
+	{
+		m_MoveSpeedBuffTextTimer = 0.0f;
+		if (moveSpeedTextRoot)
+			SetActiveRecursive(moveSpeedTextRoot, false);
+	}
+}
+
+void Player::ShowRepairSpeedBuffText()
+{
+	m_RepairSpeedBuffTextTimer = RepairSpeedBuffTextDuration;
+	if (repairSpeedTextRoot)
+		SetActiveRecursive(repairSpeedTextRoot, true);
+}
+
+void Player::UpdateRepairSpeedBuffText(float deltaTime)
+{
+	if (m_RepairSpeedBuffTextTimer <= 0.0f)
+	{
+		if (repairSpeedTextRoot)
+			SetActiveRecursive(repairSpeedTextRoot, false);
+		return;
+	}
+
+	m_RepairSpeedBuffTextTimer -= deltaTime;
+
+	if (m_RepairSpeedBuffTextTimer <= 0.0f)
+	{
+		m_RepairSpeedBuffTextTimer = 0.0f;
+		if (repairSpeedTextRoot)
+			SetActiveRecursive(repairSpeedTextRoot, false);
+	}
 }
