@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////
-//  ƒI[ƒfƒBƒIˆ—	 
+//  ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªå‡¦ç†	 
 // Author: Namisyo
 //////////////////////
 
@@ -20,7 +20,7 @@ struct AUDIO
 	int						Length{};
 	int						PlayLength{};
 
-	// ’Ç‰Á: ƒtƒH[ƒ}ƒbƒgî•ñ‚ğ•Û‚µ‚Ä‚¨‚­iƒƒ“ƒVƒ‡ƒbƒg—p‚É•K—vj
+	// è¿½åŠ : ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆæƒ…å ±ã‚’ä¿æŒã—ã¦ãŠãï¼ˆãƒ¯ãƒ³ã‚·ãƒ§ãƒƒãƒˆç”¨ã«å¿…è¦ï¼‰
 	WAVEFORMATEX wfx{};
 };
 
@@ -30,7 +30,7 @@ static AUDIO g_Audio[AUDIO_MAX]{};
 
 void InitAudio()
 {
-	// Šù‘¶‚ÌƒI[ƒfƒBƒIƒŠƒ\[ƒX‚ğƒNƒŠ[ƒ“ƒAƒbƒv
+	// æ—¢å­˜ã®ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒªã‚½ãƒ¼ã‚¹ã‚’ã‚¯ãƒªãƒ¼ãƒ³ã‚¢ãƒƒãƒ—
 	if (g_Xaudio)
 	{
 		for (int i = 0; i < AUDIO_MAX; i++)
@@ -55,10 +55,10 @@ void InitAudio()
 		g_Xaudio = nullptr;
 	}
 
-	// XAudio¶¬
+	// XAudioç”Ÿæˆ
 	XAudio2Create(&g_Xaudio, 0);
 
-	// ƒ}ƒXƒ^ƒŠƒ“ƒOƒ{ƒCƒX¶¬
+	// ãƒã‚¹ã‚¿ãƒªãƒ³ã‚°ãƒœã‚¤ã‚¹ç”Ÿæˆ
 	g_Xaudio->CreateMasteringVoice(&g_MasteringVoice);
 }
 
@@ -105,7 +105,7 @@ int LoadAudio(const char* FileName)
 	if (index == -1)
 		return -1;
 
-	// ƒTƒEƒ“ƒhƒf[ƒ^“Ç
+	// ã‚µã‚¦ãƒ³ãƒ‰ãƒ‡ãƒ¼ã‚¿èª­è¾¼
 	WAVEFORMATEX wfx = { 0 };
 
 	{
@@ -158,10 +158,10 @@ int LoadAudio(const char* FileName)
 		mmioClose(hmmio, 0);
 	}
 
-	// ƒtƒH[ƒ}ƒbƒgî•ñ‚ğ•Û‘¶
+	// ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆæƒ…å ±ã‚’ä¿å­˜
 	g_Audio[index].wfx = wfx;
 
-	// ƒ\[ƒXƒ{ƒCƒX¶¬iŠù‘¶‚Ì’PˆêÄ¶—p‚Éj
+	// ã‚½ãƒ¼ã‚¹ãƒœã‚¤ã‚¹ç”Ÿæˆï¼ˆæ—¢å­˜ã®å˜ä¸€å†ç”Ÿç”¨ã«ï¼‰
 	g_Xaudio->CreateSourceVoice(&g_Audio[index].SourceVoice, &g_Audio[index].wfx);
 	assert(g_Audio[index].SourceVoice);
 
@@ -171,18 +171,28 @@ int LoadAudio(const char* FileName)
 
 void UnloadAudio(int Index)
 {
+
+
 	if (Index < 0 || Index >= AUDIO_MAX)
 		return;
+
 
 	if (g_Audio[Index].SourceVoice)
 	{
 		g_Audio[Index].SourceVoice->Stop();
 		g_Audio[Index].SourceVoice->DestroyVoice();
-		g_Audio[Index].SourceVoice = nullptr;
+
+		g_Audio[Index].SourceVoice = nullptr; 
+
+		
+
 	}
 
 	delete[] g_Audio[Index].SoundData;
 	g_Audio[Index].SoundData = nullptr;
+
+	g_Audio[Index].Length = 0;
+	g_Audio[Index].PlayLength = 0;
 }
 
 void PlayAudio(int Index, bool Loop)
@@ -194,7 +204,7 @@ void PlayAudio(int Index, bool Loop)
 	g_Audio[Index].SourceVoice->FlushSourceBuffers();
 
 
-	// ƒoƒbƒtƒ@İ’è
+	// ãƒãƒƒãƒ•ã‚¡è¨­å®š
 	XAUDIO2_BUFFER bufinfo;
 
 	memset(&bufinfo, 0x00, sizeof(bufinfo));
@@ -203,7 +213,7 @@ void PlayAudio(int Index, bool Loop)
 	bufinfo.PlayBegin = 0;
 	bufinfo.PlayLength = g_Audio[Index].PlayLength;
 
-	// ƒ‹[ƒvİ’è
+	// ãƒ«ãƒ¼ãƒ—è¨­å®š
 	if (Loop)
 	{
 		bufinfo.LoopBegin = 0;
@@ -214,7 +224,7 @@ void PlayAudio(int Index, bool Loop)
 	g_Audio[Index].SourceVoice->SubmitSourceBuffer(&bufinfo, NULL);
 
 
-	// Ä¶
+	// å†ç”Ÿ
 	g_Audio[Index].SourceVoice->Start();
 
 }
@@ -242,7 +252,7 @@ void SetAudioVolume(int Index, float volume)
 	}
 }
 
-// ƒR[ƒ‹ƒoƒbƒNƒNƒ‰ƒXiÄ¶I—¹‚É©g‚Å SourceVoice ‚ğ”jŠü‚µ‚Ä delete ‚·‚éj
+// ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚¯ãƒ©ã‚¹ï¼ˆå†ç”Ÿçµ‚äº†æ™‚ã«è‡ªèº«ã§ SourceVoice ã‚’ç ´æ£„ã—ã¦ delete ã™ã‚‹ï¼‰
 class OneShotVoiceCallback : public IXAudio2VoiceCallback
 {
 public:
@@ -250,14 +260,14 @@ public:
 	explicit OneShotVoiceCallback(IXAudio2SourceVoice* v) : m_voice(v) {}
 	virtual ~OneShotVoiceCallback() = default;
 
-	// IXAudio2VoiceCallback ‚Ì‰¼‘zŠÖ”‚ğ‹óÀ‘•
+	// IXAudio2VoiceCallback ã®ä»®æƒ³é–¢æ•°ã‚’ç©ºå®Ÿè£…
 	STDMETHOD_(void, OnVoiceProcessingPassStart)(UINT32) override {}
 	STDMETHOD_(void, OnVoiceProcessingPassEnd)() override {}
 	STDMETHOD_(void, OnStreamEnd)() override {}
 	STDMETHOD_(void, OnBufferStart)(void* pBufferContext) override { (void)pBufferContext; }
 	STDMETHOD_(void, OnBufferEnd)(void* pBufferContext) override { (void)pBufferContext;
 		{
-			// ƒoƒbƒtƒ@Ä¶I—¹ ¨ ƒ{ƒCƒX”jŠü‚µ‚ÄƒR[ƒ‹ƒoƒbƒNƒIƒuƒWƒFƒNƒg‚ğíœ
+			// ãƒãƒƒãƒ•ã‚¡å†ç”Ÿçµ‚äº† â†’ ãƒœã‚¤ã‚¹ç ´æ£„ã—ã¦ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å‰Šé™¤
 			if (m_voice)
 			{
 				m_voice->Stop();
@@ -279,22 +289,22 @@ void PlayAudioOneShot(int Index, float volume)
 	if (Index < 0)
 		return;
 
-	// •K—v‚ÈƒtƒH[ƒ}ƒbƒg/ƒf[ƒ^‚Í g_Audio[Index] ‚É•Û‚µ‚Ä‚¢‚é
+	// å¿…è¦ãªãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ/ãƒ‡ãƒ¼ã‚¿ã¯ g_Audio[Index] ã«ä¿æŒã—ã¦ã„ã‚‹
 	if (g_Audio[Index].SoundData == nullptr)
 		return;
 
 	IXAudio2SourceVoice* oneVoice = nullptr;
-	// ƒR[ƒ‹ƒoƒbƒN‚ğƒZƒbƒgidelete ‚Í OnBufferEnd “à‚Ås‚¤j
+	// ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’ã‚»ãƒƒãƒˆï¼ˆdelete ã¯ OnBufferEnd å†…ã§è¡Œã†ï¼‰
 	OneShotVoiceCallback* cb = new OneShotVoiceCallback(nullptr);
 	HRESULT hr = g_Xaudio->CreateSourceVoice(&oneVoice, &g_Audio[Index].wfx, 0, XAUDIO2_DEFAULT_FREQ_RATIO, cb);
 	if (FAILED(hr) || oneVoice == nullptr) {
-		delete cb; // ¸”s‚ÍƒR[ƒ‹ƒoƒbƒN‚à‰ğ•ú
+		delete cb; // å¤±æ•—æ™‚ã¯ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚‚è§£æ”¾
 		return;
 	}
-	// ƒR[ƒ‹ƒoƒbƒN‚ÉoneVoice‚ğƒZƒbƒg
+	// ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã«oneVoiceã‚’ã‚»ãƒƒãƒˆ
 	cb->m_voice = oneVoice;
 
-	// ƒ{ƒŠƒ…[ƒ€İ’è
+	// ãƒœãƒªãƒ¥ãƒ¼ãƒ è¨­å®š
 	oneVoice->SetVolume(volume);
 
 	XAUDIO2_BUFFER bufinfo;
@@ -304,7 +314,7 @@ void PlayAudioOneShot(int Index, float volume)
 	bufinfo.PlayBegin = 0;
 	bufinfo.PlayLength = g_Audio[Index].PlayLength;
 
-	// ƒƒ“ƒVƒ‡ƒbƒg‚È‚Ì‚Åƒ‹[ƒv‚Íİ’è‚µ‚È‚¢
+	// ãƒ¯ãƒ³ã‚·ãƒ§ãƒƒãƒˆãªã®ã§ãƒ«ãƒ¼ãƒ—ã¯è¨­å®šã—ãªã„
 	oneVoice->SubmitSourceBuffer(&bufinfo, NULL);
 	oneVoice->Start();
 }
