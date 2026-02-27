@@ -296,6 +296,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="MorphUI.h" />
     <ClInclude Include="Namioka.h" />
     <ClInclude Include="PlayerAudio.h" />
+    <ClInclude Include="PlayerPrefab.h" />
     <ClInclude Include="PowerPlantUI.h" />
     <ClInclude Include="ResultScoreUI.h" />
     <ClInclude Include="Road.h" />
@@ -309,7 +310,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="ResultController.h" />
     <ClInclude Include="GameClearChecker.h" />
     <ClInclude Include="TitleController.h" />
-    <ClInclude Include="PlayerPrefab.h" />
     <ClInclude Include="DebugCounter.h" />
     <ClInclude Include="GameContext.h" />
     <ClInclude Include="InputSystem.h" />

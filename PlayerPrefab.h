@@ -1,4 +1,4 @@
-ï»¿#ifndef PLAYER_PREFAB_H
+#ifndef PLAYER_PREFAB_H
 #define PLAYER_PREFAB_H
 
 #include "Prefab.h"
@@ -7,6 +7,7 @@
 #include "ColliderShape.h"
 #include "PhysicsBody.h"
 #include "Renderer.h"
+#include "RenderingSystem.h"
 #include "Camera.h"
 #include "Texture.h"
 #include "GameObject.h"
@@ -49,26 +50,26 @@ class PlayerPrefab : public Prefab
 public:
 	PlayerPrefab() = default;
 	virtual ~PlayerPrefab() = default;
-	// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–ãƒ¡ã‚½ãƒƒãƒ‰
+	// ƒCƒ“ƒXƒ^ƒ“ƒX‰»ƒƒ\ƒbƒh
 	virtual void Instantiate(GameObject& gameObject) override
 	{
-		// Playerã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆä½œæˆ
+		// PlayerƒRƒ“ƒ|[ƒlƒ“ƒgì¬
 		auto* player = gameObject.AddComponent<Player>();
 		gameObject.SetTag("Player");
 
-		// TPSCameraä½œæˆ
+		// TPSCameraì¬
 		GameObject* cameraObject = gameObject.CreateGameObject();
 		auto* cam = cameraObject->AddComponent<Camera>();
 		player->camera = cameraObject->AddComponent<TPSCamera>(&gameObject);
 		cameraObject->SetTag("MainCamera");
 
-		// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç”¨ã‚³ãƒãƒ³ãƒ‰ã‚»ãƒƒãƒˆä½œæˆ
+		// ƒvƒŒƒCƒ„[—pƒRƒ}ƒ“ƒhƒZƒbƒgì¬
 		auto* commandSet = gameObject.AddComponent<PlayerCommandSet>();
 
-		// InputSystemè¨­å®š
+		// InputSystemİ’è
 		player->inputHandler = gameObject.AddComponent<InputHandler>(&gameObject.input().gamePad(), commandSet);
 
-		// ãƒ¢ãƒ‡ãƒ«è¨­å®š
+		// ƒ‚ƒfƒ‹İ’è
 		std::vector<std::string> idleModelPaths =
 		{
 			"model/P_taiki.fbx"
@@ -125,12 +126,12 @@ public:
 
 		GameObject* electricEffectObject = gameObject.CreateGameObject();
 		gameObject.SetChild(*electricEffectObject);
-		// MeshRenderer ã« Quad ãƒ¡ãƒƒã‚·ãƒ¥ã‚’ç›´æ¥å‰²ã‚Šå½“ã¦
+		// MeshRenderer ‚É Quad ƒƒbƒVƒ…‚ğ’¼ÚŠ„‚è“–‚Ä
 		auto* renderer = electricEffectObject->AddComponent<MeshRenderer>();
 		renderer->material.texturePath = L"texture/ball.png";
 		renderer->material.texture = nullptr;
 		renderer->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
-		// Billboard ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãŒ Awake() ã§ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã¨ãƒ¡ãƒƒã‚·ãƒ¥ã‚’è‡ªå‹•è¨­å®š
+		// Billboard ƒRƒ“ƒ|[ƒlƒ“ƒg‚ª Awake() ‚ÅƒVƒF[ƒ_[‚ÆƒƒbƒVƒ…‚ğ©“®İ’è
 		electricEffectObject->AddComponent<Billboard>();
 		electricEffectObject->transform().scale() = Vector3(1.5f, 1.5f, 1.5f);
 		electricEffectObject->transform().position() = Vector3(0.0f, 0.5f, 0.0f);
@@ -141,35 +142,112 @@ public:
 		player->electricSheetRows = 6;
 		player->electricSheetFrameCount = 31;
 
-		// Healthã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¨­å®š
+		// ‘¬“xƒoƒt•\¦—pƒrƒ‹ƒ{[ƒhƒeƒLƒXƒg
+		GameObject* moveSpeedTextRoot = gameObject.CreateGameObject();
+		gameObject.SetChild(*moveSpeedTextRoot);
+		moveSpeedTextRoot->SetName("MoveSpeedBuffText");
+		moveSpeedTextRoot->transform().position() = Vector3(0.0f, 2.2f, 0.0f);
+		moveSpeedTextRoot->SetActive(false);
+		{
+			const char* text = "spped up!";
+			const int textLen = 9;
+			const float charScale = 0.35f;
+			const float spacing = 0.38f;
+			const float startX = -((float)(textLen - 1)) * spacing * 0.5f;
+
+			for (int ci = 0; ci < textLen; ++ci)
+			{
+				GameObject* charObj = moveSpeedTextRoot->CreateGameObject();
+				moveSpeedTextRoot->SetChild(*charObj);
+				charObj->transform().position() = Vector3(startX + spacing * (float)ci, 0.0f, 0.0f);
+				charObj->transform().scale() = Vector3(charScale, charScale, charScale);
+
+				auto* mr = charObj->AddComponent<MeshRenderer>();
+				mr->mesh = gameObject.rendering().CreateBillboardQuad().get();
+				mr->material.texturePath = L"texture/consolab_ascii_512.png";
+				mr->material.texture = nullptr;
+				mr->material.vsPath = "BillboardVS.cso";
+				mr->material.psPath = "BillboardPS.cso";
+				mr->material.shaderProgram = nullptr;
+				mr->renderQueue = RenderQueue::Transparent;
+				mr->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
+
+				// DebugText ‚Æ“¯‚¶UVŒvZ
+				int index = text[ci] - ' ';
+				float u0 = (float)(index % 16) / 16.0f;
+				float v0 = (float)(index / 16) / 16.0f;
+				mr->material.SetFloat4("uv_rect", { u0, v0, 1.0f / 16.0f, 1.0f / 16.0f });
+			}
+		}
+		player->moveSpeedTextRoot = moveSpeedTextRoot;
+
+		// •œ‹Œ‘¬“xƒoƒt•\¦—pƒrƒ‹ƒ{[ƒhƒeƒLƒXƒg
+		GameObject* repairSpeedTextRoot = gameObject.CreateGameObject();
+		gameObject.SetChild(*repairSpeedTextRoot);
+		repairSpeedTextRoot->SetName("RepairSpeedBuffText");
+		repairSpeedTextRoot->transform().position() = Vector3(0.0f, 2.7f, 0.0f);
+		repairSpeedTextRoot->SetActive(false);
+		{
+			const char* text = "repair speed up";
+			const int textLen = 15;
+			const float charScale = 0.28f;
+			const float spacing = 0.30f;
+			const float startX = -((float)(textLen - 1)) * spacing * 0.5f;
+
+			for (int ci = 0; ci < textLen; ++ci)
+			{
+				GameObject* charObj = repairSpeedTextRoot->CreateGameObject();
+				repairSpeedTextRoot->SetChild(*charObj);
+				charObj->transform().position() = Vector3(startX + spacing * (float)ci, 0.0f, 0.0f);
+				charObj->transform().scale() = Vector3(charScale, charScale, charScale);
+
+				auto* mr = charObj->AddComponent<MeshRenderer>();
+				mr->mesh = gameObject.rendering().CreateBillboardQuad().get();
+				mr->material.texturePath = L"texture/consolab_ascii_512.png";
+				mr->material.texture = nullptr;
+				mr->material.vsPath = "BillboardVS.cso";
+				mr->material.psPath = "BillboardPS.cso";
+				mr->material.shaderProgram = nullptr;
+				mr->renderQueue = RenderQueue::Transparent;
+				mr->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
+
+				int index = text[ci] - ' ';
+				float u0 = (float)(index % 16) / 16.0f;
+				float v0 = (float)(index / 16) / 16.0f;
+				mr->material.SetFloat4("uv_rect", { u0, v0, 1.0f / 16.0f, 1.0f / 16.0f });
+			}
+		}
+		player->repairSpeedTextRoot = repairSpeedTextRoot;
+
+		// HealthƒRƒ“ƒ|[ƒlƒ“ƒgİ’è
 		gameObject.AddComponent<Health>(100.0f);
 
 
-		// PlayerMovementã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¨­å®š
+		// PlayerMovementƒRƒ“ƒ|[ƒlƒ“ƒgİ’è
 		player->movement = gameObject.AddComponent<PlayerMovement>(cam);
 
-		// PlayerAudio è¿½åŠ 
+		// PlayerAudio ’Ç‰Á
 		gameObject.AddComponent<PlayerAudio>();
 
-		// PlayerMorphSystemã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¨­å®š
+		// PlayerMorphSystemƒRƒ“ƒ|[ƒlƒ“ƒgİ’è
 		player->morphSystem = gameObject.AddComponent<PlayerMorphSystem>();
 
 
-		// PlayerStateMachineã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè¨­å®š
+		// PlayerStateMachineƒRƒ“ƒ|[ƒlƒ“ƒgİ’è
 		player->stateMachine = gameObject.AddComponent<PlayerStateMachine>();
 
 
-		// ColliderShapeè¨­å®š
+		// ColliderShapeİ’è
 		CapsuleColliderDesc shapeDesc{};
 		shapeDesc.Radius = 0.5f;
 		shapeDesc.Height = 1.0f;
 		gameObject.AddComponent<ColliderShape>(shapeDesc);
 
-		// ãƒ¢ãƒ‡ãƒ«ã®è¶³å…ƒã‚’åœ°é¢ã«åˆã‚ã›ã‚‹
+		// ƒ‚ƒfƒ‹‚Ì‘«Œ³‚ğ’n–Ê‚É‡‚í‚¹‚é
 		modelRoot->transform().position().y = -(shapeDesc.Radius + (shapeDesc.Height * 0.5f));
 
 
-		// PhysicsBodyè¨­å®š
+		// PhysicsBodyİ’è
 		PhysicsBodyDesc bodyDesc{};
 		bodyDesc.Mass = 1.0f;
 		bodyDesc.Type = BodyType::DYNAMIC;

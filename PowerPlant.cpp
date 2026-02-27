@@ -3,6 +3,7 @@
 #include "PowerPlantUI.h"
 #include "Health.h"
 #include <algorithm>
+#include <cstdlib>
 #include "Player.h"
 #include "ScoreData.h"
 
@@ -44,12 +45,15 @@ void PowerPlant::Restore()
 		if (!healths.empty())
 		{
 			Health* playerHealth = nullptr;
+			Player* targetPlayer = nullptr;
 			for (auto* h : healths)
 			{
 				if (!h) continue;
-				if (h->gameObject().GetComponent<Player>() != nullptr)
+				Player* player = h->gameObject().GetComponent<Player>();
+				if (player != nullptr)
 				{
 					playerHealth = h;
+					targetPlayer = player;
 					break;
 				}
 			}
@@ -72,6 +76,17 @@ void PowerPlant::Restore()
 				ScoreData::Instance().restoredPlants++;
 				SetActiveRecursive(brokenModel, false);
 				SetActiveRecursive(restoredModel, true);
+				if (targetPlayer)
+				{
+					if ((std::rand() % 2) == 0)
+					{
+						targetPlayer->ApplyPermanentMoveSpeedBuff();
+					}
+					else
+					{
+						targetPlayer->ApplyPermanentRestoreSpeedBuff();
+					}
+				}
 				return;
 			}
 		}
@@ -87,7 +102,24 @@ void PowerPlant::UpdateHold(float deltaTime, bool isHolding)
 
 	if (isHolding)
 	{
-		m_holdTimer += deltaTime;
+		float restoreSpeedMultiplier = 1.0f;
+		auto scene = gameObject().scenePtr();
+		if (scene)
+		{
+			auto healths = scene->GetComponents<Health>();
+			for (auto* h : healths)
+			{
+				if (!h) continue;
+				Player* player = h->gameObject().GetComponent<Player>();
+				if (player)
+				{
+					restoreSpeedMultiplier = player->GetRestoreSpeedMultiplier();
+					break;
+				}
+			}
+		}
+
+		m_holdTimer += deltaTime * restoreSpeedMultiplier;
 		if (m_holdTimer >= m_holdThreshold)
 		{
 			Restore();
