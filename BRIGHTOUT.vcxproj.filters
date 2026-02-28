@@ -648,19 +648,19 @@
       <Filter>Header Files\Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="include\DebugTest\DebugCamera.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\DebugTest</Filter>
     </ClInclude>
     <ClInclude Include="include\DebugTest\DebugConsole.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\DebugTest</Filter>
     </ClInclude>
     <ClInclude Include="include\DebugTest\DebugCounter.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\DebugTest</Filter>
     </ClInclude>
     <ClInclude Include="include\DebugTest\DebugOstream.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\DebugTest</Filter>
     </ClInclude>
     <ClInclude Include="include\DebugTest\DebugText.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\DebugTest</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -788,6 +788,9 @@
     </Filter>
     <Filter Include="Source Files\DebugTest">
       <UniqueIdentifier>{b6994e9f-e9c3-466f-88b7-877931ce58f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\DebugTest">
+      <UniqueIdentifier>{069d2691-d775-4433-a748-3d99623cc789}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
