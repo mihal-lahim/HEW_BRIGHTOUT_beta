@@ -183,15 +183,6 @@
     <ClCompile Include="src\Input\GamePad.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\Debug\DebugCamera.cpp">
-      <Filter>Source Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Debug\DebugOstream.cpp">
-      <Filter>Source Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Debug\DebugText.cpp">
-      <Filter>Source Files\Debug</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scenes\Game.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
@@ -305,6 +296,15 @@
     </ClCompile>
     <ClCompile Include="src\UI\FadeController.cpp">
       <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DebugTest\DebugCamera.cpp">
+      <Filter>Source Files\DebugTest</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DebugTest\DebugOstream.cpp">
+      <Filter>Source Files\DebugTest</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DebugTest\DebugText.cpp">
+      <Filter>Source Files\DebugTest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -712,8 +712,6 @@
     <None Include="include\Engine\SceneSystem.inl">
       <Filter>Other Files</Filter>
     </None>
-    <None Include="_move_files.ps1" />
-    <None Include="_update_paths.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -764,9 +762,6 @@
     <Filter Include="Source Files\Audio">
       <UniqueIdentifier>{D38B4EE5-822F-4B38-857E-C974AF3768BF}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Debug">
-      <UniqueIdentifier>{A3CB330F-10EC-41AF-B61B-732185A86EC6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Engine">
       <UniqueIdentifier>{E297C2B8-3E76-4FD5-8D98-44536C1F5F11}</UniqueIdentifier>
     </Filter>
@@ -793,6 +788,9 @@
     </Filter>
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{D7CB58D3-E684-4673-8D3D-212CEA08E09C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DebugTest">
+      <UniqueIdentifier>{b6994e9f-e9c3-466f-88b7-877931ce58f5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

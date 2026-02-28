@@ -177,6 +177,9 @@ for %%F in ("$(TargetDir)*.cso") do (
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\DebugTest\DebugCamera.cpp" />
+    <ClCompile Include="src\DebugTest\DebugOstream.cpp" />
+    <ClCompile Include="src\DebugTest\DebugText.cpp" />
     <ClCompile Include="src\Rendering\Animation.cpp" />
     <ClCompile Include="src\Gameplay\Apartment.cpp" />
     <ClCompile Include="src\Audio\Audio.cpp" />
@@ -238,9 +241,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="src\Engine\Window.cpp" />
     <ClCompile Include="src\Engine\WindowSystem.cpp" />
     <ClCompile Include="src\Input\GamePad.cpp" />
-    <ClCompile Include="src\Debug\DebugCamera.cpp" />
-    <ClCompile Include="src\Debug\DebugOstream.cpp" />
-    <ClCompile Include="src\Debug\DebugText.cpp" />
     <ClCompile Include="src\Scenes\Game.cpp" />
     <ClCompile Include="src\Gameplay\Health.cpp" />
     <ClCompile Include="src\Input\Keyboard.cpp" />
