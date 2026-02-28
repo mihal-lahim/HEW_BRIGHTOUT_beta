@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35818.85
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX21_04_25_授業2_ウィンドウ表示", "DX21_04_25_授業2_ウィンドウ表示.vcxproj", "{0CD14713-B3D2-4F0B-90C6-5D08FE1B933E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BRIGHTOUT", "BRIGHTOUT.vcxproj", "{0CD14713-B3D2-4F0B-90C6-5D08FE1B933E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
