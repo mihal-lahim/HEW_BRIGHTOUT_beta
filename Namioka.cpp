@@ -65,7 +65,7 @@ void Namioka::Initialize()
 	ModelPrefab skyPrefab{ "model/sky.fbx" };
 	GameObject* skyDome = Instantiate(skyPrefab);
 	skyDome->AddComponent<SkyDome>();
-	skyDome->transform().scale() = { 5.0f, 5.0f, 5.0f };
+	skyDome->transform().scale() = { 10.0f, 10.0f, 10.0f };
 	skyDome->transform().position() = { 0.0f, 0.0f, 0.0f };
 
 	//残り60秒になったらBGM切り替え
