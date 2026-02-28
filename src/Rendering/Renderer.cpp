@@ -1,7 +1,7 @@
 #include "Renderer.h"
 #include "Texture.h"
 #include "GameObject.h"
-#include "DebugOstream.h"
+#include "include/DebugTest/DebugOstream.h"
 #include "RenderingSystem.h"
 
 using namespace DirectX;

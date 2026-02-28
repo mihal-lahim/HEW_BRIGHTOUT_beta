@@ -419,9 +419,6 @@
     <ClInclude Include="include\Scenes\TitleController.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="include\Debug\DebugCounter.h">
-      <Filter>Header Files\Debug</Filter>
-    </ClInclude>
     <ClInclude Include="include\Engine\GameContext.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
@@ -490,18 +487,6 @@
     </ClInclude>
     <ClInclude Include="include\Input\GamePad.h">
       <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Debug\DebugCamera.h">
-      <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Debug\DebugConsole.h">
-      <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Debug\DebugOstream.h">
-      <Filter>Header Files\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Debug\DebugText.h">
-      <Filter>Header Files\Debug</Filter>
     </ClInclude>
     <ClInclude Include="include\Scenes\Game.h">
       <Filter>Header Files\Scenes</Filter>
@@ -662,6 +647,21 @@
     <ClInclude Include="include\Gameplay\PlayerPrefab.h">
       <Filter>Header Files\Gameplay</Filter>
     </ClInclude>
+    <ClInclude Include="include\DebugTest\DebugCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DebugTest\DebugConsole.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DebugTest\DebugCounter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DebugTest\DebugOstream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DebugTest\DebugText.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\copilot-instructions.md">
@@ -722,9 +722,6 @@
     </Filter>
     <Filter Include="Header Files\Audio">
       <UniqueIdentifier>{0C14F0A0-1E4A-4525-95C7-9FE528336AA5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Debug">
-      <UniqueIdentifier>{76A40ECF-29F8-4C72-98E3-1FA307BB06F9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Engine">
       <UniqueIdentifier>{BBAEC0EE-BD1D-417C-87F5-67DB17C84F44}</UniqueIdentifier>

@@ -1,6 +1,6 @@
 #include "EngineCore.h"
 #include "GameContext.h"
-#include "DebugOstream.h"
+#include "include/DebugTest/DebugOstream.h"
 #include "GameTime.h"
 
 

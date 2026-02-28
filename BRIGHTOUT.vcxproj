@@ -269,6 +269,11 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="src\Rendering\WICTextureLoader11.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\DebugTest\DebugCamera.h" />
+    <ClInclude Include="include\DebugTest\DebugConsole.h" />
+    <ClInclude Include="include\DebugTest\DebugCounter.h" />
+    <ClInclude Include="include\DebugTest\DebugOstream.h" />
+    <ClInclude Include="include\DebugTest\DebugText.h" />
     <ClInclude Include="include\Rendering\Animation.h" />
     <ClInclude Include="include\Gameplay\Apartment.h" />
     <ClInclude Include="include\Audio\Audio.h" />
@@ -320,7 +325,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="include\Scenes\ResultController.h" />
     <ClInclude Include="include\Scenes\GameClearChecker.h" />
     <ClInclude Include="include\Scenes\TitleController.h" />
-    <ClInclude Include="include\Debug\DebugCounter.h" />
     <ClInclude Include="include\Engine\GameContext.h" />
     <ClInclude Include="include\Misc\InputSystem.h" />
     <ClInclude Include="include\Engine\ObjectPool.h" />
@@ -346,10 +350,6 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="include\Engine\Window.h" />
     <ClInclude Include="include\Engine\WindowSystem.h" />
     <ClInclude Include="include\Input\GamePad.h" />
-    <ClInclude Include="include\Debug\DebugCamera.h" />
-    <ClInclude Include="include\Debug\DebugConsole.h" />
-    <ClInclude Include="include\Debug\DebugOstream.h" />
-    <ClInclude Include="include\Debug\DebugText.h" />
     <ClInclude Include="include\Scenes\Game.h" />
     <ClInclude Include="include\Engine\GameObject.h" />
     <ClInclude Include="include\Gameplay\Health.h" />

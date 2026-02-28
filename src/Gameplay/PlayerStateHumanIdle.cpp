@@ -1,6 +1,6 @@
 
 #include "Player.h"
-#include "DebugCounter.h"
+#include "include/DebugTest/DebugCounter.h"
 
 
 void PlayerState_Human_Idle::Enter(Player& player)

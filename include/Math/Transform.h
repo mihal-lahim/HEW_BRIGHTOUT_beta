@@ -6,7 +6,7 @@
 #include "Vector3.h"
 #include "Quaternion.h"
 #include "Component.h"
-#include "DebugOstream.h"
+#include "include/DebugTest/DebugOstream.h"
 
 
 class Transform : public Component

@@ -1,5 +1,5 @@
 #include "StructuredBuffer.h"
-#include "DebugOstream.h"
+#include "include/DebugTest/DebugOstream.h"
 
 bool StructuredBuffer::CreateBuffer(GraphicsDevice& device, UINT count, UINT size, USAGE_TYPE usage, VIEW_TYPE view)
 {

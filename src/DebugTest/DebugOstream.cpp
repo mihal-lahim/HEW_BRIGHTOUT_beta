@@ -4,7 +4,7 @@
 // Date		:4/25
 //
 //=======================================
-#include "DebugOstream.h"
+#include "include/DebugTest/DebugOstream.h"
 namespace hal
 {
 	debug_ostream dout;

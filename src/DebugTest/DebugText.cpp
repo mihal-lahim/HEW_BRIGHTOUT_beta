@@ -6,7 +6,7 @@
 --------------------------------------------------------------------------------
 
 ==============================================================================*/
-#include "DebugText.h"
+#include "include/DebugTest/DebugText.h"
 #include "WICTextureLoader11.h"
 using namespace DirectX;
 #include <D3Dcompiler.h>

@@ -1,7 +1,7 @@
 #include "Game.h"
 #include "PlayerPrefab.h"
 #include "GameObject.h"
-#include "DebugCamera.h"
+#include "include/DebugTest/DebugCamera.h"
 #include "Texture.h"
 #include "PowerPlant.h"
 #include "EnemySpawnerPrefab.h"

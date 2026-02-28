@@ -3,7 +3,7 @@
 //Author: Hiroshi Kasiwagi
 //Date: 2025/10/28
 ////////////////////////////////
-#include "DebugCamera.h"
+#include "include/DebugTest/DebugCamera.h"
 #include "GameTime.h"
 #include "GameObject.h"
 #include "InputSystem.h"
