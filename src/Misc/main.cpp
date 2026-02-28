@@ -13,8 +13,8 @@
 #include "EngineCore.h"
 #include "Window.h"
 
-#include "Kageyama.h"
-#include "Kasiwagi.h"
+//#include "Kageyama.h"
+//#include "Kasiwagi.h"
 #include "Namioka.h"
 #include "Title.h"
 #include "Audio.h"
