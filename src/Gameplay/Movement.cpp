@@ -1,5 +1,5 @@
 #include "Movement.h"
-#include "Time.h"
+#include "GameTime.h"
 
 using namespace DirectX;
 

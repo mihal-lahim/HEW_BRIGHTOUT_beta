@@ -1,7 +1,7 @@
 #include "PlayerState_Human_Ground.h"
 #include "Player.h"
 #include "PowerPlant.h"
-#include "Time.h"
+#include "GameTime.h"
 
 
 using namespace DirectX;

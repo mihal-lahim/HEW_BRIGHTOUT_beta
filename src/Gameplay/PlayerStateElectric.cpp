@@ -1,5 +1,5 @@
 #include "Player.h"
-#include "Time.h"
+#include "GameTime.h"
 
 void PlayerState_Electric::Enter(Player& player)
 {

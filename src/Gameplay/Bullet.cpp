@@ -3,7 +3,7 @@
 ///////////////////////////////////////////
 
 #include "Bullet.h"
-#include "Time.h"
+#include "GameTime.h"
 #include "GameObject.h"
 #include "ScoreData.h"
 #include "Enemy.h"

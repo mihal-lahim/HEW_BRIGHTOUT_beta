@@ -7,7 +7,7 @@
 #include "Model.h"
 #include "Bullet.h"
 #include "Title.h"
-#include "Time.h"
+#include "GameTime.h"
 #include "SceneSystem.h"
 #include <algorithm>
 #include <cmath>

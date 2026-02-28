@@ -1,10 +1,10 @@
-Ôªø#ifndef ENEMY_H
+#ifndef ENEMY_H
 #define ENEMY_H
 
 #include "Movement.h"
 
 #include "GameObject.h"
-#include "Time.h"
+#include "GameTime.h"
 #include "Ray.h"
 #include <vector>
 
@@ -71,14 +71,14 @@ public:
 		SetAnimationMode(AnimationMode::Idle);
 
 
-		// Ê≠ª‰∫°SEË™≠„ÅøËæº„Åø
+		// éÄñSSEì«Ç›çûÇ›
 		m_DeathSE = LoadAudio("sound/enemy_die.wav"); 
 		if (m_DeathSE >= 0)
 		{
 			SetAudioVolume(m_DeathSE, 0.7f);
 		}
 
-		// ÔºàÂøÖË¶Å„Å™„ÇâË∂≥Èü≥„ÇÇ„Åì„Åì„ÅßË™≠„ÅøËæº„ÇÄÔºâ
+		// ÅiïKóvÇ»ÇÁë´âπÇ‡Ç±Ç±Ç≈ì«Ç›çûÇﬁÅj
 		// m_MoveSE = LoadAudio("sound/enemy_step.wav");
 		if (m_MoveSE >= 0)
 		{
@@ -137,7 +137,7 @@ public:
 			SetAnimationMode(AnimationMode::Idle);
 			UpdateAnimation((float)Time::DeltaTime());
 
-			// ÂÅúÊ≠¢„Åó„Åü„ÇâSE„ÇíÊ≠¢„ÇÅ„Çã
+			// í‚é~ÇµÇΩÇÁSEÇé~ÇﬂÇÈ
 			if (m_isMoving && m_MoveSE >= 0)
 			{
 				StopAudio(m_MoveSE);
@@ -147,7 +147,7 @@ public:
 			return;
 		}
 
-		// ÁßªÂãïÈñãÂßãÊôÇ„Å´SE„Çí„É´„Éº„Éó„ÅßÂÜçÁîü
+		// à⁄ìÆäJénéûÇ…SEÇÉãÅ[ÉvÇ≈çƒê∂
 		if (!m_isMoving && m_MoveSE >= 0)
 		{
 			PlayAudio(m_MoveSE, true);
@@ -160,17 +160,17 @@ public:
 		UpdateAnimation((float)Time::DeltaTime());
 	}
 
-	// ÂÄí„Åï„Çå„Åü/DestroyÊôÇ„Å´Âëº„Å∞„Çå„Çã
+	// ì|Ç≥ÇÍÇΩ/DestroyéûÇ…åƒÇŒÇÍÇÈ
 	void OnDestroy() override
 	{
-		// ÁßªÂãï‰∏≠„ÅÆ„É´„Éº„ÉóSE„ÇíÊ≠¢„ÇÅ„Çã
+		// à⁄ìÆíÜÇÃÉãÅ[ÉvSEÇé~ÇﬂÇÈ
 		if (m_isMoving && m_MoveSE >= 0)
 		{
 			StopAudio(m_MoveSE);
 			m_isMoving = false;
 		}
 
-		// Ê≠ª‰∫°SE„Çí„ÉØ„É≥„Ç∑„Éß„ÉÉ„Éà„ÅßÂÜçÁîü
+		// éÄñSSEÇÉèÉìÉVÉáÉbÉgÇ≈çƒê∂
 		if (!m_DestroyedByFall && m_DeathSE >= 0)
 		{
 			PlayAudioOneShot(m_DeathSE, 0.9f);
@@ -299,7 +299,7 @@ private:
 	int m_MoveSE = -1;
 	bool m_isMoving = false;
 
-	// ÂÄí„Åï„Çå„Åü„Å®„Åç„ÅÆSE
+	// ì|Ç≥ÇÍÇΩÇ∆Ç´ÇÃSE
 	int m_DeathSE = -1;
 	bool m_DestroyedByFall = false;
 

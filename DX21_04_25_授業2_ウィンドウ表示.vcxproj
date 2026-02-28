@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -22,7 +22,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{0cd14713-b3d2-4f0b-90c6-5d08fe1b933e}</ProjectGuid>
-    <RootNamespace>DX210425����2�E�B���h�E�\��</RootNamespace>
+    <RootNamespace>DX210425・ｽ・ｽ・ｽ・ｽ2・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽ\・ｽ・ｽ</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -89,7 +89,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso �t�@�C����v���W�F�N�g�f�B���N�g���ɃR�s�[�i�S�p�E�X�y�[�X�Ή��j
+      <Command>:: .cso ・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽv・ｽ・ｽ・ｽW・ｽF・ｽN・ｽg・ｽf・ｽB・ｽ・ｽ・ｽN・ｽg・ｽ・ｽ・ｽﾉコ・ｽs・ｽ[・ｽi・ｽS・ｽp・ｽE・ｽX・ｽy・ｽ[・ｽX・ｽﾎ会ｿｽ・ｽj
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -114,7 +114,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso �t�@�C����v���W�F�N�g�f�B���N�g���ɃR�s�[�i�S�p�E�X�y�[�X�Ή��j
+      <Command>:: .cso ・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽv・ｽ・ｽ・ｽW・ｽF・ｽN・ｽg・ｽf・ｽB・ｽ・ｽ・ｽN・ｽg・ｽ・ｽ・ｽﾉコ・ｽs・ｽ[・ｽi・ｽS・ｽp・ｽE・ｽX・ｽy・ｽ[・ｽX・ｽﾎ会ｿｽ・ｽj
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -127,7 +127,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include\Audio;$(ProjectDir)include\Debug;$(ProjectDir)include\Engine;$(ProjectDir)include\Gameplay;$(ProjectDir)include\Input;$(ProjectDir)include\Math;$(ProjectDir)include\Misc;$(ProjectDir)include\Physics;$(ProjectDir)include\Rendering;$(ProjectDir)include\Scenes;$(ProjectDir)include\UI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -140,7 +140,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso �t�@�C����v���W�F�N�g�f�B���N�g���ɃR�s�[�i�S�p�E�X�y�[�X�Ή��j
+      <Command>:: .cso ・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽv・ｽ・ｽ・ｽW・ｽF・ｽN・ｽg・ｽf・ｽB・ｽ・ｽ・ｽN・ｽg・ｽ・ｽ・ｽﾉコ・ｽs・ｽ[・ｽi・ｽS・ｽp・ｽE・ｽX・ｽy・ｽ[・ｽX・ｽﾎ会ｿｽ・ｽj
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -155,7 +155,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)include\Audio;$(ProjectDir)include\Debug;$(ProjectDir)include\Engine;$(ProjectDir)include\Gameplay;$(ProjectDir)include\Input;$(ProjectDir)include\Math;$(ProjectDir)include\Misc;$(ProjectDir)include\Physics;$(ProjectDir)include\Rendering;$(ProjectDir)include\Scenes;$(ProjectDir)include\UI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -170,223 +170,223 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso �t�@�C����v���W�F�N�g�f�B���N�g���ɃR�s�[�i�S�p�E�X�y�[�X�Ή��j
+      <Command>:: .cso ・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽv・ｽ・ｽ・ｽW・ｽF・ｽN・ｽg・ｽf・ｽB・ｽ・ｽ・ｽN・ｽg・ｽ・ｽ・ｽﾉコ・ｽs・ｽ[・ｽi・ｽS・ｽp・ｽE・ｽX・ｽy・ｽ[・ｽX・ｽﾎ会ｿｽ・ｽj
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="Apartment.cpp" />
-    <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="BgmSwitcher.cpp" />
-    <ClCompile Include="Billboard.cpp" />
-    <ClCompile Include="BillboardQuad.cpp" />
-    <ClCompile Include="Bullet.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Clocktower.cpp" />
-    <ClCompile Include="Component.cpp" />
-    <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="Convenience.cpp" />
-    <ClCompile Include="Dentyuu.cpp" />
-    <ClCompile Include="EngineCore.cpp" />
-    <ClCompile Include="EventSystem.cpp" />
-    <ClCompile Include="FadeController.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GraphicsDevice.cpp" />
-    <ClCompile Include="House.cpp" />
-    <ClCompile Include="HPBarUI.cpp" />
-    <ClCompile Include="InputSystem.cpp" />
-    <ClCompile Include="Karaoke.cpp" />
-    <ClCompile Include="Mansion01.cpp" />
-    <ClCompile Include="Mansion02.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="MorphUI.cpp" />
-    <ClCompile Include="Namioka.cpp" />
-    <ClCompile Include="PlayerAudio.cpp" />
-    <ClCompile Include="PowerPlantUI.cpp" />
-    <ClCompile Include="ResultScoreUI.cpp" />
-    <ClCompile Include="Road.cpp" />
-    <ClCompile Include="SkyDome.cpp" />
-    <ClCompile Include="SpecialDensen.cpp" />
-    <ClCompile Include="SpecialDentyuu.cpp" />
-    <ClCompile Include="TimerUI.cpp" />
-    <ClCompile Include="Title.cpp" />
-    <ClCompile Include="Result.cpp" />
-    <ClCompile Include="ResultController.cpp" />
-    <ClCompile Include="GameClearChecker.cpp" />
-    <ClCompile Include="TitleController.cpp" />
-    <ClCompile Include="PhysicsBody.cpp" />
-    <ClCompile Include="PoleManager.cpp" />
-    <ClCompile Include="PowerPlant.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="Resource.cpp" />
-    <ClCompile Include="ResourceSystem.cpp" />
-    <ClCompile Include="SceneSystem.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="StructuredBuffer.cpp" />
-    <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="UIDrawer.cpp" />
-    <ClCompile Include="UIQuad.cpp" />
-    <ClCompile Include="Vector2.cpp" />
-    <ClCompile Include="Vector3.cpp" />
-    <ClCompile Include="Vector4.cpp" />
-    <ClCompile Include="Wacdonald.cpp" />
-    <ClCompile Include="Window.cpp" />
-    <ClCompile Include="WindowSystem.cpp" />
-    <ClCompile Include="GamePad.cpp" />
-    <ClCompile Include="DebugCamera.cpp" />
-    <ClCompile Include="DebugOstream.cpp" />
-    <ClCompile Include="DebugText.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="Health.cpp" />
-    <ClCompile Include="Keyboard.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Mouse.cpp" />
-    <ClCompile Include="Movement.cpp" />
-    <ClCompile Include="PhysicsSystem.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PlayerMorphSystem.cpp" />
-    <ClCompile Include="PlayerMovement.cpp" />
-    <ClCompile Include="PlayerState.cpp" />
-    <ClCompile Include="PlayerStateElectric.cpp" />
-    <ClCompile Include="PlayerStateHuman.cpp" />
-    <ClCompile Include="PlayerStateHumanGround.cpp" />
-    <ClCompile Include="PlayerStateHumanIdle.cpp" />
-    <ClCompile Include="PlayerStateHumanMidAir.cpp" />
-    <ClCompile Include="PlayerStateHumanWalk.cpp" />
-    <ClCompile Include="Pole.cpp" />
-    <ClCompile Include="PowerLine.cpp" />
-    <ClCompile Include="Quaternion.cpp" />
-    <ClCompile Include="RenderingSystem.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="SystemTimer.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="TPSCamera.cpp" />
-    <ClCompile Include="WICTextureLoader11.cpp" />
+    <ClCompile Include="src\Rendering\Animation.cpp" />
+    <ClCompile Include="src\Gameplay\Apartment.cpp" />
+    <ClCompile Include="src\Audio\Audio.cpp" />
+    <ClCompile Include="src\Audio\BgmSwitcher.cpp" />
+    <ClCompile Include="src\Rendering\Billboard.cpp" />
+    <ClCompile Include="src\Rendering\BillboardQuad.cpp" />
+    <ClCompile Include="src\Gameplay\Bullet.cpp" />
+    <ClCompile Include="src\Gameplay\Camera.cpp" />
+    <ClCompile Include="src\Gameplay\Clocktower.cpp" />
+    <ClCompile Include="src\Engine\Component.cpp" />
+    <ClCompile Include="src\Rendering\ConstantBuffer.cpp" />
+    <ClCompile Include="src\Gameplay\Convenience.cpp" />
+    <ClCompile Include="src\Gameplay\Dentyuu.cpp" />
+    <ClCompile Include="src\Engine\EngineCore.cpp" />
+    <ClCompile Include="src\Engine\EventSystem.cpp" />
+    <ClCompile Include="src\UI\FadeController.cpp" />
+    <ClCompile Include="src\Engine\GameObject.cpp" />
+    <ClCompile Include="src\Rendering\GraphicsDevice.cpp" />
+    <ClCompile Include="src\Gameplay\House.cpp" />
+    <ClCompile Include="src\UI\HPBarUI.cpp" />
+    <ClCompile Include="src\Misc\InputSystem.cpp" />
+    <ClCompile Include="src\Gameplay\Karaoke.cpp" />
+    <ClCompile Include="src\Gameplay\Mansion01.cpp" />
+    <ClCompile Include="src\Gameplay\Mansion02.cpp" />
+    <ClCompile Include="src\Rendering\Material.cpp" />
+    <ClCompile Include="src\Rendering\Mesh.cpp" />
+    <ClCompile Include="src\Rendering\Model.cpp" />
+    <ClCompile Include="src\UI\MorphUI.cpp" />
+    <ClCompile Include="src\Scenes\Namioka.cpp" />
+    <ClCompile Include="src\Audio\PlayerAudio.cpp" />
+    <ClCompile Include="src\UI\PowerPlantUI.cpp" />
+    <ClCompile Include="src\UI\ResultScoreUI.cpp" />
+    <ClCompile Include="src\Gameplay\Road.cpp" />
+    <ClCompile Include="src\Rendering\SkyDome.cpp" />
+    <ClCompile Include="src\Gameplay\SpecialDensen.cpp" />
+    <ClCompile Include="src\Gameplay\SpecialDentyuu.cpp" />
+    <ClCompile Include="src\UI\TimerUI.cpp" />
+    <ClCompile Include="src\Scenes\Title.cpp" />
+    <ClCompile Include="src\Scenes\Result.cpp" />
+    <ClCompile Include="src\Scenes\ResultController.cpp" />
+    <ClCompile Include="src\Scenes\GameClearChecker.cpp" />
+    <ClCompile Include="src\Scenes\TitleController.cpp" />
+    <ClCompile Include="src\Physics\PhysicsBody.cpp" />
+    <ClCompile Include="src\Gameplay\PoleManager.cpp" />
+    <ClCompile Include="src\Gameplay\PowerPlant.cpp" />
+    <ClCompile Include="src\Rendering\Renderer.cpp" />
+    <ClCompile Include="src\Rendering\Resource.cpp" />
+    <ClCompile Include="src\Rendering\ResourceSystem.cpp" />
+    <ClCompile Include="src\Engine\SceneSystem.cpp" />
+    <ClCompile Include="src\Rendering\Shader.cpp" />
+    <ClCompile Include="src\Rendering\StructuredBuffer.cpp" />
+    <ClCompile Include="src\Math\Transform.cpp" />
+    <ClCompile Include="src\UI\UIDrawer.cpp" />
+    <ClCompile Include="src\UI\UIQuad.cpp" />
+    <ClCompile Include="src\Math\Vector2.cpp" />
+    <ClCompile Include="src\Math\Vector3.cpp" />
+    <ClCompile Include="src\Math\Vector4.cpp" />
+    <ClCompile Include="src\Gameplay\Wacdonald.cpp" />
+    <ClCompile Include="src\Engine\Window.cpp" />
+    <ClCompile Include="src\Engine\WindowSystem.cpp" />
+    <ClCompile Include="src\Input\GamePad.cpp" />
+    <ClCompile Include="src\Debug\DebugCamera.cpp" />
+    <ClCompile Include="src\Debug\DebugOstream.cpp" />
+    <ClCompile Include="src\Debug\DebugText.cpp" />
+    <ClCompile Include="src\Scenes\Game.cpp" />
+    <ClCompile Include="src\Gameplay\Health.cpp" />
+    <ClCompile Include="src\Input\Keyboard.cpp" />
+    <ClCompile Include="src\Misc\main.cpp" />
+    <ClCompile Include="src\Input\Mouse.cpp" />
+    <ClCompile Include="src\Gameplay\Movement.cpp" />
+    <ClCompile Include="src\Misc\PhysicsSystem.cpp" />
+    <ClCompile Include="src\Gameplay\Player.cpp" />
+    <ClCompile Include="src\Gameplay\PlayerMorphSystem.cpp" />
+    <ClCompile Include="src\Gameplay\PlayerMovement.cpp" />
+    <ClCompile Include="src\Gameplay\PlayerState.cpp" />
+    <ClCompile Include="src\Gameplay\PlayerStateElectric.cpp" />
+    <ClCompile Include="src\Gameplay\PlayerStateHuman.cpp" />
+    <ClCompile Include="src\Gameplay\PlayerStateHumanGround.cpp" />
+    <ClCompile Include="src\Gameplay\PlayerStateHumanIdle.cpp" />
+    <ClCompile Include="src\Gameplay\PlayerStateHumanMidAir.cpp" />
+    <ClCompile Include="src\Gameplay\PlayerStateHumanWalk.cpp" />
+    <ClCompile Include="src\Gameplay\Pole.cpp" />
+    <ClCompile Include="src\Gameplay\PowerLine.cpp" />
+    <ClCompile Include="src\Math\Quaternion.cpp" />
+    <ClCompile Include="src\Rendering\RenderingSystem.cpp" />
+    <ClCompile Include="src\Engine\Scene.cpp" />
+    <ClCompile Include="src\Math\SystemTimer.cpp" />
+    <ClCompile Include="src\Rendering\Texture.cpp" />
+    <ClCompile Include="src\Gameplay\TPSCamera.cpp" />
+    <ClCompile Include="src\Rendering\WICTextureLoader11.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Animation.h" />
-    <ClInclude Include="Apartment.h" />
-    <ClInclude Include="Audio.h" />
-    <ClInclude Include="BgmSwitcher.h" />
-    <ClInclude Include="Billboard.h" />
-    <ClInclude Include="BillboardPrefab.h" />
-    <ClInclude Include="BillboardQuad.h" />
-    <ClInclude Include="Bullet.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="CameraPrefab.h" />
-    <ClInclude Include="Clocktower.h" />
-    <ClInclude Include="ColliderShape.h" />
-    <ClInclude Include="Command.h" />
-    <ClInclude Include="CommandSet.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="ConstantBuffer.h" />
-    <ClInclude Include="Convenience.h" />
-    <ClInclude Include="DebugCameraPrefab.h" />
-    <ClInclude Include="EnemySpawner.h" />
-    <ClInclude Include="EnemySpawnerPrefab.h" />
-    <ClInclude Include="EventSystem.h" />
-    <ClInclude Include="Dentyuu.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="EnemyPrefab.h" />
-    <ClInclude Include="FadeController.h" />
-    <ClInclude Include="GraphicsDevice.h" />
-    <ClInclude Include="House.h" />
-    <ClInclude Include="HPBarUI.h" />
-    <ClInclude Include="Karaoke.h" />
-    <ClInclude Include="Mansion01.h" />
-    <ClInclude Include="Mansion02.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="MorphUI.h" />
-    <ClInclude Include="Namioka.h" />
-    <ClInclude Include="PlayerAudio.h" />
-    <ClInclude Include="PlayerPrefab.h" />
-    <ClInclude Include="PowerPlantUI.h" />
-    <ClInclude Include="ResultScoreUI.h" />
-    <ClInclude Include="Road.h" />
-    <ClInclude Include="ScoreData.h" />
-    <ClInclude Include="SkyDome.h" />
-    <ClInclude Include="SpecialDensen.h" />
-    <ClInclude Include="SpecialDentyuu.h" />
-    <ClInclude Include="TimerUI.h" />
-    <ClInclude Include="Title.h" />
-    <ClInclude Include="Result.h" />
-    <ClInclude Include="ResultController.h" />
-    <ClInclude Include="GameClearChecker.h" />
-    <ClInclude Include="TitleController.h" />
-    <ClInclude Include="DebugCounter.h" />
-    <ClInclude Include="GameContext.h" />
-    <ClInclude Include="InputSystem.h" />
-    <ClInclude Include="ObjectPool.h" />
-    <ClInclude Include="PhysicsBody.h" />
-    <ClInclude Include="PowerPlant.h" />
-    <ClInclude Include="Prefab.h" />
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="ResourceSystem.h" />
-    <ClInclude Include="SceneSystem.h" />
-    <ClInclude Include="ScriptComponent.h" />
-    <ClInclude Include="ScriptComponentSystem.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="StructuredBuffer.h" />
-    <ClInclude Include="TPSCameraPrefab.h" />
-    <ClInclude Include="UIDrawer.h" />
-    <ClInclude Include="UIQuad.h" />
-    <ClInclude Include="UniqueQueue.h" />
-    <ClInclude Include="UniqueVector.h" />
-    <ClInclude Include="Vector2.h" />
-    <ClInclude Include="Vector3.h" />
-    <ClInclude Include="Vector4.h" />
-    <ClInclude Include="Wacdonald.h" />
-    <ClInclude Include="Window.h" />
-    <ClInclude Include="WindowSystem.h" />
-    <ClInclude Include="GamePad.h" />
-    <ClInclude Include="DebugCamera.h" />
-    <ClInclude Include="DebugConsole.h" />
-    <ClInclude Include="DebugOstream.h" />
-    <ClInclude Include="DebugText.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="Health.h" />
-    <ClInclude Include="InputHandler.h" />
-    <ClInclude Include="InputDevice.h" />
-    <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="Mouse.h" />
-    <ClInclude Include="Movement.h" />
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="PhysicsSystem.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="PlayerCommand.h" />
-    <ClInclude Include="PlayerCommandSet.h" />
-    <ClInclude Include="PlayerMorphSystem.h" />
-    <ClInclude Include="PlayerMovement.h" />
-    <ClInclude Include="PlayerState.h" />
-    <ClInclude Include="PlayerState_Electric.h" />
-    <ClInclude Include="PlayerState_Human_Ground.h" />
-    <ClInclude Include="PlayerState_Human.h" />
-    <ClInclude Include="PlayerState_Human_Idle.h" />
-    <ClInclude Include="PlayerState_Human_MidAir.h" />
-    <ClInclude Include="PlayerState_Human_Walk.h" />
-    <ClInclude Include="Pole.h" />
-    <ClInclude Include="PoleManager.h" />
-    <ClInclude Include="PowerLine.h" />
-    <ClInclude Include="Quaternion.h" />
-    <ClInclude Include="Ray.h" />
-    <ClInclude Include="RenderingSystem.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="EngineCore.h" />
-    <ClInclude Include="SystemTimer.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="Time.h" />
-    <ClInclude Include="TPSCamera.h" />
-    <ClInclude Include="Transform.h" />
-    <ClInclude Include="WICTextureLoader11.h" />
+    <ClInclude Include="include\Rendering\Animation.h" />
+    <ClInclude Include="include\Gameplay\Apartment.h" />
+    <ClInclude Include="include\Audio\Audio.h" />
+    <ClInclude Include="include\Audio\BgmSwitcher.h" />
+    <ClInclude Include="include\Rendering\Billboard.h" />
+    <ClInclude Include="include\Misc\BillboardPrefab.h" />
+    <ClInclude Include="include\Rendering\BillboardQuad.h" />
+    <ClInclude Include="include\Gameplay\Bullet.h" />
+    <ClInclude Include="include\Gameplay\Camera.h" />
+    <ClInclude Include="include\Gameplay\CameraPrefab.h" />
+    <ClInclude Include="include\Gameplay\Clocktower.h" />
+    <ClInclude Include="include\Physics\ColliderShape.h" />
+    <ClInclude Include="include\Input\Command.h" />
+    <ClInclude Include="include\Input\CommandSet.h" />
+    <ClInclude Include="include\Engine\Component.h" />
+    <ClInclude Include="include\Rendering\ConstantBuffer.h" />
+    <ClInclude Include="include\Gameplay\Convenience.h" />
+    <ClInclude Include="include\Misc\DebugCameraPrefab.h" />
+    <ClInclude Include="include\Gameplay\EnemySpawner.h" />
+    <ClInclude Include="include\Gameplay\EnemySpawnerPrefab.h" />
+    <ClInclude Include="include\Engine\EventSystem.h" />
+    <ClInclude Include="include\Gameplay\Dentyuu.h" />
+    <ClInclude Include="include\Gameplay\Enemy.h" />
+    <ClInclude Include="include\Gameplay\EnemyPrefab.h" />
+    <ClInclude Include="include\UI\FadeController.h" />
+    <ClInclude Include="include\Rendering\GraphicsDevice.h" />
+    <ClInclude Include="include\Gameplay\House.h" />
+    <ClInclude Include="include\UI\HPBarUI.h" />
+    <ClInclude Include="include\Gameplay\Karaoke.h" />
+    <ClInclude Include="include\Gameplay\Mansion01.h" />
+    <ClInclude Include="include\Gameplay\Mansion02.h" />
+    <ClInclude Include="include\Rendering\Material.h" />
+    <ClInclude Include="include\Rendering\Mesh.h" />
+    <ClInclude Include="include\Rendering\Model.h" />
+    <ClInclude Include="include\UI\MorphUI.h" />
+    <ClInclude Include="include\Scenes\Namioka.h" />
+    <ClInclude Include="include\Audio\PlayerAudio.h" />
+    <ClInclude Include="include\Gameplay\PlayerPrefab.h" />
+    <ClInclude Include="include\UI\PowerPlantUI.h" />
+    <ClInclude Include="include\UI\ResultScoreUI.h" />
+    <ClInclude Include="include\Gameplay\Road.h" />
+    <ClInclude Include="include\Misc\ScoreData.h" />
+    <ClInclude Include="include\Rendering\SkyDome.h" />
+    <ClInclude Include="include\Gameplay\SpecialDensen.h" />
+    <ClInclude Include="include\Gameplay\SpecialDentyuu.h" />
+    <ClInclude Include="include\UI\TimerUI.h" />
+    <ClInclude Include="include\Scenes\Title.h" />
+    <ClInclude Include="include\Scenes\Result.h" />
+    <ClInclude Include="include\Scenes\ResultController.h" />
+    <ClInclude Include="include\Scenes\GameClearChecker.h" />
+    <ClInclude Include="include\Scenes\TitleController.h" />
+    <ClInclude Include="include\Debug\DebugCounter.h" />
+    <ClInclude Include="include\Engine\GameContext.h" />
+    <ClInclude Include="include\Misc\InputSystem.h" />
+    <ClInclude Include="include\Engine\ObjectPool.h" />
+    <ClInclude Include="include\Physics\PhysicsBody.h" />
+    <ClInclude Include="include\Gameplay\PowerPlant.h" />
+    <ClInclude Include="include\Engine\Prefab.h" />
+    <ClInclude Include="include\Rendering\Resource.h" />
+    <ClInclude Include="include\Rendering\ResourceSystem.h" />
+    <ClInclude Include="include\Engine\SceneSystem.h" />
+    <ClInclude Include="include\Engine\ScriptComponent.h" />
+    <ClInclude Include="include\Engine\ScriptComponentSystem.h" />
+    <ClInclude Include="include\Rendering\Shader.h" />
+    <ClInclude Include="include\Rendering\StructuredBuffer.h" />
+    <ClInclude Include="include\Gameplay\TPSCameraPrefab.h" />
+    <ClInclude Include="include\UI\UIDrawer.h" />
+    <ClInclude Include="include\UI\UIQuad.h" />
+    <ClInclude Include="include\Engine\UniqueQueue.h" />
+    <ClInclude Include="include\Engine\UniqueVector.h" />
+    <ClInclude Include="include\Math\Vector2.h" />
+    <ClInclude Include="include\Math\Vector3.h" />
+    <ClInclude Include="include\Math\Vector4.h" />
+    <ClInclude Include="include\Gameplay\Wacdonald.h" />
+    <ClInclude Include="include\Engine\Window.h" />
+    <ClInclude Include="include\Engine\WindowSystem.h" />
+    <ClInclude Include="include\Input\GamePad.h" />
+    <ClInclude Include="include\Debug\DebugCamera.h" />
+    <ClInclude Include="include\Debug\DebugConsole.h" />
+    <ClInclude Include="include\Debug\DebugOstream.h" />
+    <ClInclude Include="include\Debug\DebugText.h" />
+    <ClInclude Include="include\Scenes\Game.h" />
+    <ClInclude Include="include\Engine\GameObject.h" />
+    <ClInclude Include="include\Gameplay\Health.h" />
+    <ClInclude Include="include\Input\InputHandler.h" />
+    <ClInclude Include="include\Input\InputDevice.h" />
+    <ClInclude Include="include\Input\Keyboard.h" />
+    <ClInclude Include="include\Rendering\Renderer.h" />
+    <ClInclude Include="include\Input\Mouse.h" />
+    <ClInclude Include="include\Gameplay\Movement.h" />
+    <ClInclude Include="include\Engine\Object.h" />
+    <ClInclude Include="include\Misc\PhysicsSystem.h" />
+    <ClInclude Include="include\Gameplay\Player.h" />
+    <ClInclude Include="include\Input\PlayerCommand.h" />
+    <ClInclude Include="include\Input\PlayerCommandSet.h" />
+    <ClInclude Include="include\Gameplay\PlayerMorphSystem.h" />
+    <ClInclude Include="include\Gameplay\PlayerMovement.h" />
+    <ClInclude Include="include\Gameplay\PlayerState.h" />
+    <ClInclude Include="include\Gameplay\PlayerState_Electric.h" />
+    <ClInclude Include="include\Gameplay\PlayerState_Human_Ground.h" />
+    <ClInclude Include="include\Gameplay\PlayerState_Human.h" />
+    <ClInclude Include="include\Gameplay\PlayerState_Human_Idle.h" />
+    <ClInclude Include="include\Gameplay\PlayerState_Human_MidAir.h" />
+    <ClInclude Include="include\Gameplay\PlayerState_Human_Walk.h" />
+    <ClInclude Include="include\Gameplay\Pole.h" />
+    <ClInclude Include="include\Gameplay\PoleManager.h" />
+    <ClInclude Include="include\Gameplay\PowerLine.h" />
+    <ClInclude Include="include\Math\Quaternion.h" />
+    <ClInclude Include="include\Math\Ray.h" />
+    <ClInclude Include="include\Rendering\RenderingSystem.h" />
+    <ClInclude Include="include\Engine\Scene.h" />
+    <ClInclude Include="include\Engine\EngineCore.h" />
+    <ClInclude Include="include\Math\SystemTimer.h" />
+    <ClInclude Include="include\Rendering\Texture.h" />
+    <ClInclude Include="include\Math\GameTime.h" />
+    <ClInclude Include="include\Gameplay\TPSCamera.h" />
+    <ClInclude Include="include\Math\Transform.h" />
+    <ClInclude Include="include\Rendering\WICTextureLoader11.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BillboardPS.hlsl">
@@ -478,7 +478,7 @@ for %%F in ("$(TargetDir)*.cso") do (
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />
-    <None Include="Component.inl" />
+    <None Include="include\Engine\Component.inl" />
     <None Include="context\Component.md" />
     <None Include="context\GameObject.md" />
     <None Include="context\Math.md" />
@@ -489,10 +489,10 @@ for %%F in ("$(TargetDir)*.cso") do (
     <None Include="context\ScriptComponent.md" />
     <None Include="context\System.md" />
     <None Include="context\Time.md" />
-    <None Include="GameObject.inl" />
-    <None Include="ResourceSystem.inl" />
-    <None Include="Scene.inl" />
-    <None Include="SceneSystem.inl" />
+    <None Include="include\Engine\GameObject.inl" />
+    <None Include="include\Rendering\ResourceSystem.inl" />
+    <None Include="include\Engine\Scene.inl" />
+    <None Include="include\Engine\SceneSystem.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

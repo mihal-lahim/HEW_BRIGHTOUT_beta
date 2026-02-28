@@ -3,7 +3,7 @@
 
 #include "ScriptComponent.h"
 #include "EnemyPrefab.h"
-#include "Time.h"
+#include "GameTime.h"
 #include "GameObject.h"
 #include <algorithm>
 

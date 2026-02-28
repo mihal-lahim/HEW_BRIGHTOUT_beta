@@ -1,11 +1,11 @@
-ï»¿////////////////////////////////////////////
-//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚·ã‚¹ãƒ†ãƒ ã®å®Ÿè£…
+////////////////////////////////////////////
+//ƒAƒjƒ[ƒVƒ‡ƒ“ƒVƒXƒeƒ€‚ÌÀ‘•
 ////////////////////////////////////////////
 
 #include "Animation.h"
 #include "Model.h"
 #include "GameObject.h"
-#include "Time.h"
+#include "GameTime.h"
 #include "RenderingSystem.h"
 
 using namespace DirectX;
@@ -21,7 +21,7 @@ Animator::Animator(const Model* model)
 
 void Animator::InitializeByContext()
 {
-	// ãƒãƒ¼ã‚ºã®åˆæœŸåŒ–
+	// ƒ|[ƒY‚Ì‰Šú‰»
 	ComputeGlobalPose();
 	ComputeSkinPose();
 }
@@ -59,11 +59,11 @@ void Animator::UpdateAnimation()
 	{
 		return;
 	}
-	// å†ç”Ÿæ™‚é–“ã®æ›´æ–°ï¼ˆticksï¼‰
+	// Ä¶ŠÔ‚ÌXViticksj
 	const float ticksPerSecond = (m_currentClip->ticksPerSecond > 0.0f) ? m_currentClip->ticksPerSecond : 1.0f;
 	m_currentTime += m_speed * (float)Time::DeltaTime() * ticksPerSecond;
 
-	// ãƒ«ãƒ¼ãƒ—å‡¦ç†
+	// ƒ‹[ƒvˆ—
 	if (m_isLoop && m_currentTime > m_currentClip->duration)
 	{
 		m_currentTime = fmodf(m_currentTime, m_currentClip->duration);
@@ -74,17 +74,17 @@ void Animator::UpdateAnimation()
 		m_isPlaying = false;
 	}
 
-	// ãƒ­ãƒ¼ã‚«ãƒ«ãƒãƒ¼ã‚ºã®ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°
+	// ƒ[ƒJƒ‹ƒ|[ƒY‚ÌƒTƒ“ƒvƒŠƒ“ƒO
 	SampleLocalPose(m_currentTime);
-	// ã‚°ãƒ­ãƒ¼ãƒãƒ«ãƒãƒ¼ã‚ºã®è¨ˆç®—
+	// ƒOƒ[ƒoƒ‹ƒ|[ƒY‚ÌŒvZ
 	ComputeGlobalPose();
-	// ã‚¹ã‚­ãƒ³ãƒãƒ¼ã‚ºã®è¨ˆç®—
+	// ƒXƒLƒ“ƒ|[ƒY‚ÌŒvZ
 	ComputeSkinPose();
 }
 
 void Animator::Bind(GraphicsDevice& device)
 {
-	// ãƒœãƒ¼ãƒ³è¡Œåˆ—ç”¨æ§‹é€ åŒ–ãƒãƒƒãƒ•ã‚¡ã®æ›´æ–°ã¨ãƒã‚¤ãƒ³ãƒ‰
+	// ƒ{[ƒ“s—ñ—p\‘¢‰»ƒoƒbƒtƒ@‚ÌXV‚ÆƒoƒCƒ“ƒh
 	if (m_boneMatrixBuffer.GetElementCount() != m_skeleton->bones.size())
 	{
 		m_boneMatrixBuffer.CreateBuffer(device, (UINT)m_skeleton->bones.size(), sizeof(XMMATRIX), USAGE_TYPE::DYNAMIC, VIEW_TYPE::SRV);
@@ -110,15 +110,15 @@ void Animator::SetAnimationClip(const AnimationClip* clip)
 
 XMFLOAT3 Animator::SampleVec3(const std::vector<KeyframeVec3>& keyframes, float time)
 {
-	// ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ãŒå­˜åœ¨ã—ãªã„å ´åˆã¯ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’è¿”ã™
+	// ƒL[ƒtƒŒ[ƒ€‚ª‘¶İ‚µ‚È‚¢ê‡‚ÍƒfƒtƒHƒ‹ƒg’l‚ğ•Ô‚·
 	if (keyframes.empty())
 		return {};
 
-	// å˜ä¸€ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®å ´åˆã€ãã®å€¤ã‚’è¿”ã™
+	// ’PˆêƒL[ƒtƒŒ[ƒ€‚Ìê‡A‚»‚Ì’l‚ğ•Ô‚·
 	if (keyframes.size() == 1)
 		return keyframes[0].value;
 
-	// æ™‚é–“ãŒç¯„å›²å¤–ã®å ´åˆã€æœ€åˆã¾ãŸã¯æœ€å¾Œã®ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®å€¤ã‚’è¿”ã™
+	// ŠÔ‚ª”ÍˆÍŠO‚Ìê‡AÅ‰‚Ü‚½‚ÍÅŒã‚ÌƒL[ƒtƒŒ[ƒ€‚Ì’l‚ğ•Ô‚·
 	if (time <= keyframes.front().time)
 		return keyframes.front().value;
 
@@ -129,7 +129,7 @@ XMFLOAT3 Animator::SampleVec3(const std::vector<KeyframeVec3>& keyframes, float 
 	{
 		if (time >= keyframes[i].time && time <= keyframes[i + 1].time)
 		{
-			// ç·šå½¢è£œé–“
+			// üŒ`•âŠÔ
 			float t = (time - keyframes[i].time) / (keyframes[i + 1].time - keyframes[i].time);
 			XMFLOAT3 start = keyframes[i].value;
 			XMFLOAT3 end = keyframes[i + 1].value;
@@ -141,21 +141,21 @@ XMFLOAT3 Animator::SampleVec3(const std::vector<KeyframeVec3>& keyframes, float 
 		}
 	}
 
-	// æœ€å¾Œã®ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®å€¤ã‚’è¿”ã™
+	// ÅŒã‚ÌƒL[ƒtƒŒ[ƒ€‚Ì’l‚ğ•Ô‚·
 	return keyframes.back().value;
 }
 
 XMFLOAT4 Animator::SampleQuat(const std::vector<KeyframeQuat>& keyframes, float time)
 {
-	// ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ãŒå­˜åœ¨ã—ãªã„å ´åˆã¯ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’è¿”ã™
+	// ƒL[ƒtƒŒ[ƒ€‚ª‘¶İ‚µ‚È‚¢ê‡‚ÍƒfƒtƒHƒ‹ƒg’l‚ğ•Ô‚·
 	if (keyframes.empty())
 		return {};
 
-	// å˜ä¸€ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®å ´åˆã€ãã®å€¤ã‚’è¿”ã™
+	// ’PˆêƒL[ƒtƒŒ[ƒ€‚Ìê‡A‚»‚Ì’l‚ğ•Ô‚·
 	if (keyframes.size() == 1)
 		return keyframes[0].value;
 
-	// æ™‚é–“ãŒç¯„å›²å¤–ã®å ´åˆã€æœ€åˆã¾ãŸã¯æœ€å¾Œã®ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®å€¤ã‚’è¿”ã™
+	// ŠÔ‚ª”ÍˆÍŠO‚Ìê‡AÅ‰‚Ü‚½‚ÍÅŒã‚ÌƒL[ƒtƒŒ[ƒ€‚Ì’l‚ğ•Ô‚·
 	if (time <= keyframes.front().time)
 		return keyframes.front().value;
 
@@ -166,7 +166,7 @@ XMFLOAT4 Animator::SampleQuat(const std::vector<KeyframeQuat>& keyframes, float 
 	{
 		if (time >= keyframes[i].time && time <= keyframes[i + 1].time)
 		{
-			// çƒé¢ç·šå½¢è£œé–“
+			// ‹…–ÊüŒ`•âŠÔ
 			float t = (time - keyframes[i].time) / (keyframes[i + 1].time - keyframes[i].time);
 			XMFLOAT4 start = keyframes[i].value;
 			XMFLOAT4 end = keyframes[i + 1].value;
@@ -178,7 +178,7 @@ XMFLOAT4 Animator::SampleQuat(const std::vector<KeyframeQuat>& keyframes, float 
 		}
 	}
 
-	// æœ€å¾Œã®ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®å€¤ã‚’è¿”ã™
+	// ÅŒã‚ÌƒL[ƒtƒŒ[ƒ€‚Ì’l‚ğ•Ô‚·
 	return keyframes.back().value;
 }
 
@@ -230,11 +230,11 @@ void Animator::ComputeGlobalPose()
 
 void Animator::RecursiveComputeGlobalPose(int boneIndex, const DirectX::XMMATRIX& parentMatrix)
 {
-	// ãƒ­ãƒ¼ã‚«ãƒ«è¡Œåˆ—ã‚’å–å¾—ã—ã¦è¦ªè¡Œåˆ—ã¨æ›ã‘åˆã‚ã›ã‚‹
+	// ƒ[ƒJƒ‹s—ñ‚ğæ“¾‚µ‚Äes—ñ‚ÆŠ|‚¯‡‚í‚¹‚é
 	XMMATRIX current = m_currentPose.localMatrixes[boneIndex];
 	m_currentPose.globalMatrixes[boneIndex] = current * parentMatrix;
 
-	// å­ãƒœãƒ¼ãƒ³ã«å¯¾ã—ã¦å†å¸°çš„ã«å‡¦ç†ã‚’è¡Œã†
+	// qƒ{[ƒ“‚É‘Î‚µ‚ÄÄ‹A“I‚Éˆ—‚ğs‚¤
 	for (int childIndex : m_skeleton->bones[boneIndex].childIndexes)
 	{
 		RecursiveComputeGlobalPose(childIndex, m_currentPose.globalMatrixes[boneIndex]);
@@ -245,7 +245,7 @@ void Animator::ComputeSkinPose()
 {
 	for (int i = 0; i < m_skeleton->bones.size(); ++i)
 	{
-		// ã‚¹ã‚­ãƒ³è¡Œåˆ— = ã‚ªãƒ•ã‚»ãƒƒãƒˆè¡Œåˆ— * ã‚°ãƒ­ãƒ¼ãƒãƒ«è¡Œåˆ—
+		// ƒXƒLƒ“s—ñ = ƒIƒtƒZƒbƒgs—ñ * ƒOƒ[ƒoƒ‹s—ñ
 		XMMATRIX offsetMatrix = m_skeleton->bones[i].offsetMatrix;
 		XMMATRIX globalMatrix = m_currentPose.globalMatrixes[i];
 		m_currentPose.skinMatrixes[i] = XMMatrixTranspose(offsetMatrix * globalMatrix);

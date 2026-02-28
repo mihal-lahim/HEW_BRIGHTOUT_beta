@@ -1,7 +1,7 @@
 #include "EngineCore.h"
 #include "GameContext.h"
 #include "DebugOstream.h"
-#include "Time.h"
+#include "GameTime.h"
 
 
 GameContext& EngineCore::GetGameContext()
