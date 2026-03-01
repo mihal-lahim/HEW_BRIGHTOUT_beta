@@ -306,6 +306,18 @@
     <ClCompile Include="src\DebugTest\DebugText.cpp">
       <Filter>Source Files\DebugTest</Filter>
     </ClCompile>
+    <ClCompile Include="src\Rendering\MFVideoDecoder.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\VideoTexture.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\VideoPlayerController.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\LoadingMovieScene.cpp">
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Rendering\Animation.h">
@@ -662,6 +674,18 @@
     <ClInclude Include="include\DebugTest\DebugText.h">
       <Filter>Header Files\DebugTest</Filter>
     </ClInclude>
+    <ClInclude Include="include\Rendering\MFVideoDecoder.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\VideoTexture.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scenes\LoadingMovieScene.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\VideoPlayerController.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\copilot-instructions.md">
@@ -712,6 +736,7 @@
     <None Include="include\Engine\SceneSystem.inl">
       <Filter>Other Files</Filter>
     </None>
+    <None Include="context\EngineArchitecture.md" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

@@ -22,7 +22,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{0cd14713-b3d2-4f0b-90c6-5d08fe1b933e}</ProjectGuid>
-    <RootNamespace>DX210425・ｽ・ｽ・ｽ・ｽ2・ｽE・ｽB・ｽ・ｽ・ｽh・ｽE・ｽ\・ｽ・ｽ</RootNamespace>
+    <RootNamespace>DX210425郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ2郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽB郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽh郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽ\郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -89,7 +89,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽv・ｽ・ｽ・ｽW・ｽF・ｽN・ｽg・ｽf・ｽB・ｽ・ｽ・ｽN・ｽg・ｽ・ｽ・ｽﾉコ・ｽs・ｽ[・ｽi・ｽS・ｽp・ｽE・ｽX・ｽy・ｽ[・ｽX・ｽﾎ会ｿｽ・ｽj
+      <Command>:: .cso 郢晢ｽｻ繝ｻ・ｽt郢晢ｽｻ繝ｻ・ｽ@郢晢ｽｻ繝ｻ・ｽC郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽv郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽW郢晢ｽｻ繝ｻ・ｽF郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽf郢晢ｽｻ繝ｻ・ｽB郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ繝ｻ蟲ｨ縺慕ｹ晢ｽｻ繝ｻ・ｽs郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽi郢晢ｽｻ繝ｻ・ｽS郢晢ｽｻ繝ｻ・ｽp郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽy郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽ繝ｻ諠ｹ・ｼ螟ｲ・ｽ・ｿ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽj
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -114,7 +114,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽv・ｽ・ｽ・ｽW・ｽF・ｽN・ｽg・ｽf・ｽB・ｽ・ｽ・ｽN・ｽg・ｽ・ｽ・ｽﾉコ・ｽs・ｽ[・ｽi・ｽS・ｽp・ｽE・ｽX・ｽy・ｽ[・ｽX・ｽﾎ会ｿｽ・ｽj
+      <Command>:: .cso 郢晢ｽｻ繝ｻ・ｽt郢晢ｽｻ繝ｻ・ｽ@郢晢ｽｻ繝ｻ・ｽC郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽv郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽW郢晢ｽｻ繝ｻ・ｽF郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽf郢晢ｽｻ繝ｻ・ｽB郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ繝ｻ蟲ｨ縺慕ｹ晢ｽｻ繝ｻ・ｽs郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽi郢晢ｽｻ繝ｻ・ｽS郢晢ｽｻ繝ｻ・ｽp郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽy郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽ繝ｻ諠ｹ・ｼ螟ｲ・ｽ・ｿ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽj
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -140,7 +140,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽv・ｽ・ｽ・ｽW・ｽF・ｽN・ｽg・ｽf・ｽB・ｽ・ｽ・ｽN・ｽg・ｽ・ｽ・ｽﾉコ・ｽs・ｽ[・ｽi・ｽS・ｽp・ｽE・ｽX・ｽy・ｽ[・ｽX・ｽﾎ会ｿｽ・ｽj
+      <Command>:: .cso 郢晢ｽｻ繝ｻ・ｽt郢晢ｽｻ繝ｻ・ｽ@郢晢ｽｻ繝ｻ・ｽC郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽv郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽW郢晢ｽｻ繝ｻ・ｽF郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽf郢晢ｽｻ繝ｻ・ｽB郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ繝ｻ蟲ｨ縺慕ｹ晢ｽｻ繝ｻ・ｽs郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽi郢晢ｽｻ繝ｻ・ｽS郢晢ｽｻ繝ｻ・ｽp郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽy郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽ繝ｻ諠ｹ・ｼ螟ｲ・ｽ・ｿ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽj
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -170,7 +170,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso ・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽv・ｽ・ｽ・ｽW・ｽF・ｽN・ｽg・ｽf・ｽB・ｽ・ｽ・ｽN・ｽg・ｽ・ｽ・ｽﾉコ・ｽs・ｽ[・ｽi・ｽS・ｽp・ｽE・ｽX・ｽy・ｽ[・ｽX・ｽﾎ会ｿｽ・ｽj
+      <Command>:: .cso 郢晢ｽｻ繝ｻ・ｽt郢晢ｽｻ繝ｻ・ｽ@郢晢ｽｻ繝ｻ・ｽC郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽv郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽW郢晢ｽｻ繝ｻ・ｽF郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽf郢晢ｽｻ繝ｻ・ｽB郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ繝ｻ蟲ｨ縺慕ｹ晢ｽｻ繝ｻ・ｽs郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽi郢晢ｽｻ繝ｻ・ｽS郢晢ｽｻ繝ｻ・ｽp郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽy郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽ繝ｻ諠ｹ・ｼ螟ｲ・ｽ・ｿ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽj
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -267,6 +267,10 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="src\Rendering\Texture.cpp" />
     <ClCompile Include="src\Gameplay\TPSCamera.cpp" />
     <ClCompile Include="src\Rendering\WICTextureLoader11.cpp" />
+    <ClCompile Include="src\Rendering\MFVideoDecoder.cpp" />
+    <ClCompile Include="src\Rendering\VideoTexture.cpp" />
+    <ClCompile Include="src\Rendering\VideoPlayerController.cpp" />
+    <ClCompile Include="src\Scenes\LoadingMovieScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\DebugTest\DebugCamera.h" />
@@ -387,6 +391,10 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="include\Gameplay\TPSCamera.h" />
     <ClInclude Include="include\Math\Transform.h" />
     <ClInclude Include="include\Rendering\WICTextureLoader11.h" />
+    <ClInclude Include="include\Rendering\MFVideoDecoder.h" />
+    <ClInclude Include="include\Rendering\VideoTexture.h" />
+    <ClInclude Include="include\Rendering\VideoPlayerController.h" />
+    <ClInclude Include="include\Scenes\LoadingMovieScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BillboardPS.hlsl">
@@ -424,6 +432,10 @@ for %%F in ("$(TargetDir)*.cso") do (
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="SkyPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -442,12 +454,18 @@ for %%F in ("$(TargetDir)*.cso") do (
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="MeshPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="SpriteVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
@@ -456,28 +474,43 @@ for %%F in ("$(TargetDir)*.cso") do (
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="MeshVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="UiPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="UiVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\copilot-instructions.md" />
+    <None Include="context\EngineArchitecture.md" />
     <None Include="include\Engine\Component.inl" />
     <None Include="context\Component.md" />
     <None Include="context\GameObject.md" />
