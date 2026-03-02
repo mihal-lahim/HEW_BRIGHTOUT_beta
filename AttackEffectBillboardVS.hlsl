@@ -1,6 +1,6 @@
-// BillboardVS.hlsl
-// ƒtƒ‹ƒrƒ‹ƒ{[ƒh’¸“_ƒVƒF[ƒ_[
-// views—ñ‚©‚çƒJƒƒ‰‚Ìright/upƒxƒNƒgƒ‹‚ğæ“¾‚µA”Â‚ğí‚ÉƒJƒƒ‰‚ÉŒü‚¯‚é
+// AttackEffectBillboardVS.hlsl
+// Yè»¸å›ºå®šãƒ“ãƒ«ãƒœãƒ¼ãƒ‰é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼
+// Yè»¸(ä¸Šæ–¹å‘)ã‚’å›ºå®šã—ã€XZå¹³é¢ä¸Šã§ã‚«ãƒ¡ãƒ©ã«å‘ãè»¸ãƒ“ãƒ«ãƒœãƒ¼ãƒ‰
 
 cbuffer PER_CAMERA : register(b1)
 {
@@ -33,31 +33,37 @@ VS_OUTPUT main(VS_INPUT vsin)
 {
     VS_OUTPUT vsout;
 
-    // worlds—ñ‚©‚çƒ[ƒ‹ƒhÀ•Wi•½sˆÚ“®¬•ªj‚ğæ“¾
+    // ãƒ¯ãƒ¼ãƒ«ãƒ‰ä¸­å¿ƒä½ç½®
     float3 worldCenter = float3(world[3][0], world[3][1], world[3][2]);
 
-    // worlds—ñ‚©‚çƒXƒP[ƒ‹‚ğæ“¾iŠe²‚ÌƒxƒNƒgƒ‹’·j
+    // ã‚¹ã‚±ãƒ¼ãƒ«å–å¾—
     float scaleX = length(float3(world[0][0], world[0][1], world[0][2]));
     float scaleY = length(float3(world[1][0], world[1][1], world[1][2]));
 
-    // views—ñ‚©‚çƒJƒƒ‰‚Ìright/upƒxƒNƒgƒ‹‚ğæ“¾
-    // views—ñ‚Ì—ñ0 = ƒJƒƒ‰‰E•ûŒüA—ñ1 = ƒJƒƒ‰ã•ûŒüiƒ[ƒ‹ƒh‹óŠÔj
-    float3 camRight = float3(view[0][0], view[1][0], view[2][0]);
-    float3 camUp    = float3(view[0][1], view[1][1], view[2][1]);
+    // ã‚«ãƒ¡ãƒ©å‰æ–¹å‘ï¼ˆãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ï¼‰
     float3 camForward = float3(view[0][2], view[1][2], view[2][2]);
 
-    // ƒrƒ‹ƒ{[ƒh’¸“_‚ğƒ[ƒ‹ƒh‹óŠÔ‚Å\’z
-    float3 worldPos = worldCenter
-        + vsin.posL.x * scaleX * camRight
-        + vsin.posL.y * scaleY * camUp;
+    // Yè»¸å›ºå®š: upã¯å¸¸ã«ãƒ¯ãƒ¼ãƒ«ãƒ‰Y
+    float3 up = float3(0.0f, 1.0f, 0.0f);
 
-    // ƒrƒ…[ ¨ ƒvƒƒWƒFƒNƒVƒ‡ƒ“•ÏŠ·
+    // XZå¹³é¢ã§ã‚«ãƒ¡ãƒ©ã«å‘ãforwardï¼ˆYæˆåˆ†ã‚’æ½°ã—ã¦æ­£è¦åŒ–ï¼‰
+    float3 look = -camForward;
+    look.y = 0.0f;
+    look = normalize(look);
+
+    // rightã¯lookã¨upã®å¤–ç©
+    float3 right = cross(up, look);
+
+    // ãƒ“ãƒ«ãƒœãƒ¼ãƒ‰é ‚ç‚¹ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã§æ§‹ç¯‰
+    float3 worldPos = worldCenter
+        + vsin.posL.x * scaleX * right
+        + vsin.posL.y * scaleY * up;
+
+    // ãƒ“ãƒ¥ãƒ¼ â†’ ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³å¤‰æ›
     float4 viewPos = mul(float4(worldPos, 1.0f), view);
     vsout.posH = mul(viewPos, proj);
 
-    // –@ü‚ÍƒJƒƒ‰³–Ê•ûŒüiƒ‰ƒCƒeƒBƒ“ƒO—pj
-    vsout.normalW = -camForward;
-
+    vsout.normalW = look;
     vsout.color = vsin.color;
     vsout.uv = vsin.uv;
 

@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "SceneSystem.h"
 #include "InputSystem.h"
-#include "Namioka.h"
+#include "LoadingMovieScene.h"
 #include "FadeController.h"
 
 void TitleController::Start()
@@ -41,7 +41,7 @@ void TitleController::Update()
 			m_fadeController->StartFadeOut(1.0f, [this]()
 			{
 				// フェードアウト完了後にシーン切り替え
-				scene().ChangeScene<Namioka>();
+				scene().ChangeScene<LoadingMovieScene>();
 			});
 			return;
 		}
@@ -55,7 +55,7 @@ void TitleController::Update()
 		m_fadeController->StartFadeOut(1.0f, [this]()
 		{
 			// フェードアウト完了後にシーン切り替え
-			scene().ChangeScene<Namioka>();
+			scene().ChangeScene<LoadingMovieScene>();
 		});
 		return;
 	}

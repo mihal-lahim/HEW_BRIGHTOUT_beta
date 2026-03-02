@@ -12,6 +12,8 @@
 #include "Game.h"
 #include "EngineCore.h"
 #include "Window.h"
+#include <mfapi.h>
+#pragma comment(lib, "mfplat.lib")
 
 //#include "Kageyama.h"
 //#include "Kasiwagi.h"
@@ -29,6 +31,13 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	_In_ LPSTR /*lpCmdLine*/, _In_ int nCmdShow)
 {
 	(void)CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
+	// Media Foundation の初期化
+	HRESULT hrMF = MFStartup(MF_VERSION);
+	if (FAILED(hrMF))
+	{
+		OutputDebugStringA("[Main] MFStartup failed\n");
+	}
 
 	//DPIスケーリング
 	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
@@ -112,6 +121,8 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 	Mouse_Finalize();       // マウスの終了処理
 	graphicsDevice.Finalize(); // Direct3Dの終了処理
 
+	// Media Foundation の終了処理
+	MFShutdown();
 
 	CoUninitialize();
 
