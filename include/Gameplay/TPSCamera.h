@@ -9,12 +9,12 @@
 // TPSカメラ設定構造体
 struct TPSCameraCtx
 {
-    float Height = 2.0f;
+    float Height = 1.0f;
 
     float SensitivityX = 1.5f; // 水平回転感度
 	float SensitivityY = 1.5f; // 垂直（高さ）調整感度
 	float FollowSpeed = 3.0f; // 自動追従の速度
-	float Distance = 2.0f;
+	float Distance = 0.2f;
 };
 
 
