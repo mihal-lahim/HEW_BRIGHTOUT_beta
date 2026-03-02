@@ -53,11 +53,15 @@ public:
 	float AttackRange = 1.8f;
 	float AttackDamage = 10.0f;
 	float AttackInterval = 2.0f;
-	std::wstring AttackEffectTexturePath = L"texture/kazekiri_effects.png";
+	std::wstring AttackEffectTexturePath = L"texture/kiru_effects_1.png";
 	Vector3 AttackEffectOffset = Vector3(0.0f, 0.0f, 0.6f);
 	Vector3 AttackEffectScale = Vector3(0.8f, 0.8f, 0.8f);
 	float AttackEffectPitch = 180.0f;
 	float AttackEffectDuration = 0.2f;
+	int AttackEffectDirectionColumns = 1;
+	int AttackEffectDirectionRows = 1;
+	int AttackEffectDirectionFrameCount = 1;
+	float AttackEffectDirectionYawOffset = 0.0f;
 	bool UseGravity = true;
 	float Gravity = -30.0f;
 
@@ -143,6 +147,10 @@ public:
 		enemy->AttackEffectForwardDistance = AttackEffectOffset.z;
 		enemy->AttackEffectHeightOffset = AttackEffectOffset.y;
 		enemy->AttackEffectPitch = AttackEffectPitch;
+		enemy->AttackEffectDirectionColumns = AttackEffectDirectionColumns;
+		enemy->AttackEffectDirectionRows = AttackEffectDirectionRows;
+		enemy->AttackEffectDirectionFrameCount = AttackEffectDirectionFrameCount;
+		enemy->AttackEffectDirectionYawOffset = AttackEffectDirectionYawOffset;
 
 		enemy->IdleAnimationInterval = IdleAnimationInterval;
 		enemy->MoveAnimationInterval = MoveAnimationInterval;

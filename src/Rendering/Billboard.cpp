@@ -20,6 +20,7 @@ namespace
 			renderer->material.shaderProgram = nullptr;
 			renderer->renderQueue = RenderQueue::Transparent;
 			renderer->material.SetFloat4("uv_rect", { 0.0f, 0.0f, 1.0f, 1.0f });
+			renderer->material.SetFloat("uv_rotation", 0.0f);
 		}
 
 		for (auto* child : gameObject->GetChildren())
@@ -46,6 +47,7 @@ void Billboard::Awake()
 		renderer->material.shaderProgram = nullptr;
 		renderer->renderQueue = RenderQueue::Transparent;
 		renderer->material.SetFloat4("uv_rect", { 0.0f, 0.0f, 1.0f, 1.0f });
+		renderer->material.SetFloat("uv_rotation", 0.0f);
 	}
 	else
 	{
@@ -57,6 +59,7 @@ void Billboard::Awake()
 		renderer->material.shaderProgram = nullptr;
 		renderer->renderQueue = RenderQueue::Transparent;
 		renderer->material.SetFloat4("uv_rect", { 0.0f, 0.0f, 1.0f, 1.0f });
+		renderer->material.SetFloat("uv_rotation", 0.0f);
 	}
 }
 
