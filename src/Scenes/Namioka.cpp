@@ -122,6 +122,39 @@ void Namioka::Initialize()
 		road->AddComponent<PhysicsBody>(bodyDesc);
 	}
 
+	//Ground
+	ModelPrefab GroundPrefab{ "model/cube.glb" };
+	std::vector<Vector3> GroundPositions =
+	{
+		{    0.0f, -40.0f,    0.0f},   //①
+		{    0.0f, -40.0f,  -60.0f},   //②
+		{  -60.0f, -40.0f,  -60.0f},   //③
+		{  -60.0f, -40.0f, -120.0f},   //④
+		{    0.0f, -40.0f, -120.0f},   //⑤
+		{ -120.0f, -40.0f, -120.0f},   //⑥
+		{ -120.0f, -40.0f, -180.0f},   //⑦
+		{ -120.0f, -40.0f, -240.0f},   //⑧
+		{ -180.0f, -40.0f, -240.0f},   //⑨
+	};
+	for (const auto& pos : GroundPositions)
+	{
+		GameObject* road = Instantiate(GroundPrefab);
+		road->AddComponent<Road>();
+
+		road->transform().scale() = { 40.0f, 80.0f, 40.0f };
+		road->transform().position() = pos;
+
+		BoxColliderDesc shapeDesc{};
+		shapeDesc.SizeX = 1.0f;
+		shapeDesc.SizeY = 1.0f;
+		shapeDesc.SizeZ = 1.0f;
+		road->AddComponent<ColliderShape>(shapeDesc);
+
+		PhysicsBodyDesc bodyDesc{};
+		bodyDesc.Type = BodyType::STATIC;
+		road->AddComponent<PhysicsBody>(bodyDesc);
+	}
+
 	//House
 	struct HouseData
 	{
@@ -142,7 +175,7 @@ void Namioka::Initialize()
 		{ { -18.0f, 0.0f, -66.0f },	  0.0f },
 		{ {  -6.0f, 0.0f, -78.0f },	  0.0f },
 		{ { -18.0f, 0.0f, -78.0f },	  0.0f },
-		 					
+		 				
 		//③						
 		{ { -66.0f, 0.0f, -66.0f },	  0.0f },
 		{ { -78.0f, 0.0f, -66.0f },	  0.0f },
@@ -581,22 +614,22 @@ void Namioka::Initialize()
 		//③							
 		{ { -71.0f, 0.0f, -71.0f },	  0.0f },
 		 							  
-		//④							
+		//④						
 		{ { -71.0f, 0.0f, -131.0f },  0.0f },
 		 							
-		//⑤							
+		//⑤						
 		{ { -11.0f, 0.0f, -131.0f },  0.0f },
 		 							
-		//⑥							
+		//⑥						
 		{ { -131.0f, 0.0f, -131.0f }, 0.0f },
 									
-		//⑦							
+		//⑦						
 		{ { -131.0f, 0.0f, -191.0f }, 0.0f },
 									 
-		//⑧							
+		//⑧						
 		{ { -131.0f, 0.0f, -251.0f }, 0.0f },
 		 							
-		//⑨							
+		//⑨						
 		{ { -191.0f, 0.0f, -251.0f }, 0.0f },
 	};
 	for (const auto& data : clocktowerList)
@@ -751,188 +784,222 @@ void Namioka::Initialize()
 	}
 
 	//dentyuu
-	ModelPrefab dentyuuPrefab{ "model/dentyuu.glb" };
-	std::vector<Vector3> dentyuuPositions =
+	struct DentyuuData
 	{
-		//①
-		{   3.0f, 2.0f,  10.0f },
-		{   3.0f, 2.0f,  20.0f },
-		{  -3.0f, 2.0f,  10.0f },
-		{  -3.0f, 2.0f,  20.0f },
-		{   3.0f, 2.0f, -10.0f },
-		{   3.0f, 2.0f, -20.0f },
-		{  -3.0f, 2.0f, -10.0f },
-		{  -3.0f, 2.0f, -20.0f },
-		{   9.0f, 2.0f,   3.0f },
-		{  18.0f, 2.0f,   3.0f },
-		{   9.0f, 2.0f,  -3.0f },
-		{  18.0f, 2.0f,  -3.0f },
-		{  -9.0f, 2.0f,   3.0f },
-		{ -18.0f, 2.0f,   3.0f },
-		{  -9.0f, 2.0f,  -3.0f },
-		{ -18.0f, 2.0f,  -3.0f },
-
-		//②
-		{   3.0f, 2.0f, -50.0f },
-		{   3.0f, 2.0f, -40.0f },
-		{  -3.0f, 2.0f, -50.0f },
-		{  -3.0f, 2.0f, -40.0f },
-		{   3.0f, 2.0f, -70.0f },
-		{   3.0f, 2.0f, -80.0f },
-		{  -3.0f, 2.0f, -70.0f },
-		{  -3.0f, 2.0f, -80.0f },
-		{   9.0f, 2.0f, -57.0f },
-		{  18.0f, 2.0f, -57.0f },
-		{   9.0f, 2.0f, -63.0f },
-		{  18.0f, 2.0f, -63.0f },
-		{  -9.0f, 2.0f, -57.0f },
-		{ -18.0f, 2.0f, -57.0f },
-		{  -9.0f, 2.0f, -63.0f },
-		{ -18.0f, 2.0f, -63.0f },
-
-		//③
-		{ -57.0f, 2.0f, -50.0f },
-		{ -57.0f, 2.0f, -40.0f },
-		{ -63.0f, 2.0f, -50.0f },
-		{ -63.0f, 2.0f, -40.0f },
-		{ -57.0f, 2.0f, -70.0f },
-		{ -57.0f, 2.0f, -80.0f },
-		{ -63.0f, 2.0f, -70.0f },
-		{ -63.0f, 2.0f, -80.0f },
-		{ -51.0f, 2.0f, -57.0f },
-		{ -42.0f, 2.0f, -57.0f },
-		{ -51.0f, 2.0f, -63.0f },
-		{ -42.0f, 2.0f, -63.0f },
-		{ -69.0f, 2.0f, -57.0f },
-		{ -78.0f, 2.0f, -57.0f },
-		{ -69.0f, 2.0f, -63.0f },
-		{ -78.0f, 2.0f, -63.0f },
-
-		//④
-		{ -57.0f, 2.0f, -110.0f },
-		{ -57.0f, 2.0f, -100.0f },
-		{ -63.0f, 2.0f, -110.0f },
-		{ -63.0f, 2.0f, -100.0f },
-		{ -57.0f, 2.0f, -130.0f },
-		{ -57.0f, 2.0f, -140.0f },
-		{ -63.0f, 2.0f, -130.0f },
-		{ -63.0f, 2.0f, -140.0f },
-		{ -51.0f, 2.0f, -117.0f },
-		{ -42.0f, 2.0f, -117.0f },
-		{ -51.0f, 2.0f, -123.0f },
-		{ -42.0f, 2.0f, -123.0f },
-		{ -69.0f, 2.0f, -117.0f },
-		{ -78.0f, 2.0f, -117.0f },
-		{ -69.0f, 2.0f, -123.0f },
-		{ -78.0f, 2.0f, -123.0f },
-
-		//⑤
-		{   3.0f, 2.0f, -110.0f },
-		{   3.0f, 2.0f, -100.0f },
-		{  -3.0f, 2.0f, -110.0f },
-		{  -3.0f, 2.0f, -100.0f },
-		{   3.0f, 2.0f, -130.0f },
-		{   3.0f, 2.0f, -140.0f },
-		{  -3.0f, 2.0f, -130.0f },
-		{  -3.0f, 2.0f, -140.0f },
-		{   9.0f, 2.0f, -117.0f },
-		{  18.0f, 2.0f, -117.0f },
-		{   9.0f, 2.0f, -123.0f },
-		{  18.0f, 2.0f, -123.0f },
-		{  -9.0f, 2.0f, -117.0f },
-		{ -18.0f, 2.0f, -117.0f },
-		{  -9.0f, 2.0f, -123.0f },
-		{ -18.0f, 2.0f, -123.0f },
-
-		//⑥
-		{ -117.0f, 2.0f, -110.0f },
-		{ -117.0f, 2.0f, -100.0f },
-		{ -123.0f, 2.0f, -110.0f },
-		{ -123.0f, 2.0f, -100.0f },
-		{ -117.0f, 2.0f, -130.0f },
-		{ -117.0f, 2.0f, -140.0f },
-		{ -123.0f, 2.0f, -130.0f },
-		{ -123.0f, 2.0f, -140.0f },
-		{ -111.0f, 2.0f, -117.0f },
-		{ -102.0f, 2.0f, -117.0f },
-		{ -111.0f, 2.0f, -123.0f },
-		{ -102.0f, 2.0f, -123.0f },
-		{ -129.0f, 2.0f, -117.0f },
-		{ -138.0f, 2.0f, -117.0f },
-		{ -129.0f, 2.0f, -123.0f },
-		{ -138.0f, 2.0f, -123.0f },
-
-		//⑦
-		{ -117.0f, 2.0f, -170.0f },
-		{ -117.0f, 2.0f, -160.0f },
-		{ -123.0f, 2.0f, -170.0f },
-		{ -123.0f, 2.0f, -160.0f },
-		{ -117.0f, 2.0f, -190.0f },
-		{ -117.0f, 2.0f, -200.0f },
-		{ -123.0f, 2.0f, -190.0f },
-		{ -123.0f, 2.0f, -200.0f },
-		{ -111.0f, 2.0f, -177.0f },
-		{ -102.0f, 2.0f, -177.0f },
-		{ -111.0f, 2.0f, -183.0f },
-		{ -102.0f, 2.0f, -183.0f },
-		{ -129.0f, 2.0f, -177.0f },
-		{ -138.0f, 2.0f, -177.0f },
-		{ -129.0f, 2.0f, -183.0f },
-		{ -138.0f, 2.0f, -183.0f },
-
-		//⑧
-		{ -117.0f, 2.0f, -230.0f },
-		{ -117.0f, 2.0f, -220.0f },
-		{ -123.0f, 2.0f, -230.0f },
-		{ -123.0f, 2.0f, -220.0f },
-		{ -117.0f, 2.0f, -250.0f },
-		{ -117.0f, 2.0f, -260.0f },
-		{ -123.0f, 2.0f, -250.0f },
-		{ -123.0f, 2.0f, -260.0f },
-		{ -111.0f, 2.0f, -237.0f },
-		{ -102.0f, 2.0f, -237.0f },
-		{ -111.0f, 2.0f, -243.0f },
-		{ -102.0f, 2.0f, -243.0f },
-		{ -129.0f, 2.0f, -237.0f },
-		{ -138.0f, 2.0f, -237.0f },
-		{ -129.0f, 2.0f, -243.0f },
-		{ -138.0f, 2.0f, -243.0f },
-
-		//⑨
-		{ -177.0f, 2.0f, -230.0f },
-		{ -177.0f, 2.0f, -220.0f },
-		{ -183.0f, 2.0f, -230.0f },
-		{ -183.0f, 2.0f, -220.0f },
-		{ -177.0f, 2.0f, -250.0f },
-		{ -177.0f, 2.0f, -260.0f },
-		{ -183.0f, 2.0f, -250.0f },
-		{ -183.0f, 2.0f, -260.0f },
-		{ -171.0f, 2.0f, -237.0f },
-		{ -162.0f, 2.0f, -237.0f },
-		{ -171.0f, 2.0f, -243.0f },
-		{ -162.0f, 2.0f, -243.0f },
-		{ -189.0f, 2.0f, -237.0f },
-		{ -198.0f, 2.0f, -237.0f },
-		{ -189.0f, 2.0f, -243.0f },
-		{ -198.0f, 2.0f, -243.0f },
+		Vector3 position;
+		Vector3 scale;
+		float yRotation; // Y軸回転（度）
 	};
-	for (const auto& pos : dentyuuPositions)
+	ModelPrefab dentyuuPrefab{ "model/dentyuu.glb" };
+
+	// 各区画のオフセット中心位置
+	std::vector<Vector3> blockCenters =
 	{
-		GameObject* dentyuu = Instantiate(dentyuuPrefab);
-		dentyuu->AddComponent<Dentyuu>();
+		{    0.0f, 0.0f,    0.0f },   //①
+		{    0.0f, 0.0f,  -60.0f },   //②
+		{  -60.0f, 0.0f,  -60.0f },   //③
+		{  -60.0f, 0.0f, -120.0f },   //④
+		{    0.0f, 0.0f, -120.0f },   //⑤
+		{ -120.0f, 0.0f, -120.0f },   //⑥
+		{ -120.0f, 0.0f, -180.0f },   //⑦
+		{ -120.0f, 0.0f, -240.0f },   //⑧
+		{ -180.0f, 0.0f, -240.0f },   //⑨
+	};
 
-		dentyuu->transform().scale() = { 10.0f, 8.0f, 10.0f };
-		dentyuu->transform().position() = pos;
+	// 区画内の電柱ローカル座標（16本/区画）
+	// 0-1: +X側縦 上方向, 2-3: -X側縦 上方向
+	// 4-5: +X側縦 下方向, 6-7: -X側縦 下方向
+	// 8-9: +Z側横 右方向, 10-11: -Z側横 右方向
+	// 12-13: +Z側横 左方向, 14-15: -Z側横 左方向
+	std::vector<Vector3> localDentyuuOffsets =
+	{
+		{   3.0f, 2.0f,  10.0f },  // 0
+		{   3.0f, 2.0f,  20.0f },  // 1
+		{  -3.0f, 2.0f,  10.0f },  // 2
+		{  -3.0f, 2.0f,  20.0f },  // 3
+		{   3.0f, 2.0f, -10.0f },  // 4
+		{   3.0f, 2.0f, -18.0f },  // 5
+		{  -3.0f, 2.0f, -10.0f },  // 6
+		{  -3.0f, 2.0f, -18.0f },  // 7
+		{   9.0f, 2.0f,   3.0f },  // 8
+		{  20.0f, 2.0f,   3.0f },  // 9
+		{   9.0f, 2.0f,  -3.0f },  // 10
+		{  20.0f, 2.0f,  -3.0f },  // 11
+		{  -9.0f, 2.0f,   3.0f },  // 12
+		{ -20.0f, 2.0f,   3.0f },  // 13
+		{  -9.0f, 2.0f,  -3.0f },  // 14
+		{ -20.0f, 2.0f,  -3.0f },  // 15
+	};
 
-		BoxColliderDesc shapeDesc{};
-		shapeDesc.SizeX = 0.1f;
-		shapeDesc.SizeY = 0.5f;
-		shapeDesc.SizeZ = 0.1f;
-		dentyuu->AddComponent<ColliderShape>(shapeDesc);
+	// 電柱のデフォルトスケール・回転
+	Vector3 dentyuuDefaultScale = { 10.0f, 8.0f, 10.0f };
+	float dentyuuDefaultRotation = 0.0f;
 
-		PhysicsBodyDesc bodyDesc{};
-		bodyDesc.Type = BodyType::STATIC;
-		dentyuu->AddComponent<PhysicsBody>(bodyDesc);
+	// コライダー設定
+	float dentyuuColliderX = 0.1f;
+	float dentyuuColliderY = 0.5f;
+	float dentyuuColliderZ = 0.1f;
+
+	// 区画内の電柱接続ペアの定義構造体
+	struct DensenPairData
+	{
+		int localA;  // 接続元の電柱ローカルインデックス
+		int localB;    // 接続先の電柱ローカルインデックス
+		Vector3 posOffset;     // 位置オフセット（自動計算された中間点からの追加ずらし）
+		Vector3 scaleOverride; // スケールオーバーライド（0,0,0 なら自動計算）
+		float rotOverride;     // Y軸回転オーバーライド（度）（-999 なら自動計算）
+	};
+
+	// 区画内の電柱接続ペア（ローカルインデックス同士)
+	// posOffset: 自動計算された中間点からの追加オフセット（常に加算される）
+	// scaleOverride が (0,0,0) の場合は自動計算
+	// rotOverride が -999 の場合は自動計算
+	std::vector<DensenPairData> intraDentyuuPairs =
+	{
+		// === 各道路沿いの隣接電柱（同じ側） ===
+		{ 0, 1,   {0,-1.0f,5}, {0,0,0}, -999.0f }, 
+		{ 2, 3,   {0,-1.0f,5}, {0,0,0}, -999.0f }, 
+		{ 4, 5,   {0,-1.0f,-4}, {0,0,0}, -999.0f }, 
+		{ 6, 7,   {0,-1.0f,-4}, {0,0,0}, -999.0f }, 
+		{ 8, 9,   {5.0f,-1.0f,0}, {0,0,0}, -999.0f },  
+		{ 10, 11, {5.0f,-1.0f,0}, {0,0,0}, -999.0f },  
+		{ 12, 13, {-5.0f,-1.0,0}, {0,0,0}, -999.0f },  
+		{ 14, 15, {-5.0f,-1.0,0}, {0,0,0}, -999.0f },  
+
+		// === 外周の接続（十字の外縁を一周） ===
+		{ 3, 1,   {3,-1.0f,0}, {0,0,0}, -999.0f }, 
+		{ 7, 5, {3,-1.0f,0}, {0,0,0}, -999.0f }, 
+		//{ 1, 9,   {-9,-1.0f,-1}, {0,0,0}, -999.0f },  // 右上角
+		{ 9, 11,  {0,-1.0f,-3}, {0,0,0}, -999.0f }, 
+		//{ 11, 5,  {0,-1.0f,0}, {0,0,0}, -999.0f },  // 右下角
+		//{ 3, 13,  {0,0,0}, {0,0,0}, -999.0f },  // 左上角
+		{ 13, 15, {0,-1.0,-3}, {0,0,0}, -999.0f },  
+		//{ 15, 7,  {0,0,0}, {0,0,0}, -999.0f },  // 左下角
+	};
+
+	// === 区画内電線のスケール・位置調整パラメータ ===
+	// 電線のベーススケール（X, Y は固定、Z は距離に応じて自動調整）
+	float densenBaseScaleX = 0.1f;
+	float densenBaseScaleY = 0.2f;
+	// 距離→Zスケール変換係数（dist * この値 = scaleZ）
+	float densenDistToScaleZ = 0.007f;
+	// 電線の位置オフセット（中間点からの追加オフセット）
+	Vector3 densenPositionOffset = { 0.0f, 0.0f, 0.0f };
+
+	// 全区画の全電柱の PoleID を保持する（区画数 × 16本)
+	constexpr int POLES_PER_BLOCK = 16;
+	std::vector<PoleID> dentyuuPoleIDs;
+	dentyuuPoleIDs.reserve(blockCenters.size() * POLES_PER_BLOCK);
+
+	for (size_t blockIdx = 0; blockIdx < blockCenters.size(); ++blockIdx)
+	{
+		const auto& center = blockCenters[blockIdx];
+
+		for (size_t localIdx = 0; localIdx < localDentyuuOffsets.size(); ++localIdx)
+		{
+			Vector3 pos = center + localDentyuuOffsets[localIdx];
+
+			GameObject* dentyuu = Instantiate(dentyuuPrefab);
+			dentyuu->AddComponent<Dentyuu>();
+
+			// Pole コンポーネントを追加して PoleManager に登録
+			auto* pole = dentyuu->AddComponent<Pole>();
+			PoleID pid = poleManager->RegisterPole(pole);
+			dentyuuPoleIDs.push_back(pid);
+
+			dentyuu->transform().scale() = dentyuuDefaultScale;
+			dentyuu->transform().position() = pos;
+
+			if (dentyuuDefaultRotation != 0.0f)
+			{
+				XMVECTOR q = XMQuaternionRotationRollPitchYaw(
+					0.0f,
+					XMConvertToRadians(dentyuuDefaultRotation),
+					0.0f
+				);
+				dentyuu->transform().rotation().FromXMVECTOR(q);
+			}
+
+			BoxColliderDesc shapeDesc{};
+			shapeDesc.SizeX = dentyuuColliderX;
+			shapeDesc.SizeY = dentyuuColliderY;
+			shapeDesc.SizeZ = dentyuuColliderZ;
+			dentyuu->AddComponent<ColliderShape>(shapeDesc);
+
+			PhysicsBodyDesc bodyDesc{};
+			bodyDesc.Type = BodyType::STATIC;
+			dentyuu->AddComponent<PhysicsBody>(bodyDesc);
+		}
+	}
+
+	// 区画内電柱間の PowerLine を生成
+	ModelPrefab densenPrefab{ "model/special_densen.glb" };
+
+	for (size_t blockIdx = 0; blockIdx < blockCenters.size(); ++blockIdx)
+	{
+		int blockBase = static_cast<int>(blockIdx) * POLES_PER_BLOCK;
+
+		for (const auto& pairData : intraDentyuuPairs)
+		{
+			PoleID poleA = dentyuuPoleIDs[blockBase + pairData.localA];
+			PoleID poleB = dentyuuPoleIDs[blockBase + pairData.localB];
+
+			// 電線オブジェクトを生成
+			GameObject* densen = Instantiate(densenPrefab);
+			densen->AddComponent<SpecialDensen>();
+
+			auto* line = densen->AddComponent<PowerLine>(poleA, poleB);
+			poleManager->RegisterPowerLine(line);
+
+			Pole* pA = poleManager->GetPole(poleA);
+			Pole* pB = poleManager->GetPole(poleB);
+			Vector3 diff = pB->GetTopPos() - pA->GetTopPos();
+			float dist = sqrtf(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
+
+			// --- 位置 ---
+			// 自動計算: 2本の電柱の中間点 + グローバルオフセット + 個別オフセット
+			{
+				Vector3 midPos = (pA->GetTopPos() + pB->GetTopPos()) * 0.5f;
+				densen->transform().position() = midPos + densenPositionOffset + pairData.posOffset;
+			}
+
+			// --- 回転 ---
+			if (pairData.rotOverride > -998.0f)
+			{
+				// オーバーライド値（度）
+				XMVECTOR q = XMQuaternionRotationRollPitchYaw(0.0f, XMConvertToRadians(pairData.rotOverride), 0.0f);
+				densen->transform().rotation().FromXMVECTOR(q);
+			}
+			else
+			{
+				// 自動計算: 電柱間の方向
+				float yAngle = atan2f(diff.x, diff.z);
+				XMVECTOR q = XMQuaternionRotationRollPitchYaw(0.0f, yAngle, 0.0f);
+				densen->transform().rotation().FromXMVECTOR(q);
+			}
+
+			// --- スケール ---
+			{
+				// 自動計算ベース値
+				Vector3 autoScale = { densenBaseScaleX, densenBaseScaleY, dist * densenDistToScaleZ };
+				// 各軸: オーバーライド値が0でなければそれを使い、0なら自動計算値を使う
+				Vector3 finalScale;
+				finalScale.x = (pairData.scaleOverride.x != 0.0f) ? pairData.scaleOverride.x : autoScale.x;
+				finalScale.y = (pairData.scaleOverride.y != 0.0f) ? pairData.scaleOverride.y : autoScale.y;
+				finalScale.z = (pairData.scaleOverride.z != 0.0f) ? pairData.scaleOverride.z : autoScale.z;
+				densen->transform().scale() = finalScale;
+			}
+
+			BoxColliderDesc shapeDesc{};
+			shapeDesc.SizeX = 1.0f;
+			shapeDesc.SizeY = 1.0f;
+			shapeDesc.SizeZ = 1.0f;
+			densen->AddComponent<ColliderShape>(shapeDesc);
+
+			PhysicsBodyDesc bodyDesc{};
+			bodyDesc.Type = BodyType::STATIC;
+			densen->AddComponent<PhysicsBody>(bodyDesc);
+		}
 	}
 
 	//Special_Dentyuu
@@ -991,11 +1058,9 @@ void Namioka::Initialize()
 		 							
 		//⑨→⑧						
 		{ { -138.0f, 0.0f, -240.0f },  0.0f },
-
-
 	};
 
-	// SpecialPole
+	//全特殊電柱のPoleIDを保持
 	std::vector<PoleID> specialPoleIDs;
 	specialPoleIDs.reserve(spedentyuList.size());
 
@@ -1076,20 +1141,20 @@ void Namioka::Initialize()
 	};
 	for (size_t index = 0; index < spedensenList.size(); ++index)
 	{
+		const auto& data = spedensenList.at(index);
+
 
 		GameObject* spedensen = Instantiate(spedensenPrefab);
-		const auto& data = spedensenList.at(index);
-		GameObject* spedentyuu = Instantiate(spedensenPrefab);
-		spedentyuu->AddComponent<SpecialDensen>();
+		spedensen->AddComponent<SpecialDensen>();
+
 		if (index < specialLinePolePairs.size() && specialPoleIDs.size() > specialLinePolePairs.at(index).second)
 		{
 			auto [startIndex, endIndex] = specialLinePolePairs.at(index);
-			auto* line = spedentyuu->AddComponent<PowerLine>(specialPoleIDs.at(startIndex), specialPoleIDs.at(endIndex));
+			auto* line = spedensen->AddComponent<PowerLine>(specialPoleIDs.at(startIndex), specialPoleIDs.at(endIndex));
 			poleManager->RegisterPowerLine(line);
 		}
 
-
-		spedensen->transform().scale() = { 0.2f,0.2f,0.18f };
+		spedensen->transform().scale() = { 0.2f, 0.2f, 0.18f };
 		spedensen->transform().position() = data.position;
 
 		XMVECTOR q = XMQuaternionRotationRollPitchYaw(
