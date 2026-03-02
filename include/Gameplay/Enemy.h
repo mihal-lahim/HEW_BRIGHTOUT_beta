@@ -5,7 +5,9 @@
 
 #include "GameObject.h"
 #include "GameTime.h"
+#include "Health.h"
 #include "Ray.h"
+#include "Renderer.h"
 #include <vector>
 
 class GameObject;
@@ -46,11 +48,21 @@ public:
 	GameObject* modelObject = nullptr;
 	std::vector<GameObject*> idleModelObjects{};
 	std::vector<GameObject*> moveModelObjects{};
+	std::vector<GameObject*> attackModelObjects{};
 	std::vector<GameObject*> deadModelObjects{};
 	float IdleAnimationInterval = 0.35f;
 	float MoveAnimationInterval = 0.12f;
+	float AttackAnimationInterval = 0.12f;
 	float DeadAnimationInterval = 0.1f;
 	float DeadDuration = 0.5f;
+	float AttackRange = 1.8f;
+	float AttackDamage = 10.0f;
+	float AttackInterval = 2.0f;
+	GameObject* attackEffectObject = nullptr;
+	float AttackEffectDuration = 0.2f;
+	float AttackEffectForwardDistance = 0.6f;
+	float AttackEffectHeightOffset = 0.0f;
+	float AttackEffectPitch = 180.0f;
 
 	bool IsDefeated() const { return m_IsDefeated; }
 	void OnDefeated()
@@ -60,6 +72,10 @@ public:
 
 		m_IsDefeated = true;
 		m_DeadTimer = 0.0f;
+		if (attackEffectObject)
+		{
+			SetEnemyActiveRecursive(attackEffectObject, false);
+		}
 		SetAnimationMode(AnimationMode::Dead);
 	}
 
@@ -89,6 +105,17 @@ public:
 
 	void Update() override
 	{
+		float deltaTime = (float)Time::DeltaTime();
+		if (m_AttackCooldownTimer > 0.0f)
+		{
+			m_AttackCooldownTimer -= deltaTime;
+			if (m_AttackCooldownTimer < 0.0f)
+			{
+				m_AttackCooldownTimer = 0.0f;
+			}
+		}
+		UpdateAttackEffect(deltaTime);
+
 		if (gameObject().transform().position().y < FallDestroyY)
 		{
 			m_DestroyedByFall = true;
@@ -108,8 +135,8 @@ public:
 
 		if (m_IsDefeated)
 		{
-			m_DeadTimer += (float)Time::DeltaTime();
-			UpdateAnimation((float)Time::DeltaTime());
+			m_DeadTimer += deltaTime;
+			UpdateAnimation(deltaTime);
 			if (m_DeadTimer >= DeadDuration)
 			{
 				DestroyEnemyRecursive(&gameObject());
@@ -130,12 +157,36 @@ public:
 		direction.y = 0.0f;
 
 		float length = direction.Length();
+		if (length <= AttackRange)
+		{
+			MoveVec = { 0.0f, 0.0f, 0.0f };
+
+			if (length > 0.001f)
+			{
+				MoveVec = direction.Normalize();
+				RotateByMoveVec();
+				MoveVec = { 0.0f, 0.0f, 0.0f };
+			}
+
+			SetAnimationMode(AnimationMode::Attack);
+			UpdateAnimation(deltaTime);
+			TryAttackTarget();
+
+			if (m_isMoving && m_MoveSE >= 0)
+			{
+				StopAudio(m_MoveSE);
+				m_isMoving = false;
+			}
+
+			return;
+		}
+
 		if (length <= 0.1f)
 		{
 			MoveVec = { 0.0f, 0.0f, 0.0f };
 
 			SetAnimationMode(AnimationMode::Idle);
-			UpdateAnimation((float)Time::DeltaTime());
+			UpdateAnimation(deltaTime);
 
 			// ’âŽ~‚µ‚½‚çSE‚ðŽ~‚ß‚é
 			if (m_isMoving && m_MoveSE >= 0)
@@ -157,12 +208,18 @@ public:
 		MoveVec = direction.Normalize() * MoveSpeed;
 		RotateByMoveVec();
 		SetAnimationMode(AnimationMode::Move);
-		UpdateAnimation((float)Time::DeltaTime());
+		UpdateAnimation(deltaTime);
 	}
 
 	// “|‚³‚ê‚½/DestroyŽž‚ÉŒÄ‚Î‚ê‚é
 	void OnDestroy() override
 	{
+		if (attackEffectObject)
+		{
+			DestroyEnemyRecursive(attackEffectObject);
+			attackEffectObject = nullptr;
+		}
+
 		// ˆÚ“®’†‚Ìƒ‹[ƒvSE‚ðŽ~‚ß‚é
 		if (m_isMoving && m_MoveSE >= 0)
 		{
@@ -184,6 +241,7 @@ private:
 	{
 		Idle,
 		Move,
+		Attack,
 		Dead,
 	};
 
@@ -194,10 +252,78 @@ private:
 	float m_DeadTimer = 0.0f;
 	float m_IdleAnimationTimer = 0.0f;
 	float m_MoveAnimationTimer = 0.0f;
+	float m_AttackAnimationTimer = 0.0f;
 	float m_DeadAnimationTimer = 0.0f;
+	float m_AttackCooldownTimer = 0.0f;
+	float m_AttackEffectTimer = 0.0f;
 	size_t m_IdleAnimationIndex = 0;
 	size_t m_MoveAnimationIndex = 0;
+	size_t m_AttackAnimationIndex = 0;
 	size_t m_DeadAnimationIndex = 0;
+
+	void UpdateAttackEffect(float deltaTime)
+	{
+		if (!attackEffectObject)
+			return;
+
+		if (m_AttackEffectTimer > 0.0f)
+		{
+			UpdateAttackEffectTransform();
+			m_AttackEffectTimer -= deltaTime;
+			if (m_AttackEffectTimer <= 0.0f)
+			{
+				m_AttackEffectTimer = 0.0f;
+				SetEnemyActiveRecursive(attackEffectObject, false);
+			}
+		}
+	}
+
+	void TriggerAttackEffect()
+	{
+		if (!attackEffectObject)
+			return;
+		UpdateAttackEffectTransform();
+
+		SetEnemyActiveRecursive(attackEffectObject, true);
+
+		m_AttackEffectTimer = AttackEffectDuration > 0.0f ? AttackEffectDuration : 0.05f;
+	}
+
+	void UpdateAttackEffectTransform()
+	{
+		if (!attackEffectObject)
+			return;
+
+		Vector3 attackDirection = Vector3(0.0f, 0.0f, 1.0f);
+		if (m_target)
+		{
+			attackDirection = m_target->transform().position() - gameObject().transform().position();
+			attackDirection.y = 0.0f;
+		}
+
+		if (!attackDirection.IsZero())
+		{
+			attackDirection = attackDirection.Normalize();
+		}
+
+		attackEffectObject->transform().position() = gameObject().transform().position()
+			+ (attackDirection * AttackEffectForwardDistance)
+			+ Vector3(0.0f, AttackEffectHeightOffset, 0.0f);
+	}
+
+	void TryAttackTarget()
+	{
+		if (!m_target || m_AttackCooldownTimer > 0.0f)
+			return;
+
+		auto* targetHealth = m_target->GetComponent<Health>();
+		if (!targetHealth || !targetHealth->IsAlive())
+			return;
+
+		targetHealth->TakeDamage(AttackDamage);
+		TriggerAttackEffect();
+		m_AttackCooldownTimer = AttackInterval >= 2.0f ? AttackInterval : 2.0f;
+	}
 
 	void HideAllModels()
 	{
@@ -206,6 +332,10 @@ private:
 			if (model) SetEnemyActiveRecursive(model, false);
 		}
 		for (auto* model : moveModelObjects)
+		{
+			if (model) SetEnemyActiveRecursive(model, false);
+		}
+		for (auto* model : attackModelObjects)
 		{
 			if (model) SetEnemyActiveRecursive(model, false);
 		}
@@ -226,7 +356,7 @@ private:
 		}
 	}
 
-	void AdvanceAnimationGroup(std::vector<GameObject*>& models, size_t& index, float& timer, float interval, float deltaTime)
+	void AdvanceAnimationGroup(std::vector<GameObject*>& models, size_t& index, float& timer, float interval, float deltaTime, bool loop = true)
 	{
 		if (models.size() <= 1 || interval <= 0.0f)
 			return;
@@ -236,10 +366,13 @@ private:
 			return;
 
 		timer -= interval;
+		if (!loop && index + 1 >= models.size())
+			return;
+
 		if (models[index])
 			SetEnemyActiveRecursive(models[index], false);
 
-		index = (index + 1) % models.size();
+		index = loop ? (index + 1) % models.size() : (index + 1);
 		if (models[index])
 			SetEnemyActiveRecursive(models[index], true);
 	}
@@ -255,6 +388,10 @@ private:
 		if (m_AnimationMode == AnimationMode::Move)
 		{
 			ResetAnimationGroup(moveModelObjects, m_MoveAnimationIndex, m_MoveAnimationTimer);
+		}
+		else if (m_AnimationMode == AnimationMode::Attack)
+		{
+			ResetAnimationGroup(attackModelObjects, m_AttackAnimationIndex, m_AttackAnimationTimer);
 		}
 		else if (m_AnimationMode == AnimationMode::Dead)
 		{
@@ -276,10 +413,15 @@ private:
 			if (!moveModelObjects.empty())
 				AdvanceAnimationGroup(moveModelObjects, m_MoveAnimationIndex, m_MoveAnimationTimer, MoveAnimationInterval, deltaTime);
 		}
+		else if (m_AnimationMode == AnimationMode::Attack)
+		{
+			if (!attackModelObjects.empty())
+				AdvanceAnimationGroup(attackModelObjects, m_AttackAnimationIndex, m_AttackAnimationTimer, AttackAnimationInterval, deltaTime);
+		}
 		else if (m_AnimationMode == AnimationMode::Dead)
 		{
 			if (!deadModelObjects.empty())
-				AdvanceAnimationGroup(deadModelObjects, m_DeadAnimationIndex, m_DeadAnimationTimer, DeadAnimationInterval, deltaTime);
+				AdvanceAnimationGroup(deadModelObjects, m_DeadAnimationIndex, m_DeadAnimationTimer, DeadAnimationInterval, deltaTime, false);
 		}
 		else
 		{

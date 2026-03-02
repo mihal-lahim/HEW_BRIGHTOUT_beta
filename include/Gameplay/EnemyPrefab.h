@@ -8,6 +8,8 @@
 #include "Quaternion.h"
 #include "ColliderShape.h"
 #include "PhysicsBody.h"
+#include "Renderer.h"
+#include "Billboard.h"
 #include <string>
 #include <vector>
 #include <exception>
@@ -18,7 +20,7 @@ class EnemyPrefab : public Prefab
 public:
 	std::vector<std::string> IdleModelPaths =
 	{
-		"model/E_run_01.fbx"
+		"model/E_kougeki_01.fbx"
 	};
 	std::vector<std::string> MoveModelPaths =
 	{
@@ -27,6 +29,14 @@ public:
 		"model/E_run_03.fbx",
 		"model/E_run_04.fbx",
 		"model/E_run_05.fbx",
+	};
+	std::vector<std::string> AttackModelPaths =
+	{
+		"model/E_kougeki_01.fbx",
+		"model/E_kougeki_02.fbx",
+		"model/E_kougeki_03.fbx",
+		"model/E_kougeki_04.fbx",
+		"model/E_kougeki_05.fbx"
 	};
 	std::vector<std::string> DeadModelPaths =
 	{
@@ -37,8 +47,17 @@ public:
 	};
 	float IdleAnimationInterval = 0.35f;
 	float MoveAnimationInterval = 0.12f;
+	float AttackAnimationInterval = 0.12f;
 	float DeadAnimationInterval = 0.1f;
 	float DeadDuration = 0.5f;
+	float AttackRange = 1.8f;
+	float AttackDamage = 10.0f;
+	float AttackInterval = 2.0f;
+	std::wstring AttackEffectTexturePath = L"texture/kazekiri_effects.png";
+	Vector3 AttackEffectOffset = Vector3(0.0f, 0.0f, 0.6f);
+	Vector3 AttackEffectScale = Vector3(0.8f, 0.8f, 0.8f);
+	float AttackEffectPitch = 180.0f;
+	float AttackEffectDuration = 0.2f;
 	bool UseGravity = true;
 	float Gravity = -30.0f;
 
@@ -55,6 +74,7 @@ public:
 		enemy->modelObject = modelRoot;
 		enemy->idleModelObjects.clear();
 		enemy->moveModelObjects.clear();
+		enemy->attackModelObjects.clear();
 		enemy->deadModelObjects.clear();
 
 		auto instantiatePseudoAnimationModels = [&](const std::vector<std::string>& modelPaths, std::vector<GameObject*>& outModels)
@@ -93,6 +113,7 @@ public:
 
 		instantiatePseudoAnimationModels(IdleModelPaths, enemy->idleModelObjects);
 		instantiatePseudoAnimationModels(MoveModelPaths, enemy->moveModelObjects);
+		instantiatePseudoAnimationModels(AttackModelPaths, enemy->attackModelObjects);
 		instantiatePseudoAnimationModels(DeadModelPaths, enemy->deadModelObjects);
 
 		if (!enemy->idleModelObjects.empty())
@@ -106,10 +127,31 @@ public:
 
 		modelRoot->transform().scale() = Vector3(0.01f, 0.01f, 0.01f);
 		modelRoot->transform().rotation() = Quaternion::SetEulerY(180.0f);
+
+		GameObject* attackEffectObject = gameObject.CreateGameObject();
+		auto* attackEffectRenderer = attackEffectObject->AddComponent<MeshRenderer>();
+		attackEffectRenderer->material.texturePath = AttackEffectTexturePath;
+		attackEffectRenderer->material.texture = nullptr;
+		attackEffectRenderer->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
+		attackEffectObject->AddComponent<Billboard>();
+		attackEffectObject->transform().position() = gameObject.transform().position() + AttackEffectOffset;
+		attackEffectObject->transform().rotation() = Quaternion::SetEulerX(AttackEffectPitch);
+		attackEffectObject->transform().scale() = AttackEffectScale;
+		attackEffectObject->SetActive(false);
+		enemy->attackEffectObject = attackEffectObject;
+		enemy->AttackEffectDuration = AttackEffectDuration;
+		enemy->AttackEffectForwardDistance = AttackEffectOffset.z;
+		enemy->AttackEffectHeightOffset = AttackEffectOffset.y;
+		enemy->AttackEffectPitch = AttackEffectPitch;
+
 		enemy->IdleAnimationInterval = IdleAnimationInterval;
 		enemy->MoveAnimationInterval = MoveAnimationInterval;
+		enemy->AttackAnimationInterval = AttackAnimationInterval;
 		enemy->DeadAnimationInterval = DeadAnimationInterval;
 		enemy->DeadDuration = DeadDuration;
+		enemy->AttackRange = AttackRange;
+		enemy->AttackDamage = AttackDamage;
+		enemy->AttackInterval = AttackInterval;
 		enemy->UseGravity = UseGravity;
 		enemy->Gravity = Gravity;
 

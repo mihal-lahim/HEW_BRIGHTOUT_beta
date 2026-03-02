@@ -19,7 +19,7 @@ void LoadingMovieScene::Initialize()
 	// VideoPlayerControllerを追加して動画パスを設定
 	auto* controller = videoPlayerObj->AddComponent<VideoPlayerController>();
 	controller->videoPath = L"movie/loading.mp4";
-	controller->transitionDelay = 5.0f;
+	controller->transitionDelay = 3.0f;
 }
 
 void LoadingMovieScene::Finalize()
