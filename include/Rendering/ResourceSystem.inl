@@ -16,6 +16,10 @@ inline T* ResourceSystem::Load(Args&&... args)
 	if constexpr (std::is_base_of_v<Texture, T>)
 	{
 		auto filePath = static_cast<std::wstring>(std::get<0>(std::forward_as_tuple(args...)));
+		if (filePath.rfind(L"texture/", 0) == 0)
+		{
+			filePath = L"resource/" + filePath;
+		}
 		size_t resourceKey = std::hash<std::wstring>{}(filePath);
 		return LoadInternal<T>(resourceKey, filePath);
 	}
@@ -23,6 +27,13 @@ inline T* ResourceSystem::Load(Args&&... args)
 	else if constexpr (std::is_base_of_v <Shader, T> || std::is_base_of_v <Model, T>)
 	{
 		auto filePath = static_cast<std::string>(std::get<0>(std::forward_as_tuple(args...)));
+		if constexpr (std::is_base_of_v<Model, T>)
+		{
+			if (filePath.rfind("model/", 0) == 0)
+			{
+				filePath = "resource/" + filePath;
+			}
+		}
 		size_t resourceKey = std::hash<std::string>{}(filePath);
 		return LoadInternal<T>(resourceKey, filePath);
 	}
