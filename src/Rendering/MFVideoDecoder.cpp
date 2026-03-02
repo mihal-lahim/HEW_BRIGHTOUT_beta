@@ -6,6 +6,7 @@
 ==============================================================================*/
 #include "MFVideoDecoder.h"
 #include <mferror.h>
+#include <string>
 #include <Windows.h>
 
 #pragma comment(lib, "mfplat.lib")
@@ -20,6 +21,11 @@ MFVideoDecoder::~MFVideoDecoder()
 bool MFVideoDecoder::Open(const std::wstring& path)
 {
 	HRESULT hr = S_OK;
+	std::wstring resolvedPath = path;
+	if (resolvedPath.rfind(L"movie/", 0) == 0)
+	{
+		resolvedPath = L"resource/" + resolvedPath;
+	}
 
 	// SourceReader を作成
 	Microsoft::WRL::ComPtr<IMFAttributes> attributes;
@@ -38,7 +44,7 @@ bool MFVideoDecoder::Open(const std::wstring& path)
 		return false;
 	}
 
-	hr = MFCreateSourceReaderFromURL(path.c_str(), attributes.Get(), &m_sourceReader);
+	hr = MFCreateSourceReaderFromURL(resolvedPath.c_str(), attributes.Get(), &m_sourceReader);
 	if (FAILED(hr))
 	{
 		OutputDebugStringA("[MFVideoDecoder] MFCreateSourceReaderFromURL failed\n");

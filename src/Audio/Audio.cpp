@@ -5,6 +5,7 @@
 
 #include <xaudio2.h>
 #include <assert.h>
+#include <string>
 #include "audio.h"
 
 #pragma comment(lib, "winmm.lib")
@@ -92,6 +93,11 @@ int LoadAudio(const char* FileName)
 {
 	assert(g_Xaudio);
 	int index = -1;
+	std::string resolvedPath = (FileName != nullptr) ? FileName : "";
+	if (resolvedPath.rfind("sound/", 0) == 0)
+	{
+		resolvedPath = "resource/" + resolvedPath;
+	}
 
 	for (int i = 0; i < AUDIO_MAX; i++)
 	{
@@ -118,7 +124,7 @@ int LoadAudio(const char* FileName)
 		LONG readlen;
 
 
-		hmmio = mmioOpen((LPSTR)FileName, &mmioinfo, MMIO_READ);
+		hmmio = mmioOpen((LPSTR)resolvedPath.c_str(), &mmioinfo, MMIO_READ);
 		assert(hmmio);
 
 		riffchunkinfo.fccType = mmioFOURCC('W', 'A', 'V', 'E');
