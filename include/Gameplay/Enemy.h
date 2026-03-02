@@ -8,6 +8,9 @@
 #include "Health.h"
 #include "Ray.h"
 #include "Renderer.h"
+#include <DirectXMath.h>
+#include <algorithm>
+#include <cmath>
 #include <vector>
 
 class GameObject;
@@ -22,6 +25,28 @@ inline void SetEnemyActiveRecursive(GameObject* obj, bool active)
 	}
 }
 
+inline void SetEnemyUVRotationRecursive(GameObject* obj, float uvRotation)
+{
+	if (!obj) return;
+
+	auto meshRenderers = obj->GetComponents<MeshRenderer>();
+	for (auto* renderer : meshRenderers)
+	{
+		renderer->material.SetFloat("uv_rotation", uvRotation);
+	}
+
+	auto skinnedRenderers = obj->GetComponents<SkinnedMeshRenderer>();
+	for (auto* renderer : skinnedRenderers)
+	{
+		renderer->material.SetFloat("uv_rotation", uvRotation);
+	}
+
+	for (auto* child : obj->GetChildren())
+	{
+		SetEnemyUVRotationRecursive(child, uvRotation);
+	}
+}
+
 inline void DestroyEnemyRecursive(GameObject* obj)
 {
 	if (!obj) return;
@@ -31,6 +56,28 @@ inline void DestroyEnemyRecursive(GameObject* obj)
 	}
 	obj->SetActive(false);
 	obj->Destroy();
+}
+
+inline void SetEnemyUVRectRecursive(GameObject* obj, const DirectX::XMFLOAT4& uvRect)
+{
+	if (!obj) return;
+
+	auto meshRenderers = obj->GetComponents<MeshRenderer>();
+	for (auto* renderer : meshRenderers)
+	{
+		renderer->material.SetFloat4("uv_rect", uvRect);
+	}
+
+	auto skinnedRenderers = obj->GetComponents<SkinnedMeshRenderer>();
+	for (auto* renderer : skinnedRenderers)
+	{
+		renderer->material.SetFloat4("uv_rect", uvRect);
+	}
+
+	for (auto* child : obj->GetChildren())
+	{
+		SetEnemyUVRectRecursive(child, uvRect);
+	}
 }
 
 #include "audio.h"
@@ -63,6 +110,10 @@ public:
 	float AttackEffectForwardDistance = 0.6f;
 	float AttackEffectHeightOffset = 0.0f;
 	float AttackEffectPitch = 180.0f;
+	int AttackEffectDirectionColumns = 1;
+	int AttackEffectDirectionRows = 1;
+	int AttackEffectDirectionFrameCount = 1;
+	float AttackEffectDirectionYawOffset = 0.0f;
 
 	bool IsDefeated() const { return m_IsDefeated; }
 	void OnDefeated()
@@ -309,6 +360,40 @@ private:
 		attackEffectObject->transform().position() = gameObject().transform().position()
 			+ (attackDirection * AttackEffectForwardDistance)
 			+ Vector3(0.0f, AttackEffectHeightOffset, 0.0f);
+
+		ApplyAttackEffectDirectionUV(attackDirection);
+	}
+
+	void ApplyAttackEffectDirectionUV(const Vector3& attackDirection)
+	{
+		if (!attackEffectObject || AttackEffectDirectionColumns <= 0 || AttackEffectDirectionRows <= 0)
+			return;
+
+		const int maxFrames = AttackEffectDirectionColumns * AttackEffectDirectionRows;
+		const int frameCount = (std::max)(1, (std::min)(AttackEffectDirectionFrameCount, maxFrames));
+		Vector3 dir = attackDirection;
+		if (dir.IsZero())
+		{
+			dir = Vector3(0.0f, 0.0f, 1.0f);
+		}
+
+		const float yaw = std::atan2(dir.x, dir.z) + DirectX::XMConvertToRadians(AttackEffectDirectionYawOffset);
+		SetEnemyUVRotationRecursive(attackEffectObject, -yaw + DirectX::XM_PI);
+		float normalized = (yaw + DirectX::XM_PI) / DirectX::XM_2PI;
+		normalized -= std::floor(normalized);
+
+		int frame = (int)std::floor(normalized * (float)frameCount + 0.5f);
+		frame %= frameCount;
+
+		const int column = frame % AttackEffectDirectionColumns;
+		const int row = frame / AttackEffectDirectionColumns;
+
+		const float width = 1.0f / (float)AttackEffectDirectionColumns;
+		const float height = 1.0f / (float)AttackEffectDirectionRows;
+		const float offsetX = width * (float)column;
+		const float offsetY = height * (float)row;
+
+		SetEnemyUVRectRecursive(attackEffectObject, { offsetX, offsetY, width, height });
 	}
 
 	void TryAttackTarget()
