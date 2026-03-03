@@ -327,6 +327,24 @@ void Model::ConstructSkinnedMesh(GraphicsDevice& device, const aiMesh* mesh, Ptr
 
 void Model::CreateMaterial(GraphicsDevice& device, const aiScene* scene, PtrToIndexMap& ptrToIndex)
 {
+	// 埋め込みテクスチャを先にすべて読み込む（後の push_back による再割り当てを防止）
+	for (unsigned int i = 0; i < scene->mNumTextures; i++)
+	{
+		aiTexture* tex = scene->mTextures[i];
+
+		ID3D11ShaderResourceView* texture;
+
+		DirectX::TexMetadata metadata;
+		DirectX::ScratchImage image;
+		LoadFromWICMemory((const void*)tex->pcData, tex->mWidth, DirectX::WIC_FLAGS_NONE, &metadata, image);
+		CreateShaderResourceView(device.GetDevice(), image.GetImages(), image.GetImageCount(), metadata, &texture);
+		assert(texture);
+
+		Texture newTexture{};
+		newTexture.CreateFromLoaded(device, texture, static_cast<UINT>(metadata.width), static_cast<UINT>(metadata.height));
+
+		m_textures.push_back(std::move(newTexture));
+	}
 
 	for (unsigned int m = 0; m < scene->mNumMaterials; m++)
 	{
@@ -343,33 +361,23 @@ void Model::CreateMaterial(GraphicsDevice& device, const aiScene* scene, PtrToIn
 			newMaterial.SetColor({ color.r, color.g, color.b, 1.0f });
 		}
 
-
-		// テクスチャ読み込み
-		for (unsigned int i = 0; i < scene->mNumTextures; i++)
+		// マテリアルに対応するテクスチャを設定
+		aiString texPath;
+		if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS)
 		{
-			// 埋め込みテクスチャを取得
-			aiTexture* tex = scene->mTextures[i];
-
-			// SRVの作成
-			ID3D11ShaderResourceView* texture;
-
-			// 画像データをDirectXTexで読み込む
-			DirectX::TexMetadata metadata;
-			DirectX::ScratchImage image;
-			LoadFromWICMemory((const void*)tex->pcData, tex->mWidth, DirectX::WIC_FLAGS_NONE, &metadata, image);
-			CreateShaderResourceView(device.GetDevice(), image.GetImages(), image.GetImageCount(), metadata, &texture);
-			assert(texture);
-
-			// テクスチャをモデルに登録
-			Texture newTexture{};
-			newTexture.CreateFromLoaded(device, texture, static_cast<UINT>(metadata.width), static_cast<UINT>(metadata.height));
-
-			// テクスチャをモデルのテクスチャリストに追加
-			m_textures.push_back(std::move(newTexture));
-
-			// マテリアルにテクスチャを設定
-			newMaterial.texture = &m_textures.back();
-
+			std::string path = texPath.C_Str();
+			if (!path.empty() && path[0] == '*')
+			{
+				int texIndex = std::atoi(path.c_str() + 1);
+				if (texIndex >= 0 && texIndex < static_cast<int>(m_textures.size()))
+				{
+					newMaterial.texture = &m_textures[texIndex];
+				}
+			}
+		}
+		else if (!m_textures.empty())
+		{
+			newMaterial.texture = &m_textures[0];
 		}
 
 		// マテリアルとインデックスのマッピングを更新

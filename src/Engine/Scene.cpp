@@ -86,6 +86,14 @@ void Scene::DestroyPendingGameObjectsProcess()
 		GameObject* obj = objPool->Get(idx);
 		if (obj)
 		{
+			// 所属コンポーネントの m_gameObject をクリアしてダングリングポインタを防止
+			for (auto* comp : obj->m_components)
+			{
+				if (comp)
+				{
+					comp->m_gameObject = nullptr;
+				}
+			}
 			objPool->Destroy(idx);
 		}
 		m_pendingDestroyGameObjects.pop();
@@ -94,6 +102,8 @@ void Scene::DestroyPendingGameObjectsProcess()
 
 void Scene::DestroyPendingComponentsProcess()
 {
+	auto* gameObjectPool = static_cast<ObjectPool<GameObject>*>(m_gameObjects.get());
+
 	// 保留中のコンポーネントをすべて破棄
 	while (!m_pendingDestroyComponents.empty())
 	{
@@ -102,13 +112,19 @@ void Scene::DestroyPendingComponentsProcess()
 		Component* comp = compPool->Get(pending.AllocationID);
 		if (comp)
 		{
-			if (comp->m_gameObject)
+			GameObject* owner = comp->m_gameObject;
+			if (owner && gameObjectPool)
 			{
-				auto& components = comp->m_gameObject->m_components;
-				components.erase(std::remove(components.begin(), components.end(), comp), components.end());
+				GameObject* aliveOwner = gameObjectPool->Get(owner->m_allocationID);
+				if (aliveOwner == owner)
+				{
+					auto& components = owner->m_components;
+					components.erase(std::remove(components.begin(), components.end(), comp), components.end());
+				}
 			}
 
 			comp->FinalizeByContext();
+			comp->m_gameObject = nullptr;
 			compPool->Destroy(pending.AllocationID);
 		}
 		m_pendingDestroyComponents.pop();
@@ -117,6 +133,8 @@ void Scene::DestroyPendingComponentsProcess()
 
 void Scene::DestroyPendingScriptComponentsProcess()
 {
+	auto* gameObjectPool = static_cast<ObjectPool<GameObject>*>(m_gameObjects.get());
+
 	// 保留中のスクリプトコンポーネントをすべて破棄
 	while (!m_pendingDestroyScriptComponents.empty())
 	{
@@ -125,13 +143,19 @@ void Scene::DestroyPendingScriptComponentsProcess()
 		ScriptComponent* scriptComp = scriptCompPool->Get(pending.AllocationID);
 		if (scriptComp)
 		{
-			if (scriptComp->m_gameObject)
+			GameObject* owner = scriptComp->m_gameObject;
+			if (owner && gameObjectPool)
 			{
-				auto& components = scriptComp->m_gameObject->m_components;
-				components.erase(std::remove(components.begin(), components.end(), scriptComp), components.end());
+				GameObject* aliveOwner = gameObjectPool->Get(owner->m_allocationID);
+				if (aliveOwner == owner)
+				{
+					auto& components = owner->m_components;
+					components.erase(std::remove(components.begin(), components.end(), scriptComp), components.end());
+				}
 			}
 
 			scriptComp->OnDestroy();
+			scriptComp->m_gameObject = nullptr;
 			scriptCompPool->Destroy(pending.AllocationID);
 		}
 		m_pendingDestroyScriptComponents.pop();
@@ -250,7 +274,10 @@ void Scene::Enable()
 		{
 			for (auto* component : gameObject->m_components)
 			{
-				component->OnEnable();
+				if (component)
+				{
+					component->OnEnable();
+				}
 			}
 		}
 	}

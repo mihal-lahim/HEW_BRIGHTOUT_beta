@@ -1,6 +1,7 @@
 ﻿#include "Namioka.h"
 #include "PlayerPrefab.h"
 #include "EnemyPrefab.h"
+#include "Bullet.h"
 #include "GameObject.h"
 #include "include/DebugTest/DebugCamera.h"
 #include "Texture.h"
@@ -51,6 +52,8 @@ void Namioka::Initialize()
 	// オーディオ初期化
 	InitAudio();
 	PowerPlant::ResetAudioState();
+	Enemy::ResetAudioState();
+	Bullet::ResetAudioState();
 
 	g_GameBgm = LoadAudio("sound/GameBGM_01.wav");
 

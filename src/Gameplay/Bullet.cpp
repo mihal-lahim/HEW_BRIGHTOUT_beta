@@ -23,7 +23,16 @@ namespace
 {
 	int g_BulletHitSE = -1;
 	bool g_BulletHitSEInitialized = false;
+}
 
+void Bullet::ResetAudioState()
+{
+	g_BulletHitSE = -1;
+	g_BulletHitSEInitialized = false;
+}
+
+namespace
+{
 	class BulletSheetAnimator : public ScriptComponent
 	{
 	public:
@@ -137,13 +146,6 @@ void Bullet::Start()
 		renderer->renderQueue = RenderQueue::Transparent;
 		renderer->material.SetColor({ VisualColorScale, VisualColorScale, VisualColorScale, VisualAlpha });
 
-		const auto firstFrameUV = MakeSheetUVRect(0, TrailSheetColumns, TrailSheetRows, TrailSheetFrameCount);
-		renderer->material.SetFloat4("uv_rect", firstFrameUV);
-		renderer->material.SetFloat("uv_rotation", EffectUVRotation);
-
-		auto* billboard = bulletVisual->AddComponent<Billboard>();
-		billboard->uvRotation = EffectUVRotation;
-
 		auto* animator = bulletVisual->AddComponent<BulletSheetAnimator>();
 		animator->SheetColumns = TrailSheetColumns;
 		animator->SheetRows = TrailSheetRows;
@@ -151,6 +153,9 @@ void Bullet::Start()
 		animator->AnimationFps = TrailAnimationFps;
 		animator->AnimationLoop = TrailAnimationLoop;
 		animator->Renderer = renderer;
+
+		auto* billboard = bulletVisual->AddComponent<Billboard>();
+		billboard->uvRotation = EffectUVRotation;
 	}
 }
 

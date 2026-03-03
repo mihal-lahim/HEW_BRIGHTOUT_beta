@@ -114,9 +114,14 @@ void Material::Apply(GraphicsDevice& device) const
 
 void Material::Bind(GraphicsDevice& device) const
 {
+	if (!shaderProgram)
+	{
+		return;
+	}
+
 	materialConstantBuffer.BindVS(device, 3);
 	materialConstantBuffer.BindPS(device, 3);
-	
+
 	shaderProgram->Bind(device);
 
 	if (texture)

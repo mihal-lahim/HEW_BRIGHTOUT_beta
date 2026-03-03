@@ -86,6 +86,16 @@ inline void SetEnemyUVRectRecursive(GameObject* obj, const DirectX::XMFLOAT4& uv
 class Enemy : public Movement
 {
 public:
+	// オーディオ状態リセット（シーン切り替え時に呼ぶ）
+	static void ResetAudioState()
+	{
+		s_DeathSE = -1;
+		s_AttackSE = -1;
+		s_HitSE = -1;
+		s_MoveSE = -1;
+		s_AudioLoaded = false;
+	}
+
 	float MoveSpeed = 3.0f;
 	bool UseGravity = true;
 	float Gravity = -30.0f;
@@ -149,35 +159,27 @@ public:
 
 		SetAnimationMode(AnimationMode::Idle);
 
-
-		// 死亡SE読み込み
-		m_DeathSE = LoadAudio("sound/enemy_die.wav"); 
-		if (m_DeathSE >= 0)
+		// SE を一度だけロード（全 Enemy で共有）
+		if (!s_AudioLoaded)
 		{
-			SetAudioVolume(m_DeathSE, 0.7f);
-		}
+			s_DeathSE = LoadAudio("sound/enemy_die.wav");
+			if (s_DeathSE >= 0) SetAudioVolume(s_DeathSE, 0.7f);
 
-		// 攻撃SE読み込み
-		m_AttackSE = LoadAudio("sound/enemy_attack.wav");
-		if (m_AttackSE >= 0)
-		{
-			SetAudioVolume(m_AttackSE, 0.5f);
-		}
+			s_AttackSE = LoadAudio("sound/enemy_attack.wav");
+			if (s_AttackSE >= 0) SetAudioVolume(s_AttackSE, 0.5f);
 
-		// 被弾SE読み込み
-		m_HitSE = LoadAudio("sound/enemy_hit.wav");
-		if (m_HitSE >= 0)
-		{
-			SetAudioVolume(m_HitSE, 0.5f);
-		}
+			s_HitSE = LoadAudio("sound/enemy_hit.wav");
+			if (s_HitSE >= 0) SetAudioVolume(s_HitSE, 0.5f);
 
-		// 移動SE読み込み
-		m_MoveSE = LoadAudio("sound/enemy_move.wav");
-		if (m_MoveSE >= 0)
-		{
-			SetAudioVolume(m_MoveSE, 0.1f);
-		}
+			s_MoveSE = LoadAudio("sound/enemy_move.wav");
+			if (s_MoveSE >= 0) SetAudioVolume(s_MoveSE, 0.1f);
 
+			s_AudioLoaded = true;
+		}
+		m_DeathSE = s_DeathSE;
+		m_AttackSE = s_AttackSE;
+		m_HitSE = s_HitSE;
+		m_MoveSE = s_MoveSE;
 	}
 
 	void Update() override
@@ -597,7 +599,12 @@ private:
 	// 被弾SE
 	int m_HitSE = -1;
 
-
+	// 全 Enemy で共有するSEスロット
+	inline static int s_DeathSE = -1;
+	inline static int s_AttackSE = -1;
+	inline static int s_HitSE = -1;
+	inline static int s_MoveSE = -1;
+	inline static bool s_AudioLoaded = false;
 };
 
 #endif

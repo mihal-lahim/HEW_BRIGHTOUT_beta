@@ -124,6 +124,8 @@ public:
 		modelRoot->transform().scale() = Vector3(0.01f, 0.01f, 0.01f);
 		modelRoot->transform().rotation() = Quaternion::SetEulerY(180.0f);
 
+
+		//player電気状態エフェクト用ビルボード
 		GameObject* electricEffectObject = gameObject.CreateGameObject();
 		gameObject.SetChild(*electricEffectObject);
 		// MeshRenderer に Quad メッシュを直接割り当て
@@ -188,7 +190,7 @@ public:
 		repairSpeedTextRoot->transform().position() = Vector3(0.0f, 2.7f, 0.0f);
 		repairSpeedTextRoot->SetActive(false);
 		{
-			const char* text = "repair speed up";
+			const char* text = "repair speed up!";
 			const int textLen = 15;
 			const float charScale = 0.28f;
 			const float spacing = 0.30f;

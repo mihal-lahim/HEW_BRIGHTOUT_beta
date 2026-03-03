@@ -15,6 +15,27 @@ public:
 	Vector3 Direction{ 0.0f, 0.0f, 1.0f };
 	float EffectUVRotation = 0.0f;
 
+	//playerと同じ設定にしたい
+	//player電気状態エフェクト用ビルボード
+	//GameObject* electricEffectObject = gameObject.CreateGameObject();
+	//gameObject.SetChild(*electricEffectObject);
+	//// MeshRenderer に Quad メッシュを直接割り当て
+	//auto* renderer = electricEffectObject->AddComponent<MeshRenderer>();
+	//renderer->material.texturePath = L"texture/ball.png";
+	//renderer->material.texture = nullptr;
+	//renderer->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
+	//// Billboard コンポーネントが Awake() でシェーダーとメッシュを自動設定
+	//electricEffectObject->AddComponent<Billboard>();
+	//electricEffectObject->transform().scale() = Vector3(1.5f, 1.5f, 1.5f);
+	//electricEffectObject->transform().position() = Vector3(0.0f, 0.5f, 0.0f);
+	//electricEffectObject->SetActive(false);
+	//player->electricEffectObject = electricEffectObject;
+	//player->electricAnimationInterval = 0.08f;
+	//player->electricSheetColumns = 6;
+	//player->electricSheetRows = 6;
+	//player->electricSheetFrameCount = 31;
+
+
 	std::wstring TexturePath = L"texture/ball.png";
 	Vector3 VisualScale{ 0.8f, 0.8f, 0.8f };
 	float VisualColorScale = 2.5f;
@@ -31,6 +52,9 @@ public:
 
 	void Start() override;
 	void Update() override;
+
+	// オーディオ状態リセット（シーン切り替え時に呼ぶ）
+	static void ResetAudioState();
 
 private:
 	float m_LifeTimer = 0.0f;
