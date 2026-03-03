@@ -1,5 +1,5 @@
 ///////////////////////////////////////////
-//弾管理と寿命を制御するBulletクラスの実装
+//弾管理と自動消滅を制御するBulletクラスの実装
 ///////////////////////////////////////////
 
 #include "Bullet.h"
@@ -7,6 +7,9 @@
 #include "GameObject.h"
 #include "ScoreData.h"
 #include "Enemy.h"
+#include "Ray.h"
+#include "PhysicsSystem.h"
+#include "PhysicsBody.h"
 
 namespace
 {
@@ -45,49 +48,28 @@ void Bullet::Update()
 
 	Vector3 dir = Direction.IsZero() ? Vector3(0.0f, 0.0f, 1.0f) : Direction.Normalize();
 	Vector3 curPos = gameObject().transform().position();
-	Vector3 nextPos = curPos + dir * (Speed * dt);
+	float stepDist = Speed * dt + HitRadius;
 
-	for (auto* enemy : GetGameObjectsByTag("Enemy"))
+	// RayCastで進行方向のヒット判定（BVH最適化済み）
+	Ray ray(curPos, dir);
+	physics().RayCast(ray, stepDist);
+
+	if (ray.IsHit && ray.HitObject)
 	{
-		if (!enemy || !enemy->IsActiveInHierarchy())
-			continue;
-
-		Vector3 enemyPos = enemy->transform().position();
-
-		// 線分 curPos→nextPos 上の最近点で判定（すり抜け防止）
-		Vector3 seg = nextPos - curPos;
-		float segLenSq = seg.Dot(seg);
-		float t = 0.0f;
-		if (segLenSq > 0.0f)
+		auto& hitGameObject = ray.HitObject->gameObject();
+		if (hitGameObject.CompareTag("Enemy") && hitGameObject.IsActiveInHierarchy())
 		{
-			t = (enemyPos - curPos).Dot(seg) / segLenSq;
-			if (t < 0.0f) t = 0.0f;
-			if (t > 1.0f) t = 1.0f;
-		}
-		Vector3 closest = curPos + seg * t;
-		Vector3 toEnemy = enemyPos - closest;
-
-		if (toEnemy.Length() <= HitRadius)
-		{
-			auto* enemyComponent = enemy->GetComponent<Enemy>();
-			if (enemyComponent && enemyComponent->IsDefeated())
+			auto* enemyComponent = hitGameObject.GetComponent<Enemy>();
+			if (enemyComponent && !enemyComponent->IsDefeated())
 			{
-				continue;
-			}
-
-			ScoreData::Instance().killedEnemies++;
-			if (enemyComponent)
-			{
+				ScoreData::Instance().killedEnemies++;
 				enemyComponent->OnDefeated();
+				DestroyWithChildren(gameObject());
+				return;
 			}
-			else
-			{
-				DestroyWithChildren(*enemy);
-			}
-			DestroyWithChildren(gameObject());
-			return;
 		}
 	}
 
+	Vector3 nextPos = curPos + dir * (Speed * dt);
 	gameObject().transform().position() = nextPos;
 }

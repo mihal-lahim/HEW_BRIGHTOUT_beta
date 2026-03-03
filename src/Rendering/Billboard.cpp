@@ -65,13 +65,11 @@ void Billboard::Awake()
 
 void Billboard::Update()
 {
-	if (!m_mainCamera)
-	{
-		m_mainCamera = GetGameObjectByTag("MainCamera");
-	}
-
-	if (!m_mainCamera)
+	// m_mainCamera が既にキャッシュされていればタグ検索をスキップ
+	if (m_mainCamera && m_mainCamera->IsActiveInHierarchy())
 	{
 		return;
 	}
+
+	m_mainCamera = GetGameObjectByTag("MainCamera");
 }

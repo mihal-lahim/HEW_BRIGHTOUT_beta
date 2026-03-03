@@ -115,6 +115,9 @@ public:
 	int AttackEffectDirectionFrameCount = 1;
 	float AttackEffectDirectionYawOffset = 0.0f;
 
+	// Ú’n”»’è‚ÌŠÔˆø‚«ŠÔŠui•bj
+	static constexpr float GroundCheckInterval = 0.1f;
+
 	bool IsDefeated() const { return m_IsDefeated; }
 	void OnDefeated()
 	{
@@ -197,7 +200,13 @@ public:
 
 		if (!m_target)
 		{
-			m_target = GetGameObjectByTag("Player");
+			// ƒ^[ƒQƒbƒgŒŸõ‚ğŠÔˆø‚«i0.5•bŠÔŠuj
+			m_targetSearchTimer -= deltaTime;
+			if (m_targetSearchTimer <= 0.0f)
+			{
+				m_targetSearchTimer = 0.5f;
+				m_target = GetGameObjectByTag("Player");
+			}
 			if (!m_target)
 			{
 				return;
@@ -515,12 +524,21 @@ private:
 		}
 	}
 
+	bool m_cachedIsOnGround = true;
+	float m_groundCheckTimer = 0.0f;
+
 	bool IsOnGround()
 	{
-		Vector3 from = gameObject().transform().position();
-		Ray ray(from, { 0.0f, -1.0f, 0.0f });
-		physics().RayCast(ray, GroundRayLength);
-		return ray.IsHit && ray.HitDistance >= 0.0f && ray.HitDistance <= GroundDetectOffset;
+		m_groundCheckTimer -= (float)Time::DeltaTime();
+		if (m_groundCheckTimer <= 0.0f)
+		{
+			m_groundCheckTimer = GroundCheckInterval;
+			Vector3 from = gameObject().transform().position();
+			Ray ray(from, { 0.0f, -1.0f, 0.0f });
+			physics().RayCast(ray, GroundRayLength);
+			m_cachedIsOnGround = ray.IsHit && ray.HitDistance >= 0.0f && ray.HitDistance <= GroundDetectOffset;
+		}
+		return m_cachedIsOnGround;
 	}
 
 	int m_MoveSE = -1;
@@ -529,6 +547,8 @@ private:
 	// “|‚³‚ê‚½‚Æ‚«‚ÌSE
 	int m_DeathSE = -1;
 	bool m_DestroyedByFall = false;
+
+	float m_targetSearchTimer = 0.0f;
 
 };
 
