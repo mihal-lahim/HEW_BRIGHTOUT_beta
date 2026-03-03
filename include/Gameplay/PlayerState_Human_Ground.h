@@ -11,6 +11,10 @@ public:
 	virtual void Enter(Player& player) override;
 	virtual void HandleInput(Player& player) override;
 	virtual void Update(Player& player) override;
+
+private:
+	std::vector<GameObject*> m_cachedPowerPlants;
+	bool m_powerPlantsCached = false;
 };
 
 

@@ -43,18 +43,23 @@ public:
 		float dt = (float)Time::DeltaTime();
 		m_ElapsedTime += dt;
 
-		// 時間経過で生成間隔を短くする
+		// 時間経過で生成間隔を短縮する
 		m_CurrentInterval = (std::max)(InitialInterval - IntervalDecreaseRate * m_ElapsedTime, MinInterval);
 
 		m_Timer += dt;
-		m_SpawnCount = static_cast<int>(GetGameObjectsByTag("Enemy").size());
-		while (m_Timer >= m_CurrentInterval && m_SpawnCount < MaxEnemies)
-		{
-			m_Timer -= m_CurrentInterval;
 
-			// 最大数に達していなければ生成
-			SpawnEnemy();
-			++m_SpawnCount;
+		// タグ検索は生成タイミングの時だけ実行する
+		if (m_Timer >= m_CurrentInterval)
+		{
+			m_SpawnCount = static_cast<int>(GetGameObjectsByTag("Enemy").size());
+			while (m_Timer >= m_CurrentInterval && m_SpawnCount < MaxEnemies)
+			{
+				m_Timer -= m_CurrentInterval;
+
+				// 最大数に達していなければ生成
+				SpawnEnemy();
+				++m_SpawnCount;
+			}
 		}
 	}
 

@@ -55,9 +55,45 @@ void RenderingSystem::Render(const Scene& scene)
     }
 
     // -------------------------
-    // 3D描画
+    // コンポーネント取得（1回だけ）
     // -------------------------
     auto cameras = scene.GetComponents<Camera>();
+    auto allMeshRenderers = scene.GetComponents<MeshRenderer>();
+    auto skinnedMeshRenderers = scene.GetComponents<SkinnedMeshRenderer>();
+
+    // -------------------------
+    // レンダラーをキューごとに事前分類（ループ回数削減 + ステート切り替え最小化）
+    // -------------------------
+    std::vector<MeshRenderer*> backgroundRenderers;
+    std::vector<MeshRenderer*> opaqueRenderers;
+    std::vector<MeshRenderer*> transparentRenderers;
+    std::vector<MeshRenderer*> uiRenderers;
+
+    for (auto* renderer : allMeshRenderers)
+    {
+        if (!renderer->IsEnable())
+            continue;
+
+        switch (renderer->renderQueue)
+        {
+        case RenderQueue::Background:  backgroundRenderers.push_back(renderer);  break;
+        case RenderQueue::Transparent: transparentRenderers.push_back(renderer); break;
+        case RenderQueue::UI:          uiRenderers.push_back(renderer);          break;
+        default:                       opaqueRenderers.push_back(renderer);      break;
+        }
+    }
+
+    // アクティブなSkinnedMeshRendererだけフィルタ
+    std::vector<SkinnedMeshRenderer*> activeSkinnedRenderers;
+    for (auto* renderer : skinnedMeshRenderers)
+    {
+        if (renderer->IsEnable())
+            activeSkinnedRenderers.push_back(renderer);
+    }
+
+    // -------------------------
+    // 3D描画
+    // -------------------------
 
     std::sort(cameras.begin(), cameras.end(),
         [](const Camera* a, const Camera* b)
@@ -72,43 +108,42 @@ void RenderingSystem::Render(const Scene& scene)
 
         UpdatePerCamera(*camera);
 
-        auto meshRenderers = scene.GetComponents<MeshRenderer>();
-
-        // Background キュー（スカイドーム等）を最初に描画
-        for (auto& renderer : meshRenderers)
+        // Background キュー
+        if (!backgroundRenderers.empty())
         {
-            if (!renderer->IsEnable())
-                continue;
-
-            if (renderer->renderQueue != RenderQueue::Background)
-                continue;
-
-            ApplyRenderQueue(renderer->renderQueue);
-            MaterialLoadingProcess(renderer->material);
-            renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
+            ApplyRenderQueue(RenderQueue::Background);
+            for (auto* renderer : backgroundRenderers)
+            {
+                MaterialLoadingProcess(renderer->material);
+                renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
+            }
         }
 
-        // Opaque / Transparent キューを描画
-        for (auto& renderer : meshRenderers)
+        // Opaque キュー
+        if (!opaqueRenderers.empty())
         {
-            if (!renderer->IsEnable())
-                continue;
-
-            if (renderer->renderQueue == RenderQueue::UI || renderer->renderQueue == RenderQueue::Background)
-                continue;
-
-            ApplyRenderQueue(renderer->renderQueue);
-            MaterialLoadingProcess(renderer->material);
-            renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
+            ApplyRenderQueue(RenderQueue::Opaque);
+            for (auto* renderer : opaqueRenderers)
+            {
+                MaterialLoadingProcess(renderer->material);
+                renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
+            }
         }
 
-        auto skinnedMeshRenderers = scene.GetComponents<SkinnedMeshRenderer>();
-
-        for (auto& renderer : skinnedMeshRenderers)
+        // Transparent キュー
+        if (!transparentRenderers.empty())
         {
-            if (!renderer->IsEnable())
-                continue;
+            ApplyRenderQueue(RenderQueue::Transparent);
+            for (auto* renderer : transparentRenderers)
+            {
+                MaterialLoadingProcess(renderer->material);
+                renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
+            }
+        }
 
+        // SkinnedMeshRenderer
+        for (auto* renderer : activeSkinnedRenderers)
+        {
             ApplyRenderQueue(renderer->renderQueue);
             MaterialLoadingProcess(renderer->material);
             renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
@@ -137,7 +172,7 @@ void RenderingSystem::Render(const Scene& scene)
     m_perCameraBuffer.BindVS(*m_graphicsDevice, 1);
     m_perCameraBuffer.BindPS(*m_graphicsDevice, 1);
 
-    // ★ UiVS の b4 に対応
+    // UiVS の b4 に対応
     UIParamsConstants uiParams{};
     uiParams.ScreenWidth = width;
     uiParams.ScreenHeight = height;
@@ -147,19 +182,14 @@ void RenderingSystem::Render(const Scene& scene)
     m_uiParamsBuffer.BindVS(*m_graphicsDevice, 4);
     m_uiParamsBuffer.BindPS(*m_graphicsDevice, 4);
 
-    auto meshRenderers = scene.GetComponents<MeshRenderer>();
-
-    for (auto& renderer : meshRenderers)
+    if (!uiRenderers.empty())
     {
-        if (!renderer->IsEnable())
-            continue;
-
-        if (renderer->renderQueue != RenderQueue::UI)
-            continue;
-
         ApplyRenderQueue(RenderQueue::UI);
-        MaterialLoadingProcess(renderer->material);
-        renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
+        for (auto* renderer : uiRenderers)
+        {
+            MaterialLoadingProcess(renderer->material);
+            renderer->Render(*m_graphicsDevice, m_perObjectBuffer);
+        }
     }
 
     m_graphicsDevice->Present();

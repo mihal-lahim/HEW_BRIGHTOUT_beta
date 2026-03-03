@@ -86,6 +86,8 @@ private:
 	// トリガーマップ（前回）
 	std::unordered_map<PhysicsBody*, std::vector<PhysicsBody*>> m_previousTriggers{};
 
+	// DYNAMIC/KINEMATICボディのキャッシュリスト（STATICを除外）
+	std::vector<PhysicsBody*> m_activeBodies;
 
 
 

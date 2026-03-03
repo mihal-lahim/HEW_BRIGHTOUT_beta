@@ -1,5 +1,5 @@
 ///////////////////////////////////////////
-//’eŠÇ—‚ÆŽõ–½‚ð§Œä‚·‚éBulletƒNƒ‰ƒX‚ÌŽÀ‘•
+//å¼¾ç®¡ç†ã¨è‡ªå‹•æ¶ˆæ»…ã‚’åˆ¶å¾¡ã™ã‚‹Bulletã‚¯ãƒ©ã‚¹ã®å®Ÿè£…
 ///////////////////////////////////////////
 
 #include "Bullet.h"
@@ -7,7 +7,13 @@
 #include "GameObject.h"
 #include "ScoreData.h"
 #include "Enemy.h"
+
+#include "Ray.h"
+#include "PhysicsSystem.h"
+#include "PhysicsBody.h"
+
 #include "audio.h"
+
 
 namespace
 {
@@ -47,37 +53,26 @@ void Bullet::Update()
 
 	Vector3 dir = Direction.IsZero() ? Vector3(0.0f, 0.0f, 1.0f) : Direction.Normalize();
 	Vector3 curPos = gameObject().transform().position();
-	Vector3 nextPos = curPos + dir * (Speed * dt);
+	float stepDist = Speed * dt + HitRadius;
 
-	for (auto* enemy : GetGameObjectsByTag("Enemy"))
+	// RayCastã§é€²è¡Œæ–¹å‘ã®ãƒ’ãƒƒãƒˆåˆ¤å®šï¼ˆBVHæœ€é©åŒ–æ¸ˆã¿ï¼‰
+	Ray ray(curPos, dir);
+	physics().RayCast(ray, stepDist);
+
+	if (ray.IsHit && ray.HitObject)
 	{
-		if (!enemy || !enemy->IsActiveInHierarchy())
-			continue;
-
-		Vector3 enemyPos = enemy->transform().position();
-
-		// ü•ª curPos¨nextPos ã‚ÌÅ‹ß“_‚Å”»’èi‚·‚è”²‚¯–hŽ~j
-		Vector3 seg = nextPos - curPos;
-		float segLenSq = seg.Dot(seg);
-		float t = 0.0f;
-		if (segLenSq > 0.0f)
+		auto& hitGameObject = ray.HitObject->gameObject();
+		if (hitGameObject.CompareTag("Enemy") && hitGameObject.IsActiveInHierarchy())
 		{
-			t = (enemyPos - curPos).Dot(seg) / segLenSq;
-			if (t < 0.0f) t = 0.0f;
-			if (t > 1.0f) t = 1.0f;
-		}
-		Vector3 closest = curPos + seg * t;
-		Vector3 toEnemy = enemyPos - closest;
 
-		if (toEnemy.Length() <= HitRadius)
-		{
+
 			auto* enemyComponent = enemy->GetComponent<Enemy>();
 			if (enemyComponent && enemyComponent->IsDefeated())
 			{
 				continue;
 			}
 
-			// ƒqƒbƒgSEÄ¶
+			// ãƒ’ãƒƒãƒˆSEå†ç”Ÿ
 			if (m_HitSE >= 0)
 			{
 				PlayAudio(m_HitSE, false);
@@ -86,17 +81,16 @@ void Bullet::Update()
 
 			ScoreData::Instance().killedEnemies++;
 			if (enemyComponent)
+
 			{
+				ScoreData::Instance().killedEnemies++;
 				enemyComponent->OnDefeated();
+				DestroyWithChildren(gameObject());
+				return;
 			}
-			else
-			{
-				DestroyWithChildren(*enemy);
-			}
-			DestroyWithChildren(gameObject());
-			return;
 		}
 	}
 
+	Vector3 nextPos = curPos + dir * (Speed * dt);
 	gameObject().transform().position() = nextPos;
 }

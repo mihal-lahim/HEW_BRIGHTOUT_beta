@@ -85,6 +85,12 @@ void PhysicsSystem::RegisterPhysicsBody(PhysicsBody* physicsBody)
 	{
 		m_dynamicsWorld->addRigidBody(physicsBody->m_rigidBody.get());
 		physicsBody->m_rigidBody->setGravity(ToBulletPosition(physicsBody->m_gravity));
+
+		// DYNAMIC/KINEMATICのみキャッシュリストに追加
+		if (physicsBody->m_type != BodyType::STATIC)
+		{
+			m_activeBodies.push_back(physicsBody);
+		}
 	}
 	// コリジョンオブジェクト登録
 	if (physicsBody->m_collisionObject)
@@ -99,6 +105,13 @@ void PhysicsSystem::UnregisterPhysicsBody(PhysicsBody* physicsBody)
 	if (physicsBody->m_rigidBody)
 	{
 		m_dynamicsWorld->removeRigidBody(physicsBody->m_rigidBody.get());
+
+		// キャッシュリストから削除
+		auto it = std::find(m_activeBodies.begin(), m_activeBodies.end(), physicsBody);
+		if (it != m_activeBodies.end())
+		{
+			m_activeBodies.erase(it);
+		}
 	}
 	// コリジョンオブジェクト登録解除
 	if (physicsBody->m_collisionObject)
@@ -224,13 +237,12 @@ void PhysicsSystem::InitializePhysicsBody(PhysicsBody* physicsBody)
 
 
 
-void PhysicsSystem::PhysicsUpdate(Scene& scene, float deltaTime)
+void PhysicsSystem::PhysicsUpdate(Scene& /*scene*/, float deltaTime)
 {
 	// 物理演算ステップ
 	m_dynamicsWorld->stepSimulation(deltaTime, 1);
-	// シーン内の剛体取得
-	std::vector<PhysicsBody*> physicsBodies = scene.GetComponents<PhysicsBody>();
-	UpdatePhysicsBody(physicsBodies);
+	// キャッシュ済みのDYNAMIC/KINEMATICボディのみ更新（STATICはスキップ、GetComponents不要）
+	UpdatePhysicsBody(m_activeBodies);
 	UpdateCollisions();
 }
 
@@ -240,6 +252,9 @@ void PhysicsSystem::UpdatePhysicsBody(std::vector<PhysicsBody*>& physicsBodies)
 	{
 		if (!physicsBody->IsEnable()) continue;
 		if (!physicsBody->m_rigidBody) continue;
+
+		// STATICボディは位置が変わらないのでスキップ
+		if (physicsBody->m_type == BodyType::STATIC) continue;
 
 		if (physicsBody->m_type == BodyType::KINEMATIC)
 		{
@@ -268,7 +283,12 @@ void PhysicsSystem::UpdatePhysicsBody(std::vector<PhysicsBody*>& physicsBodies)
 void PhysicsSystem::UpdateCollisions()
 {
 	// 前回の衝突情報を保存
-	m_previousCollisions = m_currentCollisions;
+	m_previousCollisions = std::move(m_currentCollisions);
+	m_currentCollisions.clear();
+
+	// 前回のトリガー情報を保存
+	m_previousTriggers = std::move(m_currentTriggers);
+	m_currentTriggers.clear();
 
 	// 衝突情報の取得
 	int numManifolds = m_dynamicsWorld->getDispatcher()->getNumManifolds();
@@ -286,36 +306,36 @@ void PhysicsSystem::UpdateCollisions()
 		PhysicsBody* bodyA = static_cast<PhysicsBody*>(obA->getUserPointer());
 		PhysicsBody* bodyB = static_cast<PhysicsBody*>(obB->getUserPointer());
 
-		// 衝突点数取得
-		int numContacts = contactManifold->getNumContacts();
+		if (!bodyA || !bodyB) continue;
 
+		// このマニホールドに有効な衝突点があるか確認
+		bool hasContact = false;
+		int numContacts = contactManifold->getNumContacts();
 		for (int j = 0; j < numContacts; j++)
 		{
-			// 衝突点取得
-			btManifoldPoint& pt = contactManifold->getContactPoint(j);
-
-			// 衝突しているか確認
-			if (pt.getDistance() < 0.0f)
+			if (contactManifold->getContactPoint(j).getDistance() < 0.0f)
 			{
-				// トリガーかどうか確認
-				bool isTriggerA = obA->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE;
-				bool isTriggerB = obB->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE;
-
-				// トリガーの場合
-				if (isTriggerA || isTriggerB)
-				{
-					// トリガー情報に追加
-					m_currentTriggers[bodyA].push_back(bodyB);
-					m_currentTriggers[bodyB].push_back(bodyA);
-				}
-				// トリガーでない場合
-				else
-				{
-					// 衝突情報に追加
-					m_currentCollisions[bodyA].push_back(bodyB);
-					m_currentCollisions[bodyB].push_back(bodyA);
-				}
+				hasContact = true;
+				break;
 			}
+		}
+
+		if (!hasContact) continue;
+
+		// トリガーかどうか確認
+		bool isTriggerA = obA->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE;
+		bool isTriggerB = obB->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE;
+
+		// ペアごとに1回だけ追加（重複排除）
+		if (isTriggerA || isTriggerB)
+		{
+			m_currentTriggers[bodyA].push_back(bodyB);
+			m_currentTriggers[bodyB].push_back(bodyA);
+		}
+		else
+		{
+			m_currentCollisions[bodyA].push_back(bodyB);
+			m_currentCollisions[bodyB].push_back(bodyA);
 		}
 	}
 }
