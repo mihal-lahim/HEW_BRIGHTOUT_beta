@@ -121,6 +121,13 @@ public:
 		if (m_IsDefeated)
 			return;
 
+		// ”í’eSEÄ¶
+		if (m_HitSE >= 0)
+		{
+			PlayAudio(m_HitSE, false);
+			SetAudioVolume(m_HitSE, 0.5f);
+		}
+
 		m_IsDefeated = true;
 		m_DeadTimer = 0.0f;
 		if (attackEffectObject)
@@ -145,11 +152,25 @@ public:
 			SetAudioVolume(m_DeathSE, 0.7f);
 		}
 
-		// i•K—v‚È‚ç‘«‰¹‚à‚±‚±‚Å“Ç‚İ‚Şj
-		// m_MoveSE = LoadAudio("sound/enemy_step.wav");
+		// UŒ‚SE“Ç‚İ‚İ
+		m_AttackSE = LoadAudio("sound/enemy_attack.wav");
+		if (m_AttackSE >= 0)
+		{
+			SetAudioVolume(m_AttackSE, 0.5f);
+		}
+
+		// ”í’eSE“Ç‚İ‚İ
+		m_HitSE = LoadAudio("sound/enemy_hit.wav");
+		if (m_HitSE >= 0)
+		{
+			SetAudioVolume(m_HitSE, 0.5f);
+		}
+
+		// ˆÚ“®SE“Ç‚İ‚İ
+		m_MoveSE = LoadAudio("sound/enemy_move.wav");
 		if (m_MoveSE >= 0)
 		{
-			SetAudioVolume(m_MoveSE, 0.4f);
+			SetAudioVolume(m_MoveSE, 0.1f);
 		}
 
 	}
@@ -405,8 +426,16 @@ private:
 		if (!targetHealth || !targetHealth->IsAlive())
 			return;
 
+		// UŒ‚SEÄ¶
+		if (m_AttackSE >= 0)
+		{
+			PlayAudio(m_AttackSE, false);
+			SetAudioVolume(m_AttackSE, 0.5f);
+		}
+
 		targetHealth->TakeDamage(AttackDamage);
 		TriggerAttackEffect();
+
 		m_AttackCooldownTimer = AttackInterval >= 2.0f ? AttackInterval : 2.0f;
 	}
 
@@ -529,6 +558,12 @@ private:
 	// “|‚³‚ê‚½‚Æ‚«‚ÌSE
 	int m_DeathSE = -1;
 	bool m_DestroyedByFall = false;
+
+	// UŒ‚SE
+	int m_AttackSE = -1;
+
+	// ”í’eSE
+	int m_HitSE = -1;
 
 };
 

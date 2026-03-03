@@ -23,10 +23,16 @@ static void SetActiveRecursive(GameObject* obj, bool active)
 static int s_holdSE = -1;
 static bool s_holdSELoaded = false;
 
+// 全 PowerPlant で共有する復旧完了SE
+static int s_restoreSE = -1;
+static bool s_restoreSELoaded = false;
+
 void PowerPlant::ResetAudioState()
 {
 	s_holdSE = -1;
 	s_holdSELoaded = false;
+	s_restoreSE = -1;
+	s_restoreSELoaded = false;
 }
 
 void PowerPlant::Start()
@@ -48,6 +54,16 @@ void PowerPlant::Start()
 			SetAudioVolume(s_holdSE, 0.7f); 
 		}
 		s_holdSELoaded = true;
+	}
+
+	if (!s_restoreSELoaded || s_restoreSE < 0)
+	{
+		s_restoreSE = LoadAudio("sound/restore.wav");
+		if (s_restoreSE >= 0)
+		{
+			SetAudioVolume(s_restoreSE, 0.7f);
+		}
+		s_restoreSELoaded = true;
 	}
 }
 
@@ -99,6 +115,12 @@ void PowerPlant::Restore()
 				SetActiveRecursive(brokenModel, false);
 				SetActiveRecursive(restoredModel, true);
 
+				// 復旧完了SE再生
+				if (s_restoreSELoaded && s_restoreSE >= 0)
+				{
+					PlayAudio(s_restoreSE, false);
+					SetAudioVolume(s_restoreSE, 0.7f);
+				}
 
 				// 復旧したらホールドSEは停止
 				if (s_holdSELoaded && s_holdSE >= 0)

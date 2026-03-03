@@ -57,4 +57,7 @@ private:
 
     // --- フェードアウト用 ---
     FadeController* m_fadeController = nullptr;
+
+    // --- ブザーSE ---
+    int m_buzzerSE = -1;
 };

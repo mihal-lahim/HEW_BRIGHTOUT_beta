@@ -134,13 +134,28 @@ void HPBarUI::Update()
         ? std::clamp(cur / max, 0.0f, 1.0f)
         : 0.0f;
 
-    // 左固定で右側だけ縮める
-    // UIQuadの頂点は (0,0)~(1,1) で左端が原点なので、
-    // スケールを変えるだけで左端は固定される。位置補正は不要。
-    Vector3 newScale = m_fillOriginalScale;
-    newScale.x = m_fillOriginalScale.x * percent;
+    // 整数パーセント単位で変化があった時だけメッシュを再生成（毎フレーム生成を避ける）
+    int curPercent = static_cast<int>(percent * 100.0f + 0.5f);
+    if (curPercent != m_lastPercent)
+    {
+     m_lastPercent = curPercent;
 
-    m_fillObj->transform().scale() = newScale;
+        // 左端固定で右側だけ縮める:
+     // スケールXを percent 倍に縮小し、UV の U 範囲も 0~percent にクリッピングする。
+    // これによりテクスチャが横方向に圧縮されず、左端から正しく表示される。
+        Vector3 newScale = m_fillOriginalScale;
+        newScale.x = m_fillOriginalScale.x * percent;
+  m_fillObj->transform().scale() = newScale;
+
+        // UV を 0~percent にしたメッシュを再生成してテクスチャの圧縮を防ぐ
+        if (percent > 0.0f)
+        {
+       GraphicsDevice& device = gameObject().rendering().GetGraphicsDevice();
+      m_fillMesh = ::CreateUIQuadWithUV(device, 0.0f, percent);
+    m_fillRenderer->mesh = m_fillMesh.get();
+        }
+    }
+
     m_fillObj->transform().position() = m_fillOriginalPosition;
 
     // HP0で完全に消す

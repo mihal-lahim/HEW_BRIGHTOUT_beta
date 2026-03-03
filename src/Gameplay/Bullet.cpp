@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "ScoreData.h"
 #include "Enemy.h"
+#include "audio.h"
 
 namespace
 {
@@ -24,6 +25,7 @@ namespace
 void Bullet::Start()
 {
 	m_StartPos = gameObject().transform().position();
+	m_HitSE = LoadAudio("sound/bullet_hit.wav");
 }
 
 void Bullet::Update()
@@ -73,6 +75,13 @@ void Bullet::Update()
 			if (enemyComponent && enemyComponent->IsDefeated())
 			{
 				continue;
+			}
+
+			// ƒqƒbƒgSEÄ¶
+			if (m_HitSE >= 0)
+			{
+				PlayAudio(m_HitSE, false);
+				SetAudioVolume(m_HitSE, HitSEVolume);
 			}
 
 			ScoreData::Instance().killedEnemies++;
