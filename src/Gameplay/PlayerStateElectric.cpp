@@ -1,5 +1,7 @@
 #include "Player.h"
 #include "GameTime.h"
+#include "audio.h"
+#include "EventSystem.h"
 
 void PlayerState_Electric::Enter(Player& player)
 {
@@ -8,6 +10,12 @@ void PlayerState_Electric::Enter(Player& player)
 	player.SetHumanVisualActive(false);
 	player.SetElectricEffectActive(true);
 	player.ResetElectricAnimation();
+
+	// 足音SEを停止（地上移動中に鳴っている場合）
+	EventSystem::Send("Player_MoveStop");
+
+	// 電線移動SEをループ再生
+	player.PlayElectricMoveSE();
 
 	// モデルを電気形態に設定
 	//player.meshRenderer->SetModel(player.electricModel);
@@ -40,6 +48,9 @@ void PlayerState_Electric::HandleInput(Player& player)
 	if (inputHandler->IsIssued<PlayerCommand_Jump>()
 		|| inputHandler->IsIssued<PlayerCommand_Morph>())
 	{
+		// 電線移動SEを停止
+		player.StopElectricMoveSE();
+
 		// 電線から射出
 		movement->Eject(
 			inputHandler->GetValue<PlayerCommand_MoveX>(),

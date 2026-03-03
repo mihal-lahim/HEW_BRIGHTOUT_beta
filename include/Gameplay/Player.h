@@ -119,6 +119,8 @@ public:
 	float FireAnimationInterval = 0.06f;
 	float FireAnimationDuration = 0.12f;
 
+	// 電線移動SEボリューム
+	float ElectricMoveSEVolume = 0.5f;
 
 	void Start() override;
 	void Update() override;
@@ -144,6 +146,9 @@ public:
 	void UpdateMoveSpeedBuffText(float deltaTime);
 	void ShowRepairSpeedBuffText();
 	void UpdateRepairSpeedBuffText(float deltaTime);
+	// 電線移動SE制御
+	void PlayElectricMoveSE();
+	void StopElectricMoveSE();
 
 	int MoveSpeedBuffStack = 0;
 	float MoveSpeedBuffPerRestore = 0.5f;
@@ -166,6 +171,15 @@ private:
 	};
 	HumanPseudoAnimationMode m_HumanPseudoAnimationMode = HumanPseudoAnimationMode::Idle;
 	bool m_IsReturningToTitle = false;
+
+	// 出現SE
+	int m_SpawnSE = -1;
+
+	// 射撃SE
+	int m_FireSE = -1;
+
+	// 電線移動SE
+	int m_ElectricMoveSE = -1;
 };
 
 
