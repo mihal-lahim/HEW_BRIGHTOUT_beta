@@ -137,7 +137,8 @@ public:
 		attackEffectRenderer->material.texturePath = AttackEffectTexturePath;
 		attackEffectRenderer->material.texture = nullptr;
 		attackEffectRenderer->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
-		attackEffectObject->AddComponent<Billboard>();
+		auto* attackEffectBillboard = attackEffectObject->AddComponent<Billboard>();
+		attackEffectBillboard->customVsPath = "AttackEffectBillboardVS.cso";
 		attackEffectObject->transform().position() = gameObject.transform().position() + AttackEffectOffset;
 		attackEffectObject->transform().rotation() = Quaternion::SetEulerX(AttackEffectPitch);
 		attackEffectObject->transform().scale() = AttackEffectScale;

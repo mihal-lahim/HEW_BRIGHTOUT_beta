@@ -396,6 +396,7 @@ private:
 			+ (attackDirection * AttackEffectForwardDistance)
 			+ Vector3(0.0f, AttackEffectHeightOffset, 0.0f);
 
+
 		ApplyAttackEffectDirectionUV(attackDirection);
 	}
 

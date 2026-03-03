@@ -1,4 +1,4 @@
-#include "Player.h"
+ï»¿#include "Player.h"
 #include "Renderer.h"
 #include "InputSystem.h"
 #include "Camera.h"
@@ -12,6 +12,9 @@
 #include "audio.h"
 #include "PowerPlant.h"
 #include "TimerUI.h"
+#include "Billboard.h"
+#include "Texture.h"
+#include "Shader.h"
 #include <algorithm>
 #include <cmath>
 
@@ -23,7 +26,7 @@ static void SetUVRectRecursive(GameObject* obj, const DirectX::XMFLOAT4& uvRect)
 
 void Player::Start()
 {
-	// oŒ»SE“Ç‚İ‚İ•Ä¶
+	// å‡ºç¾SEèª­ã¿è¾¼ã¿ï¼†å†ç”Ÿ
 	m_SpawnSE = LoadAudio("sound/PlayerSpawn.wav");
 	if (m_SpawnSE >= 0)
 	{
@@ -31,21 +34,34 @@ void Player::Start()
 		SetAudioVolume(m_SpawnSE, 0.5f);
 	}
 
-	// ËŒ‚SE“Ç‚İ‚İ
+	// å°„æ’ƒSEèª­ã¿è¾¼ã¿
 	m_FireSE = LoadAudio("sound/shooting.wav");
 	if (m_FireSE >= 0)
 	{
 		SetAudioVolume(m_FireSE, 3.0f);
 	}
 
-	// “düˆÚ“®SE“Ç‚İ‚İ
+	// é›»ç·šç§»å‹•SEèª­ã¿è¾¼ã¿
 	m_ElectricMoveSE = LoadAudio("sound/electoric_move.wav");
 	if (m_ElectricMoveSE >= 0)
 	{
 		SetAudioVolume(m_ElectricMoveSE, ElectricMoveSEVolume);
 	}
 
-	// ‰Šúó‘Ôİ’è
+	// åˆå›å°„æ’ƒæ™‚ã®è² è·è»½æ¸›ã®ãŸã‚ã«å…ˆèª­ã¿
+	resource().Load<Texture>(L"texture/kaminari_B.png");
+	resource().Load<VertexShader>("BillboardVS.cso");
+	resource().Load<PixelShader>("BillboardPS.cso");
+	gameObject().rendering().CreateBillboardQuad();
+
+	// é›»æ°—çŠ¶æ…‹ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®åˆå›è¡¨ç¤ºè² è·è»½æ¸›ã®ãŸã‚ã«å…ˆèª­ã¿
+	resource().Load<Texture>(L"texture/ball.png");
+
+	// æ•µæ”»æ’ƒã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®åˆå›è¡¨ç¤ºè² è·è»½æ¸›ã®ãŸã‚ã«å…ˆèª­ã¿
+	resource().Load<Texture>(L"texture/kiru_effects_1.png");
+	resource().Load<VertexShader>("AttackEffectBillboardVS.cso");
+
+	// åˆæœŸçŠ¶æ…‹è¨­å®š
 	stateMachine->ChangeState(&PlayerStates::HumanIdle, *this);
 	ResetWalkAnimation();
 	ResetHumanPseudoAnimationGroup(idleModelObjects, idleAnimationIndex, idleAnimationTimer);
@@ -59,12 +75,12 @@ void Player::Update()
 {
 	if (gameObject().transform().position().y < FallReturnY)
 	{
-		// —‰ºˆÊ’u‚ğ‹L˜^
+		// è½ä¸‹ä½ç½®ã‚’è¨˜éŒ²
 		Vector3 fallPos = gameObject().transform().position();
 
-		// ƒV[ƒ““à‚Ì‘SPowerPlant‚ğæ“¾‚µAÅ‚à‹ß‚¢”­“dŠ‚ğ’T‚·
+		// ã‚·ãƒ¼ãƒ³å†…ã®å…¨PowerPlantã‚’å–å¾—ã—ã€æœ€ã‚‚è¿‘ã„ç™ºé›»æ‰€ã‚’æ¢ã™
 		auto plants = scene().currentScene().GetComponents<PowerPlant>();
-		Vector3 closestPlantPos = Vector3(0.0f, 0.0f, 10.0f); // ƒfƒtƒHƒ‹ƒg
+		Vector3 closestPlantPos = Vector3(0.0f, 0.0f, 10.0f); // ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
 
 		if (!plants.empty())
 		{
@@ -74,7 +90,7 @@ void Player::Update()
 				Vector3 plantPos = plant->gameObject().transform().position();
 				float dx = plantPos.x - fallPos.x;
 				float dz = plantPos.z - fallPos.z;
-				float distSq = dx * dx + dz * dz; // XZ•½–Ê‚Å‚Ì‹——£iY‚Í–³‹j
+				float distSq = dx * dx + dz * dz; // XZå¹³é¢ã§ã®è·é›¢ï¼ˆYã¯ç„¡è¦–ï¼‰
 				if (distSq < minDistSq)
 				{
 					minDistSq = distSq;
@@ -83,8 +99,8 @@ void Player::Update()
 			}
 		}
 
-		// ”­“dŠ‚©‚çƒIƒuƒWƒFƒNƒg‚Éd‚È‚ç‚È‚¢‚æ‚¤Aˆê’è‹——£—£‚ê‚½ˆÊ’u‚ÉƒŠƒXƒ|[ƒ“
-		// —‰º’n“_‚©‚ç”­“dŠ‚ÖŒü‚©‚¤XZ•ûŒü‚Ì‹t•ûŒüi—‰ºˆÊ’u‚Ì•ûŒüj‚ÉƒIƒtƒZƒbƒg
+		// ç™ºé›»æ‰€ã‹ã‚‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«é‡ãªã‚‰ãªã„ã‚ˆã†ã€ä¸€å®šè·é›¢é›¢ã‚ŒãŸä½ç½®ã«ãƒªã‚¹ãƒãƒ¼ãƒ³
+		// è½ä¸‹åœ°ç‚¹ã‹ã‚‰ç™ºé›»æ‰€ã¸å‘ã‹ã†XZæ–¹å‘ã®é€†æ–¹å‘ï¼ˆï¼è½ä¸‹ä½ç½®ã®æ–¹å‘ï¼‰ã«ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 		constexpr float RespawnOffsetFromPlant = 8.0f;
 		float dirX = fallPos.x - closestPlantPos.x;
 		float dirZ = fallPos.z - closestPlantPos.z;
@@ -93,28 +109,28 @@ void Player::Update()
 		Vector3 respawnPos = closestPlantPos;
 		if (dirLen > 0.01f)
 		{
-			// —‰ºˆÊ’u•ûŒü‚É”­“dŠ‚©‚çƒIƒtƒZƒbƒg
+			// è½ä¸‹ä½ç½®æ–¹å‘ã«ç™ºé›»æ‰€ã‹ã‚‰ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 			respawnPos.x += (dirX / dirLen) * RespawnOffsetFromPlant;
 			respawnPos.z += (dirZ / dirLen) * RespawnOffsetFromPlant;
 		}
 		else
 		{
-			// —‰ºˆÊ’u‚Æ”­“dŠ‚ªd‚È‚Á‚Ä‚¢‚éê‡‚ÍZ+•ûŒü‚ÉƒIƒtƒZƒbƒg
+			// è½ä¸‹ä½ç½®ã¨ç™ºé›»æ‰€ãŒé‡ãªã£ã¦ã„ã‚‹å ´åˆã¯Z+æ–¹å‘ã«ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 			respawnPos.z += RespawnOffsetFromPlant;
 		}
 		respawnPos.y = 5.0f;
 
-		// ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ğƒŠƒXƒ|[ƒ“’n“_‚ÉˆÚ“®
+		// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½ç½®ã‚’ãƒªã‚¹ãƒãƒ¼ãƒ³åœ°ç‚¹ã«ç§»å‹•
 		gameObject().transform().position() = respawnPos;
 
-		// •¨—ƒ{ƒfƒB‚Ì‘¬“x‚ğƒŠƒZƒbƒg‚µAˆÊ’u‚ğ“¯Šú
+		// ç‰©ç†ãƒœãƒ‡ã‚£ã®é€Ÿåº¦ã‚’ãƒªã‚»ãƒƒãƒˆã—ã€ä½ç½®ã‚’åŒæœŸ
 		if (physicsBody && physicsBody->IsEnable())
 		{
 			physicsBody->SetVelocity(Vector3(0.0f, 0.0f, 0.0f));
 			physicsBody->SyncTransformToGameObject();
 		}
 
-		// §ŒÀŠÔ‚ğ10•bŒ¸‚ç‚·
+		// åˆ¶é™æ™‚é–“ã‚’10ç§’æ¸›ã‚‰ã™
 		auto timers = scene().currentScene().GetComponents<TimerUI>();
 		if (!timers.empty() && timers[0])
 		{
@@ -124,7 +140,7 @@ void Player::Update()
 		return;
 	}
 
-	// ó‘ÔŠÇ—ƒRƒ“ƒ|[ƒlƒ“ƒgXV
+	// çŠ¶æ…‹ç®¡ç†ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆæ›´æ–°
 	stateMachine->Update(*this);
 	if (modelObject && modelObject->IsActiveInHierarchy() && inputHandler)
 	{
@@ -162,7 +178,7 @@ void Player::HandleFire()
 
 void Player::FireBullet()
 {
-	// ËŒ‚SEÄ¶
+	// å°„æ’ƒSEå†ç”Ÿ
 	if (m_FireSE >= 0)
 	{
 		PlayAudio(m_FireSE, false);
@@ -175,19 +191,40 @@ void Player::FireBullet()
 		forward = Vector3(0.0f, 0.0f, 1.0f);
 	}
 	forward = forward.Normalize();
+	const float effectUvRotation = std::atan2f(forward.x, forward.z);
 
 	GameObject* bulletObject = CreateGameObject();
 	bulletObject->SetTag("Bullet");
 	bulletObject->transform().position() = gameObject().transform().position() + forward * 1.0f;
 	bulletObject->transform().rotation() = gameObject().transform().rotation();
 
-	ModelPrefab bulletModel{ "model/cube.glb" };
-	GameObject* bulletVisual = bulletObject->Instantiate(bulletModel);
+	GameObject* bulletVisual = bulletObject->CreateGameObject();
 	bulletObject->SetChild(*bulletVisual);
-	bulletVisual->transform().scale() = Vector3(0.2f, 0.2f, 0.2f);
+	bulletVisual->transform().scale() = Vector3(0.8f, 0.8f, 0.8f);
+
+	auto* renderer = bulletVisual->AddComponent<MeshRenderer>();
+	renderer->mesh = bulletVisual->rendering().CreateBillboardQuad().get();
+	renderer->material.texturePath = L"texture/kaminari_B.png";
+	renderer->material.texture = nullptr;
+	renderer->material.vsPath = "BillboardVS.cso";
+	renderer->material.psPath = "BillboardPS.cso";
+	renderer->material.shaderProgram = nullptr;
+	renderer->renderQueue = RenderQueue::Transparent;
+	renderer->material.SetColor({ 2.5f, 2.5f, 2.5f, 1.0f });
+	{
+		constexpr int kCols = 7;
+		constexpr int kRows = 3;
+		const float w = 1.0f / (float)kCols;
+		const float h = 1.0f / (float)kRows;
+		renderer->material.SetFloat4("uv_rect", { 0.0f, 0.0f, w, h });
+	}
+	auto* billboard = bulletVisual->AddComponent<Billboard>();
+	billboard->uvRotation = effectUvRotation;
+	renderer->material.SetFloat("uv_rotation", effectUvRotation);
 
 	auto* bullet = bulletObject->AddComponent<Bullet>();
 	bullet->Direction = forward;
+	bullet->EffectUVRotation = effectUvRotation;
 	bullet->Speed = BulletSpeed;
 	bullet->LifeTime = BulletLifeTime;
 }

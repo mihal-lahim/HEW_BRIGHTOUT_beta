@@ -4,10 +4,14 @@
 #include "ScriptComponent.h"
 #include "Mesh.h"
 #include <memory>
+#include <string>
 
 class Billboard : public ScriptComponent
 {
 public:
+	float uvRotation = 0.0f;
+	std::string customVsPath;
+
 	void Awake() override;
 	void Update() override;
 private:

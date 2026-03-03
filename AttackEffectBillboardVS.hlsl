@@ -1,6 +1,6 @@
 // AttackEffectBillboardVS.hlsl
 // Y軸固定ビルボード頂点シェーダー
-// Y軸(上方向)を固定し、XZ平面上でカメラに向く軸ビルボード
+// Y軸(上方向)を固定し、XZ平面上でカメラに正対する軸ビルボード
 
 cbuffer PER_CAMERA : register(b1)
 {
@@ -40,19 +40,23 @@ VS_OUTPUT main(VS_INPUT vsin)
     float scaleX = length(float3(world[0][0], world[0][1], world[0][2]));
     float scaleY = length(float3(world[1][0], world[1][1], world[1][2]));
 
-    // カメラ前方向（ワールド空間）
-    float3 camForward = float3(view[0][2], view[1][2], view[2][2]);
-
-    // Y軸固定: upは常にワールドY
     float3 up = float3(0.0f, 1.0f, 0.0f);
 
-    // XZ平面でカメラに向くforward（Y成分を潰して正規化）
+    // ビュー行列の左3x3転置 = ワールド空間でのカメラ軸
+    // camRight: ビュー行列の列0、camForward: ビュー行列の列2
+    float3 camRight   = float3(view[0][0], view[1][0], view[2][0]);
+    float3 camForward = float3(view[0][2], view[1][2], view[2][2]);
+
+    // Y軸固定: カメラ正面のXZ成分だけ使ってビルボードを向ける
+    // (-camForward)のY成分を潰して正規化 → カメラがどこにいても正対する
     float3 look = -camForward;
     look.y = 0.0f;
     look = normalize(look);
 
-    // rightはlookとupの外積
-    float3 right = cross(up, look);
+    // right は camRight のXZ投影を使う（スケール歪み防止）
+    float3 right = camRight;
+    right.y = 0.0f;
+    right = normalize(right);
 
     // ビルボード頂点をワールド空間で構築
     float3 worldPos = worldCenter
