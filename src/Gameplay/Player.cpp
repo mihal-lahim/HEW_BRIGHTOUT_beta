@@ -198,30 +198,6 @@ void Player::FireBullet()
 	bulletObject->transform().position() = gameObject().transform().position() + forward * 1.0f;
 	bulletObject->transform().rotation() = gameObject().transform().rotation();
 
-	GameObject* bulletVisual = bulletObject->CreateGameObject();
-	bulletObject->SetChild(*bulletVisual);
-	bulletVisual->transform().scale() = Vector3(0.8f, 0.8f, 0.8f);
-
-	auto* renderer = bulletVisual->AddComponent<MeshRenderer>();
-	renderer->mesh = bulletVisual->rendering().CreateBillboardQuad().get();
-	renderer->material.texturePath = L"texture/kaminari_B.png";
-	renderer->material.texture = nullptr;
-	renderer->material.vsPath = "BillboardVS.cso";
-	renderer->material.psPath = "BillboardPS.cso";
-	renderer->material.shaderProgram = nullptr;
-	renderer->renderQueue = RenderQueue::Transparent;
-	renderer->material.SetColor({ 2.5f, 2.5f, 2.5f, 1.0f });
-	{
-		constexpr int kCols = 7;
-		constexpr int kRows = 3;
-		const float w = 1.0f / (float)kCols;
-		const float h = 1.0f / (float)kRows;
-		renderer->material.SetFloat4("uv_rect", { 0.0f, 0.0f, w, h });
-	}
-	auto* billboard = bulletVisual->AddComponent<Billboard>();
-	billboard->uvRotation = effectUvRotation;
-	renderer->material.SetFloat("uv_rotation", effectUvRotation);
-
 	auto* bullet = bulletObject->AddComponent<Bullet>();
 	bullet->Direction = forward;
 	bullet->EffectUVRotation = effectUvRotation;

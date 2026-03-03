@@ -12,6 +12,7 @@
 #include "VideoTexture.h"
 #include "Texture.h"
 #include <string>
+#include <vector>
 
 class MeshRenderer;
 
@@ -36,6 +37,15 @@ private:
 	bool m_initialized = false;
 	bool m_transitionRequested = false;
 	float m_elapsed = 0.0f;
+
+	std::vector<std::string> m_preloadModelPaths{};
+	std::vector<std::wstring> m_preloadTexturePaths{};
+	size_t m_modelPreloadIndex = 0;
+	size_t m_texturePreloadIndex = 0;
+	bool m_preloadCompleted = false;
+
+	void SetupPreloadQueue();
+	void UpdatePreload();
 };
 
 #endif

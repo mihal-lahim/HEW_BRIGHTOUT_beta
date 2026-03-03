@@ -15,15 +15,16 @@ public:
 	Vector3 Direction{ 0.0f, 0.0f, 1.0f };
 	float EffectUVRotation = 0.0f;
 
-	float TrailSpawnDistance = 0.45f;
-	float TrailLifeTime = 0.14f;
-	float TrailScale = 0.55f;
-	std::wstring TrailTexturePath = L"texture/kaminari_B.png";
-	int TrailSheetColumns = 7;
-	int TrailSheetRows = 3;
-	int TrailSheetFrameCount = 21;
-	float TrailAnimationFps = 30.0f;
-	bool TrailAnimationLoop = false;
+	std::wstring TexturePath = L"texture/ball.png";
+	Vector3 VisualScale{ 0.8f, 0.8f, 0.8f };
+	float VisualColorScale = 2.5f;
+	float VisualAlpha = 1.0f;
+
+	int TrailSheetColumns = 6;
+	int TrailSheetRows = 6;
+	int TrailSheetFrameCount = 31;
+	float TrailAnimationFps = 12.5f;
+	bool TrailAnimationLoop = true;
 
 	// ヒットSEのボリューム（0.0?1.0）
 	float HitSEVolume = 0.5f;
@@ -34,7 +35,6 @@ public:
 private:
 	float m_LifeTimer = 0.0f;
 	Vector3 m_StartPos{};
-	Vector3 m_LastTrailSpawnPos{};
 	int m_HitSE = -1;
 };
 

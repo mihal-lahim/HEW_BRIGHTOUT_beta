@@ -9,6 +9,7 @@
 #include "ScriptComponent.h"
 #include "Prefab.h"
 #include "GameObject.h"
+#include <algorithm>
 
 
 WindowSystem& Scene::window() const
@@ -101,6 +102,12 @@ void Scene::DestroyPendingComponentsProcess()
 		Component* comp = compPool->Get(pending.AllocationID);
 		if (comp)
 		{
+			if (comp->m_gameObject)
+			{
+				auto& components = comp->m_gameObject->m_components;
+				components.erase(std::remove(components.begin(), components.end(), comp), components.end());
+			}
+
 			comp->FinalizeByContext();
 			compPool->Destroy(pending.AllocationID);
 		}
@@ -118,6 +125,12 @@ void Scene::DestroyPendingScriptComponentsProcess()
 		ScriptComponent* scriptComp = scriptCompPool->Get(pending.AllocationID);
 		if (scriptComp)
 		{
+			if (scriptComp->m_gameObject)
+			{
+				auto& components = scriptComp->m_gameObject->m_components;
+				components.erase(std::remove(components.begin(), components.end(), scriptComp), components.end());
+			}
+
 			scriptComp->OnDestroy();
 			scriptCompPool->Destroy(pending.AllocationID);
 		}
@@ -248,15 +261,18 @@ void Scene::Disable()
 	auto* gameObjectPool = static_cast<ObjectPool<GameObject>*>(m_gameObjects.get());
 	if (!gameObjectPool) return;
 
-	// プール内のすべてのゲームオブジェクトを無効化
 	for (size_t i = 0; i < gameObjectPool->Size(); ++i)
 	{
 		GameObject* gameObject = gameObjectPool->Get(static_cast<uint32_t>(i));
 		if (gameObject)
 		{
+			// m_components から nullptr を削除するか、アクセス前に確認
 			for (auto* component : gameObject->m_components)
 			{
-				component->OnDisable();
+				if (component != nullptr)  // 追加: nullptrチェック
+				{
+					component->OnDisable();
+				}
 			}
 		}
 	}

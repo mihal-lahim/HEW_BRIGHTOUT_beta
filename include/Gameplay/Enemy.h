@@ -86,7 +86,7 @@ inline void SetEnemyUVRectRecursive(GameObject* obj, const DirectX::XMFLOAT4& uv
 class Enemy : public Movement
 {
 public:
-	float MoveSpeed = 5.0f;
+	float MoveSpeed = 3.0f;
 	bool UseGravity = true;
 	float Gravity = -30.0f;
 	float FallDestroyY = -20.0f;
