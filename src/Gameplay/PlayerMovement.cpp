@@ -124,6 +124,13 @@ void PlayerMovement::ElectricJump(float inputX, float inputZ)
 
 void PlayerMovement::SnapToPowerLine(PowerLineID lineID)
 {
+	// 地上移動中の場合、移動停止イベントを送信してフラグをリセット
+	if (m_IsMoving)
+	{
+		EventSystem::Send("Player_MoveStop");
+		m_IsMoving = false;
+	}
+
 	// 電線を取得
 	PowerLine* powerLine = m_PoleManager->GetPowerLine(lineID);
 

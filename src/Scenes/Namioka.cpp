@@ -33,6 +33,7 @@
 #include "ScoreData.h"
 #include "SkyDome.h"
 #include "FadeController.h"
+#include "PowerPlantCountUI.h"
 
 using namespace DirectX;
 
@@ -1104,28 +1105,28 @@ void Namioka::Initialize()
 	std::vector<DensenData> spedensenList =
 	{
 		// ①→②
-		{ { 0.0f, 10.0f, -18.0f },  0.0f },
+		{ { 0.0f, 4.5f, -18.0f },  0.0f },
 
 		// ②→③
-		{ { -18.0f, 10.0f, -60.0f },  90.0f },
+		{ { -18.0f, 4.5f, -60.0f },  90.0f },
 
 		// ③→④
-		{ { -60.0f, 10.0f, -78.0f },  0.0f },
+		{ { -60.0f, 4.5f, -78.0f },  0.0f },
 
 		// ④→⑤
-		{ { -18.0f, 10.0f, -120.0f },  90.0f },
+		{ { -18.0f, 4.5f, -120.0f },  90.0f },
 
 		// ④→⑥
-		{ { -78.0f, 10.0f, -120.0f },  90.0f },
+		{ { -78.0f, 4.5f, -120.0f },  90.0f },
 
 		// ⑥→⑦
-		{ { -120.0f, 10.0f, -138.0f },  0.0f },
+		{ { -120.0f, 4.5f, -138.0f },  0.0f },
 
 		// ⑦→⑧
-		{ { -120.0f, 10.0f, -198.0f },  0.0f },
+		{ { -120.0f, 4.5f, -198.0f },  0.0f },
 
 		// ⑧→⑨
-		{ { -138.0f, 10.0f, -240.0f },  90.0f },
+		{ { -138.0f, 4.5f, -240.0f },  90.0f },
 	};
 
 	std::vector<std::pair<size_t, size_t>> specialLinePolePairs =
@@ -1326,6 +1327,22 @@ void Namioka::Initialize()
 	fadeObj->SetName("FadeController");
 	auto* fadeCtrl = fadeObj->AddComponent<FadeController>();
 	fadeCtrl->StartFadeIn(2.0f);
+
+	// 発電所復旧数 UI
+	GameObject* plantCountRoot = uiRoot->scenePtr()->CreateGameObject();
+	plantCountRoot->SetName("PowerPlantCountUI");
+	auto* plantCountUI = plantCountRoot->AddComponent<PowerPlantCountUI>();
+	// アイコン画像（発電所アイコン）
+	plantCountUI->iconTexturePath = L"texture/powerplant_icon.png";
+	plantCountUI->iconPosition    = Vector3(50.0f, 50.0f, 0.0f);
+	plantCountUI->iconScale       = Vector3(300.0f, 300.0f, 1.0f);
+	// 現在数（分子）
+	plantCountUI->currentDigitPosition = Vector3(100.0f, 80.0f, 0.0f);
+	plantCountUI->currentDigitScale    = Vector3(120.0f, 120.0f, 1.0f);
+	// 最大数（分母）
+	plantCountUI->totalDigitPosition = Vector3(200.0f, 200.0f, 0.0f);
+	plantCountUI->totalDigitScale = Vector3(120.0f, 120.0f, 1.0f);
+	plantCountUI->totalPlantCount    = 9;
 }
 
 void Namioka::Finalize()

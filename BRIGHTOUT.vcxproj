@@ -22,7 +22,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{0cd14713-b3d2-4f0b-90c6-5d08fe1b933e}</ProjectGuid>
-    <RootNamespace>DX210425郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ2郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽB郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽh郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽ\郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ</RootNamespace>
+    <RootNamespace>DX210425郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�2郢晢�E��E�繝ｻ・�E�E郢晢�E��E�繝ｻ・�E�B郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�h郢晢�E��E�繝ｻ・�E�E郢晢�E��E�繝ｻ・�E�\郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -89,7 +89,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso 郢晢ｽｻ繝ｻ・ｽt郢晢ｽｻ繝ｻ・ｽ@郢晢ｽｻ繝ｻ・ｽC郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽv郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽW郢晢ｽｻ繝ｻ・ｽF郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽf郢晢ｽｻ繝ｻ・ｽB郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ繝ｻ蟲ｨ縺慕ｹ晢ｽｻ繝ｻ・ｽs郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽi郢晢ｽｻ繝ｻ・ｽS郢晢ｽｻ繝ｻ・ｽp郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽy郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽ繝ｻ諠ｹ・ｼ螟ｲ・ｽ・ｿ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽj
+      <Command>:: .cso 郢晢�E��E�繝ｻ・�E�t郢晢�E��E�繝ｻ・�E�@郢晢�E��E�繝ｻ・�E�C郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�v郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�W郢晢�E��E�繝ｻ・�E�F郢晢�E��E�繝ｻ・�E�N郢晢�E��E�繝ｻ・�E�g郢晢�E��E�繝ｻ・�E�f郢晢�E��E�繝ｻ・�E�B郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�N郢晢�E��E�繝ｻ・�E�g郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�繝ｻ蟲�E�縺慕ｹ晢�E��E�繝ｻ・�E�s郢晢�E��E�繝ｻ・�E�[郢晢�E��E�繝ｻ・�E�i郢晢�E��E�繝ｻ・�E�S郢晢�E��E�繝ｻ・�E�p郢晢�E��E�繝ｻ・�E�E郢晢�E��E�繝ｻ・�E�X郢晢�E��E�繝ｻ・�E�y郢晢�E��E�繝ｻ・�E�[郢晢�E��E�繝ｻ・�E�X郢晢�E��E�繝ｻ・�E�繝ｻ諠�E�・�E�螟ｲ・�E�・�E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -114,7 +114,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso 郢晢ｽｻ繝ｻ・ｽt郢晢ｽｻ繝ｻ・ｽ@郢晢ｽｻ繝ｻ・ｽC郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽv郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽW郢晢ｽｻ繝ｻ・ｽF郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽf郢晢ｽｻ繝ｻ・ｽB郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ繝ｻ蟲ｨ縺慕ｹ晢ｽｻ繝ｻ・ｽs郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽi郢晢ｽｻ繝ｻ・ｽS郢晢ｽｻ繝ｻ・ｽp郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽy郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽ繝ｻ諠ｹ・ｼ螟ｲ・ｽ・ｿ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽj
+      <Command>:: .cso 郢晢�E��E�繝ｻ・�E�t郢晢�E��E�繝ｻ・�E�@郢晢�E��E�繝ｻ・�E�C郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�v郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�W郢晢�E��E�繝ｻ・�E�F郢晢�E��E�繝ｻ・�E�N郢晢�E��E�繝ｻ・�E�g郢晢�E��E�繝ｻ・�E�f郢晢�E��E�繝ｻ・�E�B郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�N郢晢�E��E�繝ｻ・�E�g郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�繝ｻ蟲�E�縺慕ｹ晢�E��E�繝ｻ・�E�s郢晢�E��E�繝ｻ・�E�[郢晢�E��E�繝ｻ・�E�i郢晢�E��E�繝ｻ・�E�S郢晢�E��E�繝ｻ・�E�p郢晢�E��E�繝ｻ・�E�E郢晢�E��E�繝ｻ・�E�X郢晢�E��E�繝ｻ・�E�y郢晢�E��E�繝ｻ・�E�[郢晢�E��E�繝ｻ・�E�X郢晢�E��E�繝ｻ・�E�繝ｻ諠�E�・�E�螟ｲ・�E�・�E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -140,7 +140,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso 郢晢ｽｻ繝ｻ・ｽt郢晢ｽｻ繝ｻ・ｽ@郢晢ｽｻ繝ｻ・ｽC郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽv郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽW郢晢ｽｻ繝ｻ・ｽF郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽf郢晢ｽｻ繝ｻ・ｽB郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ繝ｻ蟲ｨ縺慕ｹ晢ｽｻ繝ｻ・ｽs郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽi郢晢ｽｻ繝ｻ・ｽS郢晢ｽｻ繝ｻ・ｽp郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽy郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽ繝ｻ諠ｹ・ｼ螟ｲ・ｽ・ｿ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽj
+      <Command>:: .cso 郢晢�E��E�繝ｻ・�E�t郢晢�E��E�繝ｻ・�E�@郢晢�E��E�繝ｻ・�E�C郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�v郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�W郢晢�E��E�繝ｻ・�E�F郢晢�E��E�繝ｻ・�E�N郢晢�E��E�繝ｻ・�E�g郢晢�E��E�繝ｻ・�E�f郢晢�E��E�繝ｻ・�E�B郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�N郢晢�E��E�繝ｻ・�E�g郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�繝ｻ蟲�E�縺慕ｹ晢�E��E�繝ｻ・�E�s郢晢�E��E�繝ｻ・�E�[郢晢�E��E�繝ｻ・�E�i郢晢�E��E�繝ｻ・�E�S郢晢�E��E�繝ｻ・�E�p郢晢�E��E�繝ｻ・�E�E郢晢�E��E�繝ｻ・�E�X郢晢�E��E�繝ｻ・�E�y郢晢�E��E�繝ｻ・�E�[郢晢�E��E�繝ｻ・�E�X郢晢�E��E�繝ｻ・�E�繝ｻ諠�E�・�E�螟ｲ・�E�・�E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -170,7 +170,7 @@ for %%F in ("$(TargetDir)*.cso") do (
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>:: .cso 郢晢ｽｻ繝ｻ・ｽt郢晢ｽｻ繝ｻ・ｽ@郢晢ｽｻ繝ｻ・ｽC郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽv郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽW郢晢ｽｻ繝ｻ・ｽF郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽf郢晢ｽｻ繝ｻ・ｽB郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽN郢晢ｽｻ繝ｻ・ｽg郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽ繝ｻ蟲ｨ縺慕ｹ晢ｽｻ繝ｻ・ｽs郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽi郢晢ｽｻ繝ｻ・ｽS郢晢ｽｻ繝ｻ・ｽp郢晢ｽｻ繝ｻ・ｽE郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽy郢晢ｽｻ繝ｻ・ｽ[郢晢ｽｻ繝ｻ・ｽX郢晢ｽｻ繝ｻ・ｽ繝ｻ諠ｹ・ｼ螟ｲ・ｽ・ｿ繝ｻ・ｽ郢晢ｽｻ繝ｻ・ｽj
+      <Command>:: .cso 郢晢�E��E�繝ｻ・�E�t郢晢�E��E�繝ｻ・�E�@郢晢�E��E�繝ｻ・�E�C郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�v郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�W郢晢�E��E�繝ｻ・�E�F郢晢�E��E�繝ｻ・�E�N郢晢�E��E�繝ｻ・�E�g郢晢�E��E�繝ｻ・�E�f郢晢�E��E�繝ｻ・�E�B郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�N郢晢�E��E�繝ｻ・�E�g郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�繝ｻ蟲�E�縺慕ｹ晢�E��E�繝ｻ・�E�s郢晢�E��E�繝ｻ・�E�[郢晢�E��E�繝ｻ・�E�i郢晢�E��E�繝ｻ・�E�S郢晢�E��E�繝ｻ・�E�p郢晢�E��E�繝ｻ・�E�E郢晢�E��E�繝ｻ・�E�X郢晢�E��E�繝ｻ・�E�y郢晢�E��E�繝ｻ・�E�[郢晢�E��E�繝ｻ・�E�X郢晢�E��E�繝ｻ・�E�繝ｻ諠�E�・�E�螟ｲ・�E�・�E�繝ｻ・�E�郢晢�E��E�繝ｻ・�E�j
 for %%F in ("$(TargetDir)*.cso") do (
     copy /Y "%%~fF" "$(ProjectDir)"
 )</Command>
@@ -217,6 +217,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClCompile Include="src\Gameplay\SpecialDensen.cpp" />
     <ClCompile Include="src\Gameplay\SpecialDentyuu.cpp" />
     <ClCompile Include="src\UI\TimerUI.cpp" />
+    <ClCompile Include="src\UI\PowerPlantCountUI.cpp" />
     <ClCompile Include="src\Scenes\Title.cpp" />
     <ClCompile Include="src\Scenes\Result.cpp" />
     <ClCompile Include="src\Scenes\ResultController.cpp" />
@@ -324,6 +325,7 @@ for %%F in ("$(TargetDir)*.cso") do (
     <ClInclude Include="include\Gameplay\SpecialDensen.h" />
     <ClInclude Include="include\Gameplay\SpecialDentyuu.h" />
     <ClInclude Include="include\UI\TimerUI.h" />
+    <ClInclude Include="include\UI\PowerPlantCountUI.h" />
     <ClInclude Include="include\Scenes\Title.h" />
     <ClInclude Include="include\Scenes\Result.h" />
     <ClInclude Include="include\Scenes\ResultController.h" />

@@ -115,7 +115,7 @@ public:
 	int AttackEffectDirectionFrameCount = 1;
 	float AttackEffectDirectionYawOffset = 0.0f;
 
-	// Ú’n”»’è‚ÌŠÔˆø‚«ŠÔŠui•bj
+	// æ¥åœ°åˆ¤å®šã®é–“å¼•ãé–“éš”ï¼ˆç§’ï¼‰
 	static constexpr float GroundCheckInterval = 0.1f;
 
 	bool IsDefeated() const { return m_IsDefeated; }
@@ -123,6 +123,13 @@ public:
 	{
 		if (m_IsDefeated)
 			return;
+
+		// è¢«å¼¾SEå†ç”Ÿ
+		if (m_HitSE >= 0)
+		{
+			PlayAudio(m_HitSE, false);
+			SetAudioVolume(m_HitSE, 0.5f);
+		}
 
 		m_IsDefeated = true;
 		m_DeadTimer = 0.0f;
@@ -141,18 +148,32 @@ public:
 		SetAnimationMode(AnimationMode::Idle);
 
 
-		// €–SSE“Ç‚İ‚İ
+		// æ­»äº¡SEèª­ã¿è¾¼ã¿
 		m_DeathSE = LoadAudio("sound/enemy_die.wav"); 
 		if (m_DeathSE >= 0)
 		{
 			SetAudioVolume(m_DeathSE, 0.7f);
 		}
 
-		// i•K—v‚È‚ç‘«‰¹‚à‚±‚±‚Å“Ç‚İ‚Şj
-		// m_MoveSE = LoadAudio("sound/enemy_step.wav");
+		// æ”»æ’ƒSEèª­ã¿è¾¼ã¿
+		m_AttackSE = LoadAudio("sound/enemy_attack.wav");
+		if (m_AttackSE >= 0)
+		{
+			SetAudioVolume(m_AttackSE, 0.5f);
+		}
+
+		// è¢«å¼¾SEèª­ã¿è¾¼ã¿
+		m_HitSE = LoadAudio("sound/enemy_hit.wav");
+		if (m_HitSE >= 0)
+		{
+			SetAudioVolume(m_HitSE, 0.5f);
+		}
+
+		// ç§»å‹•SEèª­ã¿è¾¼ã¿
+		m_MoveSE = LoadAudio("sound/enemy_move.wav");
 		if (m_MoveSE >= 0)
 		{
-			SetAudioVolume(m_MoveSE, 0.4f);
+			SetAudioVolume(m_MoveSE, 0.1f);
 		}
 
 	}
@@ -200,7 +221,7 @@ public:
 
 		if (!m_target)
 		{
-			// ƒ^[ƒQƒbƒgŒŸõ‚ğŠÔˆø‚«i0.5•bŠÔŠuj
+			// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆæ¤œç´¢ã‚’é–“å¼•ãï¼ˆ0.5ç§’é–“éš”ï¼‰
 			m_targetSearchTimer -= deltaTime;
 			if (m_targetSearchTimer <= 0.0f)
 			{
@@ -248,7 +269,7 @@ public:
 			SetAnimationMode(AnimationMode::Idle);
 			UpdateAnimation(deltaTime);
 
-			// ’â~‚µ‚½‚çSE‚ğ~‚ß‚é
+			// åœæ­¢ã—ãŸã‚‰SEã‚’æ­¢ã‚ã‚‹
 			if (m_isMoving && m_MoveSE >= 0)
 			{
 				StopAudio(m_MoveSE);
@@ -258,7 +279,7 @@ public:
 			return;
 		}
 
-		// ˆÚ“®ŠJn‚ÉSE‚ğƒ‹[ƒv‚ÅÄ¶
+		// ç§»å‹•é–‹å§‹æ™‚ã«SEã‚’ãƒ«ãƒ¼ãƒ—ã§å†ç”Ÿ
 		if (!m_isMoving && m_MoveSE >= 0)
 		{
 			PlayAudio(m_MoveSE, true);
@@ -271,7 +292,7 @@ public:
 		UpdateAnimation(deltaTime);
 	}
 
-	// “|‚³‚ê‚½/Destroy‚ÉŒÄ‚Î‚ê‚é
+	// å€’ã•ã‚ŒãŸ/Destroyæ™‚ã«å‘¼ã°ã‚Œã‚‹
 	void OnDestroy() override
 	{
 		if (attackEffectObject)
@@ -280,14 +301,14 @@ public:
 			attackEffectObject = nullptr;
 		}
 
-		// ˆÚ“®’†‚Ìƒ‹[ƒvSE‚ğ~‚ß‚é
+		// ç§»å‹•ä¸­ã®ãƒ«ãƒ¼ãƒ—SEã‚’æ­¢ã‚ã‚‹
 		if (m_isMoving && m_MoveSE >= 0)
 		{
 			StopAudio(m_MoveSE);
 			m_isMoving = false;
 		}
 
-		// €–SSE‚ğƒƒ“ƒVƒ‡ƒbƒg‚ÅÄ¶
+		// æ­»äº¡SEã‚’ãƒ¯ãƒ³ã‚·ãƒ§ãƒƒãƒˆã§å†ç”Ÿ
 		if (!m_DestroyedByFall && m_DeathSE >= 0)
 		{
 			PlayAudioOneShot(m_DeathSE, 0.9f);
@@ -414,8 +435,16 @@ private:
 		if (!targetHealth || !targetHealth->IsAlive())
 			return;
 
+		// æ”»æ’ƒSEå†ç”Ÿ
+		if (m_AttackSE >= 0)
+		{
+			PlayAudio(m_AttackSE, false);
+			SetAudioVolume(m_AttackSE, 0.5f);
+		}
+
 		targetHealth->TakeDamage(AttackDamage);
 		TriggerAttackEffect();
+
 		m_AttackCooldownTimer = AttackInterval >= 2.0f ? AttackInterval : 2.0f;
 	}
 
@@ -544,11 +573,19 @@ private:
 	int m_MoveSE = -1;
 	bool m_isMoving = false;
 
-	// “|‚³‚ê‚½‚Æ‚«‚ÌSE
+	// å€’ã•ã‚ŒãŸã¨ãã®SE
 	int m_DeathSE = -1;
 	bool m_DestroyedByFall = false;
 
+
 	float m_targetSearchTimer = 0.0f;
+
+	// æ”»æ’ƒSE
+	int m_AttackSE = -1;
+
+	// è¢«å¼¾SE
+	int m_HitSE = -1;
+
 
 };
 

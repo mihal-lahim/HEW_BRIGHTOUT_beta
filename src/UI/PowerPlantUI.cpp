@@ -39,7 +39,12 @@ static std::shared_ptr<Mesh> CreateBottomAlignedBillboardQuad(GraphicsDevice& de
 	vertices[3].normal   = {  0.0f, 0.0f, -1.0f };
 	vertices[3].uv       = {  1.0f, 1.0f };
 
-	std::vector<UINT> indices = { 0, 1, 2, 1, 3, 2 };
+	// 両面描画: 表面 + 裏面のインデックスを追加
+	// ビルボードはカメラ角度によってワインディングが反転するため両面必要
+	std::vector<UINT> indices = {
+		0, 1, 2, 1, 3, 2,  // 表面
+		0, 2, 1, 1, 2, 3   // 裏面
+	};
 
 	auto mesh = std::make_shared<Mesh>();
 	mesh->CreateBuffer(device, vertices, indices);

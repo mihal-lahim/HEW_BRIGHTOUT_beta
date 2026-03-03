@@ -9,6 +9,7 @@
 #include "Title.h"
 #include "GameTime.h"
 #include "SceneSystem.h"
+#include "audio.h"
 #include <algorithm>
 #include <cmath>
 
@@ -20,6 +21,28 @@ static void SetUVRectRecursive(GameObject* obj, const DirectX::XMFLOAT4& uvRect)
 
 void Player::Start()
 {
+	// oŒ»SE“Ç‚Ýž‚Ý•Ä¶
+	m_SpawnSE = LoadAudio("sound/PlayerSpawn.wav");
+	if (m_SpawnSE >= 0)
+	{
+		PlayAudio(m_SpawnSE, false);
+		SetAudioVolume(m_SpawnSE, 0.5f);
+	}
+
+	// ŽËŒ‚SE“Ç‚Ýž‚Ý
+	m_FireSE = LoadAudio("sound/shooting.wav");
+	if (m_FireSE >= 0)
+	{
+		SetAudioVolume(m_FireSE, 3.0f);
+	}
+
+	// “düˆÚ“®SE“Ç‚Ýž‚Ý
+	m_ElectricMoveSE = LoadAudio("sound/electoric_move.wav");
+	if (m_ElectricMoveSE >= 0)
+	{
+		SetAudioVolume(m_ElectricMoveSE, ElectricMoveSEVolume);
+	}
+
 	// ‰Šúó‘ÔÝ’è
 	stateMachine->ChangeState(&PlayerStates::HumanIdle, *this);
 	ResetWalkAnimation();
@@ -77,6 +100,13 @@ void Player::HandleFire()
 
 void Player::FireBullet()
 {
+	// ŽËŒ‚SEÄ¶
+	if (m_FireSE >= 0)
+	{
+		PlayAudio(m_FireSE, false);
+		SetAudioVolume(m_FireSE, 0.5f);
+	}
+
 	Vector3 forward = Vector3(0.0f, 0.0f, 1.0f).Rotate(gameObject().transform().rotation());
 	if (forward.IsZero())
 	{
@@ -443,5 +473,22 @@ void Player::UpdateRepairSpeedBuffText(float deltaTime)
 		m_RepairSpeedBuffTextTimer = 0.0f;
 		if (repairSpeedTextRoot)
 			SetActiveRecursive(repairSpeedTextRoot, false);
+	}
+}
+
+void Player::PlayElectricMoveSE()
+{
+	if (m_ElectricMoveSE >= 0)
+	{
+		PlayAudio(m_ElectricMoveSE, true);
+		SetAudioVolume(m_ElectricMoveSE, ElectricMoveSEVolume);
+	}
+}
+
+void Player::StopElectricMoveSE()
+{
+	if (m_ElectricMoveSE >= 0)
+	{
+		StopAudio(m_ElectricMoveSE);
 	}
 }

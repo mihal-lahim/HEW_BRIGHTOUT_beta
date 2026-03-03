@@ -50,7 +50,7 @@ public:
 	float AttackAnimationInterval = 0.12f;
 	float DeadAnimationInterval = 0.1f;
 	float DeadDuration = 0.5f;
-	float AttackRange = 1.8f;
+	float AttackRange = 1.0f;
 	float AttackDamage = 10.0f;
 	float AttackInterval = 2.0f;
 	std::wstring AttackEffectTexturePath = L"texture/kiru_effects_1.png";

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////
-//’eŠÇ—‚ÆŽ©“®Á–Å‚ð§Œä‚·‚éBulletƒNƒ‰ƒX‚ÌŽÀ‘•
+//å¼¾ç®¡ç†ã¨è‡ªå‹•æ¶ˆæ»…ã‚’åˆ¶å¾¡ã™ã‚‹Bulletã‚¯ãƒ©ã‚¹ã®å®Ÿè£…
 ///////////////////////////////////////////
 
 #include "Bullet.h"
@@ -7,9 +7,13 @@
 #include "GameObject.h"
 #include "ScoreData.h"
 #include "Enemy.h"
+
 #include "Ray.h"
 #include "PhysicsSystem.h"
 #include "PhysicsBody.h"
+
+#include "audio.h"
+
 
 namespace
 {
@@ -27,6 +31,7 @@ namespace
 void Bullet::Start()
 {
 	m_StartPos = gameObject().transform().position();
+	m_HitSE = LoadAudio("sound/bullet_hit.wav");
 }
 
 void Bullet::Update()
@@ -50,7 +55,7 @@ void Bullet::Update()
 	Vector3 curPos = gameObject().transform().position();
 	float stepDist = Speed * dt + HitRadius;
 
-	// RayCast‚Åis•ûŒü‚Ìƒqƒbƒg”»’èiBVHÅ“K‰»Ï‚Ýj
+	// RayCastã§é€²è¡Œæ–¹å‘ã®ãƒ’ãƒƒãƒˆåˆ¤å®šï¼ˆBVHæœ€é©åŒ–æ¸ˆã¿ï¼‰
 	Ray ray(curPos, dir);
 	physics().RayCast(ray, stepDist);
 
@@ -59,8 +64,24 @@ void Bullet::Update()
 		auto& hitGameObject = ray.HitObject->gameObject();
 		if (hitGameObject.CompareTag("Enemy") && hitGameObject.IsActiveInHierarchy())
 		{
-			auto* enemyComponent = hitGameObject.GetComponent<Enemy>();
-			if (enemyComponent && !enemyComponent->IsDefeated())
+
+
+			auto* enemyComponent = enemy->GetComponent<Enemy>();
+			if (enemyComponent && enemyComponent->IsDefeated())
+			{
+				continue;
+			}
+
+			// ãƒ’ãƒƒãƒˆSEå†ç”Ÿ
+			if (m_HitSE >= 0)
+			{
+				PlayAudio(m_HitSE, false);
+				SetAudioVolume(m_HitSE, HitSEVolume);
+			}
+
+			ScoreData::Instance().killedEnemies++;
+			if (enemyComponent)
+
 			{
 				ScoreData::Instance().killedEnemies++;
 				enemyComponent->OnDefeated();

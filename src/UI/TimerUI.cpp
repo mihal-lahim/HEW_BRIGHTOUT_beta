@@ -8,6 +8,7 @@
 #include "Mesh.h"
 #include "Result.h"
 #include "FadeController.h"
+#include "audio.h"
 
 #include <chrono>
 #include <cmath>
@@ -105,6 +106,9 @@ void TimerUI::Start()
 	timeUpRoot->SetActive(false);
 	m_timeUpRoot = timeUpRoot;
 
+	// ブザーSE読み込み
+	m_buzzerSE = LoadAudio("sound/Buzzer.wav");
+
 	m_lastTime = steady_clock::now();
 }
 
@@ -160,7 +164,14 @@ void TimerUI::Update()
 			m_timeUpUI->SetActive(true);
 		}
 
-		// タイムアップ由来のリザルトなので再生するBGMを差し替え
+		// ブザーSE再生
+		if (m_buzzerSE >= 0)
+		{
+			PlayAudio(m_buzzerSE, false);
+			SetAudioVolume(m_buzzerSE, 0.7f);
+		}
+
+		// タイムアップ時のリザルトなので再生中のBGMを切り替え
 		SetResultBgm("sound/Result_02.wav");
 
 		return;
@@ -235,7 +246,7 @@ void TimerUI::Update()
 		if (m_digitRenderers[i] && m_digitMeshes.size() > static_cast<size_t>(digits[i]))
 		{
 			m_digitRenderers[i]->mesh = m_digitMeshes[digits[i]].get();
-			m_digitRenderers[i]->material.texturePath = L"texture/BRIGHTOUT_Number_0-9.png";
+			m_digitRenderers[i]->material.texturePath = L"texture/Number_ver2.png";
 			m_digitRenderers[i]->material.vsPath = "UiVS.cso";
 			m_digitRenderers[i]->material.psPath = "UiPS.cso";
 		}
