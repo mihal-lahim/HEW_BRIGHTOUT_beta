@@ -217,7 +217,7 @@ void PowerPlant::UpdateHold(float deltaTime, bool isHolding)
 
 void PowerPlant::ResetHold()
 {
-	m_holdTimer = 0.0f;
+	// ゲージの進行状況（m_holdTimer）は保持し、SEのみ停止する
 
 	// ホールドがリセットされたら SE を停止
 	if (m_wasHolding)

@@ -86,7 +86,7 @@ inline void SetEnemyUVRectRecursive(GameObject* obj, const DirectX::XMFLOAT4& uv
 class Enemy : public Movement
 {
 public:
-	float MoveSpeed = 3.0f;
+	float MoveSpeed = 5.0f;
 	bool UseGravity = true;
 	float Gravity = -30.0f;
 	float FallDestroyY = -20.0f;
@@ -105,6 +105,8 @@ public:
 	float AttackRange = 1.8f;
 	float AttackDamage = 10.0f;
 	float AttackInterval = 2.0f;
+	// 攻撃が届くY軸方向の最大距離（電線上のプレイヤーには届かない）
+	float AttackHeightRange = 3.0f;
 	GameObject* attackEffectObject = nullptr;
 	float AttackEffectDuration = 0.2f;
 	float AttackEffectForwardDistance = 0.6f;
@@ -235,10 +237,13 @@ public:
 		}
 
 		Vector3 direction = m_target->transform().position() - gameObject().transform().position();
+		float heightDiff = std::fabs(direction.y);
 		direction.y = 0.0f;
 
 		float length = direction.Length();
-		if (length <= AttackRange)
+		// XZ平面で近くても、Y軸方向の距離が大きい場合は攻撃しない（電線上のプレイヤー等）
+		bool canAttack = (length <= AttackRange) && (heightDiff <= AttackHeightRange);
+		if (canAttack)
 		{
 			MoveVec = { 0.0f, 0.0f, 0.0f };
 
@@ -429,6 +434,11 @@ private:
 	void TryAttackTarget()
 	{
 		if (!m_target || m_AttackCooldownTimer > 0.0f)
+			return;
+
+		// Y軸方向の距離が大きすぎる場合は攻撃しない（電線上のプレイヤー等）
+		float heightDiff = std::fabs(m_target->transform().position().y - gameObject().transform().position().y);
+		if (heightDiff > AttackHeightRange)
 			return;
 
 		auto* targetHealth = m_target->GetComponent<Health>();
