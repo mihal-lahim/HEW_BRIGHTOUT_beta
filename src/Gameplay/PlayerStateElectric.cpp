@@ -2,6 +2,7 @@
 #include "GameTime.h"
 #include "audio.h"
 #include "EventSystem.h"
+#include "Health.h"
 
 void PlayerState_Electric::Enter(Player& player)
 {
@@ -82,6 +83,13 @@ void PlayerState_Electric::Update(Player& player)
 	// “düãˆÚ“®ˆ—
 	movement->LineMove();
 	player.AdvanceElectricAnimation((float)Time::DeltaTime());
+
+	// “düˆÚ“®’†‚ÌHP‰ñ•œ
+	if (player.health && player.ElectricHealPerSecond > 0.0f)
+	{
+		float healAmount = player.ElectricHealPerSecond * (float)Time::DeltaTime();
+		player.health->Heal(healAmount);
+	}
 
 	PlayerState::Update(player);
 }

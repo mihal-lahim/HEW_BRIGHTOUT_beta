@@ -219,8 +219,8 @@ public:
 		}
 		player->repairSpeedTextRoot = repairSpeedTextRoot;
 
-		// Healthコンポーネント設定
-		gameObject.AddComponent<Health>(100.0f);
+		// Health コンポーネント設定
+		player->health = gameObject.AddComponent<Health>(100.0f);
 
 
 		// PlayerMovementコンポーネント設定

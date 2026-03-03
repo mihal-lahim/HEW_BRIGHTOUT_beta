@@ -18,8 +18,11 @@ public:
     void Start() override;
     void Update() override;
 
-	// 残り秒数を外部から参照するためのゲッター
+	// 残り秒数を外部から取得するためのゲッター
 	float GetRemainingSeconds() const { return m_totalSeconds; }
+
+	// 残り時間を指定秒数だけ減らす（0未満にはならない）
+	void SubtractSeconds(float seconds) { m_totalSeconds -= seconds; if (m_totalSeconds < 0.0f) m_totalSeconds = 0.0f; }
 
 private:
     // カウントダウン秒数

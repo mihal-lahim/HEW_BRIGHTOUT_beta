@@ -122,6 +122,9 @@ public:
 	// 電線移動SEボリューム
 	float ElectricMoveSEVolume = 0.5f;
 
+	// 電線移動中のHP回復速度（秒間回復量）
+	float ElectricHealPerSecond = 5.0f;
+
 	void Start() override;
 	void Update() override;
 	void HandleFire();
