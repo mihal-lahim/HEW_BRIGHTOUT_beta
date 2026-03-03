@@ -6,6 +6,7 @@
 #include "ColliderShape.h"
 #include "Model.h"
 #include "Bullet.h"
+#include "Billboard.h"
 #include "Title.h"
 #include "GameTime.h"
 #include "SceneSystem.h"
@@ -100,7 +101,7 @@ void Player::HandleFire()
 
 void Player::FireBullet()
 {
-	// ŽËŒ‚SEÄ¶
+	// ”­ŽËSEÄ¶
 	if (m_FireSE >= 0)
 	{
 		PlayAudio(m_FireSE, false);
@@ -119,10 +120,31 @@ void Player::FireBullet()
 	bulletObject->transform().position() = gameObject().transform().position() + forward * 1.0f;
 	bulletObject->transform().rotation() = gameObject().transform().rotation();
 
-	ModelPrefab bulletModel{ "model/cube.glb" };
-	GameObject* bulletVisual = bulletObject->Instantiate(bulletModel);
+	GameObject* bulletVisual = CreateGameObject();
 	bulletObject->SetChild(*bulletVisual);
-	bulletVisual->transform().scale() = Vector3(0.2f, 0.2f, 0.2f);
+	bulletVisual->transform().position() = Vector3(0.0f, 0.0f, 0.0f);
+	bulletVisual->transform().rotation() = Quaternion::Identity();
+	bulletVisual->transform().scale() = Vector3(0.35f, 1.25f, 0.35f);
+
+	auto* bulletRenderer = bulletVisual->AddComponent<MeshRenderer>();
+	bulletRenderer->material.texturePath = L"texture/kaminari_30fps.png";
+	const int sheetColumns = (std::max)(1, BulletTextureSheetColumns);
+	const int sheetRows = (std::max)(1, BulletTextureSheetRows);
+	const int totalFrames = (std::max)(1, sheetColumns * sheetRows);
+	int frame = BulletTextureSheetFrameIndex % totalFrames;
+	if (frame < 0)
+	{
+		frame += totalFrames;
+	}
+	const int column = frame % sheetColumns;
+	const int row = frame / sheetColumns;
+	const float uvW = 1.0f / (float)sheetColumns;
+	const float uvH = 1.0f / (float)sheetRows;
+	const float uvX = uvW * (float)column;
+	const float uvY = uvH * (float)row;
+	bulletRenderer->material.SetFloat4("uv_rect", { uvX, uvY, uvW, uvH });
+	bulletRenderer->material.SetFloat("uv_rotation", BulletTextureUVRotation);
+	bulletVisual->AddComponent<Billboard>();
 
 	auto* bullet = bulletObject->AddComponent<Bullet>();
 	bullet->Direction = forward;

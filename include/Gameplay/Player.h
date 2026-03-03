@@ -118,6 +118,11 @@ public:
 	float IdleAnimationInterval = 0.35f;
 	float FireAnimationInterval = 0.06f;
 	float FireAnimationDuration = 0.12f;
+	// 射撃ビルボードのテクスチャ分割設定
+	int BulletTextureSheetColumns = 7;
+	int BulletTextureSheetRows = 3;
+	int BulletTextureSheetFrameIndex =21;
+	float BulletTextureUVRotation = 0.0f;
 
 	// 電線移動SEボリューム
 	float ElectricMoveSEVolume = 0.5f;
