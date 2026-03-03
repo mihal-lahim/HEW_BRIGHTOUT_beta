@@ -321,6 +321,9 @@
     <ClCompile Include="src\Scenes\LoadingMovieScene.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="src\UI\PowerPlantCountUI.cpp">
+      <Filter>Source Files\Gameplay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Rendering\Animation.h">
@@ -688,6 +691,9 @@
     </ClInclude>
     <ClInclude Include="include\Rendering\VideoPlayerController.h">
       <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UI\PowerPlantCountUI.h">
+      <Filter>Header Files\Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

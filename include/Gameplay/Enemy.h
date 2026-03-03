@@ -1,4 +1,4 @@
-#ifndef ENEMY_H
+﻿#ifndef ENEMY_H
 #define ENEMY_H
 
 #include "Movement.h"

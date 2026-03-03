@@ -1,4 +1,4 @@
-///////////////////////////////////////////
+﻿///////////////////////////////////////////
 //弾管理と自動消滅を制御するBulletクラスの実装
 ///////////////////////////////////////////
 
@@ -64,12 +64,10 @@ void Bullet::Update()
 		auto& hitGameObject = ray.HitObject->gameObject();
 		if (hitGameObject.CompareTag("Enemy") && hitGameObject.IsActiveInHierarchy())
 		{
-
-
-			auto* enemyComponent = enemy->GetComponent<Enemy>();
+			auto* enemyComponent = hitGameObject.GetComponent<Enemy>();
 			if (enemyComponent && enemyComponent->IsDefeated())
 			{
-				continue;
+				return;
 			}
 
 			// ヒットSE再生
@@ -79,9 +77,7 @@ void Bullet::Update()
 				SetAudioVolume(m_HitSE, HitSEVolume);
 			}
 
-			ScoreData::Instance().killedEnemies++;
 			if (enemyComponent)
-
 			{
 				ScoreData::Instance().killedEnemies++;
 				enemyComponent->OnDefeated();
