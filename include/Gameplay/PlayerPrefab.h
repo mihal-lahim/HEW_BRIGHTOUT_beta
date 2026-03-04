@@ -13,6 +13,7 @@
 #include "GameObject.h"
 #include "PlayerAudio.h"
 #include "Billboard.h"
+#include "ResourceSystem.h"
 #include <string>
 #include <vector>
 
@@ -128,8 +129,9 @@ public:
 		gameObject.SetChild(*electricEffectObject);
 		// MeshRenderer に Quad メッシュを直接割り当て
 		auto* renderer = electricEffectObject->AddComponent<MeshRenderer>();
-		renderer->material.texturePath = L"texture/ball.png";
-		renderer->material.texture = nullptr;
+		//renderer->material.texturePath = L"texture/ball.png";
+		//renderer->material.texture = nullptr;
+		renderer->material.texture = gameObject.resource().Load<Texture>(L"texture/ball.png");
 		renderer->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
 		// Billboard コンポーネントが Awake() でシェーダーとメッシュを自動設定
 		electricEffectObject->AddComponent<Billboard>();
