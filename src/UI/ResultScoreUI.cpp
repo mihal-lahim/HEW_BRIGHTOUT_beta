@@ -83,7 +83,7 @@ void ResultScoreUI::CreateNumberRow(const ScoreRowConfig& config, int value)
 
 		renderer->material.vsPath = "UiVS.cso";
 		renderer->material.psPath = "UiPS.cso";
-		renderer->material.texturePath = L"texture/BRIGHTOUT_Number_0-9.png";
+		renderer->material.texturePath = L"texture/Number_ver2.png";
 
 		renderer->material.SetFloat("ScreenWidth", static_cast<float>(device.GetBackBufferWidth()));
 		renderer->material.SetFloat("ScreenHeight", static_cast<float>(device.GetBackBufferHeight()));

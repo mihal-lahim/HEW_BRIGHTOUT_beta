@@ -11,6 +11,7 @@
 #include "Ray.h"
 #include "PhysicsSystem.h"
 #include "PhysicsBody.h"
+#include "Health.h"
 
 #include "audio.h"
 
@@ -19,6 +20,9 @@ namespace
 {
 	void DestroyWithChildren(GameObject& obj)
 	{
+		// 既に破棄済みならスキップ
+		if (!obj.IsActiveSelf()) return;
+
 		for (auto* child : obj.GetChildren())
 		{
 			if (child) DestroyWithChildren(*child);
@@ -61,26 +65,53 @@ void Bullet::Update()
 
 	if (ray.IsHit && ray.HitObject)
 	{
+		// ヒットしたPhysicsBodyのGameObjectが有効か確認
 		auto& hitGameObject = ray.HitObject->gameObject();
 		if (hitGameObject.CompareTag("Enemy") && hitGameObject.IsActiveInHierarchy())
 		{
 			auto* enemyComponent = hitGameObject.GetComponent<Enemy>();
+
+			// 既に倒された敵はスキップして弾の移動を継続する
 			if (enemyComponent && enemyComponent->IsDefeated())
 			{
-				return;
+				// return せず下のposition更新へ進む
 			}
-
-			// ヒットSE再生
-			if (m_HitSE >= 0)
+			else if (enemyComponent)
 			{
-				PlayAudio(m_HitSE, false);
-				SetAudioVolume(m_HitSE, HitSEVolume);
-			}
+				// ヒットSE再生
+				if (m_HitSE >= 0)
+				{
+					PlayAudio(m_HitSE, false);
+					SetAudioVolume(m_HitSE, HitSEVolume);
+				}
 
-			if (enemyComponent)
-			{
 				ScoreData::Instance().killedEnemies++;
 				enemyComponent->OnDefeated();
+
+				// プレイヤーのHPを30回復
+				GameObject* player = GetGameObjectByTag("Player");
+				if (player)
+				{
+					auto* playerHealth = player->GetComponent<Health>();
+					if (playerHealth)
+					{
+						playerHealth->Heal(30.0f);
+					}
+				}
+
+				DestroyWithChildren(gameObject());
+				return;
+			}
+			else
+			{
+				// Enemyコンポーネントがないが"Enemy"タグがついている場合
+				// ヒットSE再生
+				if (m_HitSE >= 0)
+				{
+					PlayAudio(m_HitSE, false);
+					SetAudioVolume(m_HitSE, HitSEVolume);
+				}
+
 				DestroyWithChildren(gameObject());
 				return;
 			}

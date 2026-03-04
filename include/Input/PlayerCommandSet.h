@@ -27,7 +27,7 @@ public:
 		// ADSコマンドを登録
 		RegisterCommand<GamePadButton, playerCommand_ADS>(BUTTON_LB, InputCondition::PERFOMED);
 		// 射撃コマンドを登録
-		RegisterCommand<GamePadButton, PlayerCommand_Fire>(BUTTON_RB, InputCondition::STARTED);
+		RegisterCommand<GamePadButton, PlayerCommand_Fire>(TRIGGER_RIGHT, InputCondition::STARTED);
 
 		// インタラクトコマンドを登録
 		RegisterCommand<GamePadButton, PlayerCommand_Interact>(BUTTON_B, InputCondition::NONE);

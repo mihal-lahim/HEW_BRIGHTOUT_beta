@@ -45,6 +45,9 @@ void Player::Start()
 		SetAudioVolume(m_ElectricMoveSE, ElectricMoveSEVolume);
 	}
 
+	// 落下ペナルティSE読み込み
+	m_FallPenaltySE = LoadAudio("sound/rakka.wav");
+
 	// 初期状態設定
 	stateMachine->ChangeState(&PlayerStates::HumanIdle, *this);
 	ResetWalkAnimation();
@@ -121,6 +124,13 @@ void Player::Update()
 			timers[0]->SubtractSeconds(10.0f);
 		}
 
+		// 落下ペナルティSE再生
+		if (m_FallPenaltySE >= 0)
+		{
+			PlayAudio(m_FallPenaltySE, false);
+			SetAudioVolume(m_FallPenaltySE, 5.0f);
+		}
+
 		return;
 	}
 
@@ -178,7 +188,7 @@ void Player::FireBullet()
 
 	GameObject* bulletObject = CreateGameObject();
 	bulletObject->SetTag("Bullet");
-	bulletObject->transform().position() = gameObject().transform().position() + forward * 1.0f;
+	bulletObject->transform().position() = gameObject().transform().position() + forward * 0.3f;
 	bulletObject->transform().rotation() = gameObject().transform().rotation();
 
 	ModelPrefab bulletModel{ "model/cube.glb" };

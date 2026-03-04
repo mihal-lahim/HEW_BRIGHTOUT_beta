@@ -136,34 +136,36 @@ static constexpr float TRIGGER_DIVIDER = 1.0f / 255.0f;
 
 TriggerState GamePad::GetLeftTrigger() const
 {
-	// 左トリガーの状態
+	// 左トリガーの情報
 	TriggerState state{};
 
 	// 取得して正規化
 	float value = (float)(m_curState.Gamepad.bLeftTrigger) * TRIGGER_DIVIDER;
 
-	// 閾値を超えていれば値をセット、超えていなければ0.0f
-	state.Value = value >= m_triggerThreshold ? value : 0.0f;
+	// 正規化した閾値と比較して値をセット、超えていなければ0.0f
+	float normalizedThreshold = m_triggerThreshold * TRIGGER_DIVIDER;
+	state.Value = value >= normalizedThreshold ? value : 0.0f;
 
 	// 閾値を超えたかどうか
-	state.IsDowned = m_curState.Gamepad.bLeftTrigger > m_triggerThreshold;
+	state.IsDowned = value >= normalizedThreshold;
 
 	return state;
 }
 
 TriggerState GamePad::GetRightTrigger() const
 {
-	// 右トリガーの状態
+	// 右トリガーの情報
 	TriggerState state{};
 
 	// 取得して正規化
 	float value = (float)(m_curState.Gamepad.bRightTrigger) * TRIGGER_DIVIDER;
 
-	// 閾値を超えていれば値をセット、超えていなければ0.0f
-	state.Value = value >= m_triggerThreshold ? value : 0.0f;
+	// 正規化した閾値と比較して値をセット、超えていなければ0.0f
+	float normalizedThreshold = m_triggerThreshold * TRIGGER_DIVIDER;
+	state.Value = value >= normalizedThreshold ? value : 0.0f;
 
 	// 閾値を超えたかどうか
-	state.IsDowned = m_curState.Gamepad.bRightTrigger > m_triggerThreshold;
+	state.IsDowned = value >= normalizedThreshold;
 
 	return state;
 }

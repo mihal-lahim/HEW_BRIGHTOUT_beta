@@ -59,8 +59,8 @@ void Namioka::Initialize()
 
 	// BGM再生（ループ）
 	PlayAudio(g_GameBgm, true);
-	SetAudioVolume(g_GameBgm, 0.2f);
-	SetAudioVolume(g_GameBgm2, 0.5f);
+	SetAudioVolume(g_GameBgm, 0.1f);
+	SetAudioVolume(g_GameBgm2, 0.3f);
 
 	// スカイドーム
 	ModelPrefab skyPrefab{ "model/sky.fbx" };
