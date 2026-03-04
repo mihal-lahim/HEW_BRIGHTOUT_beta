@@ -22,11 +22,11 @@ class ResultScoreUI : public ScriptComponent
 {
 public:
 	// 各項目の位置・スケール設定（
-	ScoreRowConfig configRestoredCount  = { { 1150.0f, 240.0f, 0.0f }, { 90.0f, 180.0f, 1.0f }, 90.0f, 1 };
-	ScoreRowConfig configRestoredScore  = { { 900.0f, 320.0f, 0.0f }, { 80.0f, 160.0f, 1.0f }, 90.0f, 4 };
-	ScoreRowConfig configKilledCount    = { { 950.0f, 430.0f, 0.0f }, { 90.0f, 180.0f, 1.0f }, 90.0f, 3 };
-	ScoreRowConfig configKilledScore    = { { 880.0f, 520.0f, 0.0f }, { 80.0f, 160.0f, 1.0f }, 90.0f, 5 };
-	ScoreRowConfig configTotalScore     = { { 500.0f, 750.0f, 0.0f }, { 150.0f, 300.0f, 1.0f }, 120.0f, 6 };
+	ScoreRowConfig configRestoredCount  = { { 1200.0f, 300.0f, 0.0f }, { 60.0f, 60.0f, 1.0f }, 80.0f, 1 };
+	ScoreRowConfig configRestoredScore  = { { 1000.0f, 370.0f, 0.0f }, { 60.0f, 60.0f, 1.0f }, 80.0f, 4 };
+	ScoreRowConfig configKilledCount    = { { 1100.0f, 500.0f, 0.0f }, { 60.0f, 60.0f, 1.0f }, 90.0f, 3 };
+	ScoreRowConfig configKilledScore    = { { 880.0f, 570.0f, 0.0f }, { 60.0f, 60.0f, 1.0f }, 90.0f, 5 };
+	ScoreRowConfig configTotalScore     = { { 500.0f, 850.0f, 0.0f }, { 120.0f, 120.0f, 1.0f }, 120.0f, 6 };
 
 	void Start() override;
 

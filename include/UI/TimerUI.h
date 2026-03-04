@@ -26,7 +26,7 @@ public:
 
 private:
     // カウントダウン秒数
-    float m_totalSeconds = 120.0f;
+    float m_totalSeconds = 5.0f;
 
     // シーン遷移済みフラグ（二重遷移防止）
     bool m_hasTransitioned = false;

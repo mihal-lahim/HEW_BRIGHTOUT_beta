@@ -123,7 +123,7 @@ public:
 	float ElectricMoveSEVolume = 0.5f;
 
 	// 電線移動中のHP回復速度（秒間回復量）
-	float ElectricHealPerSecond = 5.0f;
+	float ElectricHealPerSecond = 15.0f;
 
 	void Start() override;
 	void Update() override;
@@ -183,6 +183,9 @@ private:
 
 	// 電線移動SE
 	int m_ElectricMoveSE = -1;
+
+	// 落下ペナルティSE
+	int m_FallPenaltySE = -1;
 };
 
 
