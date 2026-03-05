@@ -131,7 +131,7 @@ void Player::FireBullet()
 
 	GameObject* bulletObject = CreateGameObject();
 	bulletObject->SetTag("Bullet");
-	bulletObject->transform().position() = gameObject().transform().position() + forward * 0.3f;
+	bulletObject->transform().position() = gameObject().transform().position() + forward * 0.5f;
 	bulletObject->transform().rotation() = gameObject().transform().rotation();
 
 	// 弾用ビルボード生成（電気エフェクトと同じテクスチャ・アニメーション）

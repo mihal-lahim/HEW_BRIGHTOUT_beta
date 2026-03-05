@@ -33,6 +33,9 @@ private:
 	Vector3 m_StartPos{};
 	int m_HitSE = -1;
 
+	// プレイヤーキャッシュ（毎ヒット時の検索を回避）
+	GameObject* m_cachedPlayer = nullptr;
+
 	// 弾ビルボードアニメーション
 	float m_BulletAnimationTimer = 0.0f;
 	size_t m_BulletAnimationIndex = 0;

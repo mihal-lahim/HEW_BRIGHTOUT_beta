@@ -221,6 +221,12 @@ public:
 			return;
 		}
 
+		// ターゲットが無効（null、破壊済み、非アクティブ）なら再検索
+		if (m_target && (!m_target->IsActiveSelf() || m_target->IsDestroyed()))
+		{
+			m_target = nullptr;
+		}
+
 		if (!m_target)
 		{
 			// ターゲット検索を間引き（0.5秒間隔）

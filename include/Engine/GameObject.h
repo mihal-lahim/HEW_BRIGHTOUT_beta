@@ -131,6 +131,12 @@ public:
 		return m_scene;
 	}
 
+	// GameObjectが破棄済みかどうかを判定するメソッドを追加
+	bool IsDestroyed() const
+	{
+		return m_isDestroyed;
+	}
+
 private:
 	// 現在のゲームコンテキスト
 	GameContext m_gameContext{};

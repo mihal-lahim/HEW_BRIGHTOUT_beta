@@ -40,6 +40,9 @@ void Bullet::Start()
 	m_StartPos = gameObject().transform().position();
 	m_HitSE = LoadAudio("sound/bullet_hit.wav");
 
+	// プレイヤーを事前にキャッシュ
+	m_cachedPlayer = GetGameObjectByTag("Player");
+
 	// 初期フレームのUVを即座に適用（フルテクスチャが一瞬見えるのを防ぐ）
 	m_BulletAnimationTimer = 0.0f;
 	m_BulletAnimationIndex = 0;
@@ -96,11 +99,10 @@ void Bullet::Update()
 				ScoreData::Instance().killedEnemies++;
 				enemyComponent->OnDefeated();
 
-				// プレイヤーのHPを30回復
-				GameObject* player = GetGameObjectByTag("Player");
-				if (player)
+				// プレイヤーのHPを30回復（キャッシュ済みのプレイヤーを使用）
+				if (m_cachedPlayer && m_cachedPlayer->IsActiveSelf())
 				{
-					auto* playerHealth = player->GetComponent<Health>();
+					auto* playerHealth = m_cachedPlayer->GetComponent<Health>();
 					if (playerHealth)
 					{
 						playerHealth->Heal(30.0f);
