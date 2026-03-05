@@ -14,6 +14,9 @@
 #include "Health.h"
 
 #include "audio.h"
+#include "Renderer.h"
+
+#include <algorithm>
 
 
 namespace
@@ -36,6 +39,11 @@ void Bullet::Start()
 {
 	m_StartPos = gameObject().transform().position();
 	m_HitSE = LoadAudio("sound/bullet_hit.wav");
+
+	// 初期フレームのUVを即座に適用（フルテクスチャが一瞬見えるのを防ぐ）
+	m_BulletAnimationTimer = 0.0f;
+	m_BulletAnimationIndex = 0;
+	ApplyBulletFrameUV(0);
 }
 
 void Bullet::Update()
@@ -120,4 +128,43 @@ void Bullet::Update()
 
 	Vector3 nextPos = curPos + dir * (Speed * dt);
 	gameObject().transform().position() = nextPos;
+
+	// 弾ビルボードアニメーション更新
+	AdvanceBulletBillboardAnimation(dt);
+}
+
+void Bullet::AdvanceBulletBillboardAnimation(float deltaTime)
+{
+	if (!billboardObject || bulletAnimationInterval <= 0.0f || bulletSheetFrameCount <= 1)
+		return;
+
+	m_BulletAnimationTimer += deltaTime;
+	if (m_BulletAnimationTimer < bulletAnimationInterval)
+		return;
+
+	m_BulletAnimationTimer -= bulletAnimationInterval;
+	m_BulletAnimationIndex = (m_BulletAnimationIndex + 1) % (size_t)(std::max)(1, bulletSheetFrameCount);
+	ApplyBulletFrameUV(m_BulletAnimationIndex);
+}
+
+void Bullet::ApplyBulletFrameUV(size_t frameIndex)
+{
+	if (!billboardObject || bulletSheetColumns <= 0 || bulletSheetRows <= 0)
+		return;
+
+	const int totalFrames = (std::max)(1, bulletSheetFrameCount);
+	const int frame = (int)(frameIndex % (size_t)totalFrames);
+	const int column = frame % bulletSheetColumns;
+	const int row = frame / bulletSheetColumns;
+
+	const float width = 1.0f / (float)bulletSheetColumns;
+	const float height = 1.0f / (float)bulletSheetRows;
+	const float offsetX = width * (float)column;
+	const float offsetY = height * (float)row;
+
+	auto renderers = billboardObject->GetComponents<MeshRenderer>();
+	for (auto* renderer : renderers)
+	{
+		renderer->material.SetFloat4("uv_rect", { offsetX, offsetY, width, height });
+	}
 }

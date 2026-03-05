@@ -149,6 +149,8 @@ public:
 	void UpdateMoveSpeedBuffText(float deltaTime);
 	void ShowRepairSpeedBuffText();
 	void UpdateRepairSpeedBuffText(float deltaTime);
+	// リスポーン処理
+	void RespawnAtNearestPlant();
 	// 電線移動SE制御
 	void PlayElectricMoveSE();
 	void StopElectricMoveSE();
