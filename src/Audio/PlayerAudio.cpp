@@ -6,7 +6,7 @@ void PlayerAudio::Awake()
 {
     m_FootstepSE = LoadAudio("sound/hito_ge_run_hai_ss01.wav");
 
-    EventSystem::Register("Player_MoveStart", [this]()
+    m_MoveStartHandle = EventSystem::Register("Player_MoveStart", [this]()
         {
             if (!m_IsMoving)
             {
@@ -16,7 +16,7 @@ void PlayerAudio::Awake()
             }
         });
 
-    EventSystem::Register("Player_MoveStop", [this]()
+    m_MoveStopHandle = EventSystem::Register("Player_MoveStop", [this]()
         {
             if (m_IsMoving)
             {
@@ -24,4 +24,13 @@ void PlayerAudio::Awake()
                 m_IsMoving = false;
             }
         });
+}
+
+void PlayerAudio::OnDestroy()
+{
+    // イベント登録を解除してダングリングコールバックを防ぐ
+    EventSystem::Unregister("Player_MoveStart", m_MoveStartHandle);
+    EventSystem::Unregister("Player_MoveStop", m_MoveStopHandle);
+    m_MoveStartHandle = 0;
+    m_MoveStopHandle = 0;
 }

@@ -34,6 +34,7 @@
 #include "SkyDome.h"
 #include "FadeController.h"
 #include "PowerPlantCountUI.h"
+#include "EventSystem.h"
 
 using namespace DirectX;
 
@@ -51,6 +52,7 @@ void Namioka::Initialize()
 	// オーディオ初期化
 	InitAudio();
 	PowerPlant::ResetAudioState();
+	EventSystem::ClearAll();
 
 	g_GameBgm = LoadAudio("sound/GameBGM_01.wav");
 
@@ -59,7 +61,7 @@ void Namioka::Initialize()
 
 	// BGM再生（ループ）
 	PlayAudio(g_GameBgm, true);
-	SetAudioVolume(g_GameBgm, 0.1f);
+	SetAudioVolume(g_GameBgm, 0.3f);
 	SetAudioVolume(g_GameBgm2, 0.3f);
 
 	// スカイドーム

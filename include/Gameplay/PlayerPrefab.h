@@ -192,7 +192,7 @@ public:
 		{
 			const char* text = "repair speed up";
 			const int textLen = 15;
-			const float charScale = 0.28f;
+			const float charScale = 0.8f;
 			const float spacing = 0.30f;
 			const float startX = -((float)(textLen - 1)) * spacing * 0.5f;
 

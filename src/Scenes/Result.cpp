@@ -6,6 +6,7 @@
 #include "UIDrawer.h"
 #include "ResultScoreUI.h"
 #include "FadeController.h"
+#include "EventSystem.h"
 
 #include <optional>
 
@@ -24,6 +25,7 @@ void Result::Initialize()
 
 	// オーディオ初期化
 	InitAudio();
+	EventSystem::ClearAll();
 
 	// 使用する BGM を決定（デフォルトまたは外部で指定されたパス）
 	const char* bgmPath = "sound/Result_01.wav";

@@ -12,6 +12,9 @@
 #include "audio.h"
 #include "PowerPlant.h"
 #include "TimerUI.h"
+#include "Billboard.h"
+#include "Texture.h"
+#include "ResourceSystem.h"
 #include <algorithm>
 #include <cmath>
 
@@ -60,77 +63,17 @@ void Player::Start()
 
 void Player::Update()
 {
+	// 落下リスポーン
 	if (gameObject().transform().position().y < FallReturnY)
 	{
-		// 落下位置を記録
-		Vector3 fallPos = gameObject().transform().position();
+		RespawnAtNearestPlant();
+		return;
+	}
 
-		// シーン内の全PowerPlantを取得し、最も近い発電所を探す
-		auto plants = scene().currentScene().GetComponents<PowerPlant>();
-		Vector3 closestPlantPos = Vector3(0.0f, 0.0f, 10.0f); // デフォルト
-
-		if (!plants.empty())
-		{
-			float minDistSq = FLT_MAX;
-			for (auto* plant : plants)
-			{
-				Vector3 plantPos = plant->gameObject().transform().position();
-				float dx = plantPos.x - fallPos.x;
-				float dz = plantPos.z - fallPos.z;
-				float distSq = dx * dx + dz * dz; // XZ平面での距離（Yは無視）
-				if (distSq < minDistSq)
-				{
-					minDistSq = distSq;
-					closestPlantPos = plantPos;
-				}
-			}
-		}
-
-		// 発電所からオブジェクトに重ならないよう、一定距離離れた位置にリスポーン
-		// 落下地点から発電所へ向かうXZ方向の逆方向（＝落下位置の方向）にオフセット
-		constexpr float RespawnOffsetFromPlant = 8.0f;
-		float dirX = fallPos.x - closestPlantPos.x;
-		float dirZ = fallPos.z - closestPlantPos.z;
-		float dirLen = std::sqrtf(dirX * dirX + dirZ * dirZ);
-
-		Vector3 respawnPos = closestPlantPos;
-		if (dirLen > 0.01f)
-		{
-			// 落下位置方向に発電所からオフセット
-			respawnPos.x += (dirX / dirLen) * RespawnOffsetFromPlant;
-			respawnPos.z += (dirZ / dirLen) * RespawnOffsetFromPlant;
-		}
-		else
-		{
-			// 落下位置と発電所が重なっている場合はZ+方向にオフセット
-			respawnPos.z += RespawnOffsetFromPlant;
-		}
-		respawnPos.y = 5.0f;
-
-		// プレイヤーの位置をリスポーン地点に移動
-		gameObject().transform().position() = respawnPos;
-
-		// 物理ボディの速度をリセットし、位置を同期
-		if (physicsBody && physicsBody->IsEnable())
-		{
-			physicsBody->SetVelocity(Vector3(0.0f, 0.0f, 0.0f));
-			physicsBody->SyncTransformToGameObject();
-		}
-
-		// 制限時間を10秒減らす
-		auto timers = scene().currentScene().GetComponents<TimerUI>();
-		if (!timers.empty() && timers[0])
-		{
-			timers[0]->SubtractSeconds(10.0f);
-		}
-
-		// 落下ペナルティSE再生
-		if (m_FallPenaltySE >= 0)
-		{
-			PlayAudio(m_FallPenaltySE, false);
-			SetAudioVolume(m_FallPenaltySE, 5.0f);
-		}
-
+	// HP0リスポーン
+	if (health && !health->IsAlive())
+	{
+		RespawnAtNearestPlant();
 		return;
 	}
 
@@ -188,18 +131,27 @@ void Player::FireBullet()
 
 	GameObject* bulletObject = CreateGameObject();
 	bulletObject->SetTag("Bullet");
-	bulletObject->transform().position() = gameObject().transform().position() + forward * 0.3f;
+	bulletObject->transform().position() = gameObject().transform().position() + forward * 0.5f;
 	bulletObject->transform().rotation() = gameObject().transform().rotation();
 
-	ModelPrefab bulletModel{ "model/cube.glb" };
-	GameObject* bulletVisual = bulletObject->Instantiate(bulletModel);
-	bulletObject->SetChild(*bulletVisual);
-	bulletVisual->transform().scale() = Vector3(0.2f, 0.2f, 0.2f);
+	// 弾用ビルボード生成（電気エフェクトと同じテクスチャ・アニメーション）
+	GameObject* bulletBillboard = bulletObject->CreateGameObject();
+	bulletObject->SetChild(*bulletBillboard);
+	auto* bbRenderer = bulletBillboard->AddComponent<MeshRenderer>();
+	bbRenderer->material.texture = gameObject().resource().Load<Texture>(L"texture/ball.png");
+	bbRenderer->material.SetColor({ 2.0f, 2.0f, 2.0f, 1.0f });
+	bulletBillboard->AddComponent<Billboard>();
+	bulletBillboard->transform().scale() = Vector3(1.0f, 1.0f, 1.0f);
 
 	auto* bullet = bulletObject->AddComponent<Bullet>();
 	bullet->Direction = forward;
 	bullet->Speed = BulletSpeed;
 	bullet->LifeTime = BulletLifeTime;
+	bullet->billboardObject = bulletBillboard;
+	bullet->bulletSheetColumns = electricSheetColumns;
+	bullet->bulletSheetRows = electricSheetRows;
+	bullet->bulletSheetFrameCount = electricSheetFrameCount;
+	bullet->bulletAnimationInterval = electricAnimationInterval;
 }
 
 void Player::SetHumanVisualActive(bool active)
@@ -546,6 +498,87 @@ void Player::UpdateRepairSpeedBuffText(float deltaTime)
 		if (repairSpeedTextRoot)
 			SetActiveRecursive(repairSpeedTextRoot, false);
 	}
+}
+
+void Player::RespawnAtNearestPlant()
+{
+	Vector3 currentPos = gameObject().transform().position();
+
+	// シーン内の全PowerPlantを取得し、最も近い発電所を探す
+	auto plants = scene().currentScene().GetComponents<PowerPlant>();
+	Vector3 closestPlantPos = Vector3(0.0f, 0.0f, 10.0f); // デフォルト
+
+	if (!plants.empty())
+	{
+		float minDistSq = FLT_MAX;
+		for (auto* plant : plants)
+		{
+			Vector3 plantPos = plant->gameObject().transform().position();
+			float dx = plantPos.x - currentPos.x;
+			float dz = plantPos.z - currentPos.z;
+			float distSq = dx * dx + dz * dz;
+			if (distSq < minDistSq)
+			{
+				minDistSq = distSq;
+				closestPlantPos = plantPos;
+			}
+		}
+	}
+
+	constexpr float RespawnOffsetFromPlant = 8.0f;
+	float dirX = currentPos.x - closestPlantPos.x;
+	float dirZ = currentPos.z - closestPlantPos.z;
+	float dirLen = std::sqrtf(dirX * dirX + dirZ * dirZ);
+
+	Vector3 respawnPos = closestPlantPos;
+	if (dirLen > 0.01f)
+	{
+		respawnPos.x += (dirX / dirLen) * RespawnOffsetFromPlant;
+		respawnPos.z += (dirZ / dirLen) * RespawnOffsetFromPlant;
+	}
+	else
+	{
+		respawnPos.z += RespawnOffsetFromPlant;
+	}
+	respawnPos.y = 5.0f;
+
+	gameObject().transform().position() = respawnPos;
+
+	if (physicsBody && physicsBody->IsEnable())
+	{
+		physicsBody->SetVelocity(Vector3(0.0f, 0.0f, 0.0f));
+		physicsBody->SyncTransformToGameObject();
+	}
+
+	// 制限時間を10秒減らす
+	auto timers = scene().currentScene().GetComponents<TimerUI>();
+	if (!timers.empty() && timers[0])
+	{
+		timers[0]->SubtractSeconds(10.0f);
+	}
+
+	// ペナルティSE再生
+	if (m_FallPenaltySE >= 0)
+	{
+		PlayAudio(m_FallPenaltySE, false);
+		SetAudioVolume(m_FallPenaltySE, 5.0f);
+	}
+
+	// HPを全回復
+	if (health)
+	{
+		health->SetCurrentHealth(health->GetMaxHealth());
+	}
+
+	// 電線移動中だった場合は人間形態に戻す
+	StopElectricMoveSE();
+	SetElectricEffectActive(false);
+	if (physicsBody)
+	{
+		physicsBody->SetEnable(true);
+	}
+	SetHumanVisualActive(true);
+	stateMachine->ChangeState(&PlayerStates::HumanMidAir, *this);
 }
 
 void Player::PlayElectricMoveSE()

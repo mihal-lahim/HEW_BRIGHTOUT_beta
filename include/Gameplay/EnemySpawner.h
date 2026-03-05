@@ -48,17 +48,23 @@ public:
 
 		m_Timer += dt;
 
-		// タグ検索は生成タイミングの時だけ実行する
+		// スポーンタイミングに達した時だけ敵数をカウント（毎フレームの検索を回避）
 		if (m_Timer >= m_CurrentInterval)
 		{
-			m_SpawnCount = static_cast<int>(GetGameObjectsByTag("Enemy").size());
+			// 敵数カウントの間引き（0.5秒に1回だけ更新）
+			m_EnemyCountTimer -= dt;
+			if (m_EnemyCountTimer <= 0.0f)
+			{
+				m_SpawnCount = static_cast<int>(GetGameObjectsByTag("Enemy").size());
+				m_EnemyCountTimer = 0.5f;
+			}
+
 			while (m_Timer >= m_CurrentInterval && m_SpawnCount < MaxEnemies)
 			{
 				m_Timer -= m_CurrentInterval;
 
 				// 最大数に達していなければ生成
 				SpawnEnemy();
-				++m_SpawnCount;
 			}
 		}
 	}
@@ -77,6 +83,7 @@ private:
 	float m_ElapsedTime = 0.0f;
 	float m_CurrentInterval = 5.0f;
 	int m_SpawnCount = 0;
+	float m_EnemyCountTimer = 0.0f;
 
 	void SpawnEnemy()
 	{

@@ -4,12 +4,14 @@
 #include "RenderingSystem.h"
 #include "audio.h"
 #include "UIDrawer.h"
+#include "EventSystem.h"
 
 static int g_TitleBgm{};
 
 void Title::Initialize()
 {
 	g_TitleBgm = LoadAudio("sound/GameTitle_02.wav");
+	EventSystem::ClearAll();
 
 	// デフォルトの背景色に戻す
 	rendering().GetGraphicsDevice().SetClearColor(0.5f, 0.5f, 0.5f);
