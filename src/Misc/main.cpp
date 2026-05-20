@@ -7,6 +7,7 @@
 
 #define WIN32_LEAN_AND_MEAN //古いウィンドウズのファイルを使わないように飛ばすため
 #include<Windows.h>
+#include <stdexcept>
 #include "GraphicsDevice.h"
 #include "Mouse.h"
 #include "Game.h"
@@ -109,12 +110,26 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE /*hPrevInstanc
 			DispatchMessage(&msg);
 		}
 
+		try
+		{
+			engineCore.Update();
+		}
+		catch (const std::exception& e)
+		{
+			OutputDebugStringA("[CRASH] std::exception: ");
+			OutputDebugStringA(e.what());
+			OutputDebugStringA("\n");
+			MessageBoxA(window.GetHWND(), e.what(), "Fatal Error", MB_OK | MB_ICONERROR);
+			PostQuitMessage(1);
+		}
+		catch (...)
+		{
+			OutputDebugStringA("[CRASH] Unknown exception\n");
+			MessageBoxA(window.GetHWND(), "Unknown exception", "Fatal Error", MB_OK | MB_ICONERROR);
+			PostQuitMessage(1);
+		}
 
-		engineCore.Update();
-
-
-
-		} while (msg.message != WM_QUIT);
+	} while (msg.message != WM_QUIT);
 
 	// 終了処理
 	UninitAudio();
