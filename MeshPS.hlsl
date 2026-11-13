@@ -12,6 +12,7 @@ cbuffer PER_FRAME : register(b0)
 cbuffer PER_MATERIAL : register(b3)
 {
     float4 diffuse_color;
+    float4 uv_rect;
 }
 
 struct PS_INPUT
@@ -28,11 +29,22 @@ SamplerState major_sampler;
 
 float4 main(PS_INPUT psin) : SV_TARGET
 {
-    float4 material = major_texture.Sample(major_sampler, psin.uv) * psin.color * diffuse_color;
+    float2 uv = psin.uv * uv_rect.zw + uv_rect.xy;
+    float4 material = major_texture.Sample(major_sampler, uv) * psin.color * diffuse_color;
     float3 ambient = material.rgb * ambient_light_color.rgb;
+    float3 normal = psin.normalW;
+    float normalLen = length(normal);
+    if (normalLen > 0.00001f)
+    {
+        normal /= normalLen;
+    }
+    else
+    {
+        normal = float3(0.0f, 0.0f, -1.0f);
+    }
     
     // -1 ~ 1 -> 0 ~ 2 -> 0 ~ 1
-    float brightness = (dot(-directional_light_vector.xyz, normalize(psin.normalW)) + 1) * 0.5f;
+    float brightness = (dot(-directional_light_vector.xyz, normal) + 1) * 0.5f;
         
     float3 diffuse = material.rgb * directional_light_color.rgb * brightness;
         
